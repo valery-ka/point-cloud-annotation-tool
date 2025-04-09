@@ -103,5 +103,6 @@
         "clear": "Clear",
         
         "loadingConfig": "Loading config",
-        "loadingFrames": "Loading frames"
+        "loadingFrames": "Loading frames",
+        "BSOD": "Something went wrong :С"
 }

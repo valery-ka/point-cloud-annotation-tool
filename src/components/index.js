@@ -9,3 +9,4 @@ export { Sidebar } from "./Editor/Sidebar";
 
 export { LoadingOverlay } from "./UI/LoadingOverlay";
 export { Dialog } from "./UI/Dialog";
+export { default as ErrorBoundary } from "./UI/ErrorBoundary";

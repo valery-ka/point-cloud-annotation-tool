@@ -27,7 +27,7 @@ export const App = () => {
             <FileNavigator />
             <div className="tool-3d-scene">
                 <div className="tool-3d-container">
-                    <ContextMenu /> 
+                    <ContextMenu />
                     <canvas
                         id="canvasSelection"
                         className="tool-3d-canvas-selection"
