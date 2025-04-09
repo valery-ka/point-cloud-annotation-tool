@@ -1,0 +1,52 @@
+.classes-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.classes-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    border: 1px solid var(--border-color);
+    background-color: var(--content-theme-color);
+    border-radius: 5px;
+    padding: 10px;
+    cursor: pointer;
+
+    &.selected {
+        background-color: var(--secondary-theme-color);
+    }
+
+    &.hidden {
+        opacity: 0.35;
+    }
+
+    &:hover {
+        box-shadow: 0 0 3px currentColor inset;
+    }
+
+    &:active {
+        transform: scale(0.975);
+    }
+
+    transition: background-color 0.1s ease, 
+                transform 0.1s ease, 
+                box-shadow 0.1s ease, 
+}
+
+.color-box {
+    width: 30px;
+    height: 30px;
+    border-radius: 4px;
+}
+
+.classes-label-container {
+    flex-grow: 1;
+}
+
+.classes-label {
+    user-select: none;
+    opacity: 0.8;
+}

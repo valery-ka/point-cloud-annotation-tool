@@ -1,0 +1,113 @@
+@import './editor-top-left-controls.scss';
+@import './editor-side-left-controls.scss';
+@import './editor-top-right-controls.scss';
+
+.tool-3d-controls-group {
+    display: flex;
+    gap: 0;
+}
+
+.tool-3d-controls-group--vertical {
+    display: flex;
+    flex-direction: column;
+}
+
+.tool-3d-controls-group--horizontal {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+}
+
+.tool-3d-control-button {
+    width: $button-size;
+    height: $button-size;
+    background-color: var(--button-bg-color);
+    color: var(--button-text-color);
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.1s;
+    position: relative;
+    z-index: 2;
+    pointer-events: auto;
+
+    &:hover {
+        color: var(--button-hover-text-color);
+        background-color: var(--button-hover-bg-color);
+    }
+
+    &:active {
+        background-color: var(--button-active-bg-color);
+        transform: scale(0.95);
+    }
+
+    &.disabled {
+        background-color: var(--button-disabled-bg-color);
+        color: var(--button-disabled-text-color);
+    }
+
+    &.pushed {
+        background-color: var(--button-text-color);
+        color: var(--button-bg-color);
+        .icon {
+            filter: drop-shadow(0 0 5px color-mix(in srgb,  var(--button-bg-color) 50%, transparent));
+        }
+    }
+
+    &.selected::after {
+        content: "";
+        position: absolute;
+        top: 7.5%;
+        left: 7.5%;
+        width: 85%;
+        height: 85%;
+        background-color: var(--button-active-bg-color);
+        border-radius: inherit;
+    }
+
+    &.single {
+        border-radius: $border-radius;
+    }
+
+    &.top-left {
+        border-radius: $border-radius-top-left;
+    }
+
+    &.top-right {
+        border-radius: $border-radius-top-right;
+    }
+
+    &.bottom-left {
+        border-radius: $border-radius-bottom-left;
+    }
+
+    &.bottom-right {
+        border-radius: $border-radius-bottom-right;
+    }
+
+    &.top {
+        border-radius: $border-radius-top;
+    }
+
+    &.left {
+        border-radius: $border-radius-left;
+    }
+
+    &.middle {
+        border-radius: $border-radius-none;
+    }
+
+    &.right {
+        border-radius: $border-radius-right;
+    }
+
+    &.bottom {
+        border-radius: $border-radius-bottom;
+    }
+}
+
+.icon {
+    font-size: $icon-size;
+    position: relative;
+    z-index: 1;
+    filter: drop-shadow(0 0 5px color-mix(in srgb,  var(--button-text-color) 50%, transparent));
+}

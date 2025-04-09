@@ -1,0 +1,59 @@
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 1000;
+}
+
+.loading-overlay__progress-bar {
+    width: 600px;
+    height: 20px;
+    border: 1px solid #3e3b4d;
+    border-radius: 0;
+    overflow: hidden;
+    margin-top: 10px;
+    position: relative;
+}
+
+.loading-overlay__progress-bar-fill {
+    height: 100%;
+    background: #008cffc4;
+    position: relative;
+    overflow: hidden;
+}
+
+.loading-dots {
+    display: inline-block;
+    position: relative;
+}
+
+.loading-dots span {
+    opacity: 0;
+    animation: blink 1.4s infinite;
+}
+
+.loading-dots span:nth-child(1) {
+    animation-delay: 0s;
+}
+
+.loading-dots span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.loading-dots span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+.loading-overlay h3,
+.loading-overlay p {
+    user-select: none;
+    cursor: default;
+}

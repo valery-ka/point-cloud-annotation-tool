@@ -1,0 +1,29 @@
+.glitch {
+    color: #fff;
+    position: relative;
+    width: auto;
+}
+
+.glitch:before,
+.glitch:after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    color: #fff;
+    background: #18121A;
+    overflow: hidden;
+}
+
+.glitch:before {
+    width: 100%;
+    left: -5px;
+    text-shadow: 2px 0 #00f;
+    animation: noise-anim-2 3s infinite linear alternate-reverse
+}
+
+.glitch:after {
+    width: 100%;
+    left: 2px;
+    text-shadow: -2px 0 red;
+    animation: noise-anim 2s infinite linear alternate-reverse;
+}

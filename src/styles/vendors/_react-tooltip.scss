@@ -1,0 +1,30 @@
+.react-tooltip {
+    font-family: Arial, sans-serif;
+    font-weight: normal;
+
+    max-width: 600px;
+    padding-block: 10px !important;
+    border-radius: $tooltip-border-radius !important; 
+    
+    background-color: var(--tooltip-color) !important;
+    color: var(--text-color) !important;
+
+    z-index: 1000;
+    user-select: none;
+}
+
+.react-tooltip .react-tooltip-arrow {
+    color: var(--tooltip-color)  !important;
+}
+
+.tooltip-hotkey {
+    display: inline-block;
+    padding: 2px 5px;
+    text-align: center;
+    border: 1px solid var(--text-color);
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: normal;
+    min-width: 12px;
+    text-transform: capitalize;
+  }

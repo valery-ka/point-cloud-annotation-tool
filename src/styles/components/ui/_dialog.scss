@@ -1,0 +1,93 @@
+.dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.dialog-content {
+  background: var(--primary-theme-color);
+  border-radius: 8px;
+  padding: 8px 30px 0px 30px;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+
+  &.size-small {
+    width: 600px;
+    height: 400px;
+  }
+
+  &.size-medium {
+    width: 1000px;
+    height: 800px;
+  }
+
+  &.size-large {
+    width: 60vw;
+    height: 75vh;
+    min-width: 600px;
+    min-height: 400px;
+  }
+}
+
+.dialog-header {
+  display: flex;
+  justify-content: left;
+  align-items: center;
+  margin: 15px 10px 5px 10px;
+}
+
+.dialog-title {
+  font-size: 20px;
+  font-weight: bold;
+  font-family: "Montserrat", ui-sans-serif, system-ui, sans-serif;
+  color: var(--text-color);
+}
+
+.dialog-body {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.dialog-bottom {
+  display: flex;
+  justify-content: right;
+  align-items: center;
+  margin: 10px 0px;
+}
+
+.dialog-buttons-group {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+.dialog-button {
+  min-width: 100px;
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  font-family: "Montserrat", ui-sans-serif, system-ui, sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  background-color: var(--primary-theme-color);
+  color: var(--text-color);
+  cursor: pointer;
+
+  &:hover {
+    background-color: var(--secondary-theme-color);
+  }
+
+  &:active {
+    transform: scale(0.98);
+    background-color: var(--button-active-bg-color);
+  }
+}

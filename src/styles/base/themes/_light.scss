@@ -1,0 +1,39 @@
+[theme="light"] {
+    --primary-theme-color: #d6d6d9;
+    --secondary-theme-color: #adadb2;
+    --content-theme-color: #c7c7cc;
+    --subcontent-theme-color: #bbbbc0;
+    --background-color: #ccc;
+    --text-color: #444449;
+    --border-color: #bbbbbe;
+
+    // editor buttons styles
+    --button-bg-color: var(--primary-theme-color);
+    --button-disabled-bg-color: #bbb;
+    --button-active-bg-color: #aaa;
+    --button-text-color: var(--text-color);
+    --button-disabled-text-color: #888;
+    --button-hover-bg-color: var(--secondary-theme-color);
+    --button-hover-text-color: #444;
+
+    // vendors
+    --tooltip-color: #bbb;
+
+    --slider-rail-color: #e0e0e0;
+    --slider-track-color: #999;
+    --slider-handle-bg-color: #fff;
+    --slider-handle-border-color: #999;
+    --slider-handle-hover-border-color: #999;
+    --slider-handle-focus-border-color: #666;
+    --slider-handle-focus-shadow-color: rgba(0, 0, 0, 0.1);
+    --slider-dot-active-color: #666;
+    --slider-mark-text-color: #333;
+    --slider-mark-text-active-color: #888;
+
+    // radio-button
+    --radio-options-bg-color: #e6e6e6;
+    --radio-button-border-color: #9e9e9e;
+    --radio-button-input-checked-bg-color: #fff;
+    --radio-button-input-checked-text-color: #000;
+    --radio-button-span-text-color: #5c5c5c;
+}

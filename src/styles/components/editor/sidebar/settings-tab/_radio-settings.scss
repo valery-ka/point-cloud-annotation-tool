@@ -1,0 +1,37 @@
+.radio-group {
+    margin-bottom: 15px;
+
+    .radio-options {
+        display: inline-flex;
+        border: 1px dotted var(--radio-button-border-color);
+        border-radius: 5px;
+        background-color: var(--radio-options-bg-color);
+        overflow: hidden;
+    }
+
+    .radio-button {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 4px 5px;
+        cursor: pointer;
+        font-size: 14px;
+        position: relative;
+
+        input {
+            display: none;
+        }
+
+        span {
+            display: block;
+            text-align: center;
+            color: var(--radio-button-span-text-color);
+            padding: 3px 15px;
+        }
+
+        input:checked+span {
+            background-color: var(--radio-button-input-checked-bg-color);
+            color: var(--radio-button-input-checked-text-color);
+        }
+    }
+}

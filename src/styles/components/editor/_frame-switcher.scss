@@ -1,0 +1,132 @@
+.frame-switcher {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-sizing: content-box;
+    overflow: hidden;
+
+    height: 50px;
+    width: 100%;
+
+    border-top: 1px solid var(--border-color);
+    background: var(--primary-theme-color);
+    color: white;
+
+    .frame-switcher-content {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        flex: 1;
+        user-select: none;
+        width: 100%;
+    }
+
+    .frame-switcher-head {
+        display: flex;
+        flex-direction: column;
+    }
+}
+
+.frame-switcher-controls {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    flex: 1;
+    user-select: none;
+    height: 25px;
+    max-width: 200px;
+
+    .frame-switcher-controls-group {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    .frame-switcher-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-color);
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        transition: transform 0.1s ease, color 0.1s ease;
+
+        &:hover {
+            transform: scale(1.1);
+            transform-origin: center;
+        }
+
+        &.active {
+            color: #b13939 !important;
+            filter: drop-shadow(0 0 5px color-mix(in srgb, #b13939 40%, transparent));
+        }
+
+        svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        // .icon {
+        //     filter: none;
+        // }
+    }
+}
+
+.frame-switcher-lane-timeline {
+    display: flex;
+    flex-direction: row;
+    user-select: none;
+    padding: 13px 25px 0 25px;
+    gap: 25px;
+
+    .frame-switcher-lane-frames {
+        display: flex;
+        flex-direction: row;
+        flex: 1;
+        user-select: none;
+        border: 1px solid var(--text-color);
+        border-radius: 4px;
+        cursor: grab;
+    }
+    
+    .frame-switcher-frame-container {
+        display: flex;
+        flex-direction: row;
+        flex: 1;
+        position: relative;
+        user-select: none;
+    
+        &.selected {
+            background-color: var(--secondary-theme-color);
+        }
+    }
+    
+    .frame-switcher-frame {
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        right: 0;
+    
+        height: 5px;
+        border-left: 1px solid var(--text-color);
+    
+        &.first {
+            height: 0px;
+            border-left: none;
+        }
+    
+        &.mod-five {
+            height: 10px;
+            border-left: 1px solid var(--text-color);
+        }
+    }
+    
+    .frame-switcher-frame-text {
+        position: absolute;
+        left: 4px;
+        z-index: 1;
+    }
+}

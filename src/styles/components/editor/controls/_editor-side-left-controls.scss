@@ -1,0 +1,9 @@
+.controls-side-left {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  top: 60px;
+  left: 10px;
+  gap: 5px;
+  pointer-events: none;
+}

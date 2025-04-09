@@ -1,0 +1,57 @@
+.file-navigator {
+    display: flex;
+    align-items: center;
+    padding: 8px 0px;   
+    background: var(--primary-theme-color);
+    color: white;
+    width: 100%;
+    height: 40px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+    border-bottom: 1px solid var(--border-color);
+    justify-content: space-between;
+}
+
+.file-navigator-content {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
+
+
+.file-navigator select {
+    padding: 5px;
+    width: 200px;
+    font-size: 14px;
+    border-radius: 5px;
+    border: none;
+}
+
+.file-navigator-selectors {
+    display: flex;
+    flex-direction: row;
+    justify-content: left;
+    gap: 10px;
+    width: 100%;
+    margin-left: 10px;
+}
+
+.file-navigator-save-state {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+    width: auto;
+    margin-right: 10px;
+}
+
+.file-navigator-save-icon {
+    color: var(--text-color);
+    font-size: 20px;
+    margin-left: 10px;
+    filter: drop-shadow(0 0 5px color-mix(in srgb,  var(--button-text-color) 50%, transparent));
+
+    &.saving {
+        color: #b13939;
+        filter: drop-shadow(0 0 5px color-mix(in srgb, #b13939 40%, transparent));
+    }
+}

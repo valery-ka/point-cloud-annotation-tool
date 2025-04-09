@@ -1,0 +1,22 @@
+.slider-container {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+}
+
+.slider-wrapper {
+    display: flex;
+    padding: 5px 15px;
+    border-radius: 5px;
+    border: 1px dotted var(--text-color);
+    align-items: center;
+    gap: 10px;
+}
+
+.slider-value {
+    font-size: 16px;
+    font-weight: bold;
+    color: var(--text-color);
+    min-width: 35px;
+    text-align: right;
+}

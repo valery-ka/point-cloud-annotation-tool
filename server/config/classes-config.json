@@ -1,0 +1,62 @@
+[
+    {
+        "label": "VOID",
+        "color": "#BBBBBB",
+        "hidden": true
+    },
+    {
+        "label": "Road",
+        "color": "#A52A2A",
+        "hidden": false
+    },
+    {
+        "label": "Person",
+        "color": "#F5F5F5",
+        "hidden": true
+    },
+    {
+        "label": "Cyclist",
+        "color": "#F5F5F5",
+        "hidden": true
+    },
+    {
+        "label": "Vehicle",
+        "color": "#F5F5F5",
+        "hidden": true
+    },
+    {
+        "label": "Motorcycle",
+        "color": "#F5F5F5",
+        "hidden": true
+    },
+    {
+        "label": "Animal",
+        "color": "#F5F5F5",
+        "hidden": true
+    },
+    {
+        "label": "Snow",
+        "color": "#FF7FFF",
+        "hidden": false
+    },
+    {
+        "label": "Problem",
+        "color": "#00FFFF",
+        "hidden": false
+    },
+    {
+        "label": "Leaves",
+        "color": "#FFD966",
+        "hidden": true
+    },
+    {
+        "label": "Phantom",
+        "color": "#6D6DFF",
+        "hidden": false
+    },
+    {
+        "label": "Fog",
+        "color": "#00D860",
+        "hidden": true
+    }
+]

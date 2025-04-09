@@ -1,0 +1,28 @@
+.spoiler {
+    margin-bottom: 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    overflow: hidden;
+
+    .spoiler-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        background: var(--content-theme-color);
+        cursor: pointer;
+        user-select: none;
+
+        .spoiler-arrow {
+            transition: transform 0.2s;
+            font-size: 14px;
+            color: var(--text-color);
+        }
+    }
+
+    .spoiler-content {
+        padding: 10px;
+        background: var(--subcontent-theme-color);
+        border-top: 1px solid var(--border-color);
+    }
+}

@@ -1,0 +1,41 @@
+.controls-top-left {
+  position: absolute;
+  display: flex;
+  top: 10px;
+  left: 10px;
+  gap: 5px;
+  pointer-events: none;
+}
+
+.pop-up-slider {
+  position: absolute;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  left: 45px;
+  bottom: -49px;
+  width: 600px;
+  height: 38px;
+
+  background: var(--button-bg-color);
+  color: var(--button-text-color);
+  border-radius: $border-radius;
+
+  pointer-events: auto;
+  z-index: 10;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.horizontal-slider-range {
+  display: inline-flex;
+  align-items: center;
+  width: 100%;
+
+  &.min-max-value {
+    flex: 0 100px;
+    display: flex;
+    justify-content: center;
+    user-select: none;
+  }
+}

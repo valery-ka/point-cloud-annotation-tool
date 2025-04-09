@@ -1,0 +1,1 @@
+export { PointShader } from './PointShader';
