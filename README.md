@@ -28,7 +28,7 @@ SERVER_PORT=3001
 DATA_PATH=/path/to/your/local/data
 ```
 
-Replace /path/to/your/local/data with the actual path to the data on your machine.
+Replace `/path/to/your/local/data` with the actual path to the data on your machine.
 
 3. Build and run the project using Docker Compose:
 
