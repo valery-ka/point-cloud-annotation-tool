@@ -1,19 +1,9 @@
 import { useEffect, useRef, useCallback } from "react";
 
-import {
-    usePCDManager,
-    useSettings,
-    useEditor,
-    useFrames,
-    useConfig,
-} from "@contexts";
+import { usePCDManager, useSettings, useEditor, useFrames, useConfig } from "@contexts";
 import { useSubscribeFunction } from "@hooks";
 
-import {
-    hexToRgb,
-    changeClassOfSelection,
-    updatePointCloudColors,
-} from "@utils/editor";
+import { hexToRgb, changeClassOfSelection, updatePointCloudColors } from "@utils/editor";
 
 export const usePaintFramePoints = (updateGlobalBox) => {
     const classColorsCache = useRef({});
@@ -38,8 +28,7 @@ export const usePaintFramePoints = (updateGlobalBox) => {
     useEffect(() => {
         if (selectedClassIndex == null) return;
 
-        const originalIndex =
-            nonHiddenClasses[selectedClassIndex].originalIndex;
+        const originalIndex = nonHiddenClasses[selectedClassIndex].originalIndex;
         selectedClassColor.current = classColorsCache.current[originalIndex];
     }, [selectedClassIndex]);
 
@@ -62,19 +51,14 @@ export const usePaintFramePoints = (updateGlobalBox) => {
             const activeFrameFilePath = pcdFiles[activeFrameIndex];
             const activeFrameRef = pointCloudRefs.current[activeFrameFilePath];
 
-            const activeFrameColors =
-                activeFrameRef?.geometry?.attributes?.color?.array;
+            const activeFrameColors = activeFrameRef?.geometry?.attributes?.color?.array;
 
             if (!activeFrameColors || !selectedClassColor.current) return;
 
-            const activeFrameLabels =
-                pointLabelsRef.current[activeFrameFilePath];
-            const originalClassIndex =
-                nonHiddenClasses[selectedClassIndex].originalIndex;
-            const classVisible =
-                classesVisibilityRef.current[originalClassIndex].visible;
-            const activeFrameIntensity =
-                activeFrameRef?.geometry?.attributes?.intensity?.array;
+            const activeFrameLabels = pointLabelsRef.current[activeFrameFilePath];
+            const originalClassIndex = nonHiddenClasses[selectedClassIndex].originalIndex;
+            const classVisible = classesVisibilityRef.current[originalClassIndex].visible;
+            const activeFrameIntensity = activeFrameRef?.geometry?.attributes?.intensity?.array;
 
             changeClassOfSelection({
                 mode,
@@ -99,7 +83,7 @@ export const usePaintFramePoints = (updateGlobalBox) => {
                 updateBox: updateGlobalBox,
             });
         },
-        [pcdFiles, activeFrameIndex, selectedClassIndex]
+        [pcdFiles, activeFrameIndex, selectedClassIndex],
     );
 
     const handlePointCloudColors = useCallback(
@@ -111,11 +95,9 @@ export const usePaintFramePoints = (updateGlobalBox) => {
 
             const activeFrameFilePath = pcdFiles[activeFrameIndex];
             const activeFrameRef = pointCloudRefs.current[activeFrameFilePath];
-            const activeFrameLabels =
-                pointLabelsRef.current[activeFrameFilePath];
+            const activeFrameLabels = pointLabelsRef.current[activeFrameFilePath];
 
-            const activeFrameIntensity =
-                activeFrameRef?.geometry?.attributes?.intensity?.array;
+            const activeFrameIntensity = activeFrameRef?.geometry?.attributes?.intensity?.array;
 
             if (activeFrameRef?.geometry?.attributes?.color) {
                 updatePointCloudColors(
@@ -123,11 +105,11 @@ export const usePaintFramePoints = (updateGlobalBox) => {
                     activeFrameRef,
                     classColorsCache,
                     activeFrameIntensity,
-                    pointColorRef.current
+                    pointColorRef.current,
                 );
             }
         },
-        [pcdFiles, activeFrameIndex, pointCloudRefs]
+        [pcdFiles, activeFrameIndex, pointCloudRefs],
     );
 
     useSubscribeFunction("pointColor", handlePointCloudColors, [

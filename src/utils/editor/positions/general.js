@@ -14,13 +14,7 @@ export const getPositionArray = (pointCloudRefs, filePath) => {
     return null;
 };
 
-export const hidePoint = (
-    geometry,
-    positions,
-    i,
-    hiddenPosition,
-    ignoreSkip = false
-) => {
+export const hidePoint = (geometry, positions, i, hiddenPosition, ignoreSkip = false) => {
     if (positions[i] >= HIDDEN_POINT && !ignoreSkip) return;
     for (let j = 0; j < 3; j++) {
         positions[i + j] = hiddenPosition;

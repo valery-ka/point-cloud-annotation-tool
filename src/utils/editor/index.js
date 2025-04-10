@@ -32,16 +32,8 @@ export {
     updateHighlightedPointSize,
 } from "./sizes/general";
 
-export {
-    rebuildGeometry,
-    drawGlobalBox,
-    drawCircleRuler,
-} from "./geometry/general";
+export { rebuildGeometry, drawGlobalBox, drawCircleRuler } from "./geometry/general";
 
-export {
-    LempelZivWelch,
-    arraysAreEqual,
-    formatPointLabels,
-} from "./output/LempelZivWelch";
+export { LempelZivWelch, arraysAreEqual, formatPointLabels } from "./output/LempelZivWelch";
 export { saveLabels } from "./output/saveLabels";
 export { loadLabels } from "./output/loadLabels";

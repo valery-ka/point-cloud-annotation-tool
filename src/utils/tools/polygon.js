@@ -24,8 +24,7 @@ export function pointInPolyRaycast(point, polygon) {
         var xj = polygon[j][0],
             yj = polygon[j][1];
 
-        var intersect =
-            yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi;
+        var intersect = yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi;
         if (intersect) inside = !inside;
     }
     return inside;

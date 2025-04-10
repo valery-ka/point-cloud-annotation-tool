@@ -6,7 +6,7 @@ export const useGlobalEventListeners = () => {
     }, []);
 
     const handleKeyDown = useCallback((event) => {
-        if (event.key == "Tab" || event.key == "Alt") {
+        if (event.key === "Tab" || event.key === "Alt") {
             event.preventDefault();
         }
     }, []);

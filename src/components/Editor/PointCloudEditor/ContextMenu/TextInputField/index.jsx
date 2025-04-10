@@ -2,11 +2,7 @@ import { useCallback, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useForm } from "react-hook-form";
 
-export const TextInputField = ({
-    resetContextMenu,
-    setIsTextInputOpened,
-    addIssue,
-}) => {
+export const TextInputField = ({ resetContextMenu, setIsTextInputOpened, addIssue }) => {
     const { t } = useTranslation();
     const { register, handleSubmit } = useForm();
 

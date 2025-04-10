@@ -31,4 +31,3 @@ export const saveLabels = (folderName, labelsData, worker) => {
         worker.postMessage({ labelsData });
     });
 };
-

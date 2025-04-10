@@ -22,20 +22,14 @@ export const useEditorTheme = () => {
     const { settings } = useSettings();
 
     useEffect(() => {
-        scene.background = new Color(
-            THEME_COLORS[settings.general.theme].background
-        );
+        scene.background = new Color(THEME_COLORS[settings.general.theme].background);
 
-        const pointsObjects = scene.children.filter(
-            (child) => child instanceof Points
-        );
+        const pointsObjects = scene.children.filter((child) => child instanceof Points);
 
         if (pointsObjects) {
-            const shadowColor =
-                pointsObjects[0]?.material.uniforms.uShadowColor;
+            const shadowColor = pointsObjects[0]?.material.uniforms.uShadowColor;
 
-            const newShadowColor =
-                THEME_COLORS[settings.general.theme].shadowColor;
+            const newShadowColor = THEME_COLORS[settings.general.theme].shadowColor;
 
             shadowColor?.value.copy(newShadowColor);
         }

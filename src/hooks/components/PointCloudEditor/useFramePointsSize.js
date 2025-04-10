@@ -38,8 +38,7 @@ export const useFramePointsSize = () => {
 
             const activeFrameFilePath = pcdFiles[activeFrameIndex];
             const activeFrameRef = pointCloudRefs.current[activeFrameFilePath];
-            const activeFrameLabels =
-                pointLabelsRef.current[activeFrameFilePath];
+            const activeFrameLabels = pointLabelsRef.current[activeFrameFilePath];
 
             if (activeFrameRef?.geometry?.attributes?.size) {
                 if (points) {
@@ -48,14 +47,14 @@ export const useFramePointsSize = () => {
                         activeFrameLabels,
                         pointSizeRef.current,
                         selectedClassRef.current,
-                        points
+                        points,
                     );
                 } else {
                     updatePointsSize(
                         activeFrameRef,
                         activeFrameLabels,
                         pointSizeRef.current,
-                        selectedClassRef.current
+                        selectedClassRef.current,
                     );
                 }
 
@@ -65,26 +64,22 @@ export const useFramePointsSize = () => {
                     pointSizeRef.current,
                     highlightedIndex.current,
                     prevIndex.current,
-                    selectedClassRef.current
+                    selectedClassRef.current,
                 );
             }
         },
-        [pcdFiles, activeFrameIndex]
+        [pcdFiles, activeFrameIndex],
     );
 
     const handleSelectedPointsSize = useCallback(
         (points) => handlePointsSize(null, points),
-        [handlePointsSize]
+        [handlePointsSize],
     );
 
-    useSubscribeFunction("pointSize", handlePointsSize, [
-        activeFrameIndex,
-        pcdFiles,
-    ]);
+    useSubscribeFunction("pointSize", handlePointsSize, [activeFrameIndex, pcdFiles]);
 
     useEffect(() => {
-        const selectedClass =
-            nonHiddenClasses[selectedClassIndex]?.originalIndex;
+        const selectedClass = nonHiddenClasses[selectedClassIndex]?.originalIndex;
         selectedClassRef.current = selectedClass;
         handlePointsSize(null, null);
     }, [nonHiddenClasses, selectedClassIndex]);
@@ -103,7 +98,7 @@ export const useFramePointsSize = () => {
                 pointSizeRef.current,
                 highlightedIndex.current,
                 prevIndex.current,
-                selectedClassRef.current
+                selectedClassRef.current,
             );
 
             prevIndex.current = highlightedPoint?.index;
@@ -115,7 +110,7 @@ export const useFramePointsSize = () => {
 
         pointSizeRef.current = Object.keys(sizes).reduce((acc, key) => {
             const classData = nonHiddenClasses.find((cls) =>
-                key.toLowerCase().includes(cls.label.toLowerCase())
+                key.toLowerCase().includes(cls.label.toLowerCase()),
             );
 
             acc[key] = {

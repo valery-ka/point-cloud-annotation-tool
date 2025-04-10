@@ -20,14 +20,10 @@ export default class BrushTool extends SelectorTools {
 
         this.polygon.length = 0;
 
-        for (
-            let angle = 0;
-            angle < PI_doubled;
-            angle += PI_doubled / precision
-        ) {
+        for (let angle = 0; angle < PI_doubled; angle += PI_doubled / precision) {
             this.pushPoint(
                 centerX + this.radius * Math.cos(angle),
-                centerY - this.radius * Math.sin(angle)
+                centerY - this.radius * Math.sin(angle),
             );
         }
         this.canvasSelectionIsDirty = true;

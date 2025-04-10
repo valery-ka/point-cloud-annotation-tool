@@ -8,16 +8,12 @@ export const EditorProvider = ({ children }) => {
     const [pendingSaveState, setPendingSaveState] = useState(false);
     const [selectedClassIndex, setSelectedClassIndex] = useState(null);
     const [pixelProjections, setPixelProjections] = useState(
-        new Float32Array() // [idx0, pixelX0, pixelY0, idx1, pixelX1, pixelY1, ...]
+        new Float32Array(), // [idx0, pixelX0, pixelY0, idx1, pixelX1, pixelY1, ...]
     );
 
     const classesVisibilityRef = useRef({});
-    const minMaxZRef = useRef([
-        Number.NEGATIVE_INFINITY,
-        Number.POSITIVE_INFINITY,
-    ]);
-    const [hasFilterSelectionPoint, setHasFilterSelectionPoint] =
-        useState(false);
+    const minMaxZRef = useRef([Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY]);
+    const [hasFilterSelectionPoint, setHasFilterSelectionPoint] = useState(false);
 
     const originalPositionsRef = useRef({});
     const activeFramePositionsRef = useRef([]);

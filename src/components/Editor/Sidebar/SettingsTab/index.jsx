@@ -21,10 +21,7 @@ export const SettingsTab = memo(({ title }) => {
                 <h2 className="tab-header">{title}</h2>
             </div>
             <div className="sidebar-content">
-                <Spoiler
-                    title={t(`${COMPONENT_NAME}general`)}
-                    defaultIsOpen={true}
-                >
+                <Spoiler title={t(`${COMPONENT_NAME}general`)} defaultIsOpen={true}>
                     <RadioButtonGroup
                         title="Language / Язык"
                         settingType={"general"}
@@ -36,17 +33,11 @@ export const SettingsTab = memo(({ title }) => {
                         title={t(`${COMPONENT_NAME}theme`)}
                         settingType={"general"}
                         options={["light", "dark"]}
-                        alias={[
-                            t(`${COMPONENT_NAME}light`),
-                            t(`${COMPONENT_NAME}dark`),
-                        ]}
+                        alias={[t(`${COMPONENT_NAME}light`), t(`${COMPONENT_NAME}dark`)]}
                         name="theme"
                     />
                 </Spoiler>
-                <Spoiler
-                    title={t(`${COMPONENT_NAME}navigation`)}
-                    defaultIsOpen={false}
-                >
+                <Spoiler title={t(`${COMPONENT_NAME}navigation`)} defaultIsOpen={false}>
                     <SettingsSlider
                         title={t(`${COMPONENT_NAME}zoomSpeed`)}
                         action={"navigationChange"}
@@ -70,10 +61,7 @@ export const SettingsTab = memo(({ title }) => {
                         decimals={1}
                     />
                 </Spoiler>
-                <Spoiler
-                    title={t(`${COMPONENT_NAME}pointSize`)}
-                    defaultIsOpen={false}
-                >
+                <Spoiler title={t(`${COMPONENT_NAME}pointSize`)} defaultIsOpen={false}>
                     <SettingsSlider
                         title={t(`${COMPONENT_NAME}generalPointSize`)}
                         action={"pointSize"}
@@ -111,15 +99,12 @@ export const SettingsTab = memo(({ title }) => {
                         return (
                             <SettingsSlider
                                 key={cls.label}
-                                title={`${cls.label} ${t(
-                                    `${COMPONENT_NAME}sizeIncrement`
-                                )}`}
+                                title={`${cls.label} ${t(`${COMPONENT_NAME}sizeIncrement`)}`}
                                 action={"pointSize"}
                                 setting={"editorSettings"}
                                 settingType={"sizes"}
                                 settingKey={`${
-                                    cls.label[0].toLowerCase() +
-                                    cls.label.slice(1)
+                                    cls.label[0].toLowerCase() + cls.label.slice(1)
                                 }PointSize`}
                                 min={0}
                                 max={5}
@@ -129,10 +114,7 @@ export const SettingsTab = memo(({ title }) => {
                         );
                     })}
                 </Spoiler>
-                <Spoiler
-                    title={t(`${COMPONENT_NAME}pointColor`)}
-                    defaultIsOpen={false}
-                >
+                <Spoiler title={t(`${COMPONENT_NAME}pointColor`)} defaultIsOpen={false}>
                     <SettingsSlider
                         title={t(`${COMPONENT_NAME}pointBrightness`)}
                         action={"pointColor"}
@@ -156,10 +138,7 @@ export const SettingsTab = memo(({ title }) => {
                         decimals={2}
                     />
                 </Spoiler>
-                <Spoiler
-                    title={t(`${COMPONENT_NAME}editorSettings`)}
-                    defaultIsOpen={false}
-                >
+                <Spoiler title={t(`${COMPONENT_NAME}editorSettings`)} defaultIsOpen={false}>
                     <SettingsSlider
                         title={t(`${COMPONENT_NAME}paintDepth`)}
                         action={"paintDepth"}

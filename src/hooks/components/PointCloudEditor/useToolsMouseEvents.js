@@ -32,7 +32,7 @@ export const useToolsMouseEvents = (selectorTools) => {
 
             selectorTools[selectedTool]?.handleMouseDown?.(event);
         },
-        [selectedTool]
+        [selectedTool],
     );
 
     const handleMouseUp = useCallback(
@@ -42,7 +42,7 @@ export const useToolsMouseEvents = (selectorTools) => {
             mouseRef.current.downX = NaN;
             mouseRef.current.downY = NaN;
         },
-        [selectedTool]
+        [selectedTool],
     );
 
     const handleMouseMove = useCallback(
@@ -56,17 +56,9 @@ export const useToolsMouseEvents = (selectorTools) => {
             };
 
             mouseRef.current.x =
-                ((ev.pageX - screenRef.current.left) /
-                    screenRef.current.width) *
-                    2 -
-                1;
+                ((ev.pageX - screenRef.current.left) / screenRef.current.width) * 2 - 1;
             mouseRef.current.y =
-                -(
-                    (ev.pageY - screenRef.current.top) /
-                    screenRef.current.height
-                ) *
-                    2 +
-                1;
+                -((ev.pageY - screenRef.current.top) / screenRef.current.height) * 2 + 1;
 
             selectorTools[selectedTool]?.handleMouseMove?.(ev);
 
@@ -74,20 +66,20 @@ export const useToolsMouseEvents = (selectorTools) => {
                 selectorTools[selectedTool]?.handleMouseDrag?.(ev);
             }
 
-            if (selectedTool == "brushTool") {
+            if (selectedTool === "brushTool") {
                 canvasElement.classList.add("invisible-cursor");
             } else {
                 canvasElement.classList.remove("invisible-cursor");
             }
         },
-        [selectedTool]
+        [selectedTool],
     );
 
     const handleMouseWheel = useCallback(
         (event) => {
             selectorTools[selectedTool]?.handleMouseWheel?.(event);
         },
-        [selectedTool]
+        [selectedTool],
     );
 
     const handleMouseEnter = useCallback(
@@ -99,7 +91,7 @@ export const useToolsMouseEvents = (selectorTools) => {
             //     selectorTools[selectedTool]?.handleMouseEnter?.(event);
             // }
         },
-        [selectedTool]
+        [selectedTool],
     );
 
     const handleMouseLeave = useCallback(
@@ -110,7 +102,7 @@ export const useToolsMouseEvents = (selectorTools) => {
             mouseRef.current.downY = NaN;
             canvasElement.classList.remove("invisible-cursor");
         },
-        [selectedTool]
+        [selectedTool],
     );
 
     useEffect(() => {
@@ -122,28 +114,12 @@ export const useToolsMouseEvents = (selectorTools) => {
         canvasElement.addEventListener("mouseenter", handleMouseEnter, false);
 
         return () => {
-            canvasElement.removeEventListener(
-                "mousedown",
-                handleMouseDown,
-                false
-            );
+            canvasElement.removeEventListener("mousedown", handleMouseDown, false);
             canvasElement.removeEventListener("mouseup", handleMouseUp, false);
-            canvasElement.removeEventListener(
-                "mousemove",
-                handleMouseMove,
-                false
-            );
+            canvasElement.removeEventListener("mousemove", handleMouseMove, false);
             canvasElement.removeEventListener("wheel", handleMouseWheel, false);
-            canvasElement.removeEventListener(
-                "mouseleave",
-                handleMouseLeave,
-                false
-            );
-            canvasElement.removeEventListener(
-                "mouseenter",
-                handleMouseEnter,
-                false
-            );
+            canvasElement.removeEventListener("mouseleave", handleMouseLeave, false);
+            canvasElement.removeEventListener("mouseenter", handleMouseEnter, false);
         };
     }, [
         handleMouseDown,

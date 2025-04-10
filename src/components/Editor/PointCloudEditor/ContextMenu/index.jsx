@@ -15,9 +15,7 @@ export const ContextMenu = () => {
 
     const menuRef = useRef(null);
     const [isTextInputOpened, setIsTextInputOpened] = useState(false);
-    const [contextMenuPosition, setContextMenuPosition] = useState(
-        CONTEXT_MENU_RESET_POSITION
-    );
+    const [contextMenuPosition, setContextMenuPosition] = useState(CONTEXT_MENU_RESET_POSITION);
 
     const pointIndexRef = useRef(null);
     const [isModerationMenuOpened, setIsModerationMenuOpened] = useState(false);
@@ -84,7 +82,7 @@ export const ContextMenu = () => {
                 }
             }
         },
-        [highlightedPoint]
+        [highlightedPoint],
     );
 
     const handleObjectsMenuOpen = useCallback((event) => {
@@ -117,15 +115,12 @@ export const ContextMenu = () => {
                     handleModerationMenuOpen(event);
                 } else if (OPEN_OBJECTS_MENU(event)) {
                     handleObjectsMenuOpen(event);
-                } else if (
-                    menuRef.current &&
-                    !menuRef.current.contains(event.target)
-                ) {
+                } else if (menuRef.current && !menuRef.current.contains(event.target)) {
                     resetContextMenu();
                 }
             }
         },
-        [handleModerationMenuOpen, isTextInputOpened]
+        [handleModerationMenuOpen, isTextInputOpened],
     );
 
     useEffect(() => {

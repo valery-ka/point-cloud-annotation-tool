@@ -13,6 +13,6 @@ export const defaultEditorSettings = {
         highlightedPointSize: 3.0,
     },
     editor: {
-        paintDepth: 0.03
-    }
+        paintDepth: 0.03,
+    },
 };

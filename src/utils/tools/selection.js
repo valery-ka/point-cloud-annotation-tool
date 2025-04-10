@@ -8,7 +8,7 @@ export function selectByPolygon(
     classIndex,
     selection,
     depthZ,
-    polygon
+    polygon,
 ) {
     const polygonProjections = updatePolygonProjections(
         positions,
@@ -17,14 +17,12 @@ export function selectByPolygon(
         classIndex,
         selection,
         depthZ,
-        polygon
+        polygon,
     );
     const inside = [];
 
     for (const projection of polygonProjections) {
-        if (
-            pointInPolyRaycast([projection.pixelX, projection.pixelY], polygon)
-        ) {
+        if (pointInPolyRaycast([projection.pixelX, projection.pixelY], polygon)) {
             inside.push(projection.idx);
         }
     }
@@ -39,7 +37,7 @@ function updatePolygonProjections(
     classIndex,
     selection,
     depthZ,
-    polygon
+    polygon,
 ) {
     const { minX, minY, maxX, maxY } = calculateBoundingRectangle(polygon);
 
@@ -58,7 +56,7 @@ function updatePolygonProjections(
                     classIndex,
                     positions,
                     selection,
-                    depthZ
+                    depthZ,
                 ) ?? false
             )
         ) {

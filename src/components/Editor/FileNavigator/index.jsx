@@ -113,9 +113,7 @@ export const FileNavigator = memo(() => {
                 <div className="file-navigator-save-state">
                     <FontAwesomeIcon
                         icon={faSave}
-                        className={`file-navigator-save-icon ${
-                            pendingSaveState ? "saving" : ""
-                        }`}
+                        className={`file-navigator-save-icon ${pendingSaveState ? "saving" : ""}`}
                     />
                 </div>
             </div>

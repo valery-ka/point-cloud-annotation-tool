@@ -59,6 +59,6 @@ export const Dialog = ({
                 </div>
             </div>
         </div>,
-        document.getElementById("root")
+        document.getElementById("root"),
     );
 };

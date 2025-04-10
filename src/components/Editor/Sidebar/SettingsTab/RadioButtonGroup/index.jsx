@@ -2,13 +2,7 @@ import React, { useCallback } from "react";
 
 import { useSettings } from "@contexts";
 
-export const RadioButtonGroup = ({
-    title,
-    settingType,
-    options,
-    alias,
-    name,
-}) => {
+export const RadioButtonGroup = ({ title, settingType, options, alias, name }) => {
     const { settings, updateSettings } = useSettings();
     const selectedOption = settings[settingType][name];
 
@@ -21,7 +15,7 @@ export const RadioButtonGroup = ({
                 },
             });
         },
-        [settings[settingType]]
+        [settings[settingType]],
     );
 
     return (
@@ -40,9 +34,7 @@ export const RadioButtonGroup = ({
                             name={name}
                             value={option}
                             checked={selectedOption === option}
-                            onChange={() =>
-                                handleRadioButtonChange(name, option)
-                            }
+                            onChange={() => handleRadioButtonChange(name, option)}
                         />
                         <span>{alias[index]}</span>
                     </label>

@@ -77,9 +77,8 @@ export function arraysAreEqual(arr1, arr2) {
 
 export const formatPointLabels = (pointLabels) => {
     return Object.entries(pointLabels).map(([filePath, labels]) => {
-      const pathParts = filePath.split("/");
-      const fileName = pathParts.pop();
-      return { fileName: fileName, labels };
+        const pathParts = filePath.split("/");
+        const fileName = pathParts.pop();
+        return { fileName: fileName, labels };
     });
-  };
-  
+};

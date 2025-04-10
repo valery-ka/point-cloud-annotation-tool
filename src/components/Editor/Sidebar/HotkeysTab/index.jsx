@@ -44,37 +44,23 @@ export const HotkeysTab = memo(({ title }) => {
                                     {t(`${COMPONENT_NAME}${category}`)}
                                 </div>
                                 <div className="hotkey-group-keys">
-                                    {Object.entries(commands).map(
-                                        ([command, hotkey]) => (
-                                            <div
-                                                key={command}
-                                                className="hotkey-group-item"
-                                            >
-                                                <div className="hotkey-group-key">
-                                                    {hotkey
-                                                        .split("+")
-                                                        .map((part, index) => (
-                                                            <div
-                                                                key={index}
-                                                                className="hotkey-group-button"
-                                                            >
-                                                                {part ===
-                                                                "shift"
-                                                                    ? "⇧"
-                                                                    : part}
-                                                            </div>
-                                                        ))}
-                                                </div>
-                                                <div className="hotkey-group-desc">
-                                                    {getTranslatedCommand(
-                                                        command,
-                                                        nonHiddenClasses,
-                                                        t
-                                                    )}
-                                                </div>
+                                    {Object.entries(commands).map(([command, hotkey]) => (
+                                        <div key={command} className="hotkey-group-item">
+                                            <div className="hotkey-group-key">
+                                                {hotkey.split("+").map((part, index) => (
+                                                    <div
+                                                        key={index}
+                                                        className="hotkey-group-button"
+                                                    >
+                                                        {part === "shift" ? "⇧" : part}
+                                                    </div>
+                                                ))}
                                             </div>
-                                        )
-                                    )}
+                                            <div className="hotkey-group-desc">
+                                                {getTranslatedCommand(command, nonHiddenClasses, t)}
+                                            </div>
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
                         ))}

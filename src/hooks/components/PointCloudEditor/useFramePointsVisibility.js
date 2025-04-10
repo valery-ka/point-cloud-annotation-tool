@@ -32,10 +32,7 @@ export const useFramePointsVisibility = (updateGlobalBox) => {
         const activeFrameRef = pointCloudRefs.current[activeFrameFilePath];
         const activeFrameLabels = pointLabelsRef.current[activeFrameFilePath];
 
-        if (
-            activeFrameRef &&
-            originalPositionsRef.current[activeFrameFilePath]
-        ) {
+        if (activeFrameRef && originalPositionsRef.current[activeFrameFilePath]) {
             filterPoints(
                 activeFrameRef.geometry,
                 activeFramePositionsRef.current,
@@ -43,7 +40,7 @@ export const useFramePointsVisibility = (updateGlobalBox) => {
                 activeFrameLabels,
                 classesVisibilityRef.current,
                 minMaxZRef.current[0],
-                minMaxZRef.current[1]
+                minMaxZRef.current[1],
             );
             updateGlobalBox();
         }
@@ -53,13 +50,9 @@ export const useFramePointsVisibility = (updateGlobalBox) => {
         (mode, points) => {
             const activeFrameFilePath = pcdFiles[activeFrameIndex];
             const activeFrameRef = pointCloudRefs.current[activeFrameFilePath];
-            const activeFrameLabels =
-                pointLabelsRef.current[activeFrameFilePath];
+            const activeFrameLabels = pointLabelsRef.current[activeFrameFilePath];
 
-            if (
-                activeFrameRef &&
-                originalPositionsRef.current[activeFrameFilePath]
-            ) {
+            if (activeFrameRef && originalPositionsRef.current[activeFrameFilePath]) {
                 filterPointsBySelection(
                     activeFrameRef.geometry,
                     activeFramePositionsRef.current,
@@ -72,18 +65,17 @@ export const useFramePointsVisibility = (updateGlobalBox) => {
                     updateGlobalBox,
                     activeFrameLabels,
                     classesVisibilityRef.current,
-                    showFilterPointsBySelection
+                    showFilterPointsBySelection,
                 );
 
-                const hasFilterSelectionPoint =
-                    activeFramePositionsRef.current.some(
-                        (coord) => coord == SELECTION
-                    );
+                const hasFilterSelectionPoint = activeFramePositionsRef.current.some(
+                    (coord) => coord === SELECTION,
+                );
 
                 setHasFilterSelectionPoint(hasFilterSelectionPoint);
             }
         },
-        [pcdFiles, activeFrameIndex]
+        [pcdFiles, activeFrameIndex],
     );
 
     const showFilterSelectedPoints = useCallback(() => {
@@ -91,15 +83,8 @@ export const useFramePointsVisibility = (updateGlobalBox) => {
         const activeFrameRef = pointCloudRefs.current[activeFrameFilePath];
         const activeFrameLabels = pointLabelsRef.current[activeFrameFilePath];
 
-        if (
-            activeFrameRef &&
-            originalPositionsRef.current[activeFrameFilePath]
-        ) {
-            for (
-                let i = 0;
-                i < activeFramePositionsRef.current.length;
-                i += 3
-            ) {
+        if (activeFrameRef && originalPositionsRef.current[activeFrameFilePath]) {
+            for (let i = 0; i < activeFramePositionsRef.current.length; i += 3) {
                 showFilterPointsBySelection(
                     activeFrameRef.geometry,
                     activeFramePositionsRef.current,
@@ -108,7 +93,7 @@ export const useFramePointsVisibility = (updateGlobalBox) => {
                     classesVisibilityRef.current,
                     minMaxZRef.current[0],
                     minMaxZRef.current[1],
-                    i
+                    i,
                 );
             }
             updateGlobalBox();
@@ -122,8 +107,7 @@ export const useFramePointsVisibility = (updateGlobalBox) => {
     ]);
 
     useEffect(() => {
-        if (areFramesLoading || !pcdFiles.length || !nonHiddenClasses.length)
-            return;
+        if (areFramesLoading || !pcdFiles.length || !nonHiddenClasses.length) return;
 
         nonHiddenClasses.forEach(({ originalIndex }) => {
             if (!(originalIndex in classesVisibilityRef.current)) {
@@ -151,13 +135,10 @@ export const useFramePointsVisibility = (updateGlobalBox) => {
             }
             filterFramePoints();
         },
-        [pcdFiles, activeFrameIndex]
+        [pcdFiles, activeFrameIndex],
     );
 
-    useSubscribeFunction("minMaxZ", updateMinMaxZ, [
-        pcdFiles,
-        activeFrameIndex,
-    ]);
+    useSubscribeFunction("minMaxZ", updateMinMaxZ, [pcdFiles, activeFrameIndex]);
 
     const updateClassesVisibility = useCallback(
         (data) => {
@@ -169,13 +150,10 @@ export const useFramePointsVisibility = (updateGlobalBox) => {
             }
             filterFramePoints();
         },
-        [pcdFiles, activeFrameIndex]
+        [pcdFiles, activeFrameIndex],
     );
 
-    useSubscribeFunction("filterClass", updateClassesVisibility, [
-        pcdFiles,
-        activeFrameIndex,
-    ]);
+    useSubscribeFunction("filterClass", updateClassesVisibility, [pcdFiles, activeFrameIndex]);
 
     return { filterFramePoints, filterSelectedPoints };
 };

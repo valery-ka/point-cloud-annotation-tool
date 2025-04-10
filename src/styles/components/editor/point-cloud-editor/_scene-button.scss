@@ -24,7 +24,7 @@
     top: 50%;
     transform: translate(-50%, -50%);
     opacity: 0.75;
-    
+
     &:hover {
         opacity: 1;
     }
@@ -35,7 +35,7 @@
     bottom: 100%;
     left: 50%;
     transform: translateX(-50%) translateY(-27px);
-    
+
     padding: 10px;
     background-color: var(--primary-theme-color);
     border: 1px solid var(--border-color);

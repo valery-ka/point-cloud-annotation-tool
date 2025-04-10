@@ -10,7 +10,7 @@
     position: absolute;
     top: 0;
     color: #fff;
-    background: #18121A;
+    background: #18121a;
     overflow: hidden;
 }
 
@@ -18,7 +18,7 @@
     width: 100%;
     left: -5px;
     text-shadow: 2px 0 #00f;
-    animation: noise-anim-2 3s infinite linear alternate-reverse
+    animation: noise-anim-2 3s infinite linear alternate-reverse;
 }
 
 .glitch:after {

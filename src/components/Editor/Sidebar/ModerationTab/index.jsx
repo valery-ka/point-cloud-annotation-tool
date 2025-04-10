@@ -16,8 +16,7 @@ import { SidebarIcon } from "../SidebarIcon";
 
 export const ModerationTab = memo(({ title }) => {
     const { t } = useTranslation();
-    const { issues, setIssues, isIssuesHidden, setIsIssuesHidden } =
-        useModeration();
+    const { issues, setIssues, isIssuesHidden, setIsIssuesHidden } = useModeration();
     const { activeFrameIndex, setActiveFrameIndex } = useFrames();
 
     const framesWithIssues = useMemo(() => {
@@ -26,12 +25,9 @@ export const ModerationTab = memo(({ title }) => {
     }, [issues]);
 
     const { isPrevButtonActive, isNextButtonActive } = useMemo(() => {
-        const firstIssueFrame =
-            framesWithIssues.length > 0 ? framesWithIssues[0] : null;
+        const firstIssueFrame = framesWithIssues.length > 0 ? framesWithIssues[0] : null;
         const lastIssueFrame =
-            framesWithIssues.length > 0
-                ? framesWithIssues[framesWithIssues.length - 1]
-                : null;
+            framesWithIssues.length > 0 ? framesWithIssues[framesWithIssues.length - 1] : null;
 
         return {
             isPrevButtonActive: activeFrameIndex > firstIssueFrame,
@@ -41,16 +37,13 @@ export const ModerationTab = memo(({ title }) => {
 
     const frameHasIssues = useMemo(() => {
         return issues.some(
-            ({ resolved, frame }) =>
-                resolved === false && activeFrameIndex === frame
+            ({ resolved, frame }) => resolved === false && activeFrameIndex === frame,
         );
     }, [activeFrameIndex, issues]);
 
     const removeIssue = useCallback((data) => {
         const issueIndex = data.index;
-        setIssues((prevIssues) =>
-            prevIssues.filter((_, index) => index !== issueIndex)
-        );
+        setIssues((prevIssues) => prevIssues.filter((_, index) => index !== issueIndex));
     }, []);
 
     useSubscribeFunction("removeIssue", removeIssue, []);
@@ -59,10 +52,8 @@ export const ModerationTab = memo(({ title }) => {
         const issueIndex = data.index;
         setIssues((prevIssues) =>
             prevIssues.map((issue, index) =>
-                index === issueIndex
-                    ? { ...issue, resolved: !issue.resolved }
-                    : issue
-            )
+                index === issueIndex ? { ...issue, resolved: !issue.resolved } : issue,
+            ),
         );
     }, []);
 
@@ -73,8 +64,8 @@ export const ModerationTab = memo(({ title }) => {
             prevIssues.map((issue) =>
                 issue.frame === activeFrameIndex && issue.resolved === false
                     ? { ...issue, resolved: true }
-                    : issue
-            )
+                    : issue,
+            ),
         );
     }, [activeFrameIndex]);
 
@@ -122,18 +113,14 @@ export const ModerationTab = memo(({ title }) => {
                 <h2 className="tab-header">{title}</h2>
                 <div className="tab-header-buttons">
                     <SidebarIcon
-                        className={`icon-style ${
-                            isPrevButtonActive ? "" : "disabled"
-                        }`}
+                        className={`icon-style ${isPrevButtonActive ? "" : "disabled"}`}
                         size="20px"
                         title={t("prevModerationFrame")}
                         icon={faAngleDoubleLeft}
                         action={"prevModerationFrame"}
                     />
                     <SidebarIcon
-                        className={`icon-style ${
-                            isNextButtonActive ? "" : "disabled"
-                        }`}
+                        className={`icon-style ${isNextButtonActive ? "" : "disabled"}`}
                         size="20px"
                         title={t("nextModerationFrame")}
                         icon={faAngleDoubleRight}
@@ -147,9 +134,7 @@ export const ModerationTab = memo(({ title }) => {
                         action={"hideIssues"}
                     />
                     <SidebarIcon
-                        className={`icon-style ${
-                            frameHasIssues ? "" : "disabled"
-                        }`}
+                        className={`icon-style ${frameHasIssues ? "" : "disabled"}`}
                         size="20px"
                         title={t("markAllAsResolved")}
                         icon={faCheckDouble}
@@ -167,7 +152,7 @@ export const ModerationTab = memo(({ title }) => {
                                     issue={issue}
                                     index={index}
                                     orderNumber={acc.length + 1}
-                                />
+                                />,
                             );
                         }
                         return acc;

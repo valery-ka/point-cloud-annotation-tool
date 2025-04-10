@@ -6,15 +6,7 @@ import { useEvent, useSettings } from "@contexts";
 import { useBindHotkey } from "@hooks";
 
 export const RenderFrameSwitcherButton = memo(
-    ({
-        className,
-        title,
-        action,
-        actionType = "playback",
-        icon,
-        onClick,
-        toggleable,
-    }) => {
+    ({ className, title, action, actionType = "playback", icon, onClick, toggleable }) => {
         const { publish } = useEvent();
         const { settings } = useSettings();
 
@@ -52,13 +44,8 @@ export const RenderFrameSwitcherButton = memo(
                 >
                     <FontAwesomeIcon icon={icon} className="icon" />
                 </button>
-                <Tooltip
-                    id={`tooltip-${action}`}
-                    place="top"
-                    effect="solid"
-                    delayShow={300}
-                />
+                <Tooltip id={`tooltip-${action}`} place="top" effect="solid" delayShow={300} />
             </>
         );
-    }
+    },
 );

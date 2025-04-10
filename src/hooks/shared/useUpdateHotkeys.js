@@ -6,7 +6,7 @@ export const useUpdateHotkeys = (settings, updateSettings) => {
         (newHotkeys) => {
             updateSettings({ hotkeys: newHotkeys });
         },
-        [settings.hotkeys, updateSettings]
+        [settings.hotkeys, updateSettings],
     );
 
     return { updateHotkeys };

@@ -24,12 +24,8 @@ export const EditorSideLeftControls = memo(() => {
     const { selectedTool, selectionMode, setSelectedTool } = useTools();
     const { t } = useTranslation();
 
-    const paintModes = Object.keys(MODES).filter(
-        (mode) => MODES[mode].type === "paint"
-    );
-    const filterModes = Object.keys(MODES).filter(
-        (mode) => MODES[mode].type === "filter"
-    );
+    const paintModes = Object.keys(MODES).filter((mode) => MODES[mode].type === "paint");
+    const filterModes = Object.keys(MODES).filter((mode) => MODES[mode].type === "filter");
 
     const handleSelectTool = (tool) => {
         setSelectedTool(tool);
@@ -92,11 +88,7 @@ export const EditorSideLeftControls = memo(() => {
                             {renderToolButton("brushTool", faPaintBrush, "top")}
                             {renderToolButton("polygonTool", faDrawPolygon)}
                             {renderToolButton("lassoTool", faBezierCurve)}
-                            {renderToolButton(
-                                "rectangleTool",
-                                faVectorSquare,
-                                "bottom"
-                            )}
+                            {renderToolButton("rectangleTool", faVectorSquare, "bottom")}
                         </>
                     )}
                 </div>

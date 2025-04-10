@@ -70,7 +70,7 @@ export const FrameSwitcher = memo(() => {
         handleGoToNextFrame,
         handleGoToLastFrame,
         handlePlayCycle,
-        handlePlaySpeed
+        handlePlaySpeed,
     );
 
     const { handleMouseDownLane } = useFrameLaneMouseEvents(frameLaneRef);
@@ -94,9 +94,7 @@ export const FrameSwitcher = memo(() => {
                                 />
                                 <RenderFrameSwitcherButton
                                     className="frame-switcher-button"
-                                    title={t(
-                                        `${COMPONENT_NAME}goToPreviousFrame`
-                                    )}
+                                    title={t(`${COMPONENT_NAME}goToPreviousFrame`)}
                                     action="goToPreviousFrame"
                                     icon={faStepBackward}
                                 />
@@ -132,26 +130,19 @@ export const FrameSwitcher = memo(() => {
                                 />
                                 <RenderFrameSwitcherButton
                                     className="frame-switcher-button"
-                                    title={`${t(
-                                        `${COMPONENT_NAME}playSpeed`
-                                    )}: ${playSpeedLabel}`}
+                                    title={`${t(`${COMPONENT_NAME}playSpeed`)}: ${playSpeedLabel}`}
                                     action="playSpeed"
                                     icon={faChevronCircleRight}
                                 />
                             </div>
                         </div>
-                        <div
-                            className="frame-switcher-lane-frames"
-                            ref={frameLaneRef}
-                        >
+                        <div className="frame-switcher-lane-frames" ref={frameLaneRef}>
                             {Object.entries(laneMarks).map(
                                 ([key, { value, isFirst, isModFive }]) => (
                                     <div
                                         key={key}
                                         className={`frame-switcher-frame-container ${
-                                            value === activeFrameIndex
-                                                ? "selected"
-                                                : ""
+                                            value === activeFrameIndex ? "selected" : ""
                                         }`}
                                         onMouseDown={(e) => {
                                             stopPlayback();
@@ -160,18 +151,14 @@ export const FrameSwitcher = memo(() => {
                                     >
                                         <div
                                             className={`frame-switcher-frame ${
-                                                isFirst
-                                                    ? "first"
-                                                    : isModFive
-                                                    ? "mod-five"
-                                                    : ""
+                                                isFirst ? "first" : isModFive ? "mod-five" : ""
                                             }`}
                                         ></div>
                                         <div className="frame-switcher-frame-text">
                                             {/* {value} */}
                                         </div>
                                     </div>
-                                )
+                                ),
                             )}
                         </div>
                     </div>

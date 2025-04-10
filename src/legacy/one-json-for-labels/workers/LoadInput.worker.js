@@ -1,7 +1,7 @@
 onmessage = function (e) {
     const { labels } = e.data;
 
-    console.log(e)
+    console.log(e);
 
     // если данные сжаты (бинарные), то тут сначала распаковываем
     if (labels) {

@@ -21,15 +21,10 @@ export const useHighlightedPoint = () => {
     const { pcdFiles } = usePCDManager();
     const { activeFrameIndex } = useFrames();
     const { nonHiddenClasses } = useConfig();
-    const {
-        activeFramePositionsRef,
-        pointLabelsRef,
-        pixelProjections,
-        setSelectedClassIndex,
-    } = useEditor();
+    const { activeFramePositionsRef, pointLabelsRef, pixelProjections, setSelectedClassIndex } =
+        useEditor();
     const { selectedTool } = useTools();
-    const { highlightedPoint, setHighlightedPoint, searcingRadius } =
-        useHoveredPoint();
+    const { highlightedPoint, setHighlightedPoint, searcingRadius } = useHoveredPoint();
 
     useEffect(() => {
         if (highlightedPoint == null) {
@@ -44,8 +39,7 @@ export const useHighlightedPoint = () => {
             const { layerX: screenX, layerY: screenY } = event;
 
             const activeFrameFilePath = pcdFiles[activeFrameIndex];
-            const activeFrameLabels =
-                pointLabelsRef.current[activeFrameFilePath];
+            const activeFrameLabels = pointLabelsRef.current[activeFrameFilePath];
 
             let closestPoint = null;
             let minDistance = 10; // distance to process in pixels
@@ -56,9 +50,7 @@ export const useHighlightedPoint = () => {
                 const x = pixelProjections[i + 1];
                 const y = pixelProjections[i + 2];
 
-                const distance = Math.sqrt(
-                    Math.pow(x - screenX, 2) + Math.pow(y - screenY, 2)
-                );
+                const distance = Math.sqrt(Math.pow(x - screenX, 2) + Math.pow(y - screenY, 2));
 
                 if (distance < minDistance) {
                     minDistance = distance;
@@ -93,7 +85,7 @@ export const useHighlightedPoint = () => {
                 const nearestIndices = findNearestPoints(
                     { x, y, z },
                     activeFramePositionsRef,
-                    searcingRadius
+                    searcingRadius,
                 );
                 setHighlightedPoint({
                     index,
@@ -107,7 +99,7 @@ export const useHighlightedPoint = () => {
                 });
             }
         },
-        [pcdFiles, activeFrameIndex, pixelProjections, highlightedPoint]
+        [pcdFiles, activeFrameIndex, pixelProjections, highlightedPoint],
     );
 
     useEffect(() => {
@@ -120,16 +112,10 @@ export const useHighlightedPoint = () => {
 
     const onClick = useCallback(
         (event) => {
-            if (
-                highlightedPoint &&
-                selectedTool === DEFAULT_TOOL &&
-                !event.ctrlKey
-            ) {
+            if (highlightedPoint && selectedTool === DEFAULT_TOOL && !event.ctrlKey) {
                 const index = highlightedPoint.label
                     ? nonHiddenClasses.findIndex(
-                          (item) =>
-                              item &&
-                              item.originalIndex === highlightedPoint.label
+                          (item) => item && item.originalIndex === highlightedPoint.label,
                       )
                     : null;
 
@@ -138,7 +124,7 @@ export const useHighlightedPoint = () => {
                 setSelectedClassIndex(validIndex);
             }
         },
-        [highlightedPoint, selectedTool]
+        [highlightedPoint, selectedTool],
     );
 
     useEffect(() => {

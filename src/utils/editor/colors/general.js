@@ -22,16 +22,10 @@ export const hexToRgb = (hex) => {
     return [r, g, b];
 };
 
-export const getDefaultPointColor = (
-    index,
-    frameIntensity,
-    brightnessFactor,
-    intensityFactor
-) => {
+export const getDefaultPointColor = (index, frameIntensity, brightnessFactor, intensityFactor) => {
     const intensity = frameIntensity?.[index] ?? 0;
     const adjustedIntensity = intensity * intensityFactor;
-    const defaultColor =
-        adjustedIntensity * (1 - brightnessFactor) + 255 * brightnessFactor;
+    const defaultColor = adjustedIntensity * (1 - brightnessFactor) + 255 * brightnessFactor;
 
     return defaultColor;
 };
@@ -55,7 +49,7 @@ export const changeClassOfSelection = ({
         colorData.classIndex,
         frameData.intensity,
         colorData.pointColor,
-        getDefaultPointColor
+        getDefaultPointColor,
     );
 
     if (!visibilityData.classVisible) {
@@ -68,7 +62,7 @@ export const changeClassOfSelection = ({
             visibilityData.minMaxZ[0],
             visibilityData.minMaxZ[1],
             true, // isSelection
-            updateBox
+            updateBox,
         );
     }
 
@@ -80,7 +74,7 @@ export const updatePointCloudColors = (
     pointCloud,
     classColorsCache,
     activeFrameIntensity,
-    pointColor
+    pointColor,
 ) => {
     const geometry = pointCloud.geometry;
     const colorAttribute = geometry.attributes.color;
@@ -98,7 +92,7 @@ export const updatePointCloudColors = (
                 i / 3,
                 activeFrameIntensity,
                 brightnessFactor,
-                intensityFactor
+                intensityFactor,
             );
 
             colorArray[i] = defaultColor;

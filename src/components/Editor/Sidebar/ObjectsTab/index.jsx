@@ -2,13 +2,7 @@ import React, { useEffect, useState, useCallback, memo } from "react";
 import { useTranslation } from "react-i18next";
 import { faEye, faEyeSlash, faPlus } from "@fortawesome/free-solid-svg-icons";
 
-import {
-    useEditor,
-    useConfig,
-    useEvent,
-    useSettings,
-    useTools,
-} from "@contexts";
+import { useEditor, useConfig, useEvent, useSettings, useTools } from "@contexts";
 import { useSubscribeFunction, useBindHotkey } from "@hooks";
 
 import { SidebarIcon } from "../SidebarIcon";
@@ -23,8 +17,7 @@ const { DEFAULT_TOOL } = APP_CONSTANTS;
 export const ObjectsTab = memo(({ title }) => {
     const { nonHiddenClasses } = useConfig();
     const { subscribe, unsubscribe } = useEvent();
-    const { classesVisibilityRef, selectedClassIndex, setSelectedClassIndex } =
-        useEditor();
+    const { classesVisibilityRef, selectedClassIndex, setSelectedClassIndex } = useEditor();
     const { setSelectedTool } = useTools();
     const { settings } = useSettings();
     const { hotkeys } = settings;
@@ -37,17 +30,12 @@ export const ObjectsTab = memo(({ title }) => {
     }, []);
 
     const getHideShowToggleState = useCallback(() => {
-        return Object.values(classesVisibilityRef.current).every(
-            (cls) => cls.visible === true
-        );
+        return Object.values(classesVisibilityRef.current).every((cls) => cls.visible === true);
     }, []);
 
     const handleVisibilityState = useCallback(() => {
         const newVisibilityState = Object.fromEntries(
-            Object.entries(classesVisibilityRef.current).map(([idx, cls]) => [
-                idx,
-                cls.visible,
-            ])
+            Object.entries(classesVisibilityRef.current).map(([idx, cls]) => [idx, cls.visible]),
         );
         setVisibilityState(newVisibilityState);
     }, []);
@@ -92,9 +80,7 @@ export const ObjectsTab = memo(({ title }) => {
                         }
                         icon={getHideShowToggleState() ? faEyeSlash : faEye}
                         type={"filterClass"}
-                        action={
-                            getHideShowToggleState() ? "hideAll" : "showAll"
-                        }
+                        action={getHideShowToggleState() ? "hideAll" : "showAll"}
                         hotkey={hotkeys["misc"]["hideShowAll"]}
                     />
                     <SidebarIcon
@@ -113,11 +99,7 @@ export const ObjectsTab = memo(({ title }) => {
                             cls={cls}
                             index={cls.originalIndex}
                             action={`selectClass${cls.originalIndex}`}
-                            hotkey={
-                                hotkeys["selectClass"][
-                                    `selectClass${cls.originalIndex}`
-                                ]
-                            }
+                            hotkey={hotkeys["selectClass"][`selectClass${cls.originalIndex}`]}
                             isSelected={selectedClassIndex === idx}
                             isVisible={handleIsClassVisible(cls.originalIndex)}
                         />

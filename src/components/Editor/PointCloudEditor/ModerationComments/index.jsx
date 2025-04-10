@@ -22,7 +22,7 @@ export const ModerationComments = () => {
                             position={issue.position}
                             resolved={issue.resolved}
                             workerHint={issue.workerHint}
-                        />
+                        />,
                     );
                 }
                 return acc;

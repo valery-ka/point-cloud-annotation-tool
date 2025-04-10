@@ -15,7 +15,7 @@ i18n.use(HttpApi)
         backend: {
             loadPath: "/locales/{{lng}}/translation.json",
         },
-        preload: ["en", "ru"]
+        preload: ["en", "ru"],
     });
 
 export default i18n;

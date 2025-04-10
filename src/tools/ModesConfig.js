@@ -52,7 +52,7 @@ export const MODES = {
             classIndex,
             frameIntensity,
             pointColor,
-            getDefaultPointColor
+            getDefaultPointColor,
         ) => {
             if (!points.length) return;
             const brightnessFactor = pointColor.pointBrightness;
@@ -65,7 +65,7 @@ export const MODES = {
                     pointIndex,
                     frameIntensity,
                     brightnessFactor,
-                    intensityFactor
+                    intensityFactor,
                 );
 
                 const defaultColor = [pointColor, pointColor, pointColor];
@@ -141,18 +141,13 @@ export const MODES = {
             updateGlobalBox,
             pointLabels,
             classesVisibility,
-            showFilterPoints
+            showFilterPoints,
         ) => {
             if (!points.length) return;
             for (let i = 0; i < points.length; i++) {
                 const pointIndex = points[i];
                 const hidePosition = isSelection ? CLASS_FILTER : SELECTION;
-                hidePoint(
-                    geometry,
-                    framePositions,
-                    pointIndex * 3,
-                    hidePosition
-                );
+                hidePoint(geometry, framePositions, pointIndex * 3, hidePosition);
             }
             updateGlobalBox();
         },
@@ -179,7 +174,7 @@ export const MODES = {
             updateGlobalBox,
             pointLabels,
             classesVisibility,
-            showFilterPoints
+            showFilterPoints,
         ) => {
             if (!points.length) return;
             const visiblePointsSet = new Set(points);
@@ -187,9 +182,7 @@ export const MODES = {
                 const pointIndex = i / 3;
                 const label = pointLabels[pointIndex];
                 const classVisibility = classesVisibility[label];
-                const visible = classVisibility
-                    ? classVisibility.visible
-                    : true;
+                const visible = classVisibility ? classVisibility.visible : true;
                 const originalZ = originalPositions[i + 2];
 
                 const shouldShowPoint = visiblePointsSet.has(pointIndex);
@@ -203,8 +196,8 @@ export const MODES = {
                     const reason = !shouldShowPoint
                         ? SELECTION
                         : classVisibility && !visible
-                        ? CLASS_FILTER
-                        : Z_FILTER;
+                          ? CLASS_FILTER
+                          : Z_FILTER;
                     hidePoint(geometry, framePositions, i, reason, true);
                 } else {
                     showPoint(geometry, framePositions, i, originalPositions);
@@ -235,7 +228,7 @@ export const MODES = {
             updateGlobalBox,
             pointLabels,
             classesVisibility,
-            showFilterPoints
+            showFilterPoints,
         ) => {
             if (!points.length) return;
             for (let i = 0; i < points.length; i++) {
@@ -248,7 +241,7 @@ export const MODES = {
                     classesVisibility,
                     minZ,
                     maxZ,
-                    index * 3
+                    index * 3,
                 );
             }
             updateGlobalBox();

@@ -18,27 +18,15 @@ export const useEditorHelpers = () => {
     const isBoxActive = useRef(settings.activeButtons.toggleGlobalBox);
 
     const circleRulerRef = useRef(null);
-    const isCircleRulerActive = useRef(
-        settings.activeButtons.toggleCircleRuler
-    );
+    const isCircleRulerActive = useRef(settings.activeButtons.toggleCircleRuler);
 
     const updateGlobalBox = useCallback(() => {
-        drawGlobalBox(
-            activeFramePositionsRef.current,
-            scene,
-            boundingBoxRef,
-            isBoxActive.current
-        );
+        drawGlobalBox(activeFramePositionsRef.current, scene, boundingBoxRef, isBoxActive.current);
     }, [pcdFiles, activeFrameIndex, areFramesLoading]);
 
     const toggleGlobalBox = useCallback(() => {
         isBoxActive.current = !isBoxActive.current;
-        drawGlobalBox(
-            activeFramePositionsRef.current,
-            scene,
-            boundingBoxRef,
-            isBoxActive.current
-        );
+        drawGlobalBox(activeFramePositionsRef.current, scene, boundingBoxRef, isBoxActive.current);
     }, []);
 
     useSubscribeFunction("toggleGlobalBox", toggleGlobalBox, []);

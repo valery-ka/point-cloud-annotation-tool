@@ -25,16 +25,12 @@ export const useEditorFrameSwitcher = (onFrameChanged) => {
         const activeFrameFilePath = pcdFiles[activeFrameIndex];
         const activeFrameRef = pointCloudRefs.current[activeFrameFilePath];
 
-        if (
-            activeFrameRef &&
-            originalPositionsRef.current[activeFrameFilePath]
-        ) {
-            activeFramePositionsRef.current =
-                activeFrameRef.geometry.attributes.position.array;
+        if (activeFrameRef && originalPositionsRef.current[activeFrameFilePath]) {
+            activeFramePositionsRef.current = activeFrameRef.geometry.attributes.position.array;
         }
 
         const hasFilterSelectionPoint = activeFramePositionsRef.current.some(
-            (coord) => coord == SELECTION
+            (coord) => coord === SELECTION,
         );
         setHasFilterSelectionPoint(hasFilterSelectionPoint);
         onFrameChanged?.();

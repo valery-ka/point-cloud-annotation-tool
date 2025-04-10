@@ -1,1 +1,1 @@
-export { PointShader } from './PointShader';
+export { PointShader } from "./PointShader";

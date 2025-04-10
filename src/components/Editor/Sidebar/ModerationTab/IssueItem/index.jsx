@@ -21,9 +21,7 @@ export const IssueItem = memo(({ issue, index, orderNumber }) => {
 
     return (
         <div
-            className={`issue-item ${
-                issue.resolved || isIssuesHidden ? "resolved" : ""
-            }`}
+            className={`issue-item ${issue.resolved || isIssuesHidden ? "resolved" : ""}`}
             key={index}
             onClick={() => switchCameraToIssue(issue)}
         >

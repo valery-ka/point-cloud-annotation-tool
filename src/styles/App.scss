@@ -1,23 +1,23 @@
 /* Import global variables */
-@import './base/variables';
+@import "./base/variables";
 
 /* Import theme-specific styles */
-@import './base/themes/dark';
-@import './base/themes/light';
+@import "./base/themes/dark";
+@import "./base/themes/light";
 
 /* Import global styles */
-@import './base/global';
+@import "./base/global";
 
 /* Styles for external components */
-@import './vendors/rc-slider';
-@import './vendors/react-tooltip';
+@import "./vendors/rc-slider";
+@import "./vendors/react-tooltip";
 
 /* Import custom animations */
-@import './animations/glitch';
-@import './animations/animations';
+@import "./animations/glitch";
+@import "./animations/animations";
 
 /* Import styles for UI components */
-@import './components/index';
+@import "./components/index";
 
 /* Import styles for the main layout */
-@import './layouts/tool-3d-app';
+@import "./layouts/tool-3d-app";

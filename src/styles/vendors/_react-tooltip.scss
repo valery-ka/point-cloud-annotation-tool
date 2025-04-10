@@ -4,8 +4,8 @@
 
     max-width: 600px;
     padding-block: 10px !important;
-    border-radius: $tooltip-border-radius !important; 
-    
+    border-radius: $tooltip-border-radius !important;
+
     background-color: var(--tooltip-color) !important;
     color: var(--text-color) !important;
 
@@ -14,7 +14,7 @@
 }
 
 .react-tooltip .react-tooltip-arrow {
-    color: var(--tooltip-color)  !important;
+    color: var(--tooltip-color) !important;
 }
 
 .tooltip-hotkey {
@@ -27,4 +27,4 @@
     font-weight: normal;
     min-width: 12px;
     text-transform: capitalize;
-  }
+}

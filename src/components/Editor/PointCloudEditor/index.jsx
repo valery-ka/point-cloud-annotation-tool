@@ -12,8 +12,7 @@ export const PointCloudEditor = () => {
 
     const glSize = HOOKS.useCanvasResize(() => requestPixelProjectionsUpdate());
 
-    const requestPixelProjectionsUpdate =
-        HOOKS.useUpdatePixelProjections(glSize);
+    const requestPixelProjectionsUpdate = HOOKS.useUpdatePixelProjections(glSize);
 
     HOOKS.useCameraControls(requestPixelProjectionsUpdate);
 
@@ -24,8 +23,7 @@ export const PointCloudEditor = () => {
     const { filterFramePoints, filterSelectedPoints } =
         HOOKS.useFramePointsVisibility(updateGlobalBox);
 
-    const { handlePointsSize, handleSelectedPointsSize } =
-        HOOKS.useFramePointsSize();
+    const { handlePointsSize, handleSelectedPointsSize } = HOOKS.useFramePointsSize();
 
     const { handlePointCloudColors, paintSelectedPoints } =
         HOOKS.usePaintFramePoints(updateGlobalBox);
@@ -34,7 +32,7 @@ export const PointCloudEditor = () => {
         paintSelectedPoints,
         filterSelectedPoints,
         handleSelectedPointsSize,
-        requestSaveFrame
+        requestSaveFrame,
     );
 
     HOOKS.useToolsMouseEvents(selectorTools);

@@ -1,7 +1,7 @@
 .file-navigator {
     display: flex;
     align-items: center;
-    padding: 8px 0px;   
+    padding: 8px 0px;
     background: var(--primary-theme-color);
     color: white;
     width: 100%;
@@ -16,7 +16,6 @@
     flex-direction: row;
     width: 100%;
 }
-
 
 .file-navigator select {
     padding: 5px;
@@ -48,7 +47,7 @@
     color: var(--text-color);
     font-size: 20px;
     margin-left: 10px;
-    filter: drop-shadow(0 0 5px color-mix(in srgb,  var(--button-text-color) 50%, transparent));
+    filter: drop-shadow(0 0 5px color-mix(in srgb, var(--button-text-color) 50%, transparent));
 
     &.saving {
         color: #b13939;

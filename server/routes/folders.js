@@ -8,8 +8,7 @@ const DATA_DIR = settings.cloudsPath;
 
 router.get("/", (req, res) => {
     fs.readdir(DATA_DIR, { withFileTypes: true }, (err, files) => {
-        if (err)
-            return res.status(500).json({ error: "Error reading directory" });
+        if (err) return res.status(500).json({ error: "Error reading directory" });
 
         const folders = files
             .filter((file) => file.isDirectory())

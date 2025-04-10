@@ -7,13 +7,7 @@ import { useEvent } from "@contexts";
 
 const MODERATION_TAB_INDEX = 2;
 
-export const SceneButton = ({
-    index,
-    position,
-    buttonIndex,
-    resolved,
-    workerHint,
-}) => {
+export const SceneButton = ({ index, position, buttonIndex, resolved, workerHint }) => {
     const { t } = useTranslation();
 
     const { gl } = useThree();
@@ -79,16 +73,10 @@ export const SceneButton = ({
                     <div className="issue-hover">
                         <div className="issue-hover-text">{workerHint}</div>
                         <div className="issue-hover-buttons">
-                            <button
-                                className="issue-hover-button"
-                                onClick={() => resolveIssue()}
-                            >
+                            <button className="issue-hover-button" onClick={() => resolveIssue()}>
                                 {t("resolve")}
                             </button>
-                            <button
-                                className="issue-hover-button"
-                                onClick={() => removeIssue()}
-                            >
+                            <button className="issue-hover-button" onClick={() => removeIssue()}>
                                 {t("remove")}
                             </button>
                         </div>

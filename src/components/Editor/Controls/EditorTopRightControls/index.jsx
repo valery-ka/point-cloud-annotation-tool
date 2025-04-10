@@ -33,35 +33,19 @@ export const EditorTopRightControls = memo(() => {
             <div className="camera-view">
                 <div className="camera-view-wrap">
                     <div className="button camera-view-button front">
-                        {renderButton(
-                            "switchToFrontView",
-                            faArrowDownLong,
-                            "top"
-                        )}
+                        {renderButton("switchToFrontView", faArrowDownLong, "top")}
                     </div>
                     <div className="button camera-view-button left">
-                        {renderButton(
-                            "switchToLeftView",
-                            faArrowRightLong,
-                            "left"
-                        )}
+                        {renderButton("switchToLeftView", faArrowRightLong, "left")}
                     </div>
                     <div className="button camera-view-button top">
                         {renderButton("switchToTopView", faCircle, "middle")}
                     </div>
                     <div className="button camera-view-button right">
-                        {renderButton(
-                            "switchToRightView",
-                            faArrowLeftLong,
-                            "right"
-                        )}
+                        {renderButton("switchToRightView", faArrowLeftLong, "right")}
                     </div>
                     <div className="button camera-view-button back">
-                        {renderButton(
-                            "switchToBackView",
-                            faArrowUpLong,
-                            "bottom"
-                        )}
+                        {renderButton("switchToBackView", faArrowUpLong, "bottom")}
                     </div>
                 </div>
             </div>

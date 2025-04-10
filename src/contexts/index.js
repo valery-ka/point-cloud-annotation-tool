@@ -8,4 +8,3 @@ export { HoveredPointProvider, useHoveredPoint } from "./HoveredPointContext";
 export { SettingsProvider, useSettings } from "./SettingsContext";
 export { ToolsProvider, useTools } from "./ToolsContext";
 export { ModerationProvider, useModeration } from "./ModerationProvider";
-

@@ -52,7 +52,9 @@
         background: transparent;
         border: none;
         cursor: pointer;
-        transition: transform 0.1s ease, color 0.1s ease;
+        transition:
+            transform 0.1s ease,
+            color 0.1s ease;
 
         &:hover {
             transform: scale(1.1);
@@ -91,39 +93,39 @@
         border-radius: 4px;
         cursor: grab;
     }
-    
+
     .frame-switcher-frame-container {
         display: flex;
         flex-direction: row;
         flex: 1;
         position: relative;
         user-select: none;
-    
+
         &.selected {
             background-color: var(--secondary-theme-color);
         }
     }
-    
+
     .frame-switcher-frame {
         position: absolute;
         left: 0;
         bottom: 0;
         right: 0;
-    
+
         height: 5px;
         border-left: 1px solid var(--text-color);
-    
+
         &.first {
             height: 0px;
             border-left: none;
         }
-    
+
         &.mod-five {
             height: 10px;
             border-left: 1px solid var(--text-color);
         }
     }
-    
+
     .frame-switcher-frame-text {
         position: absolute;
         left: 4px;

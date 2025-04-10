@@ -40,7 +40,7 @@ export const SidebarIcon = memo(
                     setIsActive(handler(action));
                 }
             },
-            [action]
+            [action],
         );
 
         useSubscribeFunction("filterClass", handleIsActive, []);
@@ -71,5 +71,5 @@ export const SidebarIcon = memo(
                 />
             </div>
         );
-    }
+    },
 );

@@ -1,58 +1,58 @@
 .editor-text-input-container {
-  display: flex;
-  flex-direction: column;
-  gap: 5px  ;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
 }
 
 .editor-text-input-title {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  color: var(--text-color);
-  font-weight: bold;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    color: var(--text-color);
+    font-weight: bold;
 
-  padding: 5px 5px 0px 5px;
-  margin-bottom: 5px;
+    padding: 5px 5px 0px 5px;
+    margin-bottom: 5px;
 }
 
 .editor-text-input-input {
-  color: #000;
-  width: 400px;
-  height: 25px;
-  margin: 5px;
-  padding: 0px 5px;
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
+    color: #000;
+    width: 400px;
+    height: 25px;
+    margin: 5px;
+    padding: 0px 5px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
 }
 
 .editor-text-input-buttons {
-  display: flex;
-  flex-direction: row;
-  justify-content: right;
+    display: flex;
+    flex-direction: row;
+    justify-content: right;
 
-  gap: 5px;
-  padding: 0px 5px;
-  margin-bottom: 5px;
+    gap: 5px;
+    padding: 0px 5px;
+    margin-bottom: 5px;
 }
 
 .editor-text-input-button {
-  min-width: 100px;
-  padding: 4px 16px;
-  border-radius: 6px;
-  border: 1px solid var(--border-color);
-  font-family: "Montserrat", ui-sans-serif, system-ui, sans-serif;
-  font-weight: 500;
-  font-size: 14px;
-  background-color: var(--primary-theme-color);
-  color: var(--text-color);
-  cursor: pointer;
+    min-width: 100px;
+    padding: 4px 16px;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    font-family: "Montserrat", ui-sans-serif, system-ui, sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    background-color: var(--primary-theme-color);
+    color: var(--text-color);
+    cursor: pointer;
 
-  &:hover {
-    background-color: var(--secondary-theme-color);
-  }
+    &:hover {
+        background-color: var(--secondary-theme-color);
+    }
 
-  &:active {
-    transform: scale(0.98);
-    background-color: var(--button-active-bg-color);
-  }
+    &:active {
+        transform: scale(0.98);
+        background-color: var(--button-active-bg-color);
+    }
 }

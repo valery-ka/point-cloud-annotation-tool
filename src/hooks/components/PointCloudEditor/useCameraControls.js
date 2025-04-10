@@ -2,13 +2,7 @@ import { useEffect, useRef, useCallback } from "react";
 import { useThree, useFrame } from "@react-three/fiber";
 import { Group } from "@tweenjs/tween.js";
 
-import {
-    useEvent,
-    useEditor,
-    useTools,
-    useSettings,
-    useHoveredPoint,
-} from "@contexts";
+import { useEvent, useEditor, useTools, useSettings, useHoveredPoint } from "@contexts";
 import { useSubscribeFunction, useChangeTarget } from "@hooks";
 
 import { getToolsConfig } from "@tools";
@@ -71,9 +65,7 @@ export const useCameraControls = (requestPixelProjectionsUpdate) => {
     }, []);
 
     const onChange = useCallback(() => {
-        setPixelProjections((prev) =>
-            prev.length === 0 ? prev : new Float32Array()
-        );
+        setPixelProjections((prev) => (prev.length === 0 ? prev : new Float32Array()));
         setHighlightedPoint((prev) => (prev === null ? prev : null));
     }, []);
 
@@ -108,14 +100,9 @@ export const useCameraControls = (requestPixelProjectionsUpdate) => {
     });
 
     useEffect(() => {
-        const cameraViews = createCameraViews(
-            camera,
-            controlsRef.current,
-            tweenGroup,
-            () => {
-                onEnd();
-            }
-        );
+        const cameraViews = createCameraViews(camera, controlsRef.current, tweenGroup, () => {
+            onEnd();
+        });
 
         Object.entries(cameraViews).forEach(([event, handler]) => {
             const wrappedHandler = (e) => {
@@ -140,10 +127,8 @@ export const useCameraControls = (requestPixelProjectionsUpdate) => {
     useEffect(() => {
         if (controlsRef.current) {
             const config = getToolsConfig(selectedTool, isDrawing);
-            controlsRef.current.enabledButtons.leftButton =
-                config.enabledButtons.leftButton;
-            controlsRef.current.enabledButtons.rightButton =
-                config.enabledButtons.rightButton;
+            controlsRef.current.enabledButtons.leftButton = config.enabledButtons.leftButton;
+            controlsRef.current.enabledButtons.rightButton = config.enabledButtons.rightButton;
             controlsRef.current.enableZoom = config.enableZoom;
             controlsRef.current.enabledKeys = config.enabledKeys;
         }

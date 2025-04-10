@@ -6,5 +6,5 @@ export { defaultGeneralSettings } from "./defaultGeneralSettings";
 export {
     generatePointsSizes,
     generateClassHotkeys,
-    getTranslatedCommand
+    getTranslatedCommand,
 } from "./customClassesSettings";

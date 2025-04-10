@@ -7,9 +7,7 @@ export const usePlayback = (playbackConfig) => {
     const { isPlaying, setIsPlaying, setActiveFrameIndex } = useFrames();
 
     const [isPlayCycle, setIsPlayCycle] = useState(false);
-    const [playSpeed, setPlaySpeed] = useState(
-        playbackConfig.speeds.normal.value
-    );
+    const [playSpeed, setPlaySpeed] = useState(playbackConfig.speeds.normal.value);
     const intervalRef = useRef(null);
 
     const stopPlayback = useCallback(() => {

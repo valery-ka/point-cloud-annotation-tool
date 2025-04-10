@@ -9,7 +9,7 @@ export const useEventSubscriptions = (
     handleGoToNextFrame,
     handleGoToLastFrame,
     handlePlayCycle,
-    handlePlaySpeed
+    handlePlaySpeed,
 ) => {
     const { pcdFiles } = usePCDManager();
     const { areFramesLoading } = useFrames();

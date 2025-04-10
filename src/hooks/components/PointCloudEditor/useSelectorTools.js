@@ -12,13 +12,7 @@ import {
 } from "@contexts";
 import { useSubscribeFunction } from "@hooks";
 
-import {
-    BrushTool,
-    PolygonTool,
-    LassoTool,
-    RectangleTool,
-    MODES,
-} from "@tools";
+import { BrushTool, PolygonTool, LassoTool, RectangleTool, MODES } from "@tools";
 import * as APP_CONSTANTS from "@constants";
 
 const { DEFAULT_TOOL } = APP_CONSTANTS;
@@ -27,20 +21,15 @@ export const useSelectorTools = (
     paintSelectedPoints,
     filterSelectedPoints,
     handleSelectedPointsSize,
-    requestSaveFrame
+    requestSaveFrame,
 ) => {
     const { pcdFiles } = usePCDManager();
     const { nonHiddenClasses } = useConfig();
     const { isPlaying, activeFrameIndex } = useFrames();
     const { subscribe, unsubscribe } = useEvent();
-    const {
-        pointLabelsRef,
-        activeFramePositionsRef,
-        selectedClassIndex,
-        pixelProjections,
-    } = useEditor();
-    const { selectedTool, setIsDrawing, selectionMode, setSelectionMode } =
-        useTools();
+    const { pointLabelsRef, activeFramePositionsRef, selectedClassIndex, pixelProjections } =
+        useEditor();
+    const { selectedTool, setIsDrawing, selectionMode, setSelectionMode } = useTools();
 
     const { highlightedPoint } = useHoveredPoint();
 
@@ -81,12 +70,10 @@ export const useSelectorTools = (
                 activeFrameIndex,
                 pixelProjections,
                 positions: activeFramePositionsRef,
-                activeLabels:
-                    pointLabelsRef.current[pcdFiles[activeFrameIndex]],
+                activeLabels: pointLabelsRef.current[pcdFiles[activeFrameIndex]],
             },
             classData: {
-                originalClassIndex:
-                    nonHiddenClasses[selectedClassIndex]?.originalIndex,
+                originalClassIndex: nonHiddenClasses[selectedClassIndex]?.originalIndex,
             },
         }),
         [
@@ -96,14 +83,14 @@ export const useSelectorTools = (
             activeFrameIndex,
             selectedClassIndex,
             selectionMode,
-        ]
+        ],
     );
 
     const selectorToolsRefs = useRef(
         Object.keys(toolClasses).reduce((acc, toolName) => {
             acc[toolName] = null;
             return acc;
-        }, {})
+        }, {}),
     );
 
     const [prevTool, setPrevTool] = useState(null);
@@ -119,9 +106,7 @@ export const useSelectorTools = (
             if (!selectorToolsRefs.current[toolName]) {
                 const ToolClass = toolClasses[toolName];
                 if (ToolClass) {
-                    selectorToolsRefs.current[toolName] = new ToolClass(
-                        toolProps
-                    );
+                    selectorToolsRefs.current[toolName] = new ToolClass(toolProps);
                 }
             }
         });
@@ -148,10 +133,7 @@ export const useSelectorTools = (
             selectorToolsRefs.current[prevTool].deactivate();
         }
 
-        if (
-            selectedTool !== DEFAULT_TOOL &&
-            selectorToolsRefs.current[selectedTool]
-        ) {
+        if (selectedTool !== DEFAULT_TOOL && selectorToolsRefs.current[selectedTool]) {
             selectorToolsRefs.current[selectedTool].activate();
         }
 
@@ -170,16 +152,10 @@ export const useSelectorTools = (
     }, [selectionMode]);
 
     const handleKeyDown = useCallback((ev) => {
-        if (
-            ev.key === MODES[erase].hotkey &&
-            selectionModeRef.current !== erase
-        ) {
+        if (ev.key === MODES[erase].hotkey && selectionModeRef.current !== erase) {
             prevSelectionModeRef.current = selectionModeRef.current;
             setSelectionMode(erase);
-        } else if (
-            ev.key === MODES[force].hotkey &&
-            selectionModeRef.current !== force
-        ) {
+        } else if (ev.key === MODES[force].hotkey && selectionModeRef.current !== force) {
             prevSelectionModeRef.current = selectionModeRef.current;
             setSelectionMode(force);
         }

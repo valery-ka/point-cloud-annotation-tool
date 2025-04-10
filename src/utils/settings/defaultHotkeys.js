@@ -41,5 +41,5 @@ export const defaultHotkeys = {
     },
     fixed: {
         unselectObject: "esc",
-    }
+    },
 };

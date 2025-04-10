@@ -7,20 +7,13 @@ export const updatePixelProjections = (positionArray, camera, size) => {
     const frustumMatrix = new Matrix4();
     const vector = new Vector3();
 
-    frustumMatrix.multiplyMatrices(
-        camera.projectionMatrix,
-        camera.matrixWorldInverse
-    );
+    frustumMatrix.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
     frustum.setFromProjectionMatrix(frustumMatrix);
 
     const projections = [];
 
     for (let i = 0; i < positionArray.length; i += 3) {
-        vector.set(
-            positionArray[i],
-            positionArray[i + 1],
-            positionArray[i + 2]
-        );
+        vector.set(positionArray[i], positionArray[i + 1], positionArray[i + 2]);
         if (!frustum.containsPoint(vector)) continue;
 
         vector.project(camera);

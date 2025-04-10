@@ -6,17 +6,7 @@ import { useBindHotkey } from "@hooks";
 import { useSettings, useEvent } from "@contexts";
 
 export const RenderEditorButton = memo(
-    ({
-        className,
-        title,
-        actionType,
-        action,
-        icon,
-        hotkey,
-        onClick,
-        persistent,
-        toggleable,
-    }) => {
+    ({ className, title, actionType, action, icon, hotkey, onClick, persistent, toggleable }) => {
         const { publish } = useEvent();
         const { settings, updateSettings } = useSettings();
 
@@ -72,13 +62,8 @@ export const RenderEditorButton = memo(
                 >
                     <FontAwesomeIcon icon={icon} className="icon" />
                 </button>
-                <Tooltip
-                    id={`tooltip-${action}`}
-                    place="bottom"
-                    effect="solid"
-                    delayShow={300}
-                />
+                <Tooltip id={`tooltip-${action}`} place="bottom" effect="solid" delayShow={300} />
             </>
         );
-    }
+    },
 );

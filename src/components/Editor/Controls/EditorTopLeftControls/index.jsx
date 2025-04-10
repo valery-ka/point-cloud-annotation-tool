@@ -36,9 +36,8 @@ export const EditorTopLeftControls = memo(() => {
     }, []);
 
     const calculateMinMaxZPopUpValue = useCallback(
-        (value) =>
-            value === MIN ? "−∞" : value === MAX ? "∞" : `${value.toFixed(2)}m`,
-        []
+        (value) => (value === MIN ? "−∞" : value === MAX ? "∞" : `${value.toFixed(2)}m`),
+        [],
     );
 
     const handleMinMaxZChange = useCallback(
@@ -50,20 +49,12 @@ export const EditorTopLeftControls = memo(() => {
 
             publish("minMaxZ", [minZ, maxZ]);
         },
-        [publish]
+        [publish],
     );
 
     const buttonStates = useButtonState(["undo", "redo"]);
 
-    const renderButton = (
-        name,
-        icon,
-        type,
-        actionType,
-        persistent,
-        toggleable,
-        onClick
-    ) => {
+    const renderButton = (name, icon, type, actionType, persistent, toggleable, onClick) => {
         return (
             <RenderEditorButton
                 className={`tool-3d-control-button ${type}`}
@@ -88,24 +79,18 @@ export const EditorTopLeftControls = memo(() => {
                     "undoAction",
                     faUndo,
                     `left ${buttonStates.undo ? "" : "disabled"}`,
-                    "misc"
+                    "misc",
                 )}
                 {renderButton(
                     "redoAction",
                     faRedo,
                     `right ${buttonStates.redo ? "" : "disabled"}`,
-                    "misc"
+                    "misc",
                 )}
             </div>
             <div className="tool-3d-controls-group">
                 {renderButton("toggleGlobalBox", faCube, "left", "misc", true)}
-                {renderButton(
-                    "toggleCircleRuler",
-                    faCircleDot,
-                    "right",
-                    "misc",
-                    true
-                )}
+                {renderButton("toggleCircleRuler", faCircleDot, "right", "misc", true)}
             </div>
             <div className="tool-3d-controls-group">
                 {renderButton(
@@ -115,7 +100,7 @@ export const EditorTopLeftControls = memo(() => {
                     "misc",
                     false,
                     true,
-                    toggleMinMaxZSlider
+                    toggleMinMaxZSlider,
                 )}
                 {isMinMaxZSliderVisible && (
                     <div className="pop-up-slider">

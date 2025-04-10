@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 
-import { usePCDManager } from "./PCDManagerContext"
+import { usePCDManager } from "./PCDManagerContext";
 
 import { API_PATHS } from "@config/apiPaths";
 

@@ -7,11 +7,7 @@ import { useBindHotkey } from "@hooks";
 
 import { switchView, getPointPosition, getTargetPosition } from "@utils/camera";
 
-export const useChangeTarget = (
-    controlsRef,
-    tweenGroup,
-    requestPixelProjectionsUpdate
-) => {
+export const useChangeTarget = (controlsRef, tweenGroup, requestPixelProjectionsUpdate) => {
     const { camera, gl } = useThree();
 
     const { settings } = useSettings();
@@ -39,14 +35,14 @@ export const useChangeTarget = (
             camera,
             controlsRef.current,
             tweenGroup,
-            requestPixelProjectionsUpdate
+            requestPixelProjectionsUpdate,
         );
     }, []);
 
     useBindHotkey(hotkeys["camera"]["changeTarget"], changeTarget);
 
     const handleMouseWheelDown = useCallback((event) => {
-        if (event.button == 1) {
+        if (event.button === 1) {
             changeTarget();
         }
     }, []);
@@ -59,14 +55,10 @@ export const useChangeTarget = (
     }, []);
 
     useEffect(() => {
-        subscribe("switchCameraToIssue", (position) =>
-            changeTarget(null, position)
-        );
+        subscribe("switchCameraToIssue", (position) => changeTarget(null, position));
 
         return () => {
-            unsubscribe("switchCameraToIssue", (position) =>
-                changeTarget(null, position)
-            );
+            unsubscribe("switchCameraToIssue", (position) => changeTarget(null, position));
         };
     }, [subscribe, unsubscribe]);
 };

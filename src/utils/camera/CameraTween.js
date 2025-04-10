@@ -8,7 +8,7 @@ export const cameraTween = (
     target,
     onUpdate,
     tweenGroup,
-    requestPixelProjectionsUpdate
+    requestPixelProjectionsUpdate,
 ) => {
     new Tween(current)
         .to(target, TWEEN_DURATION)
@@ -20,12 +20,8 @@ export const cameraTween = (
 };
 
 export const sphericalToCartesian = (spherical, center) => ({
-    x:
-        center.x +
-        spherical.radius * Math.sin(spherical.phi) * Math.cos(spherical.theta),
-    y:
-        center.y +
-        spherical.radius * Math.sin(spherical.phi) * Math.sin(spherical.theta),
+    x: center.x + spherical.radius * Math.sin(spherical.phi) * Math.cos(spherical.theta),
+    y: center.y + spherical.radius * Math.sin(spherical.phi) * Math.sin(spherical.theta),
     z: center.z + spherical.radius * Math.cos(spherical.phi),
 });
 
@@ -49,8 +45,4 @@ export const normalizeTheta = (currentTheta, targetTheta) => {
 };
 
 export const normalizeAngle = (angle) =>
-    angle < 0
-        ? angle + 2 * Math.PI
-        : angle >= 2 * Math.PI
-        ? angle - 2 * Math.PI
-        : angle;
+    angle < 0 ? angle + 2 * Math.PI : angle >= 2 * Math.PI ? angle - 2 * Math.PI : angle;

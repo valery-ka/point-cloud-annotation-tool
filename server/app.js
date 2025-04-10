@@ -17,12 +17,12 @@ app.use("/api/config", require("./routes/config"));
 app.use("/api/output", require("./routes/output"));
 
 if (process.env.NODE_ENV === "production") {
-  const buildPath = path.join(__dirname, "../build");
-  app.use(express.static(buildPath));
+    const buildPath = path.join(__dirname, "../build");
+    app.use(express.static(buildPath));
 
-  app.get("*", (req, res) => {
-    res.sendFile(path.join(buildPath, "index.html"));
-  });
+    app.get("*", (req, res) => {
+        res.sendFile(path.join(buildPath, "index.html"));
+    });
 }
 
 app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));

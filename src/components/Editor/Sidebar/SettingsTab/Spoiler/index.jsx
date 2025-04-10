@@ -14,9 +14,7 @@ export const Spoiler = ({ title, children, defaultIsOpen = false }) => {
             <div className="spoiler-header" onClick={toggleSpoiler}>
                 <h3>{title}</h3>
                 <span className="spoiler-arrow">
-                    <FontAwesomeIcon
-                        icon={isOpen ? faChevronUp : faChevronDown}
-                    />
+                    <FontAwesomeIcon icon={isOpen ? faChevronUp : faChevronDown} />
                 </span>
             </div>
             {isOpen && <div className="spoiler-content">{children}</div>}

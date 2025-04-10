@@ -23,7 +23,7 @@ export const rebuildGeometry = (geom) => {
             const bufferAttribute = new BufferAttribute(
                 attrData.array,
                 attrData.itemSize,
-                attrData.normalized
+                attrData.normalized,
             );
             geometry.setAttribute(key, bufferAttribute);
         }
@@ -36,12 +36,7 @@ export const rebuildGeometry = (geom) => {
     return geometry;
 };
 
-export const drawGlobalBox = (
-    positions,
-    scene,
-    boundingBoxRef,
-    isBoxActive
-) => {
+export const drawGlobalBox = (positions, scene, boundingBoxRef, isBoxActive) => {
     if (!isBoxActive) {
         if (boundingBoxRef.current) {
             scene.remove(boundingBoxRef.current);
@@ -91,11 +86,7 @@ export const drawGlobalBox = (
     const boxMaterial = new LineBasicMaterial({ color: 0x555555 });
     const boxMesh = new LineSegments(boxEdges, boxMaterial);
 
-    boxMesh.position.set(
-        (minX + maxX) / 2,
-        (minY + maxY) / 2,
-        (minZ + maxZ) / 2
-    );
+    boxMesh.position.set((minX + maxX) / 2, (minY + maxY) / 2, (minZ + maxZ) / 2);
 
     if (boundingBoxRef.current) {
         scene.remove(boundingBoxRef.current);
@@ -124,18 +115,11 @@ export const drawCircleRuler = (scene, circleRulerRef, isCircleRulerActive) => {
 
         for (let i = 0; i < segments; i++) {
             const angle = (i / segments) * Math.PI * 2;
-            positions.push(
-                radius * Math.cos(angle),
-                radius * Math.sin(angle),
-                0
-            );
+            positions.push(radius * Math.cos(angle), radius * Math.sin(angle), 0);
         }
 
         const geometry = new BufferGeometry();
-        geometry.setAttribute(
-            "position",
-            new Float32BufferAttribute(positions, 3)
-        );
+        geometry.setAttribute("position", new Float32BufferAttribute(positions, 3));
 
         const material = new LineBasicMaterial({
             color: 0xffff00,

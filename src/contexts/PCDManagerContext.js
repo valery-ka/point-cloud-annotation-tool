@@ -8,8 +8,7 @@ const { FILES } = API_PATHS;
 const PCDManagerContext = createContext();
 
 export const PCDManagerProvider = ({ children }) => {
-    const { setActiveFrameIndex, setLoadingProgress, setAreFramesLoading } =
-        useFrames();
+    const { setActiveFrameIndex, setLoadingProgress, setAreFramesLoading } = useFrames();
 
     const [folderName, setFolderName] = useState([]);
     const [filePath, setFilePath] = useState(null);
@@ -50,7 +49,7 @@ export const PCDManagerProvider = ({ children }) => {
                 filePath,
                 handleFileChange,
                 handleFolderChange,
-                folderName
+                folderName,
             }}
         >
             {children}

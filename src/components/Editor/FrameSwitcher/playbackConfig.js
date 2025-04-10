@@ -8,12 +8,12 @@ export const playbackConfig = {
     },
     getNextSpeed: (currentSpeed) => {
         const speeds = Object.values(playbackConfig.speeds);
-        const currentIndex = speeds.findIndex(speed => speed.value === currentSpeed);
+        const currentIndex = speeds.findIndex((speed) => speed.value === currentSpeed);
         const nextIndex = (currentIndex + 1) % speeds.length;
         return speeds[nextIndex].value;
     },
     getSpeedLabel: (speed) => {
-        const speedEntry = Object.values(playbackConfig.speeds).find(s => s.value === speed);
+        const speedEntry = Object.values(playbackConfig.speeds).find((s) => s.value === speed);
         return speedEntry ? speedEntry.label : "1x";
-    }
+    },
 };

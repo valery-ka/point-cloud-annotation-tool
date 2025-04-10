@@ -19,8 +19,7 @@ export const ConfigProvider = ({ children }) => {
         const fetchConfig = async (endpoint) => {
             try {
                 const response = await fetch(CONFIG(endpoint));
-                if (!response.ok)
-                    throw new Error(`Error: ${response.statusText}`);
+                if (!response.ok) throw new Error(`Error: ${response.statusText}`);
                 return await response.json();
             } catch (error) {
                 console.error(`Loading error ${endpoint}:`, error);
@@ -56,9 +55,7 @@ export const ConfigProvider = ({ children }) => {
     }, [config]);
 
     return (
-        <ConfigContext.Provider
-            value={{ config, nonHiddenClasses, isConfigLoaded }}
-        >
+        <ConfigContext.Provider value={{ config, nonHiddenClasses, isConfigLoaded }}>
             {children}
         </ConfigContext.Provider>
     );

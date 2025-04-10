@@ -15,9 +15,7 @@ router.post("/:folder/:file", (req, res) => {
     const filePath = path.join(outputDir, file);
 
     if (!file.endsWith(".json")) {
-        return res
-            .status(400)
-            .json({ error: "Invalid file format. Only .json is supported." });
+        return res.status(400).json({ error: "Invalid file format. Only .json is supported." });
     }
 
     if (!fs.existsSync(outputDir)) {

@@ -12,7 +12,7 @@ onmessage = function (event) {
                 filePath,
                 geometryWorker: geometry,
             },
-            []
+            [],
         );
     });
 };

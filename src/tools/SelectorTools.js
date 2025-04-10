@@ -35,9 +35,7 @@ export default class SelectorTools {
 
     getHoveredPoint() {
         const point = this.selection.highlightedPoint;
-        this.hoveredPoint = point
-            ? { u: point.u, v: point.v, z: point.z }
-            : null;
+        this.hoveredPoint = point ? { u: point.u, v: point.v, z: point.z } : null;
     }
 
     clearHoveredPoint() {
@@ -113,7 +111,7 @@ export default class SelectorTools {
             this.classData.originalClassIndex,
             this.selection,
             this.hoveredPoint?.z,
-            polygon
+            polygon,
         );
 
         this.handleSelectedPoint(selectedPoints);
@@ -122,16 +120,10 @@ export default class SelectorTools {
     handleSelectedPoint(selectedPoints) {
         const modeType = MODES[this.selection.selectionMode]?.type;
         if (modeType === "paint") {
-            this.actions.paintSelectedPoints?.(
-                this.selection.selectionMode,
-                selectedPoints
-            );
+            this.actions.paintSelectedPoints?.(this.selection.selectionMode, selectedPoints);
             this.actions.handleSelectedPointsSize?.(selectedPoints);
         } else if (modeType === "filter") {
-            this.actions.filterSelectedPoints?.(
-                this.selection.selectionMode,
-                selectedPoints
-            );
+            this.actions.filterSelectedPoints?.(this.selection.selectionMode, selectedPoints);
         }
     }
 }

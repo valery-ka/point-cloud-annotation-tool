@@ -35,20 +35,14 @@ export const SettingsSlider = ({
             });
             setValue(value);
         },
-        [publish, updateSettings, editorSettings, action]
+        [publish, updateSettings, editorSettings, action],
     );
 
     return (
         <div className="slider-container">
             <h4>{title}</h4>
             <div className="slider-wrapper">
-                <Slider
-                    min={min}
-                    max={max}
-                    step={step}
-                    value={value}
-                    onChange={handleChange}
-                />
+                <Slider min={min} max={max} step={step} value={value} onChange={handleChange} />
                 <span className="slider-value">{value.toFixed(decimals)}</span>
             </div>
         </div>

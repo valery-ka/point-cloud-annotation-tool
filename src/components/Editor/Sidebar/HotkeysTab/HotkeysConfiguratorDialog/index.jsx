@@ -43,13 +43,10 @@ export const HotkeyConfiguratorDialog = () => {
 
     const handleDialogAction = useCallback(
         (data) => DIALOG_BUTTONS[data]?.action(),
-        [newHotkeys, cancelNewHotkeys]
+        [newHotkeys, cancelNewHotkeys],
     );
 
-    useSubscribeFunction(COMPONENT_NAME, handleDialogAction, [
-        newHotkeys,
-        cancelNewHotkeys,
-    ]);
+    useSubscribeFunction(COMPONENT_NAME, handleDialogAction, [newHotkeys, cancelNewHotkeys]);
 
     const handleInputFieldKeyDown = useCallback(
         (e, category, command) => {
@@ -85,16 +82,14 @@ export const HotkeyConfiguratorDialog = () => {
                 }
 
                 if (!comboParts.includes(keyChar) && comboParts.length < 3) {
-                    const newCombo = prevCombo
-                        ? `${prevCombo}+${keyChar}`
-                        : keyChar;
+                    const newCombo = prevCombo ? `${prevCombo}+${keyChar}` : keyChar;
                     return updateCommandHotkey(newCombo);
                 }
 
                 return prevCombo;
             });
         },
-        [prevKeyCombo]
+        [prevKeyCombo],
     );
 
     const handleInputFieldFocus = useCallback(
@@ -113,7 +108,7 @@ export const HotkeyConfiguratorDialog = () => {
                 },
             }));
         },
-        [newHotkeys]
+        [newHotkeys],
     );
 
     const handleInputFieldBlur = useCallback(
@@ -123,31 +118,25 @@ export const HotkeyConfiguratorDialog = () => {
                     ...prev,
                     [category]: {
                         ...prev[category],
-                        [command]: newKeyCombo.length
-                            ? newKeyCombo
-                            : prevKeyCombo,
+                        [command]: newKeyCombo.length ? newKeyCombo : prevKeyCombo,
                     },
                 };
 
-                const allEntries = Object.entries(newState).flatMap(
-                    ([cat, categoryObj]) =>
-                        Object.entries(categoryObj)
-                            .filter(([, value]) => value !== EMPTY_KEY)
-                            .map(([key, value]) => ({
-                                category: cat,
-                                command: key,
-                                value,
-                            }))
+                const allEntries = Object.entries(newState).flatMap(([cat, categoryObj]) =>
+                    Object.entries(categoryObj)
+                        .filter(([, value]) => value !== EMPTY_KEY)
+                        .map(([key, value]) => ({
+                            category: cat,
+                            command: key,
+                            value,
+                        })),
                 );
 
-                const valueMap = allEntries.reduce(
-                    (acc, { category, command, value }) => {
-                        if (!acc[value]) acc[value] = [];
-                        acc[value].push({ category, command });
-                        return acc;
-                    },
-                    {}
-                );
+                const valueMap = allEntries.reduce((acc, { category, command, value }) => {
+                    if (!acc[value]) acc[value] = [];
+                    acc[value].push({ category, command });
+                    return acc;
+                }, {});
 
                 Object.entries(valueMap).forEach(([value, entries]) => {
                     if (entries.length > 1) {
@@ -162,12 +151,12 @@ export const HotkeyConfiguratorDialog = () => {
                 return newState;
             });
         },
-        [newKeyCombo, prevKeyCombo]
+        [newKeyCombo, prevKeyCombo],
     );
 
     const getHotkey = useCallback(
         (category, command) => newHotkeys[category]?.[command],
-        [newHotkeys]
+        [newHotkeys],
     );
 
     const DIALOG_BUTTONS = {
@@ -181,9 +170,7 @@ export const HotkeyConfiguratorDialog = () => {
         Reset: {
             label: t(`${COMPONENT_NAME}reset`),
             action: () => {
-                setNewHotkeys(
-                    generateClassHotkeys(defaultHotkeys, nonHiddenClasses)
-                );
+                setNewHotkeys(generateClassHotkeys(defaultHotkeys, nonHiddenClasses));
             },
         },
         Clear: {
@@ -212,12 +199,10 @@ export const HotkeyConfiguratorDialog = () => {
             Object.fromEntries(
                 Object.keys(obj).map((key) => [
                     key,
-                    typeof obj[key] === "object"
-                        ? clearHotkeys(obj[key])
-                        : EMPTY_KEY,
-                ])
+                    typeof obj[key] === "object" ? clearHotkeys(obj[key]) : EMPTY_KEY,
+                ]),
             ),
-        []
+        [],
     );
 
     return (
@@ -240,47 +225,27 @@ export const HotkeyConfiguratorDialog = () => {
                             <div className="hotkey-configurator-title">
                                 {t(`${COMPONENT_NAME}${category}`)}
                             </div>
-                            {Object.entries(commands).map(
-                                ([command, hotkey]) => (
-                                    <div
-                                        key={command}
-                                        className="hotkey-configurator-item-container item"
-                                    >
-                                        <div className="hotkey-configurator-item-container command">
-                                            {getTranslatedCommand(
-                                                command,
-                                                nonHiddenClasses,
-                                                t
-                                            )}
-                                        </div>
-                                        <input
-                                            className="hotkey-configurator-item-container hotkey"
-                                            type="text"
-                                            value={getHotkey(category, command)}
-                                            onFocus={() =>
-                                                handleInputFieldFocus(
-                                                    category,
-                                                    command
-                                                )
-                                            }
-                                            onBlur={() =>
-                                                handleInputFieldBlur(
-                                                    category,
-                                                    command
-                                                )
-                                            }
-                                            onKeyDown={(e) =>
-                                                handleInputFieldKeyDown(
-                                                    e,
-                                                    category,
-                                                    command
-                                                )
-                                            }
-                                            readOnly
-                                        />
+                            {Object.entries(commands).map(([command, hotkey]) => (
+                                <div
+                                    key={command}
+                                    className="hotkey-configurator-item-container item"
+                                >
+                                    <div className="hotkey-configurator-item-container command">
+                                        {getTranslatedCommand(command, nonHiddenClasses, t)}
                                     </div>
-                                )
-                            )}
+                                    <input
+                                        className="hotkey-configurator-item-container hotkey"
+                                        type="text"
+                                        value={getHotkey(category, command)}
+                                        onFocus={() => handleInputFieldFocus(category, command)}
+                                        onBlur={() => handleInputFieldBlur(category, command)}
+                                        onKeyDown={(e) =>
+                                            handleInputFieldKeyDown(e, category, command)
+                                        }
+                                        readOnly
+                                    />
+                                </div>
+                            ))}
                         </div>
                     ))}
             </div>

@@ -18,12 +18,7 @@ export const usePointCloudLoader = (THEME_COLORS) => {
     const { theme } = settings.general;
     const { pcdFiles } = usePCDManager();
     const { setAreFramesLoading, setLoadingProgress } = useFrames();
-    const {
-        originalPositionsRef,
-        pointCloudRefs,
-        pointLabelsRef,
-        prevLabelsRef,
-    } = useEditor();
+    const { originalPositionsRef, pointCloudRefs, pointLabelsRef, prevLabelsRef } = useEditor();
 
     const POINT_MATERIAL = PointShader(POINT_SIZE_MULTIPLIER, theme, THEME_COLORS);
 
@@ -56,23 +51,15 @@ export const usePointCloudLoader = (THEME_COLORS) => {
                 const colorArray = new Uint8Array(numPoints * 3);
                 const sizeArray = new Uint8Array(numPoints);
 
-                geometry.setAttribute(
-                    "color",
-                    new BufferAttribute(colorArray, 3, true)
-                );
-                geometry.setAttribute(
-                    "size",
-                    new BufferAttribute(sizeArray, 1)
-                );
+                geometry.setAttribute("color", new BufferAttribute(colorArray, 3, true));
+                geometry.setAttribute("size", new BufferAttribute(sizeArray, 1));
 
                 const pointCloud = new Points(geometry, POINT_MATERIAL);
                 loadedPointClouds[filePath] = pointCloud;
 
                 scene.add(pointCloud);
                 pointCloudRefs.current[filePath] = pointCloud;
-                originalPositionsRef.current[filePath] = new Float32Array(
-                    positionArray
-                );
+                originalPositionsRef.current[filePath] = new Float32Array(positionArray);
 
                 loadedFrames++;
                 updateProgress();
@@ -85,17 +72,15 @@ export const usePointCloudLoader = (THEME_COLORS) => {
 
                     const intensityToColor = intensityArray.map((intensity) => {
                         const intensityColor = Math.round(
-                            minColor + (maxColor - minColor) * (intensity / 255)
+                            minColor + (maxColor - minColor) * (intensity / 255),
                         );
                         return intensityColor;
                     });
 
-                    const intensityToColorArray = new Uint8Array(
-                        intensityToColor
-                    );
+                    const intensityToColorArray = new Uint8Array(intensityToColor);
                     geometry.setAttribute(
                         "intensity",
-                        new BufferAttribute(intensityToColorArray, 1)
+                        new BufferAttribute(intensityToColorArray, 1),
                     );
                 }
 
@@ -120,36 +105,22 @@ export const usePointCloudLoader = (THEME_COLORS) => {
 
             try {
                 const inputWorker = LoadInputWorker();
-                const labels = await loadLabels(
-                    { folderName, fileName },
-                    inputWorker
-                );
-                pointLabelsRef.current[filePath] = new Uint8Array(
-                    Object.values(labels)
-                );
+                const labels = await loadLabels({ folderName, fileName }, inputWorker);
+                pointLabelsRef.current[filePath] = new Uint8Array(Object.values(labels));
                 inputWorker.terminate();
             } catch (error) {
                 if (!pointLabelsRef.current[filePath]) {
-                    pointLabelsRef.current[filePath] = new Uint8Array(
-                        numPoints
-                    ).fill(0);
+                    pointLabelsRef.current[filePath] = new Uint8Array(numPoints).fill(0);
                 }
 
                 const outputWorker = SaveOutputWorker();
                 const labels = pointLabelsRef.current[filePath];
                 const prevLabels = {};
 
-                saveLabels(
-                    { folderName, fileName },
-                    labels,
-                    prevLabels,
-                    outputWorker
-                );
+                saveLabels({ folderName, fileName }, labels, prevLabels, outputWorker);
             }
 
-            prevLabelsRef.current[filePath] = new Uint8Array(
-                pointLabelsRef.current[filePath]
-            );
+            prevLabelsRef.current[filePath] = new Uint8Array(pointLabelsRef.current[filePath]);
 
             loadedLabels++;
             updateProgress();
@@ -162,9 +133,7 @@ export const usePointCloudLoader = (THEME_COLORS) => {
                 setAreFramesLoading(false);
                 loaderWorker.terminate();
             } else {
-                setLoadingProgress(
-                    (loadedFrames + loadedLabels) / (2 * totalFiles)
-                );
+                setLoadingProgress((loadedFrames + loadedLabels) / (2 * totalFiles));
             }
         };
 

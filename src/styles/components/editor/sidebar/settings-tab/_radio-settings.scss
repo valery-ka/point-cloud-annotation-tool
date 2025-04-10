@@ -29,7 +29,7 @@
             padding: 3px 15px;
         }
 
-        input:checked+span {
+        input:checked + span {
             background-color: var(--radio-button-input-checked-bg-color);
             color: var(--radio-button-input-checked-text-color);
         }

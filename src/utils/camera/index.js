@@ -1,7 +1,2 @@
 export { CameraControls } from "./CameraControls";
-export {
-    switchView,
-    createCameraViews,
-    getPointPosition,
-    getTargetPosition,
-} from "./CameraViews";
+export { switchView, createCameraViews, getPointPosition, getTargetPosition } from "./CameraViews";

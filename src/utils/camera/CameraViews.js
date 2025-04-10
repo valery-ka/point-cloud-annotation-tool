@@ -1,10 +1,5 @@
 import { Vector3 } from "three";
-import {
-    cameraTween,
-    sphericalToCartesian,
-    toSpherical,
-    normalizeTheta,
-} from "./CameraTween";
+import { cameraTween, sphericalToCartesian, toSpherical, normalizeTheta } from "./CameraTween";
 import * as APP_CONSTANTS from "@constants";
 
 const { DISTANCE_TO_CENTER } = APP_CONSTANTS;
@@ -21,10 +16,7 @@ export const getPointPosition = (point, position) => {
 export const getTargetPosition = (camera, point, position) => {
     if (position) {
         const direction = new Vector3()
-            .subVectors(
-                new Vector3(...point),
-                new Vector3(0, 0, DISTANCE_TO_CENTER)
-            )
+            .subVectors(new Vector3(...point), new Vector3(0, 0, DISTANCE_TO_CENTER))
             .normalize();
         return {
             x: point[0] - direction.x * DISTANCE_TO_CENTER,
@@ -46,7 +38,7 @@ export const switchView = (
     camera,
     controls,
     tweenGroup,
-    requestPixelProjectionsUpdate
+    requestPixelProjectionsUpdate,
 ) => {
     if (!controls.enabledKeys) return;
 
@@ -64,10 +56,7 @@ export const switchView = (
     const currentSpherical = toSpherical(currentPos, currentTarget);
     const targetSpherical = toSpherical(targetPos, targetTarget);
 
-    targetSpherical.theta = normalizeTheta(
-        currentSpherical.theta,
-        targetSpherical.theta
-    );
+    targetSpherical.theta = normalizeTheta(currentSpherical.theta, targetSpherical.theta);
 
     cameraTween(
         {
@@ -83,10 +72,7 @@ export const switchView = (
             tz: targetTarget.z,
         },
         ({ tx, ty, tz, radius, theta, phi }) => {
-            const cartesian = sphericalToCartesian(
-                { radius, theta, phi },
-                { x: tx, y: ty, z: tz }
-            );
+            const cartesian = sphericalToCartesian({ radius, theta, phi }, { x: tx, y: ty, z: tz });
             camera.position.set(cartesian.x, cartesian.y, cartesian.z);
             controls.target.set(tx, ty, tz);
             controls.update();
@@ -96,16 +82,11 @@ export const switchView = (
             controls.target.set(targetTarget.x, targetTarget.y, targetTarget.z);
             controls.update();
             requestPixelProjectionsUpdate();
-        }
+        },
     );
 };
 
-export const createCameraViews = (
-    camera,
-    controls,
-    tweenGroup,
-    requestPixelProjectionsUpdate
-) => {
+export const createCameraViews = (camera, controls, tweenGroup, requestPixelProjectionsUpdate) => {
     return {
         switchToOriginView: () =>
             switchView(
@@ -114,7 +95,7 @@ export const createCameraViews = (
                 camera,
                 controls,
                 tweenGroup,
-                requestPixelProjectionsUpdate
+                requestPixelProjectionsUpdate,
             ),
         switchToTopView: () =>
             switchView(
@@ -127,7 +108,7 @@ export const createCameraViews = (
                 camera,
                 controls,
                 tweenGroup,
-                requestPixelProjectionsUpdate
+                requestPixelProjectionsUpdate,
             ),
         switchToLeftView: () =>
             switchView(
@@ -140,7 +121,7 @@ export const createCameraViews = (
                 camera,
                 controls,
                 tweenGroup,
-                requestPixelProjectionsUpdate
+                requestPixelProjectionsUpdate,
             ),
         switchToRightView: () =>
             switchView(
@@ -153,7 +134,7 @@ export const createCameraViews = (
                 camera,
                 controls,
                 tweenGroup,
-                requestPixelProjectionsUpdate
+                requestPixelProjectionsUpdate,
             ),
         switchToFrontView: () =>
             switchView(
@@ -166,7 +147,7 @@ export const createCameraViews = (
                 camera,
                 controls,
                 tweenGroup,
-                requestPixelProjectionsUpdate
+                requestPixelProjectionsUpdate,
             ),
         switchToBackView: () =>
             switchView(
@@ -179,7 +160,7 @@ export const createCameraViews = (
                 camera,
                 controls,
                 tweenGroup,
-                requestPixelProjectionsUpdate
+                requestPixelProjectionsUpdate,
             ),
     };
 };

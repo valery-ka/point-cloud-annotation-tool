@@ -1,13 +1,4 @@
-import {
-    Controls,
-    Quaternion,
-    Spherical,
-    Vector2,
-    Vector3,
-    Plane,
-    Ray,
-    MathUtils,
-} from "three";
+import { Controls, Quaternion, Spherical, Vector2, Vector3, Plane, Ray, MathUtils } from "three";
 
 const _changeEvent = { type: "change" };
 const _startEvent = { type: "start" };
@@ -142,10 +133,7 @@ class CameraControls extends Controls {
         this._lastTargetPosition = new Vector3();
 
         // so camera.up is the orbit axis
-        this._quat = new Quaternion().setFromUnitVectors(
-            object.up,
-            new Vector3(0, 1, 0)
-        );
+        this._quat = new Quaternion().setFromUnitVectors(object.up, new Vector3(0, 1, 0));
         this._quatInverse = this._quat.clone().invert();
 
         // current position in spherical coordinates
@@ -204,11 +192,7 @@ class CameraControls extends Controls {
             passive: false,
         });
 
-        document.addEventListener(
-            "mousemove",
-            this._navigationTransform,
-            false
-        );
+        document.addEventListener("mousemove", this._navigationTransform, false);
         document.addEventListener("mouseup", this._onMouseUp, false);
         document.addEventListener("mouseleave", this._onMouseLeave, false);
 
@@ -219,20 +203,12 @@ class CameraControls extends Controls {
     }
 
     disconnect() {
-        this.domElement.removeEventListener(
-            "mousedown",
-            this._onMouseDown,
-            false
-        );
+        this.domElement.removeEventListener("mousedown", this._onMouseDown, false);
         this.domElement.removeEventListener("wheel", this._onMouseWheel, {
             passive: false,
         });
 
-        document.removeEventListener(
-            "mousemove",
-            this._navigationTransform,
-            false
-        );
+        document.removeEventListener("mousemove", this._navigationTransform, false);
         document.removeEventListener("mouseup", this._onMouseUp, false);
         document.removeEventListener("mouseleave", this._onMouseLeave, false);
 
@@ -293,10 +269,8 @@ class CameraControls extends Controls {
         }
 
         if (this.enableDamping) {
-            this._spherical.theta +=
-                this._sphericalDelta.theta * this.dampingFactor;
-            this._spherical.phi +=
-                this._sphericalDelta.phi * this.dampingFactor;
+            this._spherical.theta += this._sphericalDelta.theta * this.dampingFactor;
+            this._spherical.phi += this._sphericalDelta.phi * this.dampingFactor;
         } else {
             this._spherical.theta += this._sphericalDelta.theta;
             this._spherical.phi += this._sphericalDelta.phi;
@@ -315,10 +289,7 @@ class CameraControls extends Controls {
             else if (max > Math.PI) max -= _twoPI;
 
             if (min <= max) {
-                this._spherical.theta = Math.max(
-                    min,
-                    Math.min(max, this._spherical.theta)
-                );
+                this._spherical.theta = Math.max(min, Math.min(max, this._spherical.theta));
             } else {
                 this._spherical.theta =
                     this._spherical.theta > (min + max) / 2
@@ -330,7 +301,7 @@ class CameraControls extends Controls {
         // restrict phi to be between desired limits
         this._spherical.phi = Math.max(
             this.minPolarAngle,
-            Math.min(this.maxPolarAngle, this._spherical.phi)
+            Math.min(this.maxPolarAngle, this._spherical.phi),
         );
 
         this._spherical.makeSafe();
@@ -351,18 +322,11 @@ class CameraControls extends Controls {
         let zoomChanged = false;
         // adjust the camera position based on zoom only if we're not zooming to the cursor or if it's an ortho camera
         // we adjust zoom later in these cases
-        if (
-            (this.zoomToCursor && this._performCursorZoom) ||
-            this.object.isOrthographicCamera
-        ) {
-            this._spherical.radius = this._clampDistance(
-                this._spherical.radius
-            );
+        if ((this.zoomToCursor && this._performCursorZoom) || this.object.isOrthographicCamera) {
+            this._spherical.radius = this._clampDistance(this._spherical.radius);
         } else {
             const prevRadius = this._spherical.radius;
-            this._spherical.radius = this._clampDistance(
-                this._spherical.radius * this._scale
-            );
+            this._spherical.radius = this._clampDistance(this._spherical.radius * this._scale);
             zoomChanged = prevRadius != this._spherical.radius;
         }
 
@@ -396,26 +360,19 @@ class CameraControls extends Controls {
                 newRadius = this._clampDistance(prevRadius * this._scale);
 
                 const radiusDelta = prevRadius - newRadius;
-                this.object.position.addScaledVector(
-                    this._dollyDirection,
-                    radiusDelta
-                );
+                this.object.position.addScaledVector(this._dollyDirection, radiusDelta);
                 this.object.updateMatrixWorld();
 
                 zoomChanged = !!radiusDelta;
             } else if (this.object.isOrthographicCamera) {
                 // adjust the ortho camera position based on zoom changes
-                const mouseBefore = new Vector3(
-                    this._mouse.x,
-                    this._mouse.y,
-                    0
-                );
+                const mouseBefore = new Vector3(this._mouse.x, this._mouse.y, 0);
                 mouseBefore.unproject(this.object);
 
                 const prevZoom = this.object.zoom;
                 this.object.zoom = Math.max(
                     this.minZoom,
-                    Math.min(this.maxZoom, this.object.zoom / this._scale)
+                    Math.min(this.maxZoom, this.object.zoom / this._scale),
                 );
                 this.object.updateProjectionMatrix();
 
@@ -430,7 +387,7 @@ class CameraControls extends Controls {
                 newRadius = _v.length();
             } else {
                 console.warn(
-                    "WARNING: CameraControls.js encountered an unknown camera type - zoom to cursor disabled."
+                    "WARNING: CameraControls.js encountered an unknown camera type - zoom to cursor disabled.",
                 );
                 this.zoomToCursor = false;
             }
@@ -447,22 +404,14 @@ class CameraControls extends Controls {
                 } else {
                     // get the ray and translation plane to compute target
                     _ray.origin.copy(this.object.position);
-                    _ray.direction
-                        .set(0, 0, -1)
-                        .transformDirection(this.object.matrix);
+                    _ray.direction.set(0, 0, -1).transformDirection(this.object.matrix);
 
                     // if the camera is 20 degrees above the horizon then don't adjust the focus target to avoid
                     // extremely large values
-                    if (
-                        Math.abs(this.object.up.dot(_ray.direction)) <
-                        _TILT_LIMIT
-                    ) {
+                    if (Math.abs(this.object.up.dot(_ray.direction)) < _TILT_LIMIT) {
                         this.object.lookAt(this.target);
                     } else {
-                        _plane.setFromNormalAndCoplanarPoint(
-                            this.object.up,
-                            this.target
-                        );
+                        _plane.setFromNormalAndCoplanarPoint(this.object.up, this.target);
                         _ray.intersectPlane(_plane, this.target);
                     }
                 }
@@ -471,7 +420,7 @@ class CameraControls extends Controls {
             const prevZoom = this.object.zoom;
             this.object.zoom = Math.max(
                 this.minZoom,
-                Math.min(this.maxZoom, this.object.zoom / this._scale)
+                Math.min(this.maxZoom, this.object.zoom / this._scale),
             );
 
             if (prevZoom !== this.object.zoom) {
@@ -557,65 +506,51 @@ class CameraControls extends Controls {
             let targetDistance = _v.length();
 
             // half of the fov is center to top of screen
-            targetDistance *= Math.tan(
-                ((this.object.fov / 2) * Math.PI) / 180.0
-            );
+            targetDistance *= Math.tan(((this.object.fov / 2) * Math.PI) / 180.0);
 
             // we use only clientHeight here so aspect ratio does not distort speed
-            this._panLeft(
-                (2 * deltaX * targetDistance) / element.clientHeight,
-                this.object.matrix
-            );
-            this._panUp(
-                (2 * deltaY * targetDistance) / element.clientHeight,
-                this.object.matrix
-            );
+            this._panLeft((2 * deltaX * targetDistance) / element.clientHeight, this.object.matrix);
+            this._panUp((2 * deltaY * targetDistance) / element.clientHeight, this.object.matrix);
         } else if (this.object.isOrthographicCamera) {
             // orthographic
             this._panLeft(
                 (deltaX * (this.object.right - this.object.left)) /
                     this.object.zoom /
                     element.clientWidth,
-                this.object.matrix
+                this.object.matrix,
             );
             this._panUp(
                 (deltaY * (this.object.top - this.object.bottom)) /
                     this.object.zoom /
                     element.clientHeight,
-                this.object.matrix
+                this.object.matrix,
             );
         } else {
             // camera neither orthographic nor perspective
             console.warn(
-                "WARNING: CameraControls.js encountered an unknown camera type - pan disabled."
+                "WARNING: CameraControls.js encountered an unknown camera type - pan disabled.",
             );
             this.enablePan = false;
         }
     }
 
     _dollyOut(dollyScale) {
-        if (
-            this.object.isPerspectiveCamera ||
-            this.object.isOrthographicCamera
-        ) {
+        if (this.object.isPerspectiveCamera || this.object.isOrthographicCamera) {
             this._scale /= dollyScale;
         } else {
             console.warn(
-                "WARNING: CameraControls.js encountered an unknown camera type - dolly/zoom disabled."
+                "WARNING: CameraControls.js encountered an unknown camera type - dolly/zoom disabled.",
             );
             this.enableZoom = false;
         }
     }
 
     _dollyIn(dollyScale) {
-        if (
-            this.object.isPerspectiveCamera ||
-            this.object.isOrthographicCamera
-        ) {
+        if (this.object.isPerspectiveCamera || this.object.isOrthographicCamera) {
             this._scale *= dollyScale;
         } else {
             console.warn(
-                "WARNING: CameraControls.js encountered an unknown camera type - dolly/zoom disabled."
+                "WARNING: CameraControls.js encountered an unknown camera type - dolly/zoom disabled.",
             );
             this.enableZoom = false;
         }
@@ -678,13 +613,9 @@ class CameraControls extends Controls {
 
             const element = this.domElement;
 
-            this._rotateLeft(
-                (_twoPI * this._rotateDelta.x) / element.clientHeight
-            ); // yes, height
+            this._rotateLeft((_twoPI * this._rotateDelta.x) / element.clientHeight); // yes, height
 
-            this._rotateUp(
-                (_twoPI * this._rotateDelta.y) / element.clientHeight
-            );
+            this._rotateUp((_twoPI * this._rotateDelta.y) / element.clientHeight);
 
             this._rotateStart.copy(this._rotateEnd);
 
@@ -696,9 +627,7 @@ class CameraControls extends Controls {
         if (isDragging) {
             this._panEnd.set(event.clientX, event.clientY);
 
-            this._panDelta
-                .subVectors(this._panEnd, this._panStart)
-                .multiplyScalar(this.panSpeed);
+            this._panDelta.subVectors(this._panEnd, this._panStart).multiplyScalar(this.panSpeed);
 
             this._pan(this._panDelta.x, this._panDelta.y);
 
@@ -747,9 +676,7 @@ class CameraControls extends Controls {
 
                 this._handleMouseMoveRotate(event);
             }
-        } else if (
-            this._isButtonsInverted.call(this, leftButton, mouseMove, event)
-        ) {
+        } else if (this._isButtonsInverted.call(this, leftButton, mouseMove, event)) {
             if (event.shiftKey) {
                 if (!shiftIsPressed) {
                     this._rotateStart.set(event.clientX, event.clientY);
@@ -858,9 +785,7 @@ function onMouseDown(event) {
         } else {
             this._handleMouseDownRotate(event);
         }
-    } else if (
-        this._isButtonsInverted.call(this, leftButton, mousePressed, event)
-    ) {
+    } else if (this._isButtonsInverted.call(this, leftButton, mousePressed, event)) {
         if (event.shiftKey) {
             this._handleMouseDownRotate(event);
         } else {
@@ -901,12 +826,7 @@ function onMouseWheel(event) {
         return;
     }
 
-    if (
-        this.enabled === false ||
-        this.enableZoom === false ||
-        this.state !== _STATE.NONE
-    )
-        return;
+    if (this.enabled === false || this.enableZoom === false || this.state !== _STATE.NONE) return;
 
     event.preventDefault();
     event.stopPropagation();
@@ -939,8 +859,7 @@ function isInputFocused() {
     const activeElement = document.activeElement;
     const tag = activeElement.tagName.toLowerCase();
 
-    const isEditable =
-        ["input", "div"].includes(tag) || activeElement.isContentEditable;
+    const isEditable = ["input", "div"].includes(tag) || activeElement.isContentEditable;
 
     const dialogOverlay = document.querySelector(".dialog-overlay");
 
@@ -952,13 +871,7 @@ function handleKeyDown(event) {
 
     const isNavigationButton = Object.values(this.keys).includes(event.which);
 
-    if (
-        !this.enabledKeys ||
-        !isNavigationButton ||
-        !this.keyPanSpeed ||
-        stopPanning
-    )
-        return;
+    if (!this.enabledKeys || !isNavigationButton || !this.keyPanSpeed || stopPanning) return;
 
     event.preventDefault();
 

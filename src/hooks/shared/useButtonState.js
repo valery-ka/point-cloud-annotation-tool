@@ -17,17 +17,11 @@ export const useButtonState = (buttonNames) => {
         const handlers = {};
 
         buttonNames.forEach((name) => {
-            const enableEvent = `enable${
-                name.charAt(0).toUpperCase() + name.slice(1)
-            }`;
-            const disableEvent = `disable${
-                name.charAt(0).toUpperCase() + name.slice(1)
-            }`;
+            const enableEvent = `enable${name.charAt(0).toUpperCase() + name.slice(1)}`;
+            const disableEvent = `disable${name.charAt(0).toUpperCase() + name.slice(1)}`;
 
-            const enable = () =>
-                setButtonStates((prev) => ({ ...prev, [name]: true }));
-            const disable = () =>
-                setButtonStates((prev) => ({ ...prev, [name]: false }));
+            const enable = () => setButtonStates((prev) => ({ ...prev, [name]: true }));
+            const disable = () => setButtonStates((prev) => ({ ...prev, [name]: false }));
 
             subscribe(enableEvent, enable);
             subscribe(disableEvent, disable);
@@ -37,12 +31,8 @@ export const useButtonState = (buttonNames) => {
 
         return () => {
             buttonNames.forEach((name) => {
-                const enableEvent = `enable${
-                    name.charAt(0).toUpperCase() + name.slice(1)
-                }`;
-                const disableEvent = `disable${
-                    name.charAt(0).toUpperCase() + name.slice(1)
-                }`;
+                const enableEvent = `enable${name.charAt(0).toUpperCase() + name.slice(1)}`;
+                const disableEvent = `disable${name.charAt(0).toUpperCase() + name.slice(1)}`;
 
                 unsubscribe(enableEvent, handlers[name]?.enable);
                 unsubscribe(disableEvent, handlers[name]?.disable);

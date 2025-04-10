@@ -44,10 +44,7 @@ class ErrorBoundary extends React.Component {
                 <div className="error-boundary">
                     <div className="error-boundary-content">
                         <div className="error-boundary-emoji">
-                            <div
-                                className="glitch"
-                                data-text={`${emoji}${normalTable}`}
-                            >
+                            <div className="glitch" data-text={`${emoji}${normalTable}`}>
                                 {emoji}
                                 {upsideDownTable}
                             </div>
@@ -59,10 +56,7 @@ class ErrorBoundary extends React.Component {
                         {stackLines.length > 0 && (
                             <div className="error-boundary-error-lines">
                                 {stackLines.map((line, index) => (
-                                    <div
-                                        key={index}
-                                        className="error-boundary-error-line"
-                                    >
+                                    <div key={index} className="error-boundary-error-line">
                                         {line}
                                     </div>
                                 ))}

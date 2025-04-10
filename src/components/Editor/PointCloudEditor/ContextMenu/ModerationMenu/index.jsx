@@ -28,15 +28,11 @@ export const ModerationMenu = ({
     const { folderName } = usePCDManager();
 
     const pointIssuesList = useMemo(() => {
-        return moderation.filter(
-            ({ applicableTo }) => applicableTo === "point"
-        );
+        return moderation.filter(({ applicableTo }) => applicableTo === "point");
     }, [config]);
 
     const objectIssuesList = useMemo(() => {
-        return moderation.filter(
-            ({ applicableTo }) => applicableTo === "object"
-        );
+        return moderation.filter(({ applicableTo }) => applicableTo === "object");
     }, [config]);
 
     const saveIssuesList = useCallback(() => {
@@ -81,31 +77,26 @@ export const ModerationMenu = ({
             });
             resetContextMenu();
         },
-        [activeFrameIndex, contextMenuPosition]
+        [activeFrameIndex, contextMenuPosition],
     );
 
     const handleContextMenuClick = useCallback(
         (issue) => {
             addIssue(issue);
         },
-        [addIssue]
+        [addIssue],
     );
 
     const handleKeyDown = useCallback(
         (event) => {
-            if (
-                event.key >= "1" &&
-                event.key <= "9" &&
-                isOpened &&
-                !isTextInputOpened
-            ) {
+            if (event.key >= "1" && event.key <= "9" && isOpened && !isTextInputOpened) {
                 const issue = pointIssuesList[+event.key - 1];
                 if (issue) {
                     addIssue(issue);
                 }
             }
         },
-        [addIssue, isTextInputOpened]
+        [addIssue, isTextInputOpened],
     );
 
     useEffect(() => {
@@ -135,29 +126,19 @@ export const ModerationMenu = ({
                     />
                 ) : (
                     pointIssuesList.map((issue, index) => (
-                        <div
-                            key={issue.value}
-                            className="context-menu-item-container"
-                        >
+                        <div key={issue.value} className="context-menu-item-container">
                             <div
                                 className="context-menu-item"
                                 onClick={() => handleContextMenuClick(issue)}
                             >
-                                <div className="context-menu-item-color">
-                                    {index + 1}
-                                </div>
-                                <div className="context-menu-item-title">
-                                    {issue.title}
-                                </div>
+                                <div className="context-menu-item-color">{index + 1}</div>
+                                <div className="context-menu-item-title">{issue.title}</div>
                                 <div
                                     className="context-menu-item-info"
                                     data-tooltip-id={`tooltip-${issue.value}`}
                                     data-tooltip-html={issue?.moderatorHint}
                                 >
-                                    <FontAwesomeIcon
-                                        icon={faQuestionCircle}
-                                        className="icon"
-                                    />
+                                    <FontAwesomeIcon icon={faQuestionCircle} className="icon" />
                                 </div>
                                 <Tooltip
                                     id={`tooltip-${issue.value}`}

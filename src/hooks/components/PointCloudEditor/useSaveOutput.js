@@ -11,19 +11,14 @@ const { UNDO_REDO_STACK_DEPTH, SAVE_FRAME_REQUEST_TIME } = APP_CONSTANTS;
 
 const debouncedSaveFrame = debounce(
     (saveFn, updateStack) => saveFn(updateStack),
-    SAVE_FRAME_REQUEST_TIME
+    SAVE_FRAME_REQUEST_TIME,
 );
 
 export const useSaveOutput = (updateUndoRedoState) => {
     const { pcdFiles, folderName } = usePCDManager();
     const { activeFrameIndex, areFramesLoading } = useFrames();
-    const {
-        pointLabelsRef,
-        prevLabelsRef,
-        undoStackRef,
-        redoStackRef,
-        setPendingSaveState,
-    } = useEditor();
+    const { pointLabelsRef, prevLabelsRef, undoStackRef, redoStackRef, setPendingSaveState } =
+        useEditor();
 
     const worker = useRef(null);
 
@@ -38,16 +33,11 @@ export const useSaveOutput = (updateUndoRedoState) => {
 
     const saveFrame = useCallback(async () => {
         const formattedData = formatPointLabels(pointLabelsRef.current);
-        const result = await saveLabels(
-            folderName,
-            formattedData,
-            worker.current
-        );
+        const result = await saveLabels(folderName, formattedData, worker.current);
 
         if (result.saved) {
             setPendingSaveState(false);
         }
-        
     }, [updateUndoRedoState]);
 
     const requestSaveFrame = useCallback(
@@ -64,9 +54,7 @@ export const useSaveOutput = (updateUndoRedoState) => {
                 redoStackRef.current[filePath] = [];
 
                 undoStackRef.current[filePath] = [
-                    ...undoStackRef.current[filePath].slice(
-                        -(UNDO_REDO_STACK_DEPTH - 1)
-                    ),
+                    ...undoStackRef.current[filePath].slice(-(UNDO_REDO_STACK_DEPTH - 1)),
                     { labels: new Uint8Array(previousLabels) },
                 ];
             }
@@ -75,7 +63,7 @@ export const useSaveOutput = (updateUndoRedoState) => {
 
             debouncedSaveFrame(saveFrame, updateStack);
         },
-        [saveFrame, pcdFiles, activeFrameIndex]
+        [saveFrame, pcdFiles, activeFrameIndex],
     );
 
     useEffect(() => {

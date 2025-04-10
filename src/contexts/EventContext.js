@@ -1,10 +1,4 @@
-import React, {
-    createContext,
-    useContext,
-    useEffect,
-    useState,
-    useCallback,
-} from "react";
+import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
 
 const EventContext = createContext();
 
@@ -31,7 +25,7 @@ export const EventProvider = ({ children }) => {
                 eventCallbacks[event].forEach((callback) => callback(data));
             }
         },
-        [eventCallbacks]
+        [eventCallbacks],
     );
 
     useEffect(() => {

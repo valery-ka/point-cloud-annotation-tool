@@ -18,9 +18,7 @@ export const useFrameSwitcher = (stopPlayback) => {
 
     const handleGoToNextFrame = useCallback(() => {
         stopPlayback();
-        setActiveFrameIndex((prevIndex) =>
-            Math.min(pcdFiles.length - 1, prevIndex + 1)
-        );
+        setActiveFrameIndex((prevIndex) => Math.min(pcdFiles.length - 1, prevIndex + 1));
     }, [setActiveFrameIndex, stopPlayback, pcdFiles]);
 
     const handleGoToLastFrame = useCallback(() => {

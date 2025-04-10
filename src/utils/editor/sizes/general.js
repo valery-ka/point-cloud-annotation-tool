@@ -25,7 +25,7 @@ const calculatePointSize = (
     sizeMap,
     generalPointSize,
     selectedClassPointSize,
-    selectedClassIndex
+    selectedClassIndex,
 ) => {
     const labelSize = sizeMap.get(pointLabel) ?? 0;
     const baseSize =
@@ -44,7 +44,7 @@ const updateSizeArray = (
     sizeMap,
     generalPointSize,
     selectedClassPointSize,
-    selectedClassIndex
+    selectedClassIndex,
 ) => {
     for (let i = 0; i < sizeArray.length; i++) {
         sizeArray[i] = calculatePointSize(
@@ -52,17 +52,12 @@ const updateSizeArray = (
             sizeMap,
             generalPointSize,
             selectedClassPointSize,
-            selectedClassIndex
+            selectedClassIndex,
         );
     }
 };
 
-export const updatePointsSize = (
-    pointCloud,
-    pointLabels,
-    sizeSettings,
-    selectedClassIndex
-) => {
+export const updatePointsSize = (pointCloud, pointLabels, sizeSettings, selectedClassIndex) => {
     const geometry = pointCloud.geometry;
     const sizeAttribute = geometry.attributes.size;
     if (!sizeAttribute) return;
@@ -78,7 +73,7 @@ export const updatePointsSize = (
         sizeMap,
         generalPointSize,
         selectedClassPointSize,
-        selectedClassIndex
+        selectedClassIndex,
     );
 
     invalidateSize(geometry);
@@ -89,7 +84,7 @@ export const updateSelectedPointsSize = (
     pointLabels,
     sizeSettings,
     selectedClassIndex,
-    selectedPointIndices
+    selectedPointIndices,
 ) => {
     const geometry = pointCloud.geometry;
     const sizeAttribute = geometry.attributes.size;
@@ -108,7 +103,7 @@ export const updateSelectedPointsSize = (
             sizeMap,
             generalPointSize,
             selectedClassPointSize,
-            selectedClassIndex
+            selectedClassIndex,
         );
     }
 
@@ -121,7 +116,7 @@ export const updateHighlightedPointSize = (
     sizeSettings,
     highlightedIndex,
     previousIndex,
-    selectedClassIndex
+    selectedClassIndex,
 ) => {
     const geometry = pointCloud.geometry;
     const sizeAttribute = geometry.attributes.size;
@@ -139,13 +134,11 @@ export const updateHighlightedPointSize = (
         sizeMap,
         generalPointSize,
         selectedClassPointSize,
-        selectedClassIndex
+        selectedClassIndex,
     );
 
     if (highlightedIndex !== undefined) {
-        sizeArray[highlightedIndex] += convertFloatToUint(
-            highlightedPointIncrement
-        );
+        sizeArray[highlightedIndex] += convertFloatToUint(highlightedPointIncrement);
     }
 
     invalidateSize(geometry);

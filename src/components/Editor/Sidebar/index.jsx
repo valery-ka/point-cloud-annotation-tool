@@ -61,9 +61,7 @@ export const Sidebar = memo(() => {
                         {tabs.map((tab, index) => (
                             <RenderSidebarTabsButton
                                 key={index}
-                                className={`sidebar-tab ${
-                                    index === activeTab ? "active" : ""
-                                }`}
+                                className={`sidebar-tab ${index === activeTab ? "active" : ""}`}
                                 title={tab.title}
                                 icon={tab.icon}
                                 onClick={() => setActiveTab(index)}

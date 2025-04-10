@@ -13,10 +13,7 @@ export const useFrameLaneMouseEvents = (frameLaneRef) => {
         (clientX) => {
             if (laneWidth > 0) {
                 const cursorX = clientX - laneStartX;
-                const normalizedPosition = Math.max(
-                    0,
-                    Math.min(cursorX / laneWidth, 1)
-                );
+                const normalizedPosition = Math.max(0, Math.min(cursorX / laneWidth, 1));
 
                 const adjustedIndex = normalizedPosition * pcdFiles.length;
 
@@ -24,7 +21,7 @@ export const useFrameLaneMouseEvents = (frameLaneRef) => {
             }
             return activeFrameIndex;
         },
-        [laneStartX, laneWidth, pcdFiles.length, activeFrameIndex]
+        [laneStartX, laneWidth, pcdFiles.length, activeFrameIndex],
     );
 
     const handleMouseDownLane = useCallback(
@@ -42,7 +39,7 @@ export const useFrameLaneMouseEvents = (frameLaneRef) => {
                 setIsDragging(true);
             }
         },
-        [updateFrameIndexFromPosition, frameLaneRef]
+        [updateFrameIndexFromPosition, frameLaneRef],
     );
 
     const handleMouseMoveLane = useCallback(
@@ -54,7 +51,7 @@ export const useFrameLaneMouseEvents = (frameLaneRef) => {
                 }
             }
         },
-        [isDragging, updateFrameIndexFromPosition, activeFrameIndex]
+        [isDragging, updateFrameIndexFromPosition, activeFrameIndex],
     );
 
     const handleMouseUpLane = useCallback(() => {

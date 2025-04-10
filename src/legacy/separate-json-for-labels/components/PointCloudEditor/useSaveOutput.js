@@ -11,13 +11,8 @@ const { UNDO_REDO_STACK_DEPTH, SAVE_FRAME_REQUEST_TIME } = APP_CONSTANTS;
 export const useSaveOutput = (updateUndoRedoState) => {
     const { pcdFiles } = usePCDManager();
     const { activeFrameIndex, areFramesLoading } = useFrames();
-    const {
-        pointLabelsRef,
-        prevLabelsRef,
-        undoStackRef,
-        redoStackRef,
-        setPendingSaveState,
-    } = useEditor();
+    const { pointLabelsRef, prevLabelsRef, undoStackRef, redoStackRef, setPendingSaveState } =
+        useEditor();
 
     const worker = useRef(null);
     const prevFrameIndex = useRef(activeFrameIndex);
@@ -50,7 +45,7 @@ export const useSaveOutput = (updateUndoRedoState) => {
                 { folderName, fileName },
                 labels,
                 previousLabels,
-                worker.current
+                worker.current,
             );
 
             if (result.saved) {
@@ -59,9 +54,7 @@ export const useSaveOutput = (updateUndoRedoState) => {
                     redoStackRef.current[filePath] = [];
 
                     undoStackRef.current[filePath] = [
-                        ...undoStackRef.current[filePath].slice(
-                            -(UNDO_REDO_STACK_DEPTH - 1)
-                        ),
+                        ...undoStackRef.current[filePath].slice(-(UNDO_REDO_STACK_DEPTH - 1)),
                         { labels: new Uint8Array(previousLabels) },
                     ];
                 }
@@ -71,7 +64,7 @@ export const useSaveOutput = (updateUndoRedoState) => {
 
             setPendingSaveState(false);
         },
-        [pcdFiles, updateUndoRedoState]
+        [pcdFiles, updateUndoRedoState],
     );
 
     const processQueue = useCallback(
@@ -81,7 +74,7 @@ export const useSaveOutput = (updateUndoRedoState) => {
                 await saveFrame(frameIndex, updateStack);
             }
         },
-        [saveFrame]
+        [saveFrame],
     );
 
     const requestSaveFrame = useCallback(
@@ -95,7 +88,7 @@ export const useSaveOutput = (updateUndoRedoState) => {
                 processQueue(updateStack);
             }, SAVE_FRAME_REQUEST_TIME);
         },
-        [processQueue]
+        [processQueue],
     );
 
     useEffect(() => {

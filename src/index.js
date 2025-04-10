@@ -11,5 +11,5 @@ root.render(
         <AppProviders>
             <App />
         </AppProviders>
-    </ErrorBoundary>
+    </ErrorBoundary>,
 );

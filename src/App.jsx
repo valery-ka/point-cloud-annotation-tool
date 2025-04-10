@@ -28,10 +28,7 @@ export const App = () => {
             <div className="tool-3d-scene">
                 <div className="tool-3d-container">
                     <ContextMenu />
-                    <canvas
-                        id="canvasSelection"
-                        className="tool-3d-canvas-selection"
-                    ></canvas>
+                    <canvas id="canvasSelection" className="tool-3d-canvas-selection"></canvas>
                     <Canvas>
                         <PointCloudEditor />
                     </Canvas>

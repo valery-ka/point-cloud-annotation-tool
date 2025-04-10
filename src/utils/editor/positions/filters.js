@@ -9,7 +9,7 @@ const getPointData = (
     activeFrameLabels,
     classesVisibility,
     originalPositions,
-    activeFramePositions
+    activeFramePositions,
 ) => {
     const label = activeFrameLabels[index / 3];
     const classVisibility = classesVisibility[label];
@@ -27,7 +27,7 @@ export const filterPoints = (
     activeFrameLabels,
     classesVisibility,
     minZ,
-    maxZ
+    maxZ,
 ) => {
     for (let i = 0; i < activeFramePositions.length; i += 3) {
         const { visible, originalZ, currentZ } = getPointData(
@@ -35,7 +35,7 @@ export const filterPoints = (
             activeFrameLabels,
             classesVisibility,
             originalPositions,
-            activeFramePositions
+            activeFramePositions,
         );
 
         if (originalZ < minZ || originalZ > maxZ) {
@@ -62,7 +62,7 @@ export const filterPointsBySelection = (
     updateGlobalBox,
     pointLabels,
     classesVisibility,
-    showFilterPoints
+    showFilterPoints,
 ) => {
     const filterPoints = MODES[mode]?.filter;
     if (!filterPoints) return;
@@ -80,7 +80,7 @@ export const filterPointsBySelection = (
         updateGlobalBox,
         pointLabels,
         classesVisibility,
-        showFilterPoints
+        showFilterPoints,
     );
 };
 
@@ -92,14 +92,14 @@ export const showFilterPointsBySelection = (
     classesVisibility,
     minZ,
     maxZ,
-    i
+    i,
 ) => {
     const { visible, originalZ } = getPointData(
         i,
         activeFrameLabels,
         classesVisibility,
         originalPositions,
-        activeFramePositions
+        activeFramePositions,
     );
 
     if (!visible) {
@@ -124,9 +124,7 @@ export const updateClassFilter = (action, classIndex, classesVisibilityRef) => {
     const classVisibility = classesData[classIndex];
     classVisibility[action] = !classVisibility[action];
 
-    const showMode = Object.values(classesData).some(
-        (classObj) => classObj.show
-    );
+    const showMode = Object.values(classesData).some((classObj) => classObj.show);
 
     Object.values(classesData).forEach((classObj) => {
         classObj.visible = showMode ? classObj.show : !classObj.hide;

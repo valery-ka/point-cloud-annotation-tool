@@ -1,7 +1,6 @@
 import * as APP_CONSTANTS from "@constants";
 
-const { FILL_COLOR, FILL_TYPE, BORDER_WIDTH, BORDER_COLOR } =
-    APP_CONSTANTS.SELECTION_OUTLINE;
+const { FILL_COLOR, FILL_TYPE, BORDER_WIDTH, BORDER_COLOR } = APP_CONSTANTS.SELECTION_OUTLINE;
 
 export function updateCanvasSize(canvas) {
     const width = canvas.clientWidth;

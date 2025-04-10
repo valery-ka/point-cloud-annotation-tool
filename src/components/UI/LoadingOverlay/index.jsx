@@ -8,7 +8,7 @@ export const LoadingOverlay = ({ message }) => {
     const { loadingProgress } = useFrames();
 
     const { t, i18n } = useTranslation();
-    
+
     const mainLanguage = i18n.language;
     const alternateLanguage = mainLanguage === "en" ? "ru" : "en";
 

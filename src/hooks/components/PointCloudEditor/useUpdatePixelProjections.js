@@ -22,19 +22,17 @@ export const useUpdatePixelProjections = (glSize) => {
 
     const requestPixelProjectionsUpdate = useCallback(
         debounce(() => {
-            const activeFrameFilePath =
-                pcdFilesRef.current[activeFrameIndexRef.current];
+            const activeFrameFilePath = pcdFilesRef.current[activeFrameIndexRef.current];
 
-            if (isEmpty(originalPositionsRef.current[activeFrameFilePath]))
-                return;
+            if (isEmpty(originalPositionsRef.current[activeFrameFilePath])) return;
             const projections = updatePixelProjections(
                 originalPositionsRef.current[activeFrameFilePath],
                 camera,
-                glSizeRef.current
+                glSizeRef.current,
             );
             setPixelProjections(projections);
         }, PIXEL_PROJECTION_REQUEST_TIME),
-        []
+        [],
     );
 
     useEffect(() => {
