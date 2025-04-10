@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef } from "react";
 import { useThree } from "@react-three/fiber";
 
-import { useTools } from "@contexts";
+import { useTools } from "contexts";
 
 export const useToolsMouseEvents = (selectorTools) => {
     const { gl } = useThree();

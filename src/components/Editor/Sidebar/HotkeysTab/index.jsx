@@ -2,12 +2,12 @@ import React, { memo } from "react";
 import { faCog } from "@fortawesome/free-solid-svg-icons";
 import { useTranslation } from "react-i18next";
 
-import { useSettings, useConfig } from "@contexts";
+import { useSettings, useConfig } from "contexts";
 
 import { HotkeyConfiguratorDialog } from "./HotkeysConfiguratorDialog";
 import { SidebarIcon } from "../SidebarIcon";
 
-import { getTranslatedCommand } from "@utils/settings";
+import { getTranslatedCommand } from "utils/settings";
 
 // const COMPONENT_NAME = "HotkeysTab.";
 const COMPONENT_NAME = "";

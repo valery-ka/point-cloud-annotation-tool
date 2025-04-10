@@ -1,15 +1,15 @@
 import { useEffect, useCallback } from "react";
 
-import { usePCDManager, useEditor, useFrames, useConfig } from "@contexts";
-import { useSubscribeFunction } from "@hooks";
+import { usePCDManager, useEditor, useFrames, useConfig } from "contexts";
+import { useSubscribeFunction } from "hooks";
 
 import {
     filterPoints,
     updateClassFilter,
     filterPointsBySelection,
     showFilterPointsBySelection,
-} from "@utils/editor";
-import * as APP_CONSTANTS from "@constants";
+} from "utils/editor";
+import * as APP_CONSTANTS from "constants";
 
 const { SELECTION } = APP_CONSTANTS.HIDDEN_POSITION;
 

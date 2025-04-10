@@ -1,9 +1,9 @@
 import { useEffect, useRef, useCallback } from "react";
 
-import { usePCDManager, useSettings, useEditor, useFrames, useConfig } from "@contexts";
-import { useSubscribeFunction } from "@hooks";
+import { usePCDManager, useSettings, useEditor, useFrames, useConfig } from "contexts";
+import { useSubscribeFunction } from "hooks";
 
-import { hexToRgb, changeClassOfSelection, updatePointCloudColors } from "@utils/editor";
+import { hexToRgb, changeClassOfSelection, updatePointCloudColors } from "utils/editor";
 
 export const usePaintFramePoints = (updateGlobalBox) => {
     const classColorsCache = useRef({});
@@ -26,7 +26,7 @@ export const usePaintFramePoints = (updateGlobalBox) => {
     } = useEditor();
 
     useEffect(() => {
-        if (selectedClassIndex == null) return;
+        if (selectedClassIndex === null) return;
 
         const originalIndex = nonHiddenClasses[selectedClassIndex].originalIndex;
         selectedClassColor.current = classColorsCache.current[originalIndex];

@@ -1,5 +1,5 @@
 import SelectorTools from "./SelectorTools";
-import * as APP_CONSTANTS from "@constants";
+import * as APP_CONSTANTS from "constants";
 
 const { DEFAULT_BRUSH_SIZE } = APP_CONSTANTS;
 
@@ -37,7 +37,7 @@ export default class BrushTool extends SelectorTools {
     }
 
     handleMouseDown(ev) {
-        if (ev.which == this.leftMouseButton) {
+        if (ev.which === this.leftMouseButton) {
             this.getHoveredPoint();
             this.drawHoveredPoint();
             this.selectByPolygon(this.polygon);
@@ -45,13 +45,13 @@ export default class BrushTool extends SelectorTools {
     }
 
     handleMouseDrag(ev) {
-        if (ev.which == this.leftMouseButton) {
+        if (ev.which === this.leftMouseButton) {
             this.selectByPolygon(this.polygon);
         }
     }
 
     handleMouseUp(ev) {
-        if (ev.which == this.leftMouseButton) {
+        if (ev.which === this.leftMouseButton) {
             this.clearHoveredPoint();
             this.actions.requestSaveFrame();
         }

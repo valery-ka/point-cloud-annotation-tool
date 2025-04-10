@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 
-import { useConfig } from "@contexts";
-import { generateClassHotkeys, generatePointsSizes } from "@utils/settings";
+import { useConfig } from "contexts";
+import { generateClassHotkeys, generatePointsSizes } from "utils/settings";
 
 export const useCustomClassesSettings = (settings, updateSettings) => {
     const { nonHiddenClasses } = useConfig();

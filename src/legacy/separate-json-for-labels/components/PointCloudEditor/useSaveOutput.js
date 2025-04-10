@@ -1,10 +1,10 @@
 import { useEffect, useRef, useCallback } from "react";
 
-import { usePCDManager, useEditor, useFrames } from "@contexts";
+import { usePCDManager, useEditor, useFrames } from "contexts";
 
-import { SaveOutputWorker } from "@workers";
-import { saveLabels } from "@utils/editor";
-import * as APP_CONSTANTS from "@constants";
+import { SaveOutputWorker } from "workers";
+import { saveLabels } from "utils/editor";
+import * as APP_CONSTANTS from "constants";
 
 const { UNDO_REDO_STACK_DEPTH, SAVE_FRAME_REQUEST_TIME } = APP_CONSTANTS;
 

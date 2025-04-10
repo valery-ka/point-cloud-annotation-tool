@@ -1,8 +1,8 @@
 import React, { useCallback } from "react";
 import { createPortal } from "react-dom";
 
-import { useEvent } from "@contexts";
-import { useMousetrapPause } from "@hooks";
+import { useEvent } from "contexts";
+import { useMousetrapPause } from "hooks";
 
 export const Dialog = ({
     isOpen,

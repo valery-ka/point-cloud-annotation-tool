@@ -1,6 +1,6 @@
 import { createContext, useContext, useState } from "react";
 
-import { useMousetrapPause } from "@hooks";
+import { useMousetrapPause } from "hooks";
 
 const FramesContext = createContext();
 

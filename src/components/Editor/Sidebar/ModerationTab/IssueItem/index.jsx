@@ -2,7 +2,7 @@ import React, { memo, useCallback } from "react";
 import { faCheck, faTimes, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { useTranslation } from "react-i18next";
 
-import { useEvent, useModeration } from "@contexts";
+import { useEvent, useModeration } from "contexts";
 
 import { SidebarIcon } from "../../SidebarIcon";
 

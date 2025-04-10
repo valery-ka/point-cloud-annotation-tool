@@ -1,4 +1,4 @@
-import { MODES } from "@tools";
+import { MODES } from "tools";
 import { filterPointsBySelection } from "../positions/filters";
 
 export const invalidateColor = (geometry) => {

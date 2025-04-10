@@ -1,5 +1,5 @@
 import React from "react";
-import * as HOOKS from "@hooks";
+import * as HOOKS from "hooks";
 
 import { ModerationComments } from "./ModerationComments";
 

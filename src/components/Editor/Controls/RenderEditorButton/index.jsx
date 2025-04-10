@@ -2,8 +2,8 @@ import React, { useEffect, useCallback, useState, memo } from "react";
 import { Tooltip } from "react-tooltip";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import { useBindHotkey } from "@hooks";
-import { useSettings, useEvent } from "@contexts";
+import { useBindHotkey } from "hooks";
+import { useSettings, useEvent } from "contexts";
 
 export const RenderEditorButton = memo(
     ({ className, title, actionType, action, icon, hotkey, onClick, persistent, toggleable }) => {

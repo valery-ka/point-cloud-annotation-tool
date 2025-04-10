@@ -9,9 +9,9 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { useTranslation } from "react-i18next";
 
-import { MODES } from "@tools";
-import { useEditor, useTools } from "@contexts";
-import * as APP_CONSTANTS from "@constants";
+import { MODES } from "tools";
+import { useEditor, useTools } from "contexts";
+import * as APP_CONSTANTS from "constants";
 
 import { RenderEditorButton } from "../RenderEditorButton";
 

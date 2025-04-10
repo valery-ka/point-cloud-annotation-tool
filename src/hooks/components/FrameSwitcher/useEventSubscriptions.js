@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-import { useEvent, usePCDManager, useFrames } from "@contexts";
+import { useEvent, usePCDManager, useFrames } from "contexts";
 
 export const useEventSubscriptions = (
     handleGoToFirstFrame,

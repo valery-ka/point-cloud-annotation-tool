@@ -1,4 +1,4 @@
-import * as APP_CONSTANTS from "@constants";
+import * as APP_CONSTANTS from "constants";
 
 const { HIDDEN_POINT } = APP_CONSTANTS;
 

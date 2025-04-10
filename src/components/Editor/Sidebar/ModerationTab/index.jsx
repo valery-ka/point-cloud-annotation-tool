@@ -8,8 +8,8 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { useTranslation } from "react-i18next";
 
-import { useModeration, useFrames } from "@contexts";
-import { useSubscribeFunction } from "@hooks";
+import { useModeration, useFrames } from "contexts";
+import { useSubscribeFunction } from "hooks";
 
 import { IssueItem } from "./IssueItem";
 import { SidebarIcon } from "../SidebarIcon";

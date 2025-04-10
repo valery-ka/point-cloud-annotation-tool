@@ -1,5 +1,5 @@
 import React, { useCallback, useState, useEffect } from "react";
-import { usePCDManager, useFrames } from "@contexts";
+import { usePCDManager, useFrames } from "contexts";
 
 export const useFrameLaneMouseEvents = (frameLaneRef) => {
     const { pcdFiles } = usePCDManager();

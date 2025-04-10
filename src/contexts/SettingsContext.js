@@ -6,13 +6,13 @@ import {
     useSettingsStorage,
     useGlobalEventListeners,
     useCustomClassesSettings,
-} from "@hooks";
+} from "hooks";
 import {
     defaultHotkeys,
     defaultActiveButtons,
     defaultEditorSettings,
     defaultGeneralSettings,
-} from "@utils/settings";
+} from "utils/settings";
 
 const defaultSettings = {
     general: defaultGeneralSettings,

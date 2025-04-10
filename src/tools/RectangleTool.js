@@ -2,20 +2,20 @@ import SelectorTools from "./SelectorTools";
 
 export default class RectangleTool extends SelectorTools {
     handleMouseDown(ev) {
-        if (ev.which == this.leftMouseButton) {
+        if (ev.which === this.leftMouseButton) {
             this.getHoveredPoint();
             this.drawHoveredPoint();
             this.pushPoint(ev.offsetX, ev.offsetY);
             this.startX = ev.offsetX;
             this.startY = ev.offsetY;
         }
-        if (ev.which == this.rightMouseButton) {
+        if (ev.which === this.rightMouseButton) {
             this.rightButtonPressed = true;
         }
     }
 
     handleMouseUp(ev) {
-        if (ev.which == this.leftMouseButton) {
+        if (ev.which === this.leftMouseButton) {
             this.selectByPolygon(this.polygon);
             this.polygon.length = 0;
             this.startX = this.startY = NaN;
@@ -27,7 +27,7 @@ export default class RectangleTool extends SelectorTools {
     }
 
     handleMouseDrag(ev) {
-        if (ev.which == this.leftMouseButton && !this.rightButtonPressed) {
+        if (ev.which === this.leftMouseButton && !this.rightButtonPressed) {
             this.polygon.length = 0;
             const fx = this.startX;
             const fy = this.startY;

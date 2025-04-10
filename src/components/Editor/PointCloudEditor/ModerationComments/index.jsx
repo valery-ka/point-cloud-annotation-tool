@@ -1,6 +1,6 @@
 import React from "react";
 
-import { useFrames, useModeration } from "@contexts";
+import { useFrames, useModeration } from "contexts";
 
 import { SceneButton } from "../SceneButton";
 

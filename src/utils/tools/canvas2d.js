@@ -1,4 +1,4 @@
-import * as APP_CONSTANTS from "@constants";
+import * as APP_CONSTANTS from "constants";
 
 const { FILL_COLOR, FILL_TYPE, BORDER_WIDTH, BORDER_COLOR } = APP_CONSTANTS.SELECTION_OUTLINE;
 

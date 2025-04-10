@@ -2,8 +2,8 @@ import React, { useCallback, useState, memo } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Tooltip } from "react-tooltip";
 
-import { useEvent, useSettings } from "@contexts";
-import { useBindHotkey } from "@hooks";
+import { useEvent, useSettings } from "contexts";
+import { useBindHotkey } from "hooks";
 
 export const RenderFrameSwitcherButton = memo(
     ({ className, title, action, actionType = "playback", icon, onClick, toggleable }) => {

@@ -9,7 +9,7 @@ import {
     EditorProvider,
     ToolsProvider,
     ModerationProvider,
-} from "@contexts";
+} from "contexts";
 
 const DataProviders = ({ children }) => (
     <EventProvider>

@@ -1,7 +1,7 @@
 import React, { memo } from "react";
 import { useTranslation } from "react-i18next";
 
-import { useConfig } from "@contexts";
+import { useConfig } from "contexts";
 
 import { Spoiler } from "./Spoiler";
 import { SettingsSlider } from "./Slider";

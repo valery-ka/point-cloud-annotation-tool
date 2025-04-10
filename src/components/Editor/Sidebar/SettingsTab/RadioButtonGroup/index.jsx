@@ -1,6 +1,6 @@
 import React, { useCallback } from "react";
 
-import { useSettings } from "@contexts";
+import { useSettings } from "contexts";
 
 export const RadioButtonGroup = ({ title, settingType, options, alias, name }) => {
     const { settings, updateSettings } = useSettings();

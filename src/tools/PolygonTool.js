@@ -30,7 +30,7 @@ export default class PolygonTool extends SelectorTools {
     }
 
     handleMouseDown(ev) {
-        if (ev.which == this.leftMouseButton) {
+        if (ev.which === this.leftMouseButton) {
             var offsetX = ev.offsetX;
             var offsetY = ev.offsetY;
             if (!this.isDrawing) {
@@ -49,7 +49,7 @@ export default class PolygonTool extends SelectorTools {
             } else {
                 this.pushPoint(offsetX, offsetY);
             }
-        } else if (ev.which == this.rightMouseButton) {
+        } else if (ev.which === this.rightMouseButton) {
             if (this.isDrawing && this.polygon.length > 2) {
                 this.removeLastPoint();
                 this.checkDrawingStatus();

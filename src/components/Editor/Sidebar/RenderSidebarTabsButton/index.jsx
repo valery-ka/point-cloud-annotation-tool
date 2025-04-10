@@ -2,7 +2,7 @@ import React, { useCallback, memo } from "react";
 import { Tooltip } from "react-tooltip";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import { useEvent } from "@contexts";
+import { useEvent } from "contexts";
 
 export const RenderSidebarTabsButton = memo(({ className, title, icon, onClick, action }) => {
     const { publish } = useEvent();

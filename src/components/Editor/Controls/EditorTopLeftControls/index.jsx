@@ -10,9 +10,9 @@ import {
 import Slider from "rc-slider";
 import { useTranslation } from "react-i18next";
 
-import { useEvent } from "@contexts";
-import { useButtonState } from "@hooks";
-import * as APP_CONSTANTS from "@constants";
+import { useEvent } from "contexts";
+import { useButtonState } from "hooks";
+import * as APP_CONSTANTS from "constants";
 
 import { RenderEditorButton } from "../RenderEditorButton";
 

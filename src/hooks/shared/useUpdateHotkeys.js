@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import "@config/mousetrap";
+import "config/mousetrap";
 
 export const useUpdateHotkeys = (settings, updateSettings) => {
     const updateHotkeys = useCallback(

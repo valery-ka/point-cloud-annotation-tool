@@ -2,12 +2,12 @@ import { BufferAttribute, Points } from "three";
 import { useEffect, useMemo } from "react";
 import { useThree } from "@react-three/fiber";
 
-import { usePCDManager, useEditor, useFrames, useSettings, useConfig } from "@contexts";
+import { usePCDManager, useEditor, useFrames, useSettings, useConfig } from "contexts";
 
-import { PointShader } from "@shaders";
-import { PCDLoaderWorker } from "@workers";
-import { rebuildGeometry, loadLabels } from "@utils/editor";
-import * as APP_CONSTANTS from "@constants";
+import { PointShader } from "shaders";
+import { PCDLoaderWorker } from "workers";
+import { rebuildGeometry, loadLabels } from "utils/editor";
+import * as APP_CONSTANTS from "constants";
 
 const { POINT_SIZE_MULTIPLIER } = APP_CONSTANTS;
 

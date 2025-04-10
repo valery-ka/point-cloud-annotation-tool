@@ -1,17 +1,17 @@
 import React, { useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 
-import { useSettings, useConfig } from "@contexts";
-import { useSubscribeFunction } from "@hooks";
+import { useSettings, useConfig } from "contexts";
+import { useSubscribeFunction } from "hooks";
 
-import { Dialog } from "@components";
+import { Dialog } from "components";
 
 import {
     keyCodes,
     defaultHotkeys,
     generateClassHotkeys,
     getTranslatedCommand,
-} from "@utils/settings";
+} from "utils/settings";
 
 // const COMPONENT_NAME = "HotkeyConfiguratorDialog.";
 const COMPONENT_NAME = "";

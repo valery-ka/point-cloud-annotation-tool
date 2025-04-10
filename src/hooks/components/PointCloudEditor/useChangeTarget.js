@@ -2,10 +2,10 @@ import { useEffect, useRef, useCallback } from "react";
 import { Vector3 } from "three";
 import { useThree } from "@react-three/fiber";
 
-import { useSettings, useHoveredPoint, useEvent } from "@contexts";
-import { useBindHotkey } from "@hooks";
+import { useSettings, useHoveredPoint, useEvent } from "contexts";
+import { useBindHotkey } from "hooks";
 
-import { switchView, getPointPosition, getTargetPosition } from "@utils/camera";
+import { switchView, getPointPosition, getTargetPosition } from "utils/camera";
 
 export const useChangeTarget = (controlsRef, tweenGroup, requestPixelProjectionsUpdate) => {
     const { camera, gl } = useThree();

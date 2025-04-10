@@ -1,6 +1,6 @@
 import { hidePoint, showPoint } from "./general";
-import { MODES } from "@tools";
-import * as APP_CONSTANTS from "@constants";
+import { MODES } from "tools";
+import * as APP_CONSTANTS from "constants";
 
 const { Z_FILTER, SELECTION, CLASS_FILTER } = APP_CONSTANTS.HIDDEN_POSITION;
 
@@ -42,7 +42,7 @@ export const filterPoints = (
             hidePoint(geometry, activeFramePositions, i, Z_FILTER);
         } else if (!visible) {
             hidePoint(geometry, activeFramePositions, i, CLASS_FILTER);
-        } else if (currentZ == SELECTION) {
+        } else if (currentZ === SELECTION) {
             continue;
         } else {
             showPoint(geometry, activeFramePositions, i, originalPositions);

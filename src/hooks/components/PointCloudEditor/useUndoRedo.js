@@ -1,7 +1,7 @@
 import { useEffect, useCallback } from "react";
 
-import { usePCDManager, useEditor, useFrames, useEvent } from "@contexts";
-import { useSubscribeFunction } from "@hooks";
+import { usePCDManager, useEditor, useFrames, useEvent } from "contexts";
+import { useSubscribeFunction } from "hooks";
 
 export const useUndoRedo = (requestSaveFrame, onUndoRedo) => {
     const { pcdFiles } = usePCDManager();

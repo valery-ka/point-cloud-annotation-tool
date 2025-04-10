@@ -2,12 +2,12 @@ import { useEffect, useRef, useCallback } from "react";
 import { useThree, useFrame } from "@react-three/fiber";
 import { Group } from "@tweenjs/tween.js";
 
-import { useEvent, useEditor, useTools, useSettings, useHoveredPoint } from "@contexts";
-import { useSubscribeFunction, useChangeTarget } from "@hooks";
+import { useEvent, useEditor, useTools, useSettings, useHoveredPoint } from "contexts";
+import { useSubscribeFunction, useChangeTarget } from "hooks";
 
-import { getToolsConfig } from "@tools";
-import { CameraControls, createCameraViews } from "@utils/camera";
-import * as APP_CONSTANTS from "@constants";
+import { getToolsConfig } from "tools";
+import { CameraControls, createCameraViews } from "utils/camera";
+import * as APP_CONSTANTS from "constants";
 
 const tweenGroup = new Group();
 const { DISTANCE_TO_CENTER } = APP_CONSTANTS;

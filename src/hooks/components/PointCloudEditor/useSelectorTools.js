@@ -9,11 +9,11 @@ import {
     useTools,
     useSettings,
     useHoveredPoint,
-} from "@contexts";
-import { useSubscribeFunction } from "@hooks";
+} from "contexts";
+import { useSubscribeFunction } from "hooks";
 
-import { BrushTool, PolygonTool, LassoTool, RectangleTool, MODES } from "@tools";
-import * as APP_CONSTANTS from "@constants";
+import { BrushTool, PolygonTool, LassoTool, RectangleTool, MODES } from "tools";
+import * as APP_CONSTANTS from "constants";
 
 const { DEFAULT_TOOL } = APP_CONSTANTS;
 

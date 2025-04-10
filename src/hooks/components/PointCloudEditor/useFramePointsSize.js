@@ -7,14 +7,14 @@ import {
     useFrames,
     useConfig,
     useHoveredPoint,
-} from "@contexts";
-import { useSubscribeFunction } from "@hooks";
+} from "contexts";
+import { useSubscribeFunction } from "hooks";
 
 import {
     updatePointsSize,
     updateSelectedPointsSize,
     updateHighlightedPointSize,
-} from "@utils/editor";
+} from "utils/editor";
 
 export const useFramePointsSize = () => {
     const { pcdFiles } = usePCDManager();

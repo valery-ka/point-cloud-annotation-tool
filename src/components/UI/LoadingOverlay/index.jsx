@@ -1,7 +1,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 
-import { usePCDManager, useFrames } from "@contexts";
+import { usePCDManager, useFrames } from "contexts";
 
 export const LoadingOverlay = ({ message }) => {
     const { pcdFiles } = usePCDManager();

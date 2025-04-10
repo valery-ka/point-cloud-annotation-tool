@@ -10,8 +10,8 @@ import {
     Sidebar,
     LoadingOverlay,
     ContextMenu,
-} from "@components";
-import { useConfig, useFrames } from "@contexts";
+} from "components";
+import { useConfig, useFrames } from "contexts";
 
 export const App = () => {
     const { isConfigLoaded } = useConfig();

@@ -9,8 +9,8 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { useTranslation } from "react-i18next";
 
-import { usePCDManager } from "@contexts";
-import { useSubscribeFunction } from "@hooks";
+import { usePCDManager } from "contexts";
+import { useSubscribeFunction } from "hooks";
 
 import { RenderSidebarTabsButton } from "./RenderSidebarTabsButton";
 import { ObjectsTab } from "./ObjectsTab";

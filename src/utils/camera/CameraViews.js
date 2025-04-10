@@ -1,6 +1,6 @@
 import { Vector3 } from "three";
 import { cameraTween, sphericalToCartesian, toSpherical, normalizeTheta } from "./CameraTween";
-import * as APP_CONSTANTS from "@constants";
+import * as APP_CONSTANTS from "constants";
 
 const { DISTANCE_TO_CENTER } = APP_CONSTANTS;
 

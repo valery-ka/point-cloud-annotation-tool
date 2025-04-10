@@ -20,7 +20,6 @@
         "mousetrap": "^1.6.5",
         "rc-slider": "^11.1.8",
         "react": "18.2.0",
-        "react-app-rewired": "^2.2.1",
         "react-dom": "18.2.0",
         "react-hook-form": "^7.55.0",
         "react-i18next": "^13.5.0",
@@ -31,8 +30,8 @@
     },
     "scripts": {
         "start": "node server/app.js",
-        "dev": "concurrently \"node server/app.js\" \"react-app-rewired start\"",
-        "build": "react-app-rewired build",
+        "dev": "concurrently \"node server/app.js\" \"react-scripts start\"",
+        "build": "cross-env GENERATE_SOURCEMAP=false react-scripts build",
         "eject": "react-scripts eject"
     },
     "lint-staged": {
@@ -61,8 +60,10 @@
     },
     "devDependencies": {
         "concurrently": "^9.1.2",
+        "cross-env": "^7.0.3",
         "husky": "^9.1.7",
         "lint-staged": "^15.5.0",
-        "prettier": "^3.5.3"
+        "prettier": "^3.5.3",
+        "react-app-rewired": "^2.2.1"
     }
 }

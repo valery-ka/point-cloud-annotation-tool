@@ -2,10 +2,10 @@ import React, { useCallback, useState, memo } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Tooltip } from "react-tooltip";
 
-import { useEvent } from "@contexts";
-import { useSubscribeFunction, useBindHotkey } from "@hooks";
+import { useEvent } from "contexts";
+import { useSubscribeFunction, useBindHotkey } from "hooks";
 
-import { ACTIONS } from "@utils/editor";
+import { ACTIONS } from "utils/editor";
 
 export const SidebarIcon = memo(
     ({

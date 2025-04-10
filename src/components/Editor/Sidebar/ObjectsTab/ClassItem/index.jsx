@@ -2,8 +2,8 @@ import React, { useCallback, memo } from "react";
 import { useTranslation } from "react-i18next";
 import { faEyeSlash, faBullseye, faEye, faBan } from "@fortawesome/free-solid-svg-icons";
 
-import { useBindHotkey } from "@hooks";
-import { useEvent, useSettings } from "@contexts";
+import { useBindHotkey } from "hooks";
+import { useEvent, useSettings } from "contexts";
 
 import { SidebarIcon } from "../../SidebarIcon";
 

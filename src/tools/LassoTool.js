@@ -2,18 +2,18 @@ import SelectorTools from "./SelectorTools";
 
 export default class LassoTool extends SelectorTools {
     handleMouseDown(ev) {
-        if (ev.which == this.leftMouseButton) {
+        if (ev.which === this.leftMouseButton) {
             this.getHoveredPoint();
             this.drawHoveredPoint();
             this.pushPoint(ev.offsetX, ev.offsetY);
         }
-        if (ev.which == this.rightMouseButton) {
+        if (ev.which === this.rightMouseButton) {
             this.rightButtonPressed = true;
         }
     }
 
     handleMouseUp(ev) {
-        if (ev.which == this.leftMouseButton) {
+        if (ev.which === this.leftMouseButton) {
             this.selectByPolygon(this.polygon);
             this.polygon.length = 0;
         }
@@ -24,7 +24,7 @@ export default class LassoTool extends SelectorTools {
     }
 
     handleMouseDrag(ev) {
-        if (ev.which == this.leftMouseButton && !this.rightButtonPressed) {
+        if (ev.which === this.leftMouseButton && !this.rightButtonPressed) {
             this.pushPoint(ev.offsetX, ev.offsetY);
         } else {
             this.polygon.length = 0;

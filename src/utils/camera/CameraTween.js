@@ -1,5 +1,5 @@
 import { Tween, Easing } from "@tweenjs/tween.js";
-import * as APP_CONSTANTS from "@constants";
+import * as APP_CONSTANTS from "constants";
 
 const { TWEEN_DURATION } = APP_CONSTANTS;
 

@@ -1,12 +1,12 @@
-import { MODES } from "@tools";
+import { MODES } from "tools";
 import {
     updateCanvasSize,
     clearCanvas,
     drawPolyLine,
     hoveredPoint,
     selectByPolygon,
-} from "@utils/tools";
-import * as APP_CONSTANTS from "@constants";
+} from "utils/tools";
+import * as APP_CONSTANTS from "constants";
 
 const { DEFAULT_MODE } = APP_CONSTANTS;
 
@@ -98,7 +98,7 @@ export default class SelectorTools {
     }
 
     drawHoveredPoint() {
-        if (this.hoveredPoint && this.selection.selectionMode == "paintDepth") {
+        if (this.hoveredPoint && this.selection.selectionMode === "paintDepth") {
             hoveredPoint(this.contextSelection, this.hoveredPoint);
         }
     }

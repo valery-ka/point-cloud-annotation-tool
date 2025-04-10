@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 
-import { usePCDManager, useFrames } from "@contexts";
+import { usePCDManager, useFrames } from "contexts";
 
 export const useFrameSwitcher = (stopPlayback) => {
     const { pcdFiles } = usePCDManager();

@@ -8,10 +8,10 @@ import {
     usePCDManager,
     useConfig,
     useTools,
-} from "@contexts";
+} from "contexts";
 
-import { findNearestPoints } from "@utils/editor";
-import * as APP_CONSTANTS from "@constants";
+import { findNearestPoints } from "utils/editor";
+import * as APP_CONSTANTS from "constants";
 
 const { DEFAULT_TOOL, HIDDEN_POINT } = APP_CONSTANTS;
 
@@ -27,7 +27,7 @@ export const useHighlightedPoint = () => {
     const { highlightedPoint, setHighlightedPoint, searcingRadius } = useHoveredPoint();
 
     useEffect(() => {
-        if (highlightedPoint == null) {
+        if (highlightedPoint === null) {
             gl.domElement.classList.remove("pointer-cursor");
         } else {
             gl.domElement.classList.add("pointer-cursor");

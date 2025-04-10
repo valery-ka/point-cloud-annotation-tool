@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 
-import { useHoveredPoint, useTools } from "@contexts";
+import { useHoveredPoint, useTools } from "contexts";
 
 import { ModerationMenu } from "./ModerationMenu";
 

@@ -3,7 +3,7 @@ import { useThree } from "@react-three/fiber";
 import { Html } from "@react-three/drei";
 import { useTranslation } from "react-i18next";
 
-import { useEvent } from "@contexts";
+import { useEvent } from "contexts";
 
 const MODERATION_TAB_INDEX = 2;
 

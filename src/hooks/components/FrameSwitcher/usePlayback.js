@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 
-import { usePCDManager, useFrames } from "@contexts";
+import { usePCDManager, useFrames } from "contexts";
 
 export const usePlayback = (playbackConfig) => {
     const { pcdFiles } = usePCDManager();

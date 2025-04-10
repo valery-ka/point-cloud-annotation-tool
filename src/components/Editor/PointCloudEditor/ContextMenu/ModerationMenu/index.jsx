@@ -3,12 +3,12 @@ import { Tooltip } from "react-tooltip";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faQuestionCircle } from "@fortawesome/free-solid-svg-icons";
 
-import { useModeration, useConfig, useFrames, usePCDManager } from "@contexts";
-import { useMousetrapPause } from "@hooks";
+import { useModeration, useConfig, useFrames, usePCDManager } from "contexts";
+import { useMousetrapPause } from "hooks";
 
 import { TextInputField } from "../TextInputField";
 
-import { API_PATHS } from "@config/apiPaths";
+import { API_PATHS } from "config/apiPaths";
 
 const { MODERATION } = API_PATHS;
 

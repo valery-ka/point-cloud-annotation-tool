@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-import { useEvent } from "@contexts";
+import { useEvent } from "contexts";
 
 export const useButtonState = (buttonNames) => {
     const { subscribe, unsubscribe } = useEvent();

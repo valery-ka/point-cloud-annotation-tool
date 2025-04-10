@@ -2,7 +2,7 @@ import { Color, Points, Vector3 } from "three";
 import { useEffect } from "react";
 import { useThree } from "@react-three/fiber";
 
-import { useSettings } from "@contexts";
+import { useSettings } from "contexts";
 
 const THEME_COLORS = {
     light: {

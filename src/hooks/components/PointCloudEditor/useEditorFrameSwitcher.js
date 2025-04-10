@@ -1,9 +1,9 @@
 import { useEffect } from "react";
 import { useFrame } from "@react-three/fiber";
 
-import { usePCDManager, useEditor, useFrames } from "@contexts";
+import { usePCDManager, useEditor, useFrames } from "contexts";
 
-import * as APP_CONSTANTS from "@constants";
+import * as APP_CONSTANTS from "constants";
 
 const { SELECTION } = APP_CONSTANTS.HIDDEN_POSITION;
 

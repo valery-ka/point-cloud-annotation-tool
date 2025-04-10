@@ -1,4 +1,4 @@
-import { API_PATHS } from "@config/apiPaths";
+import { API_PATHS } from "config/apiPaths";
 
 const { LABELS } = API_PATHS;
 

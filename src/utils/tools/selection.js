@@ -1,4 +1,4 @@
-import { MODES } from "@tools";
+import { MODES } from "tools";
 import { calculateBoundingRectangle, pointInPolyRaycast } from "./polygon.js";
 
 export function selectByPolygon(

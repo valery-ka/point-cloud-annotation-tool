@@ -2,13 +2,13 @@ import React, { useEffect, useState, useCallback, memo } from "react";
 import { useTranslation } from "react-i18next";
 import { faEye, faEyeSlash, faPlus } from "@fortawesome/free-solid-svg-icons";
 
-import { useEditor, useConfig, useEvent, useSettings, useTools } from "@contexts";
-import { useSubscribeFunction, useBindHotkey } from "@hooks";
+import { useEditor, useConfig, useEvent, useSettings, useTools } from "contexts";
+import { useSubscribeFunction, useBindHotkey } from "hooks";
 
 import { SidebarIcon } from "../SidebarIcon";
 import { ClassItem } from "./ClassItem";
 
-import * as APP_CONSTANTS from "@constants";
+import * as APP_CONSTANTS from "constants";
 
 // const COMPONENT_NAME = "ObjectsTab.";
 const COMPONENT_NAME = "";

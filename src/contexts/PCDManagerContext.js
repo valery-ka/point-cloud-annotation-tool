@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState } from "react";
 import { useFrames } from "./FramesProvider";
 
-import { API_PATHS } from "@config/apiPaths";
+import { API_PATHS } from "config/apiPaths";
 
 const { FILES } = API_PATHS;
 

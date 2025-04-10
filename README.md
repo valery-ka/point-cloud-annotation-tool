@@ -21,16 +21,14 @@ The app will run by default on http://localhost:3000
 ### Using Docker Compose
 
 1. Clone the repository or download the project files.
-2. Create a `.env` file in the root directory, specifying the path to your point cloud data:
+2. Create a `.env` file in the root directory, specifying the server port and the path to your point cloud data:
 
 ```
-NODE_ENV=production
-CLOUDS_PATH=/app/data/clouds
-OUTPUT_PATH=/app/data/output
 SERVER_PORT=3001
 DATA_PATH=/path/to/your/local/data
-Replace /path/to/your/local/data with the actual path to the data on your machine.
 ```
+
+Replace /path/to/your/local/data with the actual path to the data on your machine.
 
 3. Build and run the project using Docker Compose:
 

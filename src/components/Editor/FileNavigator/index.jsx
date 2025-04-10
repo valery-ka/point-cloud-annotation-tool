@@ -4,10 +4,10 @@ import { useTranslation } from "react-i18next";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSave } from "@fortawesome/free-solid-svg-icons";
 
-import { usePCDManager, useFrames, useEditor } from "@contexts";
-import { useClickOutsideBlur } from "@hooks";
+import { usePCDManager, useFrames, useEditor } from "contexts";
+import { useClickOutsideBlur } from "hooks";
 
-import { API_PATHS } from "@config/apiPaths";
+import { API_PATHS } from "config/apiPaths";
 
 // const COMPONENT_NAME = "FileNavigator.";
 const COMPONENT_NAME = "";

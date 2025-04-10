@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 
-import { useEvent } from "@contexts";
+import { useEvent } from "contexts";
 
 export const useSubscribeFunction = (eventName, callback, dependencies) => {
     const callbackRef = useRef();

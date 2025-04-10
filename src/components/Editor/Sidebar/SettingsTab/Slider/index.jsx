@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import Slider from "rc-slider";
 
-import { useEvent, useSettings } from "@contexts";
+import { useEvent, useSettings } from "contexts";
 
 export const SettingsSlider = ({
     title,

@@ -1,4 +1,4 @@
-import { arraysAreEqual } from "@utils/editor";
+import { arraysAreEqual } from "utils/editor";
 
 onmessage = function (e) {
     const { newLabels, prevLabels } = e.data;

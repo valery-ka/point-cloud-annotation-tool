@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 
-import { API_PATHS } from "@config/apiPaths";
+import { API_PATHS } from "config/apiPaths";
 
 const { CONFIG } = API_PATHS;
 

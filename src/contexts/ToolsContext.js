@@ -1,5 +1,5 @@
 import { createContext, useContext, useState } from "react";
-import * as APP_CONSTANTS from "@constants";
+import * as APP_CONSTANTS from "constants";
 
 const { DEFAULT_TOOL, DEFAULT_MODE } = APP_CONSTANTS;
 

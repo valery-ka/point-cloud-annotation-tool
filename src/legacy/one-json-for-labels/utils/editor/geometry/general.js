@@ -8,7 +8,7 @@ import {
     Float32BufferAttribute,
     LineLoop,
 } from "three";
-import * as APP_CONSTANTS from "@constants";
+import * as APP_CONSTANTS from "constants";
 
 const { CIRCLE_RULER_RADIUS } = APP_CONSTANTS;
 

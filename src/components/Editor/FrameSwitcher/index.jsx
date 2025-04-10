@@ -11,14 +11,14 @@ import {
     faChevronCircleRight,
 } from "@fortawesome/free-solid-svg-icons";
 
-import { usePCDManager, useFrames } from "@contexts";
+import { usePCDManager, useFrames } from "contexts";
 import {
     useEventSubscriptions,
     useFrameSwitcher,
     usePlayback,
     useClickOutsideBlur,
     useFrameLaneMouseEvents,
-} from "@hooks";
+} from "hooks";
 
 import { RenderFrameSwitcherButton } from "./RenderFrameSwitcherButton";
 
