@@ -11,7 +11,7 @@ import { API_PATHS } from "config/apiPaths";
 
 // const COMPONENT_NAME = "FileNavigator.";
 const COMPONENT_NAME = "";
-const { FOLDERS } = API_PATHS;
+const { NAVIGATOR } = API_PATHS;
 
 export const FileNavigator = memo(() => {
     const sceneSelectRef = useClickOutsideBlur();
@@ -55,7 +55,7 @@ export const FileNavigator = memo(() => {
     };
 
     useEffect(() => {
-        fetch(FOLDERS)
+        fetch(NAVIGATOR.ROOT)
             .then((res) => res.json())
             .then(setScenes)
             .catch(console.error);

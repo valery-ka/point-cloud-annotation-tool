@@ -1,14 +1,13 @@
 version: "3.9"
 
 services:
-  app:
-    build: .
-    ports:
-      - "${SERVER_PORT}:${SERVER_PORT}"
-    environment:
-      - NODE_ENV=production
-      - CLOUDS_PATH=/app/data/clouds
-      - OUTPUT_PATH=/app/data/output
-      - SERVER_PORT=${SERVER_PORT}
-    volumes:
-      - "${DATA_PATH}:/app/data"
+    app:
+        build: .
+        ports:
+            - "${SERVER_PORT}:${SERVER_PORT}"
+        environment:
+            - NODE_ENV=production
+            - DATA_PATH=/app/data
+            - SERVER_PORT=${SERVER_PORT}
+        volumes:
+            - "${DATA_PATH}:/app/data"

@@ -5,7 +5,7 @@ const { decode } = require("@msgpack/msgpack");
 const settings = require("../config/settings");
 
 const router = express.Router();
-const OUTPUT_DIR = settings.outputPath;
+const OUTPUT_DIR = settings.dataPath;
 
 // post labels / decoding msgpack to .json
 // post moderation (raw .json)

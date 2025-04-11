@@ -3,7 +3,7 @@ import { useFrames } from "./FramesProvider";
 
 import { API_PATHS } from "config/apiPaths";
 
-const { FILES } = API_PATHS;
+const { NAVIGATOR } = API_PATHS;
 
 const PCDManagerContext = createContext();
 
@@ -16,7 +16,7 @@ export const PCDManagerProvider = ({ children }) => {
 
     const handleFolderChange = (folder, folderFiles) => {
         const pcdFiles = folderFiles.filter((file) => file.endsWith(".pcd"));
-        const filePaths = pcdFiles.map((file) => FILES(folder, file));
+        const filePaths = pcdFiles.map((file) => NAVIGATOR.FILE(folder, file));
 
         setPcdFiles(filePaths);
         setActiveFrameIndex(0);
@@ -33,7 +33,7 @@ export const PCDManagerProvider = ({ children }) => {
     };
 
     const handleFileChange = (folder, file) => {
-        const newFilePath = FILES(folder, file);
+        const newFilePath = NAVIGATOR.FILE(folder, file);
         setFilePath(newFilePath);
 
         const newIndex = pcdFiles.indexOf(newFilePath);
