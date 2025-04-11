@@ -5,21 +5,21 @@ const { decode } = require("@msgpack/msgpack");
 const settings = require("../config/settings");
 
 const router = express.Router();
-const OUTPUT_DIR = settings.dataPath;
+const DATA_DIR = settings.dataPath;
 
 // post labels / decoding msgpack to .json
 // post moderation (raw .json)
 router.post("/:folder/:file", (req, res) => {
     const { folder, file } = req.params;
-    const outputDir = path.join(OUTPUT_DIR, folder);
-    const filePath = path.join(outputDir, file);
+    const solutionDir = path.join(DATA_DIR, folder);
+    const filePath = path.join(solutionDir, file);
 
     if (!file.endsWith(".json")) {
         return res.status(400).json({ error: "Invalid file format. Only .json is supported." });
     }
 
-    if (!fs.existsSync(outputDir)) {
-        fs.mkdirSync(outputDir, { recursive: true });
+    if (!fs.existsSync(solutionDir)) {
+        fs.mkdirSync(solutionDir, { recursive: true });
     }
 
     let dataToSave;
@@ -50,7 +50,7 @@ router.post("/:folder/:file", (req, res) => {
 // get any .json formatted data
 router.get("/:folder/:file", (req, res) => {
     const { folder, file } = req.params;
-    const filePath = path.join(OUTPUT_DIR, folder, file);
+    const filePath = path.join(DATA_DIR, folder, file);
 
     if (!fs.existsSync(filePath)) {
         return res.status(404).json({ error: "File not found" });
