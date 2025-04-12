@@ -32,13 +32,12 @@ export const FileNavigator = memo(() => {
         setSelectedScene(folderName);
 
         const folder = scenes.find((f) => f.name === folderName);
-        const folderFiles = folder ? folder.files : [];
-        setFrame(folderFiles);
+        const folderFiles = folder ? folder : [];
+        setFrame(folderFiles.pointclouds);
 
-        const pcdFiles = folderFiles.filter((file) => file.endsWith(".pcd"));
-        if (pcdFiles.length > 0) {
-            setSelectedFrame(pcdFiles[0]);
-            handleFileChange(folderName, pcdFiles[0]);
+        if (folderFiles.length > 0) {
+            setSelectedFrame(folderFiles.pointclouds[0]);
+            handleFileChange(folderName, folderFiles.pointclouds[0]);
         } else {
             setSelectedFrame("");
         }
@@ -99,13 +98,11 @@ export const FileNavigator = memo(() => {
                                 <option value="" disabled>
                                     {t(`${COMPONENT_NAME}selectFrame`)}
                                 </option>
-                                {frame
-                                    .filter((file) => file.endsWith(".pcd"))
-                                    .map((file) => (
-                                        <option key={file} value={file}>
-                                            {file}
-                                        </option>
-                                    ))}
+                                {frame.map((file) => (
+                                    <option key={file} value={file}>
+                                        {file}
+                                    </option>
+                                ))}
                             </select>
                         </>
                     )}

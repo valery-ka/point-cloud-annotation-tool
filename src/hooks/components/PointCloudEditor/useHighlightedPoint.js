@@ -120,7 +120,6 @@ export const useHighlightedPoint = () => {
                     : null;
 
                 const validIndex = index === -1 ? null : index;
-                console.log(index, validIndex);
                 setSelectedClassIndex(validIndex);
             }
         },

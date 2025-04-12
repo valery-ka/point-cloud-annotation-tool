@@ -28,7 +28,7 @@ export const usePaintFramePoints = (updateGlobalBox) => {
     useEffect(() => {
         if (selectedClassIndex === null) return;
 
-        const originalIndex = nonHiddenClasses[selectedClassIndex].originalIndex;
+        const originalIndex = nonHiddenClasses[selectedClassIndex]?.originalIndex;
         selectedClassColor.current = classColorsCache.current[originalIndex];
     }, [selectedClassIndex, nonHiddenClasses]);
 

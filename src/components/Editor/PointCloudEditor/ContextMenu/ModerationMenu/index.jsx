@@ -10,7 +10,7 @@ import { TextInputField } from "../TextInputField";
 
 import { API_PATHS } from "config/apiPaths";
 
-const { MODERATION } = API_PATHS;
+const { SOLUTION } = API_PATHS;
 
 export const ModerationMenu = ({
     menuRef,
@@ -38,7 +38,7 @@ export const ModerationMenu = ({
     const saveIssuesList = useCallback(() => {
         const issuesJSON = JSON.stringify(issues);
 
-        fetch(MODERATION(folderName), {
+        fetch(SOLUTION.MODERATION(folderName), {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

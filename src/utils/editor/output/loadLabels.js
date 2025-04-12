@@ -1,10 +1,10 @@
 import { API_PATHS } from "config/apiPaths";
 
-const { LABELS } = API_PATHS;
+const { SOLUTION } = API_PATHS;
 
 export const loadLabels = (folderName) => {
     return new Promise((resolve, reject) => {
-        fetch(LABELS(folderName), { method: "GET" })
+        fetch(SOLUTION.LABELS(folderName), { method: "GET" })
             .then((response) => {
                 if (!response.ok) {
                     return resolve([]);

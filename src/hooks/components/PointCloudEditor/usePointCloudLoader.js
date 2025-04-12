@@ -28,6 +28,8 @@ export const usePointCloudLoader = (THEME_COLORS) => {
     const POINT_MATERIAL = PointShader(POINT_SIZE_MULTIPLIER, theme, THEME_COLORS);
 
     useEffect(() => {
+        if (!availableLabels.size) return;
+
         const loaderWorker = PCDLoaderWorker();
         let activeWorkers = 0;
         const MAX_WORKERS = 2;
@@ -170,5 +172,5 @@ export const usePointCloudLoader = (THEME_COLORS) => {
             prevLabelsRef.current = {};
             loaderWorker.terminate();
         };
-    }, [pcdFiles, scene]);
+    }, [pcdFiles, scene, availableLabels]);
 };

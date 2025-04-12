@@ -4,7 +4,7 @@ import { usePCDManager } from "./PCDManagerContext";
 
 import { API_PATHS } from "config/apiPaths";
 
-const { MODERATION } = API_PATHS;
+const { SOLUTION } = API_PATHS;
 
 const ModerationContext = createContext();
 
@@ -16,7 +16,7 @@ export const ModerationProvider = ({ children }) => {
     useEffect(() => {
         if (!folderName.length) return;
 
-        fetch(MODERATION(folderName))
+        fetch(SOLUTION.MODERATION(folderName))
             .then((res) => res.json())
             .then((data) => {
                 if (data.error) {

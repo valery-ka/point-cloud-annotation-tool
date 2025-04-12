@@ -23,7 +23,7 @@ export const ConfigProvider = ({ children }) => {
 
         const fetchConfig = async (endpoint) => {
             try {
-                const response = await fetch(CONFIG(folderName, endpoint));
+                const response = await fetch(endpoint);
                 if (!response.ok) throw new Error(`Error: ${response.statusText}`);
                 return await response.json();
             } catch (error) {
@@ -33,13 +33,15 @@ export const ConfigProvider = ({ children }) => {
         };
 
         const loadAllConfigs = async () => {
-            const [classes, moderation, objects] = await Promise.all([
-                fetchConfig("classes"),
-                fetchConfig("moderation"),
-                fetchConfig("objects"),
-            ]);
+            const configEntries = await Promise.all(
+                Object.entries(CONFIG).map(async ([key, pathFn]) => {
+                    const data = await fetchConfig(pathFn(folderName));
+                    return [key.toLowerCase(), data];
+                }),
+            );
 
-            setConfig({ classes, moderation, objects });
+            const config = Object.fromEntries(configEntries);
+            setConfig(config);
             setIsConfigLoaded(true);
         };
 

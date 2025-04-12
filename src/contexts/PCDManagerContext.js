@@ -4,6 +4,7 @@ import { useFrames } from "./FramesProvider";
 import { API_PATHS } from "config/apiPaths";
 
 const { NAVIGATOR } = API_PATHS;
+const POINTCLOUDS_ROOT = "pointclouds";
 
 const PCDManagerContext = createContext();
 
@@ -11,32 +12,24 @@ export const PCDManagerProvider = ({ children }) => {
     const { setActiveFrameIndex, setLoadingProgress, setAreFramesLoading } = useFrames();
 
     const [folderName, setFolderName] = useState([]);
-    const [filePath, setFilePath] = useState(null);
     const [pcdFiles, setPcdFiles] = useState([]);
 
     const handleFolderChange = (folder, folderFiles) => {
-        const pcdFiles = folderFiles.filter((file) => file.endsWith(".pcd"));
-        const filePaths = pcdFiles.map((file) => NAVIGATOR.FILE(folder, file));
+        const pointclouds = folderFiles.pointclouds;
+        const pcdPaths = pointclouds.map((file) => NAVIGATOR.FILE(folder, POINTCLOUDS_ROOT, file));
 
-        setPcdFiles(filePaths);
+        setFolderName(folder);
+        setPcdFiles(pcdPaths);
+
         setActiveFrameIndex(0);
         setLoadingProgress(0);
         setAreFramesLoading(true);
-
-        setFolderName(folder);
-
-        if (filePaths.length > 0) {
-            setFilePath(filePaths[0]);
-        } else {
-            setFilePath(null);
-        }
     };
 
     const handleFileChange = (folder, file) => {
-        const newFilePath = NAVIGATOR.FILE(folder, file);
-        setFilePath(newFilePath);
-
+        const newFilePath = NAVIGATOR.FILE(folder, POINTCLOUDS_ROOT, file);
         const newIndex = pcdFiles.indexOf(newFilePath);
+
         if (newIndex !== -1) {
             setActiveFrameIndex(newIndex);
         }
@@ -46,7 +39,6 @@ export const PCDManagerProvider = ({ children }) => {
         <PCDManagerContext.Provider
             value={{
                 pcdFiles,
-                filePath,
                 handleFileChange,
                 handleFolderChange,
                 folderName,
