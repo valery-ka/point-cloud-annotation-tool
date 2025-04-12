@@ -13,13 +13,13 @@ import {
 
 const DataProviders = ({ children }) => (
     <EventProvider>
-        <ConfigProvider>
-            <FramesProvider>
-                <PCDManagerProvider>
+        <FramesProvider>
+            <PCDManagerProvider>
+                <ConfigProvider>
                     <ModerationProvider>{children}</ModerationProvider>
-                </PCDManagerProvider>
-            </FramesProvider>
-        </ConfigProvider>
+                </ConfigProvider>
+            </PCDManagerProvider>
+        </FramesProvider>
     </EventProvider>
 );
 

@@ -119,7 +119,7 @@ export const useFramePointsSize = () => {
             };
             return acc;
         }, {});
-    }, [settings.editorSettings.sizes]);
+    }, [settings.editorSettings.sizes, nonHiddenClasses]);
 
     return { handlePointsSize, handleSelectedPointsSize };
 };

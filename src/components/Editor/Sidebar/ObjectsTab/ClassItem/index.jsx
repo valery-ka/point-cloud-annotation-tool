@@ -41,7 +41,7 @@ export const ClassItem = memo(({ cls, index, action, hotkey, isSelected, isVisib
                 index={index}
                 type={"filterClass"}
                 action={"show"}
-                hotkey={hotkeys["showClass"][`showClass${index}`]}
+                hotkey={hotkeys["showClass"]?.[`showClass${index}`]}
                 toggleable={true}
                 altIcon={faBan}
             />
@@ -52,7 +52,7 @@ export const ClassItem = memo(({ cls, index, action, hotkey, isSelected, isVisib
                 index={index}
                 type={"filterClass"}
                 action={"hide"}
-                hotkey={hotkeys["hideClass"][`hideClass${index}`]}
+                hotkey={hotkeys["hideClass"]?.[`hideClass${index}`]}
                 toggleable={true}
                 altIcon={faEye}
             />

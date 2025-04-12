@@ -30,7 +30,7 @@ export const usePaintFramePoints = (updateGlobalBox) => {
 
         const originalIndex = nonHiddenClasses[selectedClassIndex].originalIndex;
         selectedClassColor.current = classColorsCache.current[originalIndex];
-    }, [selectedClassIndex]);
+    }, [selectedClassIndex, nonHiddenClasses]);
 
     useEffect(() => {
         if (!pcdFiles.length || areFramesLoading) return;
@@ -83,7 +83,7 @@ export const usePaintFramePoints = (updateGlobalBox) => {
                 updateBox: updateGlobalBox,
             });
         },
-        [pcdFiles, activeFrameIndex, selectedClassIndex],
+        [pcdFiles, activeFrameIndex, selectedClassIndex, nonHiddenClasses],
     );
 
     const handlePointCloudColors = useCallback(

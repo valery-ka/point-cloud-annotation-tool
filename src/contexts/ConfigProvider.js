@@ -1,5 +1,7 @@
 import { createContext, useContext, useState, useEffect } from "react";
 
+import { usePCDManager } from "./PCDManagerContext";
+
 import { API_PATHS } from "config/apiPaths";
 
 const { CONFIG } = API_PATHS;
@@ -14,16 +16,19 @@ export const ConfigProvider = ({ children }) => {
     });
     const [isConfigLoaded, setIsConfigLoaded] = useState(false);
     const [nonHiddenClasses, setNonHiddenClasses] = useState([]);
+    const { folderName } = usePCDManager();
 
     useEffect(() => {
+        if (!folderName.length) return;
+
         const fetchConfig = async (endpoint) => {
             try {
-                const response = await fetch(CONFIG(endpoint));
+                const response = await fetch(CONFIG(folderName, endpoint));
                 if (!response.ok) throw new Error(`Error: ${response.statusText}`);
                 return await response.json();
             } catch (error) {
                 console.error(`Loading error ${endpoint}:`, error);
-                return null;
+                return [];
             }
         };
 
@@ -39,7 +44,7 @@ export const ConfigProvider = ({ children }) => {
         };
 
         loadAllConfigs();
-    }, []);
+    }, [folderName]);
 
     useEffect(() => {
         if (config?.classes) {

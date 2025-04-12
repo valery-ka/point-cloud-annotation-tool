@@ -11,15 +11,10 @@ import {
     LoadingOverlay,
     ContextMenu,
 } from "components";
-import { useConfig, useFrames } from "contexts";
+import { useFrames } from "contexts";
 
 export const App = () => {
-    const { isConfigLoaded } = useConfig();
     const { areFramesLoading } = useFrames();
-
-    if (!isConfigLoaded) {
-        return <LoadingOverlay message="loadingConfig" />;
-    }
 
     return (
         <div className="tool-3d-app">

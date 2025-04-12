@@ -124,7 +124,7 @@ export const useHighlightedPoint = () => {
                 setSelectedClassIndex(validIndex);
             }
         },
-        [highlightedPoint, selectedTool],
+        [highlightedPoint, selectedTool, nonHiddenClasses],
     );
 
     useEffect(() => {

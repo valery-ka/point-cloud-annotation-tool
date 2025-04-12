@@ -28,11 +28,11 @@ export const ModerationMenu = ({
     const { folderName } = usePCDManager();
 
     const pointIssuesList = useMemo(() => {
-        return moderation.filter(({ applicableTo }) => applicableTo === "point");
+        return moderation?.filter(({ applicableTo }) => applicableTo === "point");
     }, [config]);
 
     const objectIssuesList = useMemo(() => {
-        return moderation.filter(({ applicableTo }) => applicableTo === "object");
+        return moderation?.filter(({ applicableTo }) => applicableTo === "object");
     }, [config]);
 
     const saveIssuesList = useCallback(() => {
@@ -108,6 +108,8 @@ export const ModerationMenu = ({
 
     useMousetrapPause(isOpened);
 
+    if (!moderation?.length) return null;
+
     return (
         <div
             ref={menuRef}
@@ -125,7 +127,7 @@ export const ModerationMenu = ({
                         addIssue={addIssue}
                     />
                 ) : (
-                    pointIssuesList.map((issue, index) => (
+                    pointIssuesList?.map((issue, index) => (
                         <div key={issue.value} className="context-menu-item-container">
                             <div
                                 className="context-menu-item"

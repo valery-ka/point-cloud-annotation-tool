@@ -9,7 +9,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { useTranslation } from "react-i18next";
 
-import { usePCDManager } from "contexts";
+import { usePCDManager, useFrames } from "contexts";
 import { useSubscribeFunction } from "hooks";
 
 import { RenderSidebarTabsButton } from "./RenderSidebarTabsButton";
@@ -23,6 +23,7 @@ const COMPONENT_NAME = "";
 
 export const Sidebar = memo(() => {
     const { pcdFiles } = usePCDManager();
+    const { areFramesLoading } = useFrames();
 
     const [activeTab, setActiveTab] = useState(0);
     const [sidebarVisible, setSidebarVisible] = useState(true);
@@ -36,7 +37,7 @@ export const Sidebar = memo(() => {
     useSubscribeFunction("toggleSidebar", toggleSidebar, []);
     useSubscribeFunction("setActiveTab", (data) => setActiveTab(data), []);
 
-    if (!pcdFiles.length) return null;
+    if (!pcdFiles.length || areFramesLoading) return null;
 
     const createTab = (icon, title, Component) => ({
         icon,

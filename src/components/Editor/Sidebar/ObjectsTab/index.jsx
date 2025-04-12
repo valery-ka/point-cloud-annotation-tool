@@ -63,7 +63,7 @@ export const ObjectsTab = memo(({ title }) => {
                 unsubscribe(actionName, callback);
             });
         };
-    }, [subscribe, unsubscribe]);
+    }, [subscribe, unsubscribe, nonHiddenClasses]);
 
     return (
         <div className="sidebar-tab-panel">
@@ -99,7 +99,7 @@ export const ObjectsTab = memo(({ title }) => {
                             cls={cls}
                             index={cls.originalIndex}
                             action={`selectClass${cls.originalIndex}`}
-                            hotkey={hotkeys["selectClass"][`selectClass${cls.originalIndex}`]}
+                            hotkey={hotkeys["selectClass"]?.[`selectClass${cls.originalIndex}`]}
                             isSelected={selectedClassIndex === idx}
                             isVisible={handleIsClassVisible(cls.originalIndex)}
                         />

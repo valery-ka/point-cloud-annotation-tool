@@ -83,6 +83,7 @@ export const useSelectorTools = (
             activeFrameIndex,
             selectedClassIndex,
             selectionMode,
+            nonHiddenClasses,
         ],
     );
 
