@@ -1,7 +1,7 @@
 import { useEffect, useRef, useCallback } from "react";
 import { useThree } from "@react-three/fiber";
 
-import { usePCDManager, useEditor, useFrames, useSettings } from "contexts";
+import { useFileManager, useEditor, useFrames, useSettings } from "contexts";
 import { useSubscribeFunction } from "hooks";
 
 import { drawGlobalBox, drawCircleRuler } from "utils/editor";
@@ -10,7 +10,7 @@ export const useEditorHelpers = () => {
     const { scene } = useThree();
     const { settings } = useSettings();
 
-    const { pcdFiles } = usePCDManager();
+    const { pcdFiles } = useFileManager();
     const { activeFramePositionsRef } = useEditor();
     const { activeFrameIndex, areFramesLoading } = useFrames();
 

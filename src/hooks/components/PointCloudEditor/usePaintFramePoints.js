@@ -1,6 +1,6 @@
 import { useEffect, useRef, useCallback } from "react";
 
-import { usePCDManager, useSettings, useEditor, useFrames, useConfig } from "contexts";
+import { useFileManager, useSettings, useEditor, useFrames, useConfig } from "contexts";
 import { useSubscribeFunction } from "hooks";
 
 import { hexToRgb, changeClassOfSelection, updatePointCloudColors } from "utils/editor";
@@ -12,7 +12,7 @@ export const usePaintFramePoints = (updateGlobalBox) => {
     const { settings } = useSettings();
     const pointColorRef = useRef(settings.editorSettings.colors);
 
-    const { pcdFiles } = usePCDManager();
+    const { pcdFiles } = useFileManager();
     const { nonHiddenClasses } = useConfig();
     const { activeFrameIndex, areFramesLoading } = useFrames();
     const {

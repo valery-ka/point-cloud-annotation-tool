@@ -11,7 +11,7 @@ import {
     faChevronCircleRight,
 } from "@fortawesome/free-solid-svg-icons";
 
-import { usePCDManager, useFrames } from "contexts";
+import { useFileManager, useFrames } from "contexts";
 import {
     useEventSubscriptions,
     useFrameSwitcher,
@@ -28,7 +28,7 @@ import { playbackConfig } from "./playbackConfig";
 const COMPONENT_NAME = "";
 
 export const FrameSwitcher = memo(() => {
-    const { pcdFiles } = usePCDManager();
+    const { pcdFiles } = useFileManager();
     const { activeFrameIndex } = useFrames();
 
     const { t } = useTranslation();

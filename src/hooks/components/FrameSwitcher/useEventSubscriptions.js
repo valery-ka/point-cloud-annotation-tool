@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-import { useEvent, usePCDManager, useFrames } from "contexts";
+import { useEvent, useFileManager, useFrames } from "contexts";
 
 export const useEventSubscriptions = (
     handleGoToFirstFrame,
@@ -11,7 +11,7 @@ export const useEventSubscriptions = (
     handlePlayCycle,
     handlePlaySpeed,
 ) => {
-    const { pcdFiles } = usePCDManager();
+    const { pcdFiles } = useFileManager();
     const { areFramesLoading } = useFrames();
     const { subscribe, unsubscribe } = useEvent();
 

@@ -4,22 +4,32 @@ import { useFrames } from "./FramesProvider";
 import { API_PATHS } from "config/apiPaths";
 
 const { NAVIGATOR } = API_PATHS;
-const POINTCLOUDS_ROOT = "pointclouds";
 
-const PCDManagerContext = createContext();
+const FileManagerContext = createContext();
 
-export const PCDManagerProvider = ({ children }) => {
+export const FileManagerProvider = ({ children }) => {
     const { setActiveFrameIndex, setLoadingProgress, setAreFramesLoading } = useFrames();
 
     const [folderName, setFolderName] = useState([]);
     const [pcdFiles, setPcdFiles] = useState([]);
+    const [images, setImages] = useState({});
 
     const handleFolderChange = (folder, folderFiles) => {
         const pointclouds = folderFiles.pointclouds;
-        const pcdPaths = pointclouds.map((file) => NAVIGATOR.FILE(folder, POINTCLOUDS_ROOT, file));
+        const imagesByCamera = folderFiles.images;
+
+        const pcdPaths = pointclouds.map((file) => NAVIGATOR.PCD(folder, file));
+
+        const imagesPaths = Object.fromEntries(
+            Object.entries(imagesByCamera).map(([cameraName, files]) => [
+                cameraName,
+                files.map((file) => NAVIGATOR.IMG(folder, cameraName, file)),
+            ]),
+        );
 
         setFolderName(folder);
         setPcdFiles(pcdPaths);
+        setImages(imagesPaths);
 
         setActiveFrameIndex(0);
         setLoadingProgress(0);
@@ -27,26 +37,24 @@ export const PCDManagerProvider = ({ children }) => {
     };
 
     const handleFileChange = (folder, file) => {
-        const newFilePath = NAVIGATOR.FILE(folder, POINTCLOUDS_ROOT, file);
+        const newFilePath = NAVIGATOR.PCD(folder, file);
         const newIndex = pcdFiles.indexOf(newFilePath);
-
-        if (newIndex !== -1) {
-            setActiveFrameIndex(newIndex);
-        }
+        setActiveFrameIndex(newIndex);
     };
 
     return (
-        <PCDManagerContext.Provider
+        <FileManagerContext.Provider
             value={{
+                folderName,
                 pcdFiles,
+                images,
                 handleFileChange,
                 handleFolderChange,
-                folderName,
             }}
         >
             {children}
-        </PCDManagerContext.Provider>
+        </FileManagerContext.Provider>
     );
 };
 
-export const usePCDManager = () => useContext(PCDManagerContext);
+export const useFileManager = () => useContext(FileManagerContext);

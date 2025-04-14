@@ -11,10 +11,13 @@ const SUBDIRECTORIES = [
     { name: "images", extensions: [".jpg", ".jpeg", ".png"] },
 ];
 
-const readFilesIfExists = async (dirPath, validExtensions = []) => {
+const readFilesIfExists = async (dirPath, subdir) => {
     try {
+        const { extensions } = SUBDIRECTORIES.find((s) => s.name === subdir) || {};
+        if (!extensions) return [];
+
         const files = await fs.readdir(dirPath);
-        return files.filter((f) => validExtensions.some((ext) => f.endsWith(ext)));
+        return files.filter((f) => extensions.some((ext) => f.endsWith(ext)));
     } catch {
         return [];
     }
@@ -30,19 +33,28 @@ router.get("/", async (req, res) => {
                 .map(async (dir) => {
                     const folderPath = path.join(DATA_DIR, dir.name);
 
-                    const data = await Promise.all(
-                        SUBDIRECTORIES.map(async ({ name, extensions }) => {
-                            const fullPath = path.join(folderPath, name);
-                            const files = await readFilesIfExists(fullPath, extensions);
-                            return [name, files];
-                        }),
+                    const pointclouds = await readFilesIfExists(
+                        path.join(folderPath, "pointclouds"),
+                        "pointclouds",
                     );
 
-                    const folderData = Object.fromEntries(data);
+                    let imagesByCamera = {};
+                    const imagesPath = path.join(folderPath, "images");
+                    try {
+                        const cameraDirs = await fs.readdir(imagesPath, { withFileTypes: true });
+                        for (const camDir of cameraDirs) {
+                            if (camDir.isDirectory()) {
+                                const camPath = path.join(imagesPath, camDir.name);
+                                const images = await readFilesIfExists(camPath, "images");
+                                imagesByCamera[camDir.name] = images;
+                            }
+                        }
+                    } catch {}
 
                     return {
                         name: dir.name,
-                        ...folderData,
+                        pointclouds,
+                        images: imagesByCamera,
                     };
                 }),
         );
@@ -54,15 +66,16 @@ router.get("/", async (req, res) => {
     }
 });
 
-router.get("/:folder/:subdir/:file", async (req, res) => {
-    const { folder, subdir, file } = req.params;
+router.get("/:folder/:subdir/*", async (req, res) => {
+    const { folder, subdir } = req.params;
+    const remainingPath = req.params[0];
 
     const allowedSubdir = SUBDIRECTORIES.find((s) => s.name === subdir);
     if (!allowedSubdir) {
         return res.status(400).json({ error: `Unsupported subdirectory: ${subdir}` });
     }
 
-    const filePath = path.join(DATA_DIR, folder, subdir, file);
+    const filePath = path.join(DATA_DIR, folder, subdir, remainingPath);
 
     try {
         await fs.access(filePath);

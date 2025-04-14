@@ -5,7 +5,7 @@ import {
     useEditor,
     useHoveredPoint,
     useFrames,
-    usePCDManager,
+    useFileManager,
     useConfig,
     useTools,
 } from "contexts";
@@ -18,7 +18,7 @@ const { DEFAULT_TOOL, HIDDEN_POINT } = APP_CONSTANTS;
 export const useHighlightedPoint = () => {
     const { gl } = useThree();
 
-    const { pcdFiles } = usePCDManager();
+    const { pcdFiles } = useFileManager();
     const { activeFrameIndex } = useFrames();
     const { nonHiddenClasses } = useConfig();
     const { activeFramePositionsRef, pointLabelsRef, pixelProjections, setSelectedClassIndex } =

@@ -1,10 +1,10 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 
-import { usePCDManager, useFrames } from "contexts";
+import { useFileManager, useFrames } from "contexts";
 
 export const LoadingOverlay = ({ message }) => {
-    const { pcdFiles } = usePCDManager();
+    const { pcdFiles } = useFileManager();
     const { loadingProgress } = useFrames();
 
     const { t, i18n } = useTranslation();

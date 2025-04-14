@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 
-import { usePCDManager } from "./PCDManagerContext";
+import { useFileManager } from "./FileManagerContext";
 
 import { API_PATHS } from "config/apiPaths";
 
@@ -16,7 +16,7 @@ export const ConfigProvider = ({ children }) => {
     });
     const [isConfigLoaded, setIsConfigLoaded] = useState(false);
     const [nonHiddenClasses, setNonHiddenClasses] = useState([]);
-    const { folderName } = usePCDManager();
+    const { folderName } = useFileManager();
 
     useEffect(() => {
         if (!folderName.length) return;

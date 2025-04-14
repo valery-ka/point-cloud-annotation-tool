@@ -1,14 +1,14 @@
 import { useEffect } from "react";
 import { useFrame } from "@react-three/fiber";
 
-import { usePCDManager, useEditor, useFrames } from "contexts";
+import { useFileManager, useEditor, useFrames } from "contexts";
 
 import * as APP_CONSTANTS from "constants";
 
 const { SELECTION } = APP_CONSTANTS.HIDDEN_POSITION;
 
 export const useEditorFrameSwitcher = (onFrameChanged) => {
-    const { pcdFiles } = usePCDManager();
+    const { pcdFiles } = useFileManager();
     const { activeFrameIndex, areFramesLoading } = useFrames();
     const {
         pointCloudRefs,

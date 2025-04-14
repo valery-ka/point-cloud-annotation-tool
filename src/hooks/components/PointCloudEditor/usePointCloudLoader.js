@@ -2,7 +2,7 @@ import { BufferAttribute, Points } from "three";
 import { useEffect, useMemo } from "react";
 import { useThree } from "@react-three/fiber";
 
-import { usePCDManager, useEditor, useFrames, useSettings, useConfig } from "contexts";
+import { useFileManager, useEditor, useFrames, useSettings, useConfig } from "contexts";
 
 import { PointShader } from "shaders";
 import { PCDLoaderWorker } from "workers";
@@ -16,7 +16,7 @@ export const usePointCloudLoader = (THEME_COLORS) => {
 
     const { settings } = useSettings();
     const { theme } = settings.general;
-    const { pcdFiles, folderName } = usePCDManager();
+    const { pcdFiles, folderName } = useFileManager();
     const { setAreFramesLoading, setLoadingProgress } = useFrames();
     const { originalPositionsRef, pointCloudRefs, pointLabelsRef, prevLabelsRef } = useEditor();
     const { nonHiddenClasses } = useConfig();

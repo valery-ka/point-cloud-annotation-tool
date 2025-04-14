@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSave } from "@fortawesome/free-solid-svg-icons";
 
-import { usePCDManager, useFrames, useEditor } from "contexts";
+import { useFileManager, useFrames, useEditor } from "contexts";
 import { useClickOutsideBlur } from "hooks";
 
 import { API_PATHS } from "config/apiPaths";
@@ -25,7 +25,7 @@ export const FileNavigator = memo(() => {
 
     const { pendingSaveState } = useEditor();
     const { activeFrameIndex } = useFrames();
-    const { handleFileChange, handleFolderChange, pcdFiles } = usePCDManager();
+    const { handleFileChange, handleFolderChange, pcdFiles } = useFileManager();
 
     const handleSceneChange = (event) => {
         const folderName = event.target.value;

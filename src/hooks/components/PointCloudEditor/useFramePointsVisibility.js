@@ -1,6 +1,6 @@
 import { useEffect, useCallback } from "react";
 
-import { usePCDManager, useEditor, useFrames, useConfig } from "contexts";
+import { useFileManager, useEditor, useFrames, useConfig } from "contexts";
 import { useSubscribeFunction } from "hooks";
 
 import {
@@ -14,7 +14,7 @@ import * as APP_CONSTANTS from "constants";
 const { SELECTION } = APP_CONSTANTS.HIDDEN_POSITION;
 
 export const useFramePointsVisibility = (updateGlobalBox) => {
-    const { pcdFiles } = usePCDManager();
+    const { pcdFiles } = useFileManager();
     const { nonHiddenClasses } = useConfig();
     const { activeFrameIndex, areFramesLoading } = useFrames();
     const {

@@ -3,7 +3,7 @@ import {
     ConfigProvider,
     EventProvider,
     FramesProvider,
-    PCDManagerProvider,
+    FileManagerProvider,
     HoveredPointProvider,
     SettingsProvider,
     EditorProvider,
@@ -14,11 +14,11 @@ import {
 const DataProviders = ({ children }) => (
     <EventProvider>
         <FramesProvider>
-            <PCDManagerProvider>
+            <FileManagerProvider>
                 <ConfigProvider>
                     <ModerationProvider>{children}</ModerationProvider>
                 </ConfigProvider>
-            </PCDManagerProvider>
+            </FileManagerProvider>
         </FramesProvider>
     </EventProvider>
 );

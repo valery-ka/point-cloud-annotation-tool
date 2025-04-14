@@ -4,7 +4,7 @@ import {
     useEditor,
     useFrames,
     useConfig,
-    usePCDManager,
+    useFileManager,
     useEvent,
     useTools,
     useSettings,
@@ -23,7 +23,7 @@ export const useSelectorTools = (
     handleSelectedPointsSize,
     requestSaveFrame,
 ) => {
-    const { pcdFiles } = usePCDManager();
+    const { pcdFiles } = useFileManager();
     const { nonHiddenClasses } = useConfig();
     const { isPlaying, activeFrameIndex } = useFrames();
     const { subscribe, unsubscribe } = useEvent();

@@ -1,3 +1,8 @@
+export { useDebugger } from "./dev/useDebugger";
+export { useWhyUpdate } from "./dev/useWhyUpdate";
+export { useRenderCount } from "./dev/useRenderCount";
+export { useTimeSinceMount } from "./dev/useTimeSinceMount";
+
 export { useTheme } from "./shared/useTheme";
 export { useLanguage } from "./shared/useLanguage";
 export { useBindHotkey } from "./shared/useBindHotkey";

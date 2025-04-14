@@ -1,8 +1,8 @@
 import React, { useCallback, useState, useEffect } from "react";
-import { usePCDManager, useFrames } from "contexts";
+import { useFileManager, useFrames } from "contexts";
 
 export const useFrameLaneMouseEvents = (frameLaneRef) => {
-    const { pcdFiles } = usePCDManager();
+    const { pcdFiles } = useFileManager();
     const { activeFrameIndex, setActiveFrameIndex } = useFrames();
 
     const [isDragging, setIsDragging] = useState(false);

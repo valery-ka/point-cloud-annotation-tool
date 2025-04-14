@@ -1,7 +1,7 @@
 import { useEffect, useRef, useCallback } from "react";
 import { debounce } from "lodash";
 
-import { usePCDManager, useEditor, useFrames } from "contexts";
+import { useFileManager, useEditor, useFrames } from "contexts";
 
 import { SaveOutputWorker } from "workers";
 import { saveLabels, formatPointLabels } from "utils/editor";
@@ -15,7 +15,7 @@ const debouncedSaveFrame = debounce(
 );
 
 export const useSaveOutput = (updateUndoRedoState) => {
-    const { pcdFiles, folderName } = usePCDManager();
+    const { pcdFiles, folderName } = useFileManager();
     const { activeFrameIndex, areFramesLoading } = useFrames();
     const { pointLabelsRef, prevLabelsRef, undoStackRef, redoStackRef, setPendingSaveState } =
         useEditor();

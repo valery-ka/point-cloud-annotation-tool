@@ -3,7 +3,7 @@ import { Tooltip } from "react-tooltip";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faQuestionCircle } from "@fortawesome/free-solid-svg-icons";
 
-import { useModeration, useConfig, useFrames, usePCDManager } from "contexts";
+import { useModeration, useConfig, useFrames, useFileManager } from "contexts";
 import { useMousetrapPause } from "hooks";
 
 import { TextInputField } from "../TextInputField";
@@ -25,7 +25,7 @@ export const ModerationMenu = ({
     const { moderation } = config;
     const { activeFrameIndex } = useFrames();
     const { issues, setIssues } = useModeration();
-    const { folderName } = usePCDManager();
+    const { folderName } = useFileManager();
 
     const pointIssuesList = useMemo(() => {
         return moderation?.filter(({ applicableTo }) => applicableTo === "point");

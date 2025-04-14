@@ -2,7 +2,7 @@ import { useEffect, useRef, useCallback } from "react";
 
 import {
     useEditor,
-    usePCDManager,
+    useFileManager,
     useSettings,
     useFrames,
     useConfig,
@@ -17,7 +17,7 @@ import {
 } from "utils/editor";
 
 export const useFramePointsSize = () => {
-    const { pcdFiles } = usePCDManager();
+    const { pcdFiles } = useFileManager();
     const { nonHiddenClasses } = useConfig();
     const { activeFrameIndex } = useFrames();
     const { highlightedPoint } = useHoveredPoint();

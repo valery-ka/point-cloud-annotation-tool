@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 
-import { usePCDManager, useFrames } from "contexts";
+import { useFileManager, useFrames } from "contexts";
 
 export const usePlayback = (playbackConfig) => {
-    const { pcdFiles } = usePCDManager();
+    const { pcdFiles } = useFileManager();
     const { isPlaying, setIsPlaying, setActiveFrameIndex } = useFrames();
 
     const [isPlayCycle, setIsPlayCycle] = useState(false);

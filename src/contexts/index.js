@@ -3,7 +3,7 @@ export { EventProvider, useEvent } from "./EventContext";
 export { ConfigProvider, useConfig } from "./ConfigProvider";
 export { FramesProvider, useFrames } from "./FramesProvider";
 export { EditorProvider, useEditor } from "./EditorContext";
-export { PCDManagerProvider, usePCDManager } from "./PCDManagerContext";
+export { FileManagerProvider, useFileManager } from "./FileManagerContext";
 export { HoveredPointProvider, useHoveredPoint } from "./HoveredPointContext";
 export { SettingsProvider, useSettings } from "./SettingsContext";
 export { ToolsProvider, useTools } from "./ToolsContext";

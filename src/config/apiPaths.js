@@ -3,7 +3,8 @@ const API_BASE = "/api";
 export const API_PATHS = {
     NAVIGATOR: {
         ROOT: `${API_BASE}/navigator`,
-        FILE: (folder, subdir, file) => `${API_BASE}/navigator/${folder}/${subdir}/${file}`,
+        PCD: (folder, file) => `${API_BASE}/navigator/${folder}/pointclouds/${file}`,
+        IMG: (folder, camera, file) => `${API_BASE}/navigator/${folder}/images/${camera}/${file}`,
     },
     CONFIG: {
         JOB: (folder) => `${API_BASE}/config/${folder}/job.json`,

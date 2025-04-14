@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 
-import { usePCDManager } from "./PCDManagerContext";
+import { useFileManager } from "./FileManagerContext";
 
 import { API_PATHS } from "config/apiPaths";
 
@@ -11,7 +11,7 @@ const ModerationContext = createContext();
 export const ModerationProvider = ({ children }) => {
     const [issues, setIssues] = useState([]);
     const [isIssuesHidden, setIsIssuesHidden] = useState(false);
-    const { folderName } = usePCDManager();
+    const { folderName } = useFileManager();
 
     useEffect(() => {
         if (!folderName.length) return;

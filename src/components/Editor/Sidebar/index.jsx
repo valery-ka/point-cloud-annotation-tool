@@ -9,7 +9,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { useTranslation } from "react-i18next";
 
-import { usePCDManager, useFrames } from "contexts";
+import { useFileManager, useFrames } from "contexts";
 import { useSubscribeFunction } from "hooks";
 
 import { RenderSidebarTabsButton } from "./RenderSidebarTabsButton";
@@ -22,7 +22,7 @@ import { HotkeysTab } from "./HotkeysTab";
 const COMPONENT_NAME = "";
 
 export const Sidebar = memo(() => {
-    const { pcdFiles } = usePCDManager();
+    const { pcdFiles } = useFileManager();
     const { areFramesLoading } = useFrames();
 
     const [activeTab, setActiveTab] = useState(0);
