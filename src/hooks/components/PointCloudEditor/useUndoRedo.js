@@ -7,7 +7,7 @@ export const useUndoRedo = (requestSaveFrame, onUndoRedo) => {
     const { pcdFiles } = useFileManager();
     const { publish } = useEvent();
     const { pointLabelsRef, undoStackRef, redoStackRef } = useEditor();
-    const { isPlaying, activeFrameIndex, areFramesLoading } = useFrames();
+    const { isPlaying, activeFrameIndex, arePointCloudsLoading } = useFrames();
 
     const updateUndoRedoState = useCallback(() => {
         const activeFrameFilePath = pcdFiles[activeFrameIndex];
@@ -16,10 +16,10 @@ export const useUndoRedo = (requestSaveFrame, onUndoRedo) => {
 
         publish(undoStack.length ? "enableUndo" : "disableUndo");
         publish(redoStack.length ? "enableRedo" : "disableRedo");
-    }, [pcdFiles, areFramesLoading, activeFrameIndex, publish]);
+    }, [pcdFiles, arePointCloudsLoading, activeFrameIndex, publish]);
 
     const undoAction = useCallback(() => {
-        if (!pcdFiles.length || areFramesLoading || isPlaying) return;
+        if (!pcdFiles.length || arePointCloudsLoading || isPlaying) return;
 
         const activeFrameFilePath = pcdFiles[activeFrameIndex];
         const undoStack = undoStackRef.current[activeFrameFilePath];
@@ -41,17 +41,17 @@ export const useUndoRedo = (requestSaveFrame, onUndoRedo) => {
         updateUndoRedoState();
 
         requestSaveFrame(activeFrameIndex, false);
-    }, [pcdFiles, areFramesLoading, activeFrameIndex, isPlaying]);
+    }, [pcdFiles, arePointCloudsLoading, activeFrameIndex, isPlaying]);
 
     useSubscribeFunction("undoAction", undoAction, [
         pcdFiles,
-        areFramesLoading,
+        arePointCloudsLoading,
         activeFrameIndex,
         isPlaying,
     ]);
 
     const redoAction = useCallback(() => {
-        if (!pcdFiles.length || areFramesLoading || isPlaying) return;
+        if (!pcdFiles.length || arePointCloudsLoading || isPlaying) return;
 
         const activeFrameFilePath = pcdFiles[activeFrameIndex];
         const redoStack = redoStackRef.current[activeFrameFilePath];
@@ -73,19 +73,19 @@ export const useUndoRedo = (requestSaveFrame, onUndoRedo) => {
         updateUndoRedoState();
 
         requestSaveFrame(activeFrameIndex, false);
-    }, [pcdFiles, areFramesLoading, activeFrameIndex, isPlaying]);
+    }, [pcdFiles, arePointCloudsLoading, activeFrameIndex, isPlaying]);
 
     useSubscribeFunction("redoAction", redoAction, [
         pcdFiles,
-        areFramesLoading,
+        arePointCloudsLoading,
         activeFrameIndex,
         isPlaying,
     ]);
 
     useEffect(() => {
-        if (areFramesLoading || isPlaying) return;
+        if (arePointCloudsLoading || isPlaying) return;
         updateUndoRedoState();
-    }, [pcdFiles, areFramesLoading, activeFrameIndex, isPlaying]);
+    }, [pcdFiles, arePointCloudsLoading, activeFrameIndex, isPlaying]);
 
     return updateUndoRedoState;
 };

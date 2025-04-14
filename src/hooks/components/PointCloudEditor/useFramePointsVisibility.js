@@ -16,7 +16,7 @@ const { SELECTION } = APP_CONSTANTS.HIDDEN_POSITION;
 export const useFramePointsVisibility = (updateGlobalBox) => {
     const { pcdFiles } = useFileManager();
     const { nonHiddenClasses } = useConfig();
-    const { activeFrameIndex, areFramesLoading } = useFrames();
+    const { activeFrameIndex, arePointCloudsLoading } = useFrames();
     const {
         pointCloudRefs,
         classesVisibilityRef,
@@ -107,7 +107,7 @@ export const useFramePointsVisibility = (updateGlobalBox) => {
     ]);
 
     useEffect(() => {
-        if (areFramesLoading || !pcdFiles.length || !nonHiddenClasses.length) return;
+        if (arePointCloudsLoading || !pcdFiles.length || !nonHiddenClasses.length) return;
 
         nonHiddenClasses.forEach(({ originalIndex }) => {
             if (!(originalIndex in classesVisibilityRef.current)) {
@@ -126,7 +126,7 @@ export const useFramePointsVisibility = (updateGlobalBox) => {
                 visible: true,
             };
         }
-    }, [areFramesLoading, pcdFiles, nonHiddenClasses]);
+    }, [arePointCloudsLoading, pcdFiles, nonHiddenClasses]);
 
     const updateMinMaxZ = useCallback(
         (data) => {

@@ -13,7 +13,7 @@ export const useUpdatePixelProjections = (glSize) => {
     const { camera } = useThree();
 
     const { pcdFiles } = useFileManager();
-    const { activeFrameIndex, areFramesLoading } = useFrames();
+    const { activeFrameIndex, arePointCloudsLoading } = useFrames();
     const { setPixelProjections, originalPositionsRef } = useEditor();
 
     const glSizeRef = useRef(glSize);
@@ -44,7 +44,7 @@ export const useUpdatePixelProjections = (glSize) => {
     useEffect(() => {
         setPixelProjections(new Float32Array());
         requestPixelProjectionsUpdate();
-    }, [activeFrameIndex, areFramesLoading]);
+    }, [activeFrameIndex, arePointCloudsLoading]);
 
     return requestPixelProjectionsUpdate;
 };

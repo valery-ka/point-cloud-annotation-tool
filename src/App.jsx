@@ -10,15 +10,18 @@ import {
     Sidebar,
     LoadingOverlay,
     ContextMenu,
+    CameraImages,
 } from "components";
 import { useFrames } from "contexts";
 
 export const App = () => {
-    const { areFramesLoading } = useFrames();
+    const { arePointCloudsLoading, areImagesLoading } = useFrames();
 
     return (
         <div className="tool-3d-app">
-            {areFramesLoading && <LoadingOverlay message="loadingFrames" />}
+            {/* тут на подумать */}
+            {arePointCloudsLoading && <LoadingOverlay message="loadingFrames" />}
+            {areImagesLoading && <LoadingOverlay message="loadingImages" />}
             <FileNavigator />
             <div className="tool-3d-scene">
                 <div className="tool-3d-container">
@@ -30,6 +33,7 @@ export const App = () => {
                     <EditorTopLeftControls />
                     <EditorSideLeftControls />
                     <EditorTopRightControls />
+                    <CameraImages />
                 </div>
                 <Sidebar />
             </div>

@@ -14,7 +14,7 @@ export const usePaintFramePoints = (updateGlobalBox) => {
 
     const { pcdFiles } = useFileManager();
     const { nonHiddenClasses } = useConfig();
-    const { activeFrameIndex, areFramesLoading } = useFrames();
+    const { activeFrameIndex, arePointCloudsLoading } = useFrames();
     const {
         pointCloudRefs,
         activeFramePositionsRef,
@@ -33,7 +33,7 @@ export const usePaintFramePoints = (updateGlobalBox) => {
     }, [selectedClassIndex, nonHiddenClasses]);
 
     useEffect(() => {
-        if (!pcdFiles.length || areFramesLoading) return;
+        if (!pcdFiles.length || arePointCloudsLoading) return;
 
         const newColorMap = nonHiddenClasses.reduce((map, cls) => {
             const hex = cls.color;
@@ -44,7 +44,7 @@ export const usePaintFramePoints = (updateGlobalBox) => {
             return map;
         }, {});
         classColorsCache.current = newColorMap;
-    }, [areFramesLoading, nonHiddenClasses, pcdFiles]);
+    }, [arePointCloudsLoading, nonHiddenClasses, pcdFiles]);
 
     const paintSelectedPoints = useCallback(
         (mode, points) => {

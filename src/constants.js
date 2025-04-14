@@ -38,6 +38,9 @@ export const DEFAULT_MODE = "paintFill";
 export const DEFAULT_TOOL = "handPointer";
 export const DEFAULT_BRUSH_SIZE = 40;
 
+// camera
+export const DEFAULT_CAMERA = "camera_inner_frontal_middle";
+
 // save
 export const SAVE_FRAME_REQUEST_TIME = 500;
 export const UNDO_REDO_STACK_DEPTH = 10;

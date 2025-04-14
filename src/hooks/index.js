@@ -36,3 +36,5 @@ export { usePlayback } from "./components/FrameSwitcher/usePlayback";
 export { useFrameSwitcher } from "./components/FrameSwitcher/useFrameSwitcher";
 export { useEventSubscriptions } from "./components/FrameSwitcher/useEventSubscriptions";
 export { useFrameLaneMouseEvents } from "./components/FrameSwitcher/useFrameLaneMouseEvents";
+
+export { useImageResize } from "./components/CameraImages/useImageResize";

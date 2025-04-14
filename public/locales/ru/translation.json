@@ -5,7 +5,6 @@
     "switchToTopView": "Вид сверху",
     "switchToRightView": "Вид справа",
     "switchToBackView": "Вид сзади",
-
     "handPointer": "Завершить редактирование",
     "brushTool": "Инструмент кисть",
     "polygonTool": "Инструмент полигон",
@@ -19,7 +18,6 @@
     "filterCrop": "Оставить только выделенные точки",
     "filterReveal": "Показать точки",
     "showFilteredPoints": "Показать все скрытые точки",
-
     "switchToOriginView": "Стандартный вид",
     "undoAction": "Отменить действие",
     "redoAction": "Повторить действие",
@@ -28,12 +26,10 @@
     "earthSkyLevels": "Уровни земли и неба",
     "switchTheme": "Переключить тему",
     "switchLanguage": "Переключить язык",
-
     "scene": "Сцена",
     "selectScene": "Выберите сцену",
     "frame": "Кадр",
     "selectFrame": "Выберите кадр",
-
     "goToFirstFrame": "Перейти на первый кадр",
     "goToPreviousFrame": "Перейти на предыдущий кадр",
     "play": "Воспроизвести",
@@ -42,21 +38,17 @@
     "goToLastFrame": "Перейти на последний кадр",
     "playCycle": "Циклическое воспроизведение",
     "playSpeed": "Скорость воспроизведения",
-
     "objectsTab": "Объекты",
     "settingsTab": "Настройки",
     "moderationTab": "Комментарии",
     "hotkeysTab": "Горячие клавиши",
     "togglePanel": "Скрыть / показать боковую панель",
-
     "hideAll": "Скрыть все объекты",
     "showAll": "Показать все объекты",
     "hideShowAll": "Скрыть / Показать все объекты",
     "unselectObject": "Сбросить выделенный объект",
-
     "hideObject": "Скрыть объект",
     "showObject": "Показать объект",
-
     "general": "Общие",
     "theme": "Тема",
     "light": "Светлая",
@@ -73,7 +65,6 @@
     "pointBrightness": "Яркость точки",
     "pointIntensity": "Интенсивность точки",
     "editorSettings": "Настройки редактирования",
-
     "hideIssues": "Скрыть ошибки",
     "markAllAsResolved": "Пометить все ошибки как разрешенные",
     "resolveIssue": "Разрешить ошибку",
@@ -85,9 +76,7 @@
     "nextModerationFrame": "Следующий кадр с ошибкой",
     "remove": "Удалить",
     "resolve": "Разрешить",
-
     "openConfigurator": "Настройка горячих клавиш",
-
     "configureHotkeys": "Настройка горячих клавиш",
     "camera": "Перемещение камеры",
     "playback": "Воспроизведение",
@@ -101,8 +90,8 @@
     "cancel": "Отмена",
     "reset": "Сбросить",
     "clear": "Очистить",
-
     "loadingConfig": "Загрузка конфигурации",
     "loadingFrames": "Загрузка кадров",
+    "loadingImages": "Загрузка изображений",
     "BSOD": "Что-то пошло не так :С"
 }

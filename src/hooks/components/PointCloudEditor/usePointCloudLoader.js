@@ -17,7 +17,7 @@ export const usePointCloudLoader = (THEME_COLORS) => {
     const { settings } = useSettings();
     const { theme } = settings.general;
     const { pcdFiles, folderName } = useFileManager();
-    const { setAreFramesLoading, setLoadingProgress } = useFrames();
+    const { setArePointCloudsLoading, setLoadingProgress } = useFrames();
     const { originalPositionsRef, pointCloudRefs, pointLabelsRef, prevLabelsRef } = useEditor();
     const { nonHiddenClasses } = useConfig();
 
@@ -32,7 +32,7 @@ export const usePointCloudLoader = (THEME_COLORS) => {
 
         const loaderWorker = PCDLoaderWorker();
         let activeWorkers = 0;
-        const MAX_WORKERS = 2;
+        const MAX_WORKERS = 8;
 
         const loadQueue = [...pcdFiles];
         const loadedPointClouds = {};
@@ -151,7 +151,7 @@ export const usePointCloudLoader = (THEME_COLORS) => {
             const totalFiles = pcdFiles.length;
             if (loadedFrames === totalFiles && loadedLabels === totalFiles) {
                 setLoadingProgress(1);
-                setAreFramesLoading(false);
+                setArePointCloudsLoading(false);
                 loaderWorker.terminate();
             } else {
                 setLoadingProgress((loadedFrames + loadedLabels) / (2 * totalFiles));

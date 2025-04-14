@@ -8,7 +8,7 @@ const { NAVIGATOR } = API_PATHS;
 const FileManagerContext = createContext();
 
 export const FileManagerProvider = ({ children }) => {
-    const { setActiveFrameIndex, setLoadingProgress, setAreFramesLoading } = useFrames();
+    const { setActiveFrameIndex, setLoadingProgress, setArePointCloudsLoading } = useFrames();
 
     const [folderName, setFolderName] = useState([]);
     const [pcdFiles, setPcdFiles] = useState([]);
@@ -33,7 +33,7 @@ export const FileManagerProvider = ({ children }) => {
 
         setActiveFrameIndex(0);
         setLoadingProgress(0);
-        setAreFramesLoading(true);
+        setArePointCloudsLoading(true);
     };
 
     const handleFileChange = (folder, file) => {

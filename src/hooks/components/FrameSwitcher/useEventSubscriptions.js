@@ -12,11 +12,11 @@ export const useEventSubscriptions = (
     handlePlaySpeed,
 ) => {
     const { pcdFiles } = useFileManager();
-    const { areFramesLoading } = useFrames();
+    const { arePointCloudsLoading } = useFrames();
     const { subscribe, unsubscribe } = useEvent();
 
     useEffect(() => {
-        if (pcdFiles.length < 2 || areFramesLoading) return;
+        if (pcdFiles.length < 2 || arePointCloudsLoading) return;
 
         subscribe("goToFirstFrame", handleGoToFirstFrame);
         subscribe("goToPreviousFrame", handleGoToPreviousFrame);
@@ -35,5 +35,5 @@ export const useEventSubscriptions = (
             unsubscribe("playCycle", handlePlayCycle);
             unsubscribe("playSpeed", handlePlaySpeed);
         };
-    }, [subscribe, unsubscribe, pcdFiles.length, areFramesLoading]);
+    }, [subscribe, unsubscribe, pcdFiles.length, arePointCloudsLoading]);
 };

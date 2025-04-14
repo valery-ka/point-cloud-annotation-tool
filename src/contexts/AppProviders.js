@@ -9,6 +9,7 @@ import {
     EditorProvider,
     ToolsProvider,
     ModerationProvider,
+    ImagesProvider,
 } from "contexts";
 
 const DataProviders = ({ children }) => (
@@ -27,7 +28,9 @@ const UIProviders = ({ children }) => (
     <EditorProvider>
         <ToolsProvider>
             <HoveredPointProvider>
-                <SettingsProvider>{children}</SettingsProvider>
+                <ImagesProvider>
+                    <SettingsProvider>{children}</SettingsProvider>
+                </ImagesProvider>
             </HoveredPointProvider>
         </ToolsProvider>
     </EditorProvider>

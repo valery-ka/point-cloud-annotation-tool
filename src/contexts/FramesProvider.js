@@ -7,10 +7,11 @@ const FramesContext = createContext();
 export const FramesProvider = ({ children }) => {
     const [isPlaying, setIsPlaying] = useState(false);
     const [activeFrameIndex, setActiveFrameIndex] = useState(0);
-    const [areFramesLoading, setAreFramesLoading] = useState(false);
+    const [arePointCloudsLoading, setArePointCloudsLoading] = useState(false);
+    const [areImagesLoading, setAreImagesLoading] = useState(true);
     const [loadingProgress, setLoadingProgress] = useState(0);
 
-    useMousetrapPause(areFramesLoading);
+    useMousetrapPause(arePointCloudsLoading);
 
     return (
         <FramesContext.Provider
@@ -19,8 +20,10 @@ export const FramesProvider = ({ children }) => {
                 setIsPlaying,
                 activeFrameIndex,
                 setActiveFrameIndex,
-                areFramesLoading,
-                setAreFramesLoading,
+                arePointCloudsLoading,
+                setArePointCloudsLoading,
+                areImagesLoading,
+                setAreImagesLoading,
                 loadingProgress,
                 setLoadingProgress,
             }}

@@ -16,7 +16,7 @@ const debouncedSaveFrame = debounce(
 
 export const useSaveOutput = (updateUndoRedoState) => {
     const { pcdFiles, folderName } = useFileManager();
-    const { activeFrameIndex, areFramesLoading } = useFrames();
+    const { activeFrameIndex, arePointCloudsLoading } = useFrames();
     const { pointLabelsRef, prevLabelsRef, undoStackRef, redoStackRef, setPendingSaveState } =
         useEditor();
 
@@ -67,9 +67,9 @@ export const useSaveOutput = (updateUndoRedoState) => {
     );
 
     useEffect(() => {
-        if (!pcdFiles.length || areFramesLoading) return;
+        if (!pcdFiles.length || arePointCloudsLoading) return;
         requestSaveFrame(false);
-    }, [pcdFiles, areFramesLoading]);
+    }, [pcdFiles, arePointCloudsLoading]);
 
     return requestSaveFrame;
 };

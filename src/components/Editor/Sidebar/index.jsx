@@ -23,7 +23,7 @@ const COMPONENT_NAME = "";
 
 export const Sidebar = memo(() => {
     const { pcdFiles } = useFileManager();
-    const { areFramesLoading } = useFrames();
+    const { arePointCloudsLoading } = useFrames();
 
     const [activeTab, setActiveTab] = useState(0);
     const [sidebarVisible, setSidebarVisible] = useState(true);
@@ -37,7 +37,7 @@ export const Sidebar = memo(() => {
     useSubscribeFunction("toggleSidebar", toggleSidebar, []);
     useSubscribeFunction("setActiveTab", (data) => setActiveTab(data), []);
 
-    if (!pcdFiles.length || areFramesLoading) return null;
+    if (!pcdFiles.length || arePointCloudsLoading) return null;
 
     const createTab = (icon, title, Component) => ({
         icon,

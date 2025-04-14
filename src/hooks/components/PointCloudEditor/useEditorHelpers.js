@@ -12,7 +12,7 @@ export const useEditorHelpers = () => {
 
     const { pcdFiles } = useFileManager();
     const { activeFramePositionsRef } = useEditor();
-    const { activeFrameIndex, areFramesLoading } = useFrames();
+    const { activeFrameIndex, arePointCloudsLoading } = useFrames();
 
     const boundingBoxRef = useRef(null);
     const isBoxActive = useRef(settings.activeButtons.toggleGlobalBox);
@@ -22,7 +22,7 @@ export const useEditorHelpers = () => {
 
     const updateGlobalBox = useCallback(() => {
         drawGlobalBox(activeFramePositionsRef.current, scene, boundingBoxRef, isBoxActive.current);
-    }, [pcdFiles, activeFrameIndex, areFramesLoading]);
+    }, [pcdFiles, activeFrameIndex, arePointCloudsLoading]);
 
     const toggleGlobalBox = useCallback(() => {
         isBoxActive.current = !isBoxActive.current;
