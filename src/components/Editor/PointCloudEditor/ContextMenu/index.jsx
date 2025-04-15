@@ -9,7 +9,7 @@ const OPEN_MODERATION_MENU = (event) => event.button === 0 && event.ctrlKey;
 const CONTEXT_MENU_CONTAINER = ".tool-3d-container";
 const CONTEXT_MENU_RESET_POSITION = { x: -1000, y: -1000 };
 
-export const ContextMenu = () => {
+export const EditorContextMenu = () => {
     const { highlightedPoint } = useHoveredPoint();
     const { selectedTool } = useTools();
 

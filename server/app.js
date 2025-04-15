@@ -1,9 +1,16 @@
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
+const http = require("http");
+
+const { setupWebSocket, logToClients } = require("./wsLogger");
 
 const app = express();
 const PORT = process.env.SERVER_PORT || 3001;
+
+const server = http.createServer(app);
+
+setupWebSocket(server);
 
 app.use(cors());
 
@@ -23,4 +30,6 @@ if (process.env.NODE_ENV === "production") {
     });
 }
 
-app.listen(PORT, () => console.log(`Server is running on http://localhost:${PORT}/`));
+server.listen(PORT, () => {
+    logToClients(`Server is running on http://localhost:${PORT}/`);
+});

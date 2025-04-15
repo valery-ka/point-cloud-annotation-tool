@@ -68,9 +68,9 @@ export default class PolygonTool extends SelectorTools {
             this.reset();
             this.updateDrawingStatus(false);
             this.canvasSelectionIsDirty = true;
+            this.actions.requestSaveFrame();
         }
         this.clearHoveredPoint();
-        this.actions.requestSaveFrame();
     }
 
     handleMouseMove(ev) {

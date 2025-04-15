@@ -9,23 +9,22 @@ import {
     FrameSwitcher,
     Sidebar,
     LoadingOverlay,
-    ContextMenu,
+    EditorContextMenu,
     CameraImages,
 } from "components";
-import { useFrames } from "contexts";
+
+import { useServerLogs } from "hooks";
 
 export const App = () => {
-    const { arePointCloudsLoading, areImagesLoading } = useFrames();
+    useServerLogs();
 
     return (
         <div className="tool-3d-app">
-            {/* тут на подумать */}
-            {arePointCloudsLoading && <LoadingOverlay message="loadingFrames" />}
-            {areImagesLoading && <LoadingOverlay message="loadingImages" />}
+            <LoadingOverlay />
             <FileNavigator />
             <div className="tool-3d-scene">
                 <div className="tool-3d-container">
-                    <ContextMenu />
+                    <EditorContextMenu />
                     <canvas id="canvasSelection" className="tool-3d-canvas-selection"></canvas>
                     <Canvas>
                         <PointCloudEditor />

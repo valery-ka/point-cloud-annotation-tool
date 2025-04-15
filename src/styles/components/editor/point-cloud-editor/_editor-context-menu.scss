@@ -1,4 +1,4 @@
-.context-menu {
+.editor-context-menu {
     background-color: var(--primary-theme-color);
     border: 1px solid var(--border-color);
     border-radius: 5px;
@@ -10,11 +10,11 @@
     }
 }
 
-.context-menu-content {
+.editor-context-menu-content {
     padding: 5px;
 }
 
-.context-menu-list {
+.editor-context-menu-list {
     display: flex;
     flex-direction: column;
 
@@ -23,7 +23,7 @@
     }
 }
 
-.context-menu-item-container {
+.editor-context-menu-item-container {
     display: flex;
     align-items: center;
     flex-direction: row;
@@ -34,7 +34,7 @@
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
-.context-menu-item {
+.editor-context-menu-item {
     padding: 6px 18px 6px 6px;
     margin: 3px;
     display: flex;
@@ -51,7 +51,7 @@
     }
 }
 
-.context-menu-item-color {
+.editor-context-menu-item-color {
     width: 24px;
     height: 24px;
     border: 1px solid var(--border-color);
@@ -63,14 +63,14 @@
     align-items: center;
 }
 
-.context-menu-item-title {
+.editor-context-menu-item-title {
     width: 280px;
     display: flex;
     flex-direction: row;
     align-items: center;
 }
 
-.context-menu-item-info {
+.editor-context-menu-item-info {
     padding: 0 10px;
     opacity: 0.7;
 

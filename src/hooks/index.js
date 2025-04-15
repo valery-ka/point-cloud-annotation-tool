@@ -1,5 +1,6 @@
 export { useDebugger } from "./dev/useDebugger";
 export { useWhyUpdate } from "./dev/useWhyUpdate";
+export { useServerLogs } from "./dev/useServerLogs";
 export { useRenderCount } from "./dev/useRenderCount";
 export { useTimeSinceMount } from "./dev/useTimeSinceMount";
 
@@ -38,3 +39,5 @@ export { useEventSubscriptions } from "./components/FrameSwitcher/useEventSubscr
 export { useFrameLaneMouseEvents } from "./components/FrameSwitcher/useFrameLaneMouseEvents";
 
 export { useImageResize } from "./components/CameraImages/useImageResize";
+export { useImageLoader } from "./components/CameraImages/useImageLoader";
+export { useImageSelector } from "./components/CameraImages/useImageSelector";

@@ -1,7 +1,5 @@
 import { createContext, useContext, useState } from "react";
 
-import { useMousetrapPause } from "hooks";
-
 const FramesContext = createContext();
 
 export const FramesProvider = ({ children }) => {
@@ -10,8 +8,6 @@ export const FramesProvider = ({ children }) => {
     const [arePointCloudsLoading, setArePointCloudsLoading] = useState(false);
     const [areImagesLoading, setAreImagesLoading] = useState(true);
     const [loadingProgress, setLoadingProgress] = useState(0);
-
-    useMousetrapPause(arePointCloudsLoading);
 
     return (
         <FramesContext.Provider

@@ -1,23 +1,19 @@
-import React, { memo, useEffect, useMemo, useState } from "react";
+import React, { memo, useRef, useMemo, useState } from "react";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMinus, faExpandAlt, faCompressAlt } from "@fortawesome/free-solid-svg-icons";
 
 import { useFileManager, useImages, useFrames } from "contexts";
-import { useImageResize } from "hooks";
+import { useImageResize, useImageLoader, useImageSelector } from "hooks";
 
-const MIN_IMAGE_HEIGHT = 250;
+import { TopLoader, ContextMenu } from "components";
 
 export const CameraImages = memo(() => {
     const { images } = useFileManager();
     const { selectedImage } = useImages();
-    const {
-        activeFrameIndex,
-        arePointCloudsLoading,
-        setAreImagesLoading,
-        areImagesLoading,
-        setLoadingProgress,
-    } = useFrames();
+    const { activeFrameIndex, arePointCloudsLoading } = useFrames();
+
+    const loadingBarRef = useRef(null);
 
     const [loadedImages, setLoadedImages] = useState({});
     const imagesByCamera = useMemo(() => {
@@ -35,54 +31,29 @@ export const CameraImages = memo(() => {
         wrapperRef,
         setAspectRatio,
         imageMaximized,
-    } = useImageResize(1, MIN_IMAGE_HEIGHT);
+    } = useImageResize(loadedImages, selectedImagePath);
 
-    useEffect(() => {
-        if (arePointCloudsLoading) return;
-        setAreImagesLoading(true);
+    useImageLoader(selectedImagePath, setLoadedImages, setAspectRatio, loadingBarRef);
 
-        const loaded = {};
-        const allUrls = Object.values(images).flat();
-        const total = allUrls.length;
-        let loadedCount = 0;
+    const {
+        handleMouseUp,
+        isContextMenuVisible,
+        contextMenuPosition,
+        handleSelectCamera,
+        handleCloseContextMenu,
+        setMenuDimensions,
+    } = useImageSelector(wrapperRef);
 
-        if (total === 0) {
-            setAreImagesLoading(false);
-            return;
-        }
-
-        allUrls.forEach((url) => {
-            if (!loaded[url]) {
-                const img = new Image();
-                img.src = url;
-
-                img.onload = () => {
-                    loadedCount++;
-                    setLoadingProgress(loadedCount / total);
-
-                    if (url === selectedImagePath) {
-                        const ratio = img.width / img.height;
-                        setAspectRatio(ratio);
-                    }
-
-                    if (loadedCount === total) {
-                        setAreImagesLoading(false);
-                    }
-                };
-
-                loaded[url] = img;
-            }
-        });
-
-        setLoadedImages(loaded);
-    }, [images, arePointCloudsLoading]);
-
-    if (arePointCloudsLoading || areImagesLoading) return;
+    if (arePointCloudsLoading) return;
 
     return (
         <div className="camera-wrapper" ref={wrapperRef}>
+            <TopLoader loadingBarRef={loadingBarRef} />
             {selectedImagePath && (
-                <div className="camera-image-container" style={{ height: imageHeight, width }}>
+                <div
+                    className="camera-image-container"
+                    style={{ height: imageHeight, width: width }}
+                >
                     <div className="camera-image-resize" onMouseDown={handleResizeStart}>
                         <FontAwesomeIcon icon={faMinus} className="camera-image-resize-icon" />
                     </div>
@@ -95,10 +66,20 @@ export const CameraImages = memo(() => {
                     <img
                         className="camera-image"
                         alt="Camera view"
-                        src={loadedImages[selectedImagePath]?.src || selectedImagePath}
+                        src={loadedImages[selectedImagePath]?.src}
                         draggable="false"
+                        onMouseUp={handleMouseUp}
                     />
                 </div>
+            )}
+            {isContextMenuVisible && (
+                <ContextMenu
+                    position={contextMenuPosition}
+                    itemsList={imagesByCamera}
+                    onSelect={handleSelectCamera}
+                    onClose={handleCloseContextMenu}
+                    setMenuDimensions={setMenuDimensions}
+                />
             )}
         </div>
     );

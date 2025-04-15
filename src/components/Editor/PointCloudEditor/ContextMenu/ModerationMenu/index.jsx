@@ -113,13 +113,13 @@ export const ModerationMenu = ({
     return (
         <div
             ref={menuRef}
-            className={`context-menu ${isOpened ? "" : "context-menu-hidden"}`}
+            className={`editor-context-menu ${isOpened ? "" : "editor-context-menu-hidden"}`}
             style={{
                 left: `${contextMenuPosition.x}px`,
                 top: `${contextMenuPosition.y}px`,
             }}
         >
-            <div className="context-menu-content">
+            <div className="editor-context-menu-content">
                 {isTextInputOpened ? (
                     <TextInputField
                         resetContextMenu={resetContextMenu}
@@ -128,15 +128,15 @@ export const ModerationMenu = ({
                     />
                 ) : (
                     pointIssuesList?.map((issue, index) => (
-                        <div key={issue.value} className="context-menu-item-container">
+                        <div key={issue.value} className="editor-context-menu-item-container">
                             <div
-                                className="context-menu-item"
+                                className="editor-context-menu-item"
                                 onClick={() => handleContextMenuClick(issue)}
                             >
-                                <div className="context-menu-item-color">{index + 1}</div>
-                                <div className="context-menu-item-title">{issue.title}</div>
+                                <div className="editor-context-menu-item-color">{index + 1}</div>
+                                <div className="editor-context-menu-item-title">{issue.title}</div>
                                 <div
-                                    className="context-menu-item-info"
+                                    className="editor-context-menu-item-info"
                                     data-tooltip-id={`tooltip-${issue.value}`}
                                     data-tooltip-html={issue?.moderatorHint}
                                 >
