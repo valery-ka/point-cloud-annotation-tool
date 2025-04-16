@@ -1,8 +1,10 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useRef } from "react";
 
 const CalibrationsContext = createContext();
 
 export const CalibrationsProvider = ({ children }) => {
+    const projectedPointsRef = useRef([]);
+
     const [calibrations, setCalibrations] = useState({});
     const [areCalibrationsProcessed, setAreCalibrationsProcessed] = useState(false);
 
@@ -13,6 +15,7 @@ export const CalibrationsProvider = ({ children }) => {
                 setAreCalibrationsProcessed,
                 calibrations,
                 setCalibrations,
+                projectedPointsRef,
             }}
         >
             {children}

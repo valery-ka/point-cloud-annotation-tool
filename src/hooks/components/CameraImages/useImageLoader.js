@@ -1,11 +1,14 @@
 import { useEffect } from "react";
-import { useFileManager, useFrames, useImages, useCalibrations } from "contexts";
+import { useFileManager, useFrames, useImages, useCalibrations, useEditor } from "contexts";
+
+import { getProjectedPoints } from "utils/calibrations";
 
 export const useImageLoader = (loadingBarRef) => {
     const { images } = useFileManager();
-    const { setAspectRatio, setLoadedImages, selectedImagePath } = useImages();
+    const { pointCloudRefs } = useEditor();
+    const { setAspectRatio, setLoadedImages, selectedImagePath, imagesByCamera } = useImages();
     const { arePointCloudsLoading, setAreImagesLoading, setLoadingProgress } = useFrames();
-    const { areCalibrationsProcessed } = useCalibrations();
+    const { calibrations, areCalibrationsProcessed, projectedPointsRef } = useCalibrations();
 
     useEffect(() => {
         if (arePointCloudsLoading || !areCalibrationsProcessed) return;
@@ -34,6 +37,15 @@ export const useImageLoader = (loadingBarRef) => {
                     setLoadingProgress(progress);
                     loadingBarRef?.current?.staticStart(progress * 100);
 
+                    getProjectedPoints(
+                        url,
+                        img,
+                        imagesByCamera,
+                        calibrations,
+                        pointCloudRefs,
+                        projectedPointsRef,
+                    );
+
                     if (url === selectedImagePath) {
                         const ratio = img.width / img.height;
                         setAspectRatio(ratio);
@@ -42,6 +54,7 @@ export const useImageLoader = (loadingBarRef) => {
                     if (loadedCount === total) {
                         setAreImagesLoading(false);
                         loadingBarRef?.current?.complete();
+                        console.log(projectedPointsRef.current);
                     }
                 };
 
@@ -50,5 +63,9 @@ export const useImageLoader = (loadingBarRef) => {
         });
 
         setLoadedImages(loaded);
+
+        return () => {
+            projectedPointsRef.current = {};
+        };
     }, [images, arePointCloudsLoading, areCalibrationsProcessed]);
 };
