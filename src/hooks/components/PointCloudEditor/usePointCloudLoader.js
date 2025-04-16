@@ -1,4 +1,3 @@
-import { BufferAttribute, Points } from "three";
 import { useEffect, useMemo } from "react";
 import { useThree } from "@react-three/fiber";
 
@@ -6,7 +5,16 @@ import { useFileManager, useEditor, useFrames, useSettings, useConfig } from "co
 
 import { PointShader } from "shaders";
 import { PCDLoaderWorker } from "workers";
-import { rebuildGeometry, loadLabels } from "utils/editor";
+import {
+    rebuildGeometry,
+    loadLabels,
+    handleIntensityAttribute,
+    handleLabelAttribute,
+    setupPointCloudGeometry,
+    getLabelsForFile,
+    createPointCloud,
+    cleanupPointClouds,
+} from "utils/editor";
 import * as APP_CONSTANTS from "constants";
 
 const { POINT_SIZE_MULTIPLIER } = APP_CONSTANTS;
@@ -25,7 +33,9 @@ export const usePointCloudLoader = (THEME_COLORS) => {
         return new Set(nonHiddenClasses.map((cls) => cls.originalIndex));
     }, [nonHiddenClasses]);
 
-    const POINT_MATERIAL = PointShader(POINT_SIZE_MULTIPLIER, theme, THEME_COLORS);
+    const POINT_MATERIAL = useMemo(() => {
+        return PointShader(POINT_SIZE_MULTIPLIER, theme, THEME_COLORS);
+    }, [theme]);
 
     useEffect(() => {
         if (!availableLabels.size) return;
@@ -54,45 +64,34 @@ export const usePointCloudLoader = (THEME_COLORS) => {
                 const { filePath, geometryWorker } = event.data;
 
                 const geometry = rebuildGeometry(geometryWorker);
-                const positionArray = geometry.attributes.position.array;
-                const numPoints = positionArray.length / 3;
+                const numPoints = setupPointCloudGeometry(geometry);
 
-                const colorArray = new Uint8Array(numPoints * 3);
-                const sizeArray = new Uint8Array(numPoints);
+                handleIntensityAttribute(geometry);
+                handleLabelAttribute(geometry, filePath, pointLabelsRef);
 
-                geometry.setAttribute("color", new BufferAttribute(colorArray, 3, true));
-                geometry.setAttribute("size", new BufferAttribute(sizeArray, 1));
-
-                if (geometry?.attributes?.intensity) {
-                    const [minColor, maxColor] = [50, 255];
-                    const intensityArray = geometry.attributes.intensity.array;
-
-                    const intensityToColor = intensityArray.map((intensity) => {
-                        return Math.round(minColor + (maxColor - minColor) * (intensity / 255));
-                    });
-
-                    const intensityToColorArray = new Uint8Array(intensityToColor);
-                    geometry.setAttribute(
-                        "intensity",
-                        new BufferAttribute(intensityToColorArray, 1),
-                    );
-                }
-
-                if (geometry?.attributes?.label) {
-                    const labels = geometry.attributes.label.array;
-                    pointLabelsRef.current[filePath] = new Uint8Array(labels);
-
-                    geometry.deleteAttribute("label"); // release memory (we use pointLabelsRef to store labels)
-                }
-
-                const pointCloud = new Points(geometry, POINT_MATERIAL);
+                const pointCloud = createPointCloud(geometry, POINT_MATERIAL);
                 loadedPointClouds[filePath] = pointCloud;
 
                 scene.add(pointCloud);
                 pointCloudRefs.current[filePath] = pointCloud;
-                originalPositionsRef.current[filePath] = new Float32Array(positionArray);
+                originalPositionsRef.current[filePath] = new Float32Array(
+                    geometry.attributes.position.array,
+                );
 
-                getLabels(filePath, numPoints);
+                getLabelsForFile({
+                    filePath,
+                    numPoints,
+                    folderName,
+                    labelsCache,
+                    pointLabelsRef,
+                    prevLabelsRef,
+                    availableLabels,
+                    loadLabels,
+                    onLoaded: () => {
+                        loadedLabels++;
+                        updateProgress();
+                    },
+                });
 
                 loadedFrames++;
                 updateProgress();
@@ -102,49 +101,6 @@ export const usePointCloudLoader = (THEME_COLORS) => {
                     processNextFile();
                 }
             };
-        };
-
-        const getLabels = async (filePath, numPoints) => {
-            const path = filePath.split("/");
-            const fileName = path.pop();
-
-            if (!labelsCache[folderName]) {
-                await loadLabelsForFolder(folderName);
-            }
-
-            const labels = labelsCache[folderName];
-
-            const fileData = Array.isArray(labels)
-                ? labels.find((entry) => entry.fileName === fileName)
-                : null;
-
-            if (fileData) {
-                pointLabelsRef.current[filePath] = new Uint8Array(fileData.labels);
-            } else {
-                if (!pointLabelsRef.current[filePath]) {
-                    pointLabelsRef.current[filePath] = new Uint8Array(numPoints).fill(0);
-                }
-            }
-
-            // check if label is available for annotation
-            const updatedLabels = pointLabelsRef.current[filePath].map((label) =>
-                availableLabels.has(label) ? label : 0,
-            );
-
-            pointLabelsRef.current[filePath] = new Uint8Array(updatedLabels);
-            prevLabelsRef.current[filePath] = new Uint8Array(pointLabelsRef.current[filePath]);
-
-            loadedLabels++;
-            updateProgress();
-        };
-
-        const loadLabelsForFolder = async (folderName) => {
-            try {
-                const labels = await loadLabels(folderName);
-                labelsCache[folderName] = labels;
-            } catch (error) {
-                console.error(`Error loading labels for ${folderName}`, error);
-            }
         };
 
         const updateProgress = () => {
@@ -163,14 +119,7 @@ export const usePointCloudLoader = (THEME_COLORS) => {
         }
 
         return () => {
-            Object.values(pointCloudRefs.current).forEach((pointCloud) => {
-                scene.remove(pointCloud);
-            });
-
-            pointCloudRefs.current = {};
-            pointLabelsRef.current = {};
-            prevLabelsRef.current = {};
-            loaderWorker.terminate();
+            cleanupPointClouds(scene, pointCloudRefs, pointLabelsRef, prevLabelsRef, loaderWorker);
         };
     }, [pcdFiles, scene, availableLabels]);
 };

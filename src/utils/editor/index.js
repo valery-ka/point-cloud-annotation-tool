@@ -33,6 +33,14 @@ export {
 } from "./sizes/general";
 
 export { rebuildGeometry, drawGlobalBox, drawCircleRuler } from "./geometry/general";
+export {
+    handleIntensityAttribute,
+    handleLabelAttribute,
+    setupPointCloudGeometry,
+    getLabelsForFile,
+    createPointCloud,
+    cleanupPointClouds,
+} from "./geometry/loader";
 
 export { LempelZivWelch, arraysAreEqual, formatPointLabels } from "./output/LempelZivWelch";
 export { saveLabels } from "./output/saveLabels";
