@@ -5,6 +5,8 @@ export const API_PATHS = {
         ROOT: `${API_BASE}/navigator`,
         PCD: (folder, file) => `${API_BASE}/navigator/${folder}/pointclouds/${file}`,
         IMG: (folder, camera, file) => `${API_BASE}/navigator/${folder}/images/${camera}/${file}`,
+        CALIBRATIONS: (folder, camera) =>
+            `${API_BASE}/navigator/${folder}/calibrations/${camera}.json`,
     },
     CONFIG: {
         JOB: (folder) => `${API_BASE}/config/${folder}/job.json`,

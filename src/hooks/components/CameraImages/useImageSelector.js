@@ -1,7 +1,7 @@
-import React, { useMemo, useCallback, useState } from "react";
+import { useCallback, useState } from "react";
 import { useImages } from "contexts";
 
-export const useImageSelector = (wrapperRef) => {
+export const useImageSelector = (cameraWrapperRef) => {
     const { setSelectedImage } = useImages();
 
     const [contextMenuPosition, setContextMenuPosition] = useState(null);
@@ -10,10 +10,10 @@ export const useImageSelector = (wrapperRef) => {
 
     const handleMouseUp = useCallback(
         (e) => {
-            if (e.button === 2 && wrapperRef.current) {
+            if (e.button === 2 && cameraWrapperRef.current) {
                 e.preventDefault();
 
-                const wrapperRect = wrapperRef.current.getBoundingClientRect();
+                const wrapperRect = cameraWrapperRef.current.getBoundingClientRect();
                 const { width: menuWidth, height: menuHeight } = menuDimensions;
 
                 let x = e.clientX - wrapperRect.left;

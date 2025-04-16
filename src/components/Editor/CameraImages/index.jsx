@@ -1,39 +1,29 @@
-import React, { memo, useRef, useMemo, useState } from "react";
+import React, { memo, useRef } from "react";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMinus, faExpandAlt, faCompressAlt } from "@fortawesome/free-solid-svg-icons";
 
-import { useFileManager, useImages, useFrames } from "contexts";
-import { useImageResize, useImageLoader, useImageSelector } from "hooks";
+import { useImages, useFrames } from "contexts";
+import { useImageResize, useImageLoader, useImageSelector, useFetchCalibrations } from "hooks";
 
 import { TopLoader, ContextMenu } from "components";
 
 export const CameraImages = memo(() => {
-    const { images } = useFileManager();
-    const { selectedImage } = useImages();
-    const { activeFrameIndex, arePointCloudsLoading } = useFrames();
+    const {
+        imageWidth,
+        imageHeight,
+        imageMaximized,
+        cameraWrapperRef,
+        loadedImages,
+        selectedImagePath,
+        imagesByCamera,
+    } = useImages();
+    const { arePointCloudsLoading } = useFrames();
 
     const loadingBarRef = useRef(null);
 
-    const [loadedImages, setLoadedImages] = useState({});
-    const imagesByCamera = useMemo(() => {
-        return Object.keys(images) ?? {};
-    }, [images]);
-    const selectedImagePath = useMemo(() => {
-        return images[selectedImage]?.[activeFrameIndex] ?? null;
-    }, [images, selectedImage, activeFrameIndex]);
-
-    const {
-        imageHeight,
-        width,
-        handleResizeStart,
-        toggleImageSize,
-        wrapperRef,
-        setAspectRatio,
-        imageMaximized,
-    } = useImageResize(loadedImages, selectedImagePath);
-
-    useImageLoader(selectedImagePath, setLoadedImages, setAspectRatio, loadingBarRef);
+    useFetchCalibrations();
+    useImageLoader(loadingBarRef);
 
     const {
         handleMouseUp,
@@ -42,17 +32,19 @@ export const CameraImages = memo(() => {
         handleSelectCamera,
         handleCloseContextMenu,
         setMenuDimensions,
-    } = useImageSelector(wrapperRef);
+    } = useImageSelector(cameraWrapperRef);
+
+    const { handleResizeStart, toggleImageSize } = useImageResize();
 
     if (arePointCloudsLoading) return;
 
     return (
-        <div className="camera-wrapper" ref={wrapperRef}>
+        <div className="camera-wrapper" ref={cameraWrapperRef}>
             <TopLoader loadingBarRef={loadingBarRef} />
             {selectedImagePath && (
                 <div
                     className="camera-image-container"
-                    style={{ height: imageHeight, width: width }}
+                    style={{ height: imageHeight, width: imageWidth }}
                 >
                     <div className="camera-image-resize" onMouseDown={handleResizeStart}>
                         <FontAwesomeIcon icon={faMinus} className="camera-image-resize-icon" />

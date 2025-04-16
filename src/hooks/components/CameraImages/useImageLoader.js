@@ -1,17 +1,14 @@
-import React, { useEffect } from "react";
-import { useFileManager, useFrames } from "contexts";
+import { useEffect } from "react";
+import { useFileManager, useFrames, useImages, useCalibrations } from "contexts";
 
-export const useImageLoader = (
-    selectedImagePath,
-    setLoadedImages,
-    setAspectRatio,
-    loadingBarRef,
-) => {
+export const useImageLoader = (loadingBarRef) => {
     const { images } = useFileManager();
+    const { setAspectRatio, setLoadedImages, selectedImagePath } = useImages();
     const { arePointCloudsLoading, setAreImagesLoading, setLoadingProgress } = useFrames();
+    const { areCalibrationsProcessed } = useCalibrations();
 
     useEffect(() => {
-        if (arePointCloudsLoading) return;
+        if (arePointCloudsLoading || !areCalibrationsProcessed) return;
 
         setAreImagesLoading(true);
 
@@ -53,5 +50,5 @@ export const useImageLoader = (
         });
 
         setLoadedImages(loaded);
-    }, [images, arePointCloudsLoading]);
+    }, [images, arePointCloudsLoading, areCalibrationsProcessed]);
 };

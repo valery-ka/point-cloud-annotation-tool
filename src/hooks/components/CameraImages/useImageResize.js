@@ -1,27 +1,31 @@
-import { useState, useRef, useEffect, useCallback, useMemo } from "react";
+import { useRef, useEffect, useCallback } from "react";
 
 import { useImages } from "contexts";
 
-const MIN_IMAGE_HEIGHT = 250;
+import { MIN_IMAGE_HEIGHT } from "constants";
 
-export const useImageResize = (loadedImages, selectedImagePath) => {
-    const { selectedImage } = useImages();
-
-    const [aspectRatio, setAspectRatio] = useState(1);
-    const [imageHeight, setImageHeight] = useState(MIN_IMAGE_HEIGHT);
-    const [imageMaximized, setImageMaximized] = useState(false);
+export const useImageResize = () => {
+    const {
+        selectedImage,
+        aspectRatio,
+        setAspectRatio,
+        imageHeight,
+        setImageHeight,
+        imageMaximized,
+        setImageMaximized,
+        cameraWrapperRef,
+        loadedImages,
+        selectedImagePath,
+    } = useImages();
 
     const lastManualHeight = useRef(MIN_IMAGE_HEIGHT);
-    const wrapperRef = useRef(null);
     const isResizing = useRef(false);
     const startY = useRef(0);
     const startHeight = useRef(imageHeight);
 
-    const width = useMemo(() => imageHeight * aspectRatio, [imageHeight, aspectRatio]);
-
     const updateToMaxSize = useCallback(() => {
-        if (!wrapperRef.current) return;
-        const wrapperRect = wrapperRef.current.getBoundingClientRect();
+        if (!cameraWrapperRef.current) return;
+        const wrapperRect = cameraWrapperRef.current.getBoundingClientRect();
 
         const maxByHeight = wrapperRect.height;
         const maxByWidth = wrapperRect.width / aspectRatio;
@@ -31,9 +35,9 @@ export const useImageResize = (loadedImages, selectedImagePath) => {
     }, [aspectRatio]);
 
     const checkImageBounds = useCallback(() => {
-        if (!wrapperRef.current || imageMaximized) return;
+        if (!cameraWrapperRef.current || imageMaximized) return;
 
-        const wrapperRect = wrapperRef.current.getBoundingClientRect();
+        const wrapperRect = cameraWrapperRef.current.getBoundingClientRect();
         const currentWidth = imageHeight * aspectRatio;
 
         if (currentWidth > wrapperRect.width || imageHeight > wrapperRect.height) {
@@ -72,12 +76,12 @@ export const useImageResize = (loadedImages, selectedImagePath) => {
 
     useEffect(() => {
         const handleMouseMove = (e) => {
-            if (!isResizing.current || !wrapperRef.current || imageMaximized) return;
+            if (!isResizing.current || !cameraWrapperRef.current || imageMaximized) return;
 
             const delta = startY.current - e.clientY;
             const proposedHeight = startHeight.current + delta;
 
-            const wrapperRect = wrapperRef.current.getBoundingClientRect();
+            const wrapperRect = cameraWrapperRef.current.getBoundingClientRect();
             const maxHeight = wrapperRect.height;
             const maxWidth = wrapperRect.width;
             const proposedWidth = proposedHeight * aspectRatio;
@@ -100,7 +104,7 @@ export const useImageResize = (loadedImages, selectedImagePath) => {
     }, [aspectRatio, imageMaximized]);
 
     useEffect(() => {
-        if (!wrapperRef.current) return;
+        if (!cameraWrapperRef.current) return;
 
         const observer = new ResizeObserver(() => {
             if (imageMaximized) {
@@ -109,7 +113,7 @@ export const useImageResize = (loadedImages, selectedImagePath) => {
                 checkImageBounds();
             }
         });
-        observer.observe(wrapperRef.current);
+        observer.observe(cameraWrapperRef.current);
 
         return () => observer.disconnect();
     }, [imageMaximized, updateToMaxSize, checkImageBounds]);
@@ -124,12 +128,7 @@ export const useImageResize = (loadedImages, selectedImagePath) => {
     }, [selectedImage, checkImageBounds]);
 
     return {
-        imageHeight,
-        width,
         handleResizeStart,
         toggleImageSize,
-        wrapperRef,
-        setAspectRatio,
-        imageMaximized,
     };
 };

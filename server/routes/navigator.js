@@ -9,6 +9,7 @@ const DATA_DIR = settings.dataPath;
 const SUBDIRECTORIES = [
     { name: "pointclouds", extensions: [".pcd"] },
     { name: "images", extensions: [".jpg", ".jpeg", ".png"] },
+    { name: "calibrations", extensions: [".json"] },
 ];
 
 const readFilesIfExists = async (dirPath, subdir) => {

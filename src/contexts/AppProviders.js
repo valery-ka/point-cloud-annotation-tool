@@ -10,6 +10,7 @@ import {
     ToolsProvider,
     ModerationProvider,
     ImagesProvider,
+    CalibrationsProvider,
 } from "contexts";
 
 const DataProviders = ({ children }) => (
@@ -24,22 +25,28 @@ const DataProviders = ({ children }) => (
     </EventProvider>
 );
 
-const UIProviders = ({ children }) => (
+const PointCloudProvider = ({ children }) => (
     <EditorProvider>
         <ToolsProvider>
-            <HoveredPointProvider>
-                <ImagesProvider>
-                    <SettingsProvider>{children}</SettingsProvider>
-                </ImagesProvider>
-            </HoveredPointProvider>
+            <HoveredPointProvider>{children}</HoveredPointProvider>
         </ToolsProvider>
     </EditorProvider>
+);
+
+const ImageProvider = ({ children }) => (
+    <CalibrationsProvider>
+        <ImagesProvider>{children}</ImagesProvider>
+    </CalibrationsProvider>
 );
 
 export const AppProviders = ({ children }) => {
     return (
         <DataProviders>
-            <UIProviders>{children}</UIProviders>
+            <PointCloudProvider>
+                <ImageProvider>
+                    <SettingsProvider>{children}</SettingsProvider>
+                </ImageProvider>
+            </PointCloudProvider>
         </DataProviders>
     );
 };
