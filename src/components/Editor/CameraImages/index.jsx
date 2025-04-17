@@ -1,4 +1,4 @@
-import React, { memo, useRef } from "react";
+import React, { memo, useRef, useEffect } from "react";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMinus, faExpandAlt, faCompressAlt } from "@fortawesome/free-solid-svg-icons";
@@ -7,11 +7,11 @@ import { useImages, useFrames } from "contexts";
 import { useImageResize, useImageLoader, useImageSelector, useFetchCalibrations } from "hooks";
 
 import { TopLoader, ContextMenu } from "components";
+import { ImageCanvas } from "./ImageCanvas";
 
 export const CameraImages = memo(() => {
     const {
-        imageWidth,
-        imageHeight,
+        imageSize,
         imageMaximized,
         cameraWrapperRef,
         loadedImages,
@@ -42,10 +42,7 @@ export const CameraImages = memo(() => {
         <div className="camera-wrapper" ref={cameraWrapperRef}>
             <TopLoader loadingBarRef={loadingBarRef} />
             {selectedImagePath && (
-                <div
-                    className="camera-image-container"
-                    style={{ height: imageHeight, width: imageWidth }}
-                >
+                <div className="camera-image-container" style={imageSize}>
                     <div className="camera-image-resize" onMouseDown={handleResizeStart}>
                         <FontAwesomeIcon icon={faMinus} className="camera-image-resize-icon" />
                     </div>
@@ -55,13 +52,9 @@ export const CameraImages = memo(() => {
                             className="camera-image-max-icon"
                         />
                     </div>
-                    <img
-                        className="camera-image"
-                        alt="Camera view"
-                        src={loadedImages[selectedImagePath]?.src}
-                        draggable="false"
-                        onMouseUp={handleMouseUp}
-                    />
+                    <div className="camera-image" onMouseUp={handleMouseUp}>
+                        <ImageCanvas image={loadedImages[selectedImagePath]} size={imageSize} />
+                    </div>
                 </div>
             )}
             {isContextMenuVisible && (

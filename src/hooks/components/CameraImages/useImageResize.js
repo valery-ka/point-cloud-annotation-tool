@@ -6,7 +6,7 @@ import { MIN_IMAGE_HEIGHT } from "constants";
 
 export const useImageResize = () => {
     const {
-        selectedImage,
+        selectedCamera,
         aspectRatio,
         setAspectRatio,
         imageHeight,
@@ -125,7 +125,7 @@ export const useImageResize = () => {
             setAspectRatio(ratio);
             checkImageBounds();
         }
-    }, [selectedImage, checkImageBounds]);
+    }, [selectedCamera, checkImageBounds]);
 
     return {
         handleResizeStart,

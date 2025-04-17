@@ -2,7 +2,7 @@ import { useCallback, useState } from "react";
 import { useImages } from "contexts";
 
 export const useImageSelector = (cameraWrapperRef) => {
-    const { setSelectedImage } = useImages();
+    const { setSelectedCamera } = useImages();
 
     const [contextMenuPosition, setContextMenuPosition] = useState(null);
     const [isContextMenuVisible, setIsContextMenuVisible] = useState(false);
@@ -35,7 +35,7 @@ export const useImageSelector = (cameraWrapperRef) => {
     );
 
     const handleSelectCamera = (cameraName) => {
-        setSelectedImage(cameraName);
+        setSelectedCamera(cameraName);
         setIsContextMenuVisible(false);
     };
 

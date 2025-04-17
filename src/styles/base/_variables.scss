@@ -1,3 +1,10 @@
+:root {
+    --checker-light: rgba(100, 100, 110, 0.9);
+    --checker-dark: rgba(50, 50, 60, 0.9);
+    --checker-size: 20px;
+    --checker-half: calc(var(--checker-size) / 2);
+}
+
 $button-size: 40px;
 $icon-size: 16px;
 $grid-gap: 0px;

@@ -15,10 +15,10 @@ export const ImagesProvider = ({ children }) => {
 
     const [loadedImages, setLoadedImages] = useState({});
 
-    const [selectedImage, setSelectedImage] = useState(DEFAULT_CAMERA);
+    const [selectedCamera, setSelectedCamera] = useState(DEFAULT_CAMERA);
     const selectedImagePath = useMemo(() => {
-        return images[selectedImage]?.[activeFrameIndex] ?? null;
-    }, [images, selectedImage, activeFrameIndex]);
+        return images[selectedCamera]?.[activeFrameIndex] ?? null;
+    }, [images, selectedCamera, activeFrameIndex]);
 
     const imagesByCamera = useMemo(() => {
         return Object.keys(images) ?? {};
@@ -27,14 +27,18 @@ export const ImagesProvider = ({ children }) => {
     const [aspectRatio, setAspectRatio] = useState(1);
     const [imageHeight, setImageHeight] = useState(MIN_IMAGE_HEIGHT);
     const imageWidth = useMemo(() => imageHeight * aspectRatio, [imageHeight, aspectRatio]);
+    const imageSize = useMemo(
+        () => ({ height: imageHeight, width: imageWidth }),
+        [imageHeight, imageWidth],
+    );
 
     return (
         <ImagesContext.Provider
             value={{
                 cameraWrapperRef,
-                selectedImage,
+                selectedCamera,
                 selectedImagePath,
-                setSelectedImage,
+                setSelectedCamera,
                 aspectRatio,
                 setAspectRatio,
                 imageWidth,
@@ -45,6 +49,7 @@ export const ImagesProvider = ({ children }) => {
                 loadedImages,
                 setLoadedImages,
                 imagesByCamera,
+                imageSize,
             }}
         >
             {children}

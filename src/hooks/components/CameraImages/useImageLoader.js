@@ -1,3 +1,5 @@
+import { Texture } from "three";
+
 import { useEffect } from "react";
 import { useFileManager, useFrames, useImages, useCalibrations, useEditor } from "contexts";
 
@@ -54,11 +56,18 @@ export const useImageLoader = (loadingBarRef) => {
                     if (loadedCount === total) {
                         setAreImagesLoading(false);
                         loadingBarRef?.current?.complete();
-                        console.log(projectedPointsRef.current);
                     }
-                };
 
-                loaded[url] = img;
+                    const texture = new Texture(img);
+                    texture.needsUpdate = true;
+
+                    loaded[url] = {
+                        src: url,
+                        width: img.width,
+                        height: img.height,
+                        texture,
+                    };
+                };
             }
         });
 
