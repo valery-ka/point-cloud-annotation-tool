@@ -93,5 +93,6 @@
     "loadingConfig": "Loading config",
     "loadingFrames": "Loading frames",
     "loadingImages": "Loading images",
-    "BSOD": "Something went wrong :С"
+    "BSOD": "Something went wrong :С",
+    "setCamera": "Set camera image"
 }

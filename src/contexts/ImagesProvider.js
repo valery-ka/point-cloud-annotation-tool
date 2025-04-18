@@ -15,13 +15,14 @@ export const ImagesProvider = ({ children }) => {
 
     const [loadedImages, setLoadedImages] = useState({});
 
+    const [isImageVisible, setIsImageVisible] = useState(true);
     const [selectedCamera, setSelectedCamera] = useState(DEFAULT_CAMERA);
     const selectedImagePath = useMemo(() => {
         return images[selectedCamera]?.[activeFrameIndex] ?? null;
     }, [images, selectedCamera, activeFrameIndex]);
 
     const imagesByCamera = useMemo(() => {
-        return Object.keys(images) ?? {};
+        return Object.keys(images ?? {});
     }, [images]);
 
     const [aspectRatio, setAspectRatio] = useState(1);
@@ -50,6 +51,8 @@ export const ImagesProvider = ({ children }) => {
                 setLoadedImages,
                 imagesByCamera,
                 imageSize,
+                isImageVisible,
+                setIsImageVisible,
             }}
         >
             {children}

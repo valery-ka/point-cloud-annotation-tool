@@ -30,6 +30,17 @@ export const ContextMenu = ({ position, itemsList, onSelect, onClose, setMenuDim
     return (
         <div className="ui-context-menu" style={{ top: y, left: x }} ref={menuRef}>
             <div className="ui-context-menu-content">
+                <div
+                    key="none"
+                    className="ui-context-menu-item-container"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onSelect("none");
+                        onClose();
+                    }}
+                >
+                    <div className="ui-context-menu-item">none</div>
+                </div>
                 {itemsList.map((item) => (
                     <div
                         key={item}
@@ -40,7 +51,6 @@ export const ContextMenu = ({ position, itemsList, onSelect, onClose, setMenuDim
                             onClose();
                         }}
                     >
-                        {/* можно добавить объект в конфиге с элиасами для каждой камеры */}
                         <div className="ui-context-menu-item">{item}</div>
                     </div>
                 ))}
