@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useState } from "react";
+import { useCallback, useState } from "react";
 import { useImages } from "contexts";
 
 const CONTEXT_MENU_RESET_POSITION = { x: -1000, y: -1000 };

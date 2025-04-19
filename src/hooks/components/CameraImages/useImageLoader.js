@@ -3,7 +3,7 @@ import { Texture } from "three";
 import { useEffect } from "react";
 import { useFileManager, useFrames, useImages, useCalibrations, useEditor } from "contexts";
 
-import { getProjectedPoints } from "utils/calibrations";
+import { buildImageGeometry } from "utils/calibrations";
 
 export const useImageLoader = (loadingBarRef) => {
     const { images } = useFileManager();
@@ -39,7 +39,7 @@ export const useImageLoader = (loadingBarRef) => {
                     setLoadingProgress(progress);
                     loadingBarRef?.current?.staticStart(progress * 100);
 
-                    getProjectedPoints(
+                    buildImageGeometry(
                         url,
                         img,
                         imagesByCamera,

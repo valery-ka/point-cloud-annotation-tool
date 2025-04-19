@@ -1,57 +1,56 @@
 import React, { memo, useMemo } from "react";
 
-import { BufferAttribute, BufferGeometry } from "three";
 import { Canvas } from "@react-three/fiber";
 import { Image } from "@react-three/drei";
 
-import { PointShader } from "shaders";
+import { useCalibrations, useImages } from "contexts";
+
+import { DistortedPointShader } from "shaders";
+import { getCalibrationByUrl } from "utils/calibrations";
+
 import { ImageCameraControls } from "../ImageCameraControls";
 
-const POINT_COUNT = 100000;
+const Z_INDEX = 5;
 
 export const ImageCanvas = memo(({ image, size }) => {
     const scale = useMemo(() => size?.height / image?.height, [size]);
-    const imageWidth = image?.width;
-    const imageHeight = image?.height;
+    const imageWidth = useMemo(() => image?.width, [image]);
+    const imageHeight = useMemo(() => image?.height, [image]);
+
+    const { imagesByCamera } = useImages();
+    const { calibrations, projectedPointsRef } = useCalibrations();
 
     const geometry = useMemo(() => {
-        const positions = [];
-        const colors = [];
-        const sizes = [];
+        if (!image) return;
+        return projectedPointsRef.current[image.src];
+    }, [image]);
 
-        for (let i = 0; i < POINT_COUNT; i++) {
-            const x = Math.random() * imageWidth - imageWidth / 2;
-            const y = Math.random() * imageHeight - imageHeight / 2;
-            const z = 0.1;
-            positions.push(x, y, z);
+    const distortion = useMemo(() => {
+        if (!image) return;
+        return getCalibrationByUrl(image.src, imagesByCamera, calibrations)?.distortion ?? [];
+    }, [image]);
 
-            colors.push(0.5, 0, 0);
-            sizes.push(5);
-        }
-
-        const geo = new BufferGeometry();
-        geo.setAttribute("position", new BufferAttribute(new Float32Array(positions), 3));
-        geo.setAttribute("color", new BufferAttribute(new Float32Array(colors), 3));
-        geo.setAttribute("size", new BufferAttribute(new Float32Array(sizes), 1));
-        return geo;
-    }, [imageWidth, imageHeight]);
-
-    const shaderMaterial = useMemo(() => PointShader(1, "light"), []);
+    const shaderMaterial = useMemo(
+        () =>
+            DistortedPointShader({
+                imageWidth: imageWidth * 2,
+                imageHeight: imageHeight * 2,
+                distortion: distortion,
+            }),
+        [distortion],
+    );
 
     if (!image?.texture) return null;
 
     return (
         <Canvas orthographic className="chessboard">
             <ImageCameraControls image={image} size={size} />
-            <Image
-                texture={image.texture}
-                scale={[imageWidth * scale, imageHeight * scale, 1]}
-                position={[0, 0, 0]}
-                toneMapped={false}
-            />
-            <group scale={[scale, scale, 1]}>
-                <points geometry={geometry} material={shaderMaterial} />
-            </group>
+            <Image texture={image.texture} scale={[imageWidth * scale, imageHeight * scale, 1]} />
+            {geometry && (
+                <group scale={[scale, scale, Z_INDEX]}>
+                    <points geometry={geometry} material={shaderMaterial} />
+                </group>
+            )}
         </Canvas>
     );
 });
