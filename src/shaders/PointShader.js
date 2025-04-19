@@ -1,6 +1,12 @@
 import { ShaderMaterial, Vector3 } from "three";
 
-export const PointShader = (sizeMultiplier, theme, THEME_COLORS) => {
+export const PointShader = (
+    sizeMultiplier = 1,
+    theme = "dark",
+    THEME_COLORS = {
+        light: { shadowColor: [0.8, 0.8, 0.8] },
+    },
+) => {
     return new ShaderMaterial({
         uniforms: {
             uSizeMultiplier: { value: sizeMultiplier },
