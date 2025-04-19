@@ -29,15 +29,16 @@ export const getCalibrationByUrl = (url, cameras, calibrations) => {
     }
 };
 
-export const get3DPointsForImage = (imageUrl, pointCloud) => {
-    const match = imageUrl.match(/\/(\d{9})\.jpg$/);
+export const getMatchingKeyForTimestamp = (imageUrl, pointCloud) => {
+    const match = imageUrl.match(/\/([^\/]+)\.jpg$/);
     if (!match) return null;
 
     const timestamp = match[1];
+    return Object.keys(pointCloud).find((pcdUrl) => pcdUrl.includes(`${timestamp}.pcd`));
+};
 
-    const matchingKey = Object.keys(pointCloud).find((pcdUrl) =>
-        pcdUrl.includes(`${timestamp}.pcd`),
-    );
+export const get3DPointsForImage = (imageUrl, pointCloud) => {
+    const matchingKey = getMatchingKeyForTimestamp(imageUrl, pointCloud);
 
     if (matchingKey) {
         return pointCloud[matchingKey].geometry.attributes.position.array;

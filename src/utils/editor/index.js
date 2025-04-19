@@ -17,7 +17,7 @@ export {
 
 export {
     getColorArray,
-    invalidateColor,
+    invalidateCloudColor,
     hexToRgb,
     changeClassOfSelection,
     getDefaultPointColor,

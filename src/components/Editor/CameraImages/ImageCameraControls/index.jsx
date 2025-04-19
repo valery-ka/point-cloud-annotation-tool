@@ -51,6 +51,7 @@ export const ImageCameraControls = ({ image, size }) => {
     const resetCameraState = useCallback(() => {
         zoomRef.current = 1;
         camera.zoom = 1;
+        camera.position.set(0, 0, 1);
         camera.updateProjectionMatrix();
         clampCameraPosition();
     }, [clampCameraPosition]);

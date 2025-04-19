@@ -5,6 +5,7 @@ export const PointShader = (
     theme = "dark",
     THEME_COLORS = {
         light: { shadowColor: [0.8, 0.8, 0.8] },
+        dark: { shadowColor: [0.0, 0.0, 0.0] },
     },
 ) => {
     return new ShaderMaterial({

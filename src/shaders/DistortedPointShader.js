@@ -2,8 +2,8 @@ import { ShaderMaterial, Vector2, Vector3 } from "three";
 
 export const DistortedPointShader = ({
     sizeMultiplier = 1,
-    imageWidth = 3840,
-    imageHeight = 2400,
+    imageWidth = 0,
+    imageHeight = 0,
     distortion = [],
     theme = "light",
     THEME_COLORS = {
@@ -77,5 +77,7 @@ export const DistortedPointShader = ({
             }
         `,
         vertexColors: true,
+        transparent: true,
+        depthTest: true,
     });
 };

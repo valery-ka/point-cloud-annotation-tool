@@ -16,7 +16,7 @@ export const useUndoRedo = (requestSaveFrame, onUndoRedo) => {
 
         publish(undoStack.length ? "enableUndo" : "disableUndo");
         publish(redoStack.length ? "enableRedo" : "disableRedo");
-    }, [pcdFiles, arePointCloudsLoading, activeFrameIndex, publish]);
+    }, [onUndoRedo, arePointCloudsLoading, publish]);
 
     const undoAction = useCallback(() => {
         if (!pcdFiles.length || arePointCloudsLoading || isPlaying) return;
@@ -40,15 +40,10 @@ export const useUndoRedo = (requestSaveFrame, onUndoRedo) => {
         onUndoRedo?.();
         updateUndoRedoState();
 
-        requestSaveFrame(activeFrameIndex, false);
-    }, [pcdFiles, arePointCloudsLoading, activeFrameIndex, isPlaying]);
+        requestSaveFrame(false);
+    }, [arePointCloudsLoading, isPlaying, onUndoRedo]);
 
-    useSubscribeFunction("undoAction", undoAction, [
-        pcdFiles,
-        arePointCloudsLoading,
-        activeFrameIndex,
-        isPlaying,
-    ]);
+    useSubscribeFunction("undoAction", undoAction, [arePointCloudsLoading, isPlaying]);
 
     const redoAction = useCallback(() => {
         if (!pcdFiles.length || arePointCloudsLoading || isPlaying) return;
@@ -72,20 +67,15 @@ export const useUndoRedo = (requestSaveFrame, onUndoRedo) => {
         onUndoRedo?.();
         updateUndoRedoState();
 
-        requestSaveFrame(activeFrameIndex, false);
-    }, [pcdFiles, arePointCloudsLoading, activeFrameIndex, isPlaying]);
+        requestSaveFrame(false);
+    }, [arePointCloudsLoading, isPlaying, onUndoRedo]);
 
-    useSubscribeFunction("redoAction", redoAction, [
-        pcdFiles,
-        arePointCloudsLoading,
-        activeFrameIndex,
-        isPlaying,
-    ]);
+    useSubscribeFunction("redoAction", redoAction, [arePointCloudsLoading, isPlaying]);
 
     useEffect(() => {
         if (arePointCloudsLoading || isPlaying) return;
         updateUndoRedoState();
-    }, [pcdFiles, arePointCloudsLoading, activeFrameIndex, isPlaying]);
+    }, [arePointCloudsLoading, isPlaying, onUndoRedo]);
 
     return updateUndoRedoState;
 };
