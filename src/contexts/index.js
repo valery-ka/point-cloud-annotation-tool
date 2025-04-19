@@ -1,12 +1,12 @@
 export { AppProviders } from "./AppProviders";
-export { EventProvider, useEvent } from "./EventContext";
+export { EventProvider, useEvent } from "./EventProvider";
 export { ConfigProvider, useConfig } from "./ConfigProvider";
 export { FramesProvider, useFrames } from "./FramesProvider";
-export { EditorProvider, useEditor } from "./EditorContext";
-export { FileManagerProvider, useFileManager } from "./FileManagerContext";
-export { HoveredPointProvider, useHoveredPoint } from "./HoveredPointContext";
-export { SettingsProvider, useSettings } from "./SettingsContext";
-export { ToolsProvider, useTools } from "./ToolsContext";
+export { EditorProvider, useEditor } from "./EditorProvider";
+export { FileManagerProvider, useFileManager } from "./FileManagerProvider";
+export { HoveredPointProvider, useHoveredPoint } from "./HoveredPointProvider";
+export { SettingsProvider, useSettings } from "./SettingsProvider";
+export { ToolsProvider, useTools } from "./ToolsProvider";
 export { ModerationProvider, useModeration } from "./ModerationProvider";
 export { ImagesProvider, useImages } from "./ImagesProvider";
 export { CalibrationsProvider, useCalibrations } from "./CalibrationsProvider";

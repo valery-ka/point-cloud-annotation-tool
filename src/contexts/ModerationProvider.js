@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 
-import { useFileManager } from "./FileManagerContext";
+import { useFileManager } from "./FileManagerProvider";
 
 import { API_PATHS } from "config/apiPaths";
 
