@@ -10,12 +10,7 @@ const { SELECTION } = APP_CONSTANTS.HIDDEN_POSITION;
 export const useEditorFrameSwitcher = (onFrameChanged) => {
     const { pcdFiles } = useFileManager();
     const { activeFrameIndex, arePointCloudsLoading } = useFrames();
-    const {
-        pointCloudRefs,
-        originalPositionsRef,
-        activeFramePositionsRef,
-        setHasFilterSelectionPoint,
-    } = useEditor();
+    const { pointCloudRefs, activeFramePositionsRef, setHasFilterSelectionPoint } = useEditor();
 
     // update active frame ref to keep current frame points positions
     // update geometry attributes (positions, sizes, colors) for active frame
@@ -25,7 +20,7 @@ export const useEditorFrameSwitcher = (onFrameChanged) => {
         const activeFrameFilePath = pcdFiles[activeFrameIndex];
         const activeFrameRef = pointCloudRefs.current[activeFrameFilePath];
 
-        if (activeFrameRef && originalPositionsRef.current[activeFrameFilePath]) {
+        if (activeFrameRef && activeFrameRef.geometry.attributes.original.array) {
             activeFramePositionsRef.current = activeFrameRef.geometry.attributes.position.array;
         }
 
@@ -34,7 +29,7 @@ export const useEditorFrameSwitcher = (onFrameChanged) => {
         );
         setHasFilterSelectionPoint(hasFilterSelectionPoint);
         onFrameChanged?.();
-    }, [activeFrameIndex, pointCloudRefs, arePointCloudsLoading, pcdFiles]);
+    }, [activeFrameIndex, arePointCloudsLoading, pcdFiles]);
 
     // hide previous frame, show active frame
     useFrame(() => {

@@ -1,5 +1,6 @@
 import { MODES } from "tools";
 import { filterPointsBySelection } from "../positions/filters";
+import { invalidateImagePointsVisibility } from "../positions/general";
 
 export const invalidateCloudColor = (geometry) => {
     geometry.attributes.color.needsUpdate = true;
@@ -66,16 +67,16 @@ export const changeClassOfSelection = ({
     frameData,
     colorData,
     visibilityData,
-    imagesData,
+    imageData,
     updateBox,
 }) => {
     const paintPoints = MODES[mode]?.paint;
     if (!paintPoints) return;
 
-    const { ref: geometryRef, colors, labels, intensity, positions, originalPositions } = frameData;
+    const { ref: geometryRef, colors, labels, intensity, positions } = frameData;
     const { classColor, classIndex, pointColor } = colorData;
     const { classVisible, minMaxZ } = visibilityData;
-    const { image, projectedPoints } = imagesData;
+    const { image, projectedPoints, visibleVOID } = imageData;
 
     paintPoints(
         colors,
@@ -89,21 +90,36 @@ export const changeClassOfSelection = ({
     );
 
     if (!classVisible) {
-        filterPointsBySelection(
-            geometryRef.geometry,
-            positions.current,
-            originalPositions.current,
-            points,
-            (mode = "filterHide"),
-            minMaxZ[0],
-            minMaxZ[1],
-            true, // isSelection
-            updateBox,
-        );
+        filterPointsBySelection({
+            frameData: {
+                geometry: geometryRef.geometry,
+                positions: positions,
+                labels,
+            },
+            selectionData: {
+                points,
+                mode: "filterHide",
+                isSelection: true,
+                updateGlobalBox: updateBox,
+            },
+            filterData: {
+                visibility: visibilityData.classVisible,
+                minZ: minMaxZ[0],
+                maxZ: minMaxZ[1],
+            },
+            imageData: { image, projectedPoints },
+        });
     }
 
     invalidateCloudColor(geometryRef.geometry);
     invalidateImageColor(geometryRef.geometry, image, projectedPoints);
+    invalidateImagePointsVisibility({
+        frameData: {
+            geometry: geometryRef.geometry,
+            labels: labels,
+        },
+        imageData,
+    });
 };
 
 export const updatePointCloudColors = ({ frameData, colorData, imageData }) => {

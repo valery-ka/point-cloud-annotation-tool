@@ -4,11 +4,18 @@ import { useEffect } from "react";
 import { useFileManager, useFrames, useImages, useCalibrations, useEditor } from "contexts";
 
 import { buildImageGeometry } from "utils/calibrations";
+import { DEFAULT_CAMERA } from "constants";
 
 export const useImageLoader = (loadingBarRef) => {
     const { images } = useFileManager();
     const { pointCloudRefs } = useEditor();
-    const { setAspectRatio, setLoadedImages, selectedImagePath, imagesByCamera } = useImages();
+    const {
+        setAspectRatio,
+        setLoadedImages,
+        selectedImagePath,
+        imagesByCamera,
+        setSelectedCamera,
+    } = useImages();
     const { arePointCloudsLoading, setAreImagesLoading, setLoadingProgress } = useFrames();
     const { calibrations, areCalibrationsProcessed, projectedPointsRef } = useCalibrations();
 
@@ -54,6 +61,8 @@ export const useImageLoader = (loadingBarRef) => {
                     }
 
                     if (loadedCount === total) {
+                        setLoadedImages(loaded);
+                        setSelectedCamera(DEFAULT_CAMERA);
                         setAreImagesLoading(false);
                         loadingBarRef?.current?.complete();
                     }
@@ -70,8 +79,6 @@ export const useImageLoader = (loadingBarRef) => {
                 };
             }
         });
-
-        setLoadedImages(loaded);
 
         return () => {
             projectedPointsRef.current = {};

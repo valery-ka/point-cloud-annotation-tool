@@ -26,7 +26,7 @@ export const usePointCloudLoader = (THEME_COLORS) => {
     const { theme } = settings.general;
     const { pcdFiles, folderName } = useFileManager();
     const { setArePointCloudsLoading, setLoadingProgress } = useFrames();
-    const { originalPositionsRef, pointCloudRefs, pointLabelsRef, prevLabelsRef } = useEditor();
+    const { pointCloudRefs, pointLabelsRef, prevLabelsRef } = useEditor();
     const { nonHiddenClasses } = useConfig();
 
     const availableLabels = useMemo(() => {
@@ -34,7 +34,11 @@ export const usePointCloudLoader = (THEME_COLORS) => {
     }, [nonHiddenClasses]);
 
     const POINT_MATERIAL = useMemo(() => {
-        return PointShader(POINT_SIZE_MULTIPLIER, theme, THEME_COLORS);
+        return PointShader({
+            sizeMultiplier: POINT_SIZE_MULTIPLIER,
+            theme: theme,
+            THEME_COLORS: THEME_COLORS,
+        });
     }, [theme]);
 
     useEffect(() => {
@@ -74,9 +78,6 @@ export const usePointCloudLoader = (THEME_COLORS) => {
 
                 scene.add(pointCloud);
                 pointCloudRefs.current[filePath] = pointCloud;
-                originalPositionsRef.current[filePath] = new Float32Array(
-                    geometry.attributes.position.array,
-                );
 
                 getLabelsForFile({
                     filePath,

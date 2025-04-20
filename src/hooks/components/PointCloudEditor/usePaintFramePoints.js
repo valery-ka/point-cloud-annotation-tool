@@ -19,6 +19,7 @@ export const usePaintFramePoints = (updateGlobalBox) => {
 
     const { settings } = useSettings();
     const pointColorRef = useRef(settings.editorSettings.colors);
+    const pointProjectRef = useRef(settings.editorSettings.project);
 
     const { pcdFiles } = useFileManager();
     const { nonHiddenClasses } = useConfig();
@@ -28,12 +29,11 @@ export const usePaintFramePoints = (updateGlobalBox) => {
         activeFramePositionsRef,
         selectedClassIndex,
         pointLabelsRef,
-        originalPositionsRef,
         classesVisibilityRef,
         minMaxZRef,
     } = useEditor();
 
-    const { loadedImages, selectedImagePath } = useImages();
+    const { loadedImages, selectedImagePath, selectedCamera } = useImages();
     const { projectedPointsRef } = useCalibrations();
 
     useEffect(() => {
@@ -81,8 +81,7 @@ export const usePaintFramePoints = (updateGlobalBox) => {
                     colors: activeFrameColors,
                     labels: activeFrameLabels,
                     intensity: activeFrameIntensity,
-                    positions: activeFramePositionsRef,
-                    originalPositions: originalPositionsRef,
+                    positions: activeFramePositionsRef.current,
                 },
                 colorData: {
                     pointColor: pointColorRef.current,
@@ -93,9 +92,10 @@ export const usePaintFramePoints = (updateGlobalBox) => {
                     classVisible,
                     minMaxZ: minMaxZRef.current,
                 },
-                imagesData: {
+                imageData: {
                     image,
                     projectedPoints: projectedPointsRef.current,
+                    visibleVOID: pointProjectRef.current.visibleVOID,
                 },
                 updateBox: updateGlobalBox,
             });
@@ -154,7 +154,7 @@ export const usePaintFramePoints = (updateGlobalBox) => {
 
     useEffect(() => {
         handlePointCloudColors();
-    }, [selectedImagePath]);
+    }, [selectedCamera]);
 
     return { handlePointCloudColors, paintSelectedPoints };
 };

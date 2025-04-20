@@ -5,7 +5,8 @@ export {
     showPoint,
     getPositionArray,
     findNearestPoints,
-    invalidatePosition,
+    invalidateCloudPosition,
+    invalidateImagePointsVisibility,
 } from "./positions/general";
 export {
     ACTIONS,
@@ -22,6 +23,7 @@ export {
     changeClassOfSelection,
     getDefaultPointColor,
     updatePointCloudColors,
+    getRGBFromMatchedColorArray,
 } from "./colors/general";
 
 export {

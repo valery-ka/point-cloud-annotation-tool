@@ -26,6 +26,16 @@ export const rebuildGeometry = (geom) => {
                 attrData.normalized,
             );
             geometry.setAttribute(key, bufferAttribute);
+
+            if (key === "position") {
+                const originalArray = new Float32Array(attrData.array);
+                const originalBufferAttribute = new BufferAttribute(
+                    originalArray,
+                    attrData.itemSize,
+                    attrData.normalized,
+                );
+                geometry.setAttribute("original", originalBufferAttribute);
+            }
         }
     }
 

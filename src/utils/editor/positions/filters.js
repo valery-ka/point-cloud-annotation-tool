@@ -1,4 +1,9 @@
-import { hidePoint, showPoint } from "./general";
+import {
+    hidePoint,
+    showPoint,
+    invalidateCloudPosition,
+    invalidateImagePointsVisibility,
+} from "./general";
 import { MODES } from "tools";
 import * as APP_CONSTANTS from "constants";
 
@@ -15,100 +20,90 @@ const getPointData = (
     const classVisibility = classesVisibility[label];
     const visible = classVisibility ? classVisibility.visible : true;
     const originalZ = originalPositions[index + 2];
-    const currentZ = activeFramePositions[index + 2];
+    const currentX = activeFramePositions[index];
 
-    return { visible, originalZ, currentZ };
+    return { visible, originalZ, currentX };
 };
 
-export const filterPoints = (
-    geometry,
-    activeFramePositions,
-    originalPositions,
-    activeFrameLabels,
-    classesVisibility,
-    minZ,
-    maxZ,
-) => {
-    for (let i = 0; i < activeFramePositions.length; i += 3) {
-        const { visible, originalZ, currentZ } = getPointData(
+export const filterPoints = ({ frameData, filterData, imageData }) => {
+    const { geometry, positions, originalPositions, labels } = frameData;
+    const { visibility, minZ, maxZ } = filterData;
+
+    for (let i = 0; i < positions.length; i += 3) {
+        const { visible, originalZ, currentX } = getPointData(
             i,
-            activeFrameLabels,
-            classesVisibility,
+            labels,
+            visibility,
             originalPositions,
-            activeFramePositions,
+            positions,
         );
 
         if (originalZ < minZ || originalZ > maxZ) {
-            hidePoint(geometry, activeFramePositions, i, Z_FILTER);
+            hidePoint(positions, i, Z_FILTER);
         } else if (!visible) {
-            hidePoint(geometry, activeFramePositions, i, CLASS_FILTER);
-        } else if (currentZ === SELECTION) {
+            hidePoint(positions, i, CLASS_FILTER);
+        } else if (currentX === SELECTION) {
             continue;
         } else {
-            showPoint(geometry, activeFramePositions, i, originalPositions);
+            showPoint(positions, i, originalPositions);
         }
     }
+
+    invalidateCloudPosition(geometry);
+    invalidateImagePointsVisibility({ frameData, imageData });
 };
 
-export const filterPointsBySelection = (
-    geometry,
-    activeFramePositions,
-    originalPositions,
-    points,
-    mode,
-    minZ,
-    maxZ,
-    isSelection = false,
-    updateGlobalBox,
-    pointLabels,
-    classesVisibility,
+export const filterPointsBySelection = ({
+    frameData,
+    selectionData,
+    filterData,
+    imageData,
     showFilterPoints,
-) => {
+}) => {
+    const { geometry } = frameData;
+    const { mode, updateGlobalBox } = selectionData;
+
     const filterPoints = MODES[mode]?.filter;
     if (!filterPoints) return;
 
-    filterPoints(
-        geometry,
-        activeFramePositions,
-        originalPositions,
-        points,
-        hidePoint,
-        showPoint,
-        minZ,
-        maxZ,
-        isSelection,
-        updateGlobalBox,
-        pointLabels,
-        classesVisibility,
-        showFilterPoints,
-    );
+    filterPoints({
+        frameData: frameData,
+        filterData: filterData,
+        selectionData: selectionData,
+        imageData: imageData,
+        callbacks: {
+            hidePoint,
+            showPoint,
+            updateGlobalBox,
+            showFilterPoints,
+        },
+    });
+
+    invalidateCloudPosition(geometry);
+    invalidateImagePointsVisibility({ frameData, imageData });
 };
 
-export const showFilterPointsBySelection = (
-    geometry,
-    activeFramePositions,
-    originalPositions,
-    activeFrameLabels,
-    classesVisibility,
-    minZ,
-    maxZ,
-    i,
-) => {
+export const showFilterPointsBySelection = ({ frameData, filterData, index }) => {
+    const { geometry, positions, originalPositions, labels } = frameData;
+    const { visibility, minZ, maxZ } = filterData;
+
     const { visible, originalZ } = getPointData(
-        i,
-        activeFrameLabels,
-        classesVisibility,
+        index,
+        labels,
+        visibility,
         originalPositions,
-        activeFramePositions,
+        positions,
     );
 
     if (!visible) {
-        hidePoint(geometry, activeFramePositions, i, CLASS_FILTER, true);
+        hidePoint(positions, index, CLASS_FILTER, true);
     } else if (originalZ < minZ || originalZ > maxZ) {
-        hidePoint(geometry, activeFramePositions, i, Z_FILTER, true);
+        hidePoint(positions, index, Z_FILTER, true);
     } else {
-        showPoint(geometry, activeFramePositions, i, originalPositions);
+        showPoint(positions, index, originalPositions);
     }
+
+    invalidateCloudPosition(geometry);
 };
 
 export const updateClassFilter = (action, classIndex, classesVisibilityRef) => {

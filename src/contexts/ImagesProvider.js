@@ -2,7 +2,7 @@ import { createContext, useContext, useState, useMemo, useRef } from "react";
 
 import { useFrames, useFileManager } from "contexts";
 
-import { DEFAULT_CAMERA, MIN_IMAGE_HEIGHT } from "constants";
+import { MIN_IMAGE_HEIGHT } from "constants";
 
 const ImagesContext = createContext();
 
@@ -15,8 +15,7 @@ export const ImagesProvider = ({ children }) => {
 
     const [loadedImages, setLoadedImages] = useState({});
 
-    const [isImageVisible, setIsImageVisible] = useState(true);
-    const [selectedCamera, setSelectedCamera] = useState(DEFAULT_CAMERA);
+    const [selectedCamera, setSelectedCamera] = useState(null);
     const selectedImagePath = useMemo(() => {
         return images[selectedCamera]?.[activeFrameIndex] ?? null;
     }, [images, selectedCamera, activeFrameIndex]);
@@ -51,8 +50,6 @@ export const ImagesProvider = ({ children }) => {
                 setLoadedImages,
                 imagesByCamera,
                 imageSize,
-                isImageVisible,
-                setIsImageVisible,
             }}
         >
             {children}

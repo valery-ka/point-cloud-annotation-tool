@@ -14,7 +14,7 @@ export const useUpdatePixelProjections = (glSize) => {
 
     const { pcdFiles } = useFileManager();
     const { activeFrameIndex, arePointCloudsLoading } = useFrames();
-    const { setPixelProjections, originalPositionsRef } = useEditor();
+    const { setPixelProjections, pointCloudRefs } = useEditor();
 
     const glSizeRef = useRef(glSize);
     const pcdFilesRef = useRef(pcdFiles);
@@ -23,10 +23,11 @@ export const useUpdatePixelProjections = (glSize) => {
     const requestPixelProjectionsUpdate = useCallback(
         debounce(() => {
             const activeFrameFilePath = pcdFilesRef.current[activeFrameIndexRef.current];
+            const activeFrameRef = pointCloudRefs.current[activeFrameFilePath];
 
-            if (isEmpty(originalPositionsRef.current[activeFrameFilePath])) return;
+            if (isEmpty(activeFrameRef?.geometry?.attributes?.original)) return;
             const projections = updatePixelProjections(
-                originalPositionsRef.current[activeFrameFilePath],
+                activeFrameRef.geometry.attributes.original.array,
                 camera,
                 glSizeRef.current,
             );

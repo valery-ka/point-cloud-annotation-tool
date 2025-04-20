@@ -2,7 +2,7 @@ import { Vector2, Vector3, Matrix4, BufferGeometry, BufferAttribute } from "thre
 
 import { getCalibrationByUrl, get3DPointsForImage } from "utils/calibrations";
 import { getMatchingKeyForTimestamp } from "./general";
-import { getRGBFromMatchedColorArray } from "utils/editor/colors/general";
+import { getRGBFromMatchedColorArray } from "utils/editor";
 
 export const project3DPointsTo2D = (positionArray, calibration, imageWidth, imageHeight) => {
     const { extrinsic, intrinsic, distortion } = calibration;
@@ -96,11 +96,15 @@ export const buildImageGeometry = (
     const cloud = getMatchingKeyForTimestamp(url, pointCloudRefs.current);
     const matchedColorArray = pointCloudRefs.current[cloud].geometry.attributes.color.array;
 
+    const alpha = 1.0;
+    const size = 5;
+
     if (!projectedPointsRef.current[url]) {
         const indices = [];
         const positions = [];
         const colors = [];
         const sizes = [];
+        const alphas = [];
 
         for (let i = 0; i < points.length; i += 3) {
             const pointIndex = points[i + 2];
@@ -114,14 +118,17 @@ export const buildImageGeometry = (
             indices.push(pointIndex);
             positions.push(x, y, z);
             colors.push(r, g, b);
-            sizes.push(5);
+            sizes.push(size);
+            alphas.push(alpha);
         }
 
         const geometry = new BufferGeometry();
+
         geometry.setAttribute("indices", new BufferAttribute(new Uint32Array(indices), 1));
         geometry.setAttribute("position", new BufferAttribute(new Float32Array(positions), 3));
         geometry.setAttribute("color", new BufferAttribute(new Uint8Array(colors), 3, true));
         geometry.setAttribute("size", new BufferAttribute(new Uint8Array(sizes), 1));
+        geometry.setAttribute("alpha", new BufferAttribute(new Float32Array(alphas), 1));
 
         projectedPointsRef.current[url] = geometry;
     }

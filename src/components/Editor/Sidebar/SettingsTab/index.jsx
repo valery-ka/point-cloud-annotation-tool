@@ -24,17 +24,17 @@ export const SettingsTab = memo(({ title }) => {
                 <Spoiler title={t(`${COMPONENT_NAME}general`)} defaultIsOpen={true}>
                     <RadioButtonGroup
                         title="Language / Язык"
-                        settingType={"general"}
+                        setting={"general"}
+                        settingType={"language"}
                         options={["en", "ru"]}
                         alias={["English", "Русский"]}
-                        name="language"
                     />
                     <RadioButtonGroup
                         title={t(`${COMPONENT_NAME}theme`)}
-                        settingType={"general"}
+                        setting={"general"}
+                        settingType={"theme"}
                         options={["light", "dark"]}
                         alias={[t(`${COMPONENT_NAME}light`), t(`${COMPONENT_NAME}dark`)]}
-                        name="theme"
                     />
                 </Spoiler>
                 <Spoiler title={t(`${COMPONENT_NAME}navigation`)} defaultIsOpen={false}>
@@ -149,6 +149,18 @@ export const SettingsTab = memo(({ title }) => {
                         max={5}
                         step={0.01}
                         decimals={2}
+                    />
+                </Spoiler>
+                <Spoiler title={t(`${COMPONENT_NAME}cameraProjections`)} defaultIsOpen={false}>
+                    <RadioButtonGroup
+                        title="VOID видимость"
+                        action={"projectSettings"}
+                        setting={"editorSettings"}
+                        settingType={"project"}
+                        settingKey={"visibleVOID"}
+                        options={[true, false]}
+                        alias={["Видно", "Скрыто"]}
+                        name="project"
                     />
                 </Spoiler>
             </div>

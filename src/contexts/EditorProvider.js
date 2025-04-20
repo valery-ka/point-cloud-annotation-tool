@@ -15,7 +15,6 @@ export const EditorProvider = ({ children }) => {
     const minMaxZRef = useRef([Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY]);
     const [hasFilterSelectionPoint, setHasFilterSelectionPoint] = useState(false);
 
-    const originalPositionsRef = useRef({});
     const activeFramePositionsRef = useRef([]);
 
     const pointLabelsRef = useRef({});
@@ -30,7 +29,6 @@ export const EditorProvider = ({ children }) => {
                 selectedClassIndex,
                 setSelectedClassIndex,
                 pointCloudRefs,
-                originalPositionsRef,
                 activeFramePositionsRef,
                 pointLabelsRef,
                 prevLabelsRef,

@@ -128,27 +128,21 @@ export const MODES = {
             const x = position[index * 3];
             if (x < Z_FILTER) return true;
         },
-        filter: (
-            geometry,
-            framePositions,
-            originalPositions,
-            points,
-            hidePoint,
-            showPoint,
-            minZ,
-            maxZ,
-            isSelection,
-            updateGlobalBox,
-            pointLabels,
-            classesVisibility,
-            showFilterPoints,
-        ) => {
+        filter: ({ frameData, filterData, selectionData, imageData, callbacks }) => {
+            const { positions } = frameData;
+            const { isSelection } = selectionData;
+            const { points } = selectionData;
+            const { hidePoint, updateGlobalBox } = callbacks;
+
             if (!points.length) return;
+
+            const reason = isSelection ? CLASS_FILTER : SELECTION;
+
             for (let i = 0; i < points.length; i++) {
                 const pointIndex = points[i];
-                const hidePosition = isSelection ? CLASS_FILTER : SELECTION;
-                hidePoint(geometry, framePositions, pointIndex * 3, hidePosition);
+                hidePoint(positions, pointIndex * 3, reason);
             }
+
             updateGlobalBox();
         },
     },
@@ -161,48 +155,40 @@ export const MODES = {
             const x = position[index * 3];
             if (x < Z_FILTER) return true;
         },
-        filter: (
-            geometry,
-            framePositions,
-            originalPositions,
-            points,
-            hidePoint,
-            showPoint,
-            minZ,
-            maxZ,
-            _,
-            updateGlobalBox,
-            pointLabels,
-            classesVisibility,
-            showFilterPoints,
-        ) => {
+        filter: ({ frameData, filterData, selectionData, imageData, callbacks }) => {
+            const { positions, originalPositions, labels } = frameData;
+            const { minZ, maxZ, visibility } = filterData;
+            const { points } = selectionData;
+            const { hidePoint, showPoint, updateGlobalBox } = callbacks;
+
             if (!points.length) return;
+
             const visiblePointsSet = new Set(points);
-            for (let i = 0; i < framePositions.length; i += 3) {
+
+            for (let i = 0; i < positions.length; i += 3) {
                 const pointIndex = i / 3;
-                const label = pointLabels[pointIndex];
-                const classVisibility = classesVisibility[label];
-                const visible = classVisibility ? classVisibility.visible : true;
+                const label = labels[pointIndex];
+                const classVisibility = visibility[label];
+                const isClassVisible = classVisibility ? classVisibility.visible : true;
                 const originalZ = originalPositions[i + 2];
+                const isSelected = visiblePointsSet.has(pointIndex);
 
-                const shouldShowPoint = visiblePointsSet.has(pointIndex);
+                const shouldHide =
+                    !isSelected || !isClassVisible || originalZ < minZ || originalZ > maxZ;
 
-                if (
-                    !shouldShowPoint ||
-                    (classVisibility && !visible) ||
-                    originalZ < minZ ||
-                    originalZ > maxZ
-                ) {
-                    const reason = !shouldShowPoint
+                if (shouldHide) {
+                    const reason = !isSelected
                         ? SELECTION
-                        : classVisibility && !visible
+                        : !isClassVisible
                           ? CLASS_FILTER
                           : Z_FILTER;
-                    hidePoint(geometry, framePositions, i, reason, true);
+
+                    hidePoint(positions, i, reason, true);
                 } else {
-                    showPoint(geometry, framePositions, i, originalPositions);
+                    showPoint(positions, i, originalPositions);
                 }
             }
+
             updateGlobalBox();
         },
     },
@@ -215,35 +201,34 @@ export const MODES = {
             const x = position[index * 3];
             if (x >= Z_FILTER) return true;
         },
-        filter: (
-            geometry,
-            framePositions,
-            originalPositions,
-            points,
-            hidePoint,
-            showPoint,
-            minZ,
-            maxZ,
-            _,
-            updateGlobalBox,
-            pointLabels,
-            classesVisibility,
-            showFilterPoints,
-        ) => {
+        filter: ({ frameData, filterData, selectionData, imageData, callbacks }) => {
+            const { geometry, positions, originalPositions, labels } = frameData;
+            const { minZ, maxZ, visibility } = filterData;
+            const { points } = selectionData;
+            const { showFilterPoints, updateGlobalBox } = callbacks;
+
             if (!points.length) return;
+
             for (let i = 0; i < points.length; i++) {
-                const index = points[i];
-                showFilterPoints(
-                    geometry,
-                    framePositions,
-                    originalPositions,
-                    pointLabels,
-                    classesVisibility,
-                    minZ,
-                    maxZ,
-                    index * 3,
-                );
+                const index = points[i] * 3;
+
+                showFilterPoints({
+                    frameData: {
+                        geometry,
+                        positions,
+                        originalPositions,
+                        labels,
+                    },
+                    filterData: {
+                        visibility,
+                        minZ,
+                        maxZ,
+                    },
+                    index,
+                    imageData: { imageData },
+                });
             }
+
             updateGlobalBox();
         },
     },

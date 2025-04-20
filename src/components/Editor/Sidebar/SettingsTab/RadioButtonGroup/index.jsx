@@ -1,21 +1,48 @@
 import React, { useCallback } from "react";
 
-import { useSettings } from "contexts";
+import { useEvent, useSettings } from "contexts";
 
-export const RadioButtonGroup = ({ title, settingType, options, alias, name }) => {
+export const RadioButtonGroup = ({
+    title,
+    action,
+    setting,
+    settingType,
+    settingKey,
+    options,
+    alias,
+}) => {
+    const { publish } = useEvent();
     const { settings, updateSettings } = useSettings();
-    const selectedOption = settings[settingType][name];
+
+    const editorSettings = settings[setting];
+    const selectedOption = editorSettings[settingType];
+
+    const selectedValue = action
+        ? editorSettings?.[settingType]?.[settingKey]
+        : editorSettings?.[settingType];
 
     const handleRadioButtonChange = useCallback(
         (key, value) => {
-            updateSettings({
-                [settingType]: {
-                    ...settings[settingType],
-                    [key]: value,
-                },
-            });
+            const update = action
+                ? {
+                      editorSettings: {
+                          ...editorSettings,
+                          [settingType]: {
+                              ...editorSettings[settingType],
+                              [settingKey]: value,
+                          },
+                      },
+                  }
+                : {
+                      [setting]: {
+                          ...settings[setting],
+                          [key]: value,
+                      },
+                  };
+            if (action) publish(action, { settingKey, value });
+            updateSettings(update);
         },
-        [settings[settingType]],
+        [settings[setting]],
     );
 
     return (
@@ -31,10 +58,10 @@ export const RadioButtonGroup = ({ title, settingType, options, alias, name }) =
                     <label key={index} className="radio-button">
                         <input
                             type="radio"
-                            name={name}
+                            settingType={settingType}
                             value={option}
-                            checked={selectedOption === option}
-                            onChange={() => handleRadioButtonChange(name, option)}
+                            checked={selectedValue === option}
+                            onChange={() => handleRadioButtonChange(settingType, option)}
                         />
                         <span>{alias[index]}</span>
                     </label>

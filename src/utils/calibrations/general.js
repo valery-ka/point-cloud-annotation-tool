@@ -41,7 +41,7 @@ export const get3DPointsForImage = (imageUrl, pointCloud) => {
     const matchingKey = getMatchingKeyForTimestamp(imageUrl, pointCloud);
 
     if (matchingKey) {
-        return pointCloud[matchingKey].geometry.attributes.position.array;
+        return pointCloud[matchingKey].geometry.attributes.original.array;
     }
 
     return null;
