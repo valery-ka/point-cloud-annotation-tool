@@ -32,9 +32,9 @@ export const project3DPointsTo2D = (positionArray, calibration, imageWidth, imag
         const { x_dist, y_dist } = applyFisheyeDistortion(x_norm, y_norm, distortion);
 
         const u = Math.round(fx * x_dist + cx);
-        const v = imageHeight - Math.round(fy * y_dist + cy); // почему? three.js сказал потому
+        const v = imageHeight - Math.round(fy * y_dist + cy);
 
-        if (isPointInBounds(u, v, imageWidth, imageHeight)) {
+        if (isPointInBounds({ u, v, imageWidth, imageHeight, marginFactor: 0 })) {
             points2D.push(u, v, index);
         }
     }
@@ -51,7 +51,7 @@ export const applyFisheyeDistortion = (x_norm, y_norm, distortion, applyDistorti
         return { x_dist: x_norm, y_dist: y_norm };
     }
 
-    const [k1, k2, p1, p2, k3, k4, k5, k6] = distortion;
+    const [k1, k2, p1, p2, k3, k4 = 0, k5 = 0, k6 = 0] = distortion;
 
     const point = new Vector2(x_norm, y_norm);
 
@@ -74,7 +74,7 @@ export const applyFisheyeDistortion = (x_norm, y_norm, distortion, applyDistorti
     return { x_dist, y_dist };
 };
 
-const isPointInBounds = (u, v, imageWidth, imageHeight, marginFactor = 0) => {
+const isPointInBounds = ({ u, v, imageWidth, imageHeight, marginFactor }) => {
     const margin = Math.max(imageWidth, imageHeight) * marginFactor;
     return u >= -margin && u < imageWidth + margin && v >= -margin && v < imageHeight + margin;
 };

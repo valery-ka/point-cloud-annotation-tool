@@ -153,14 +153,25 @@ export const SettingsTab = memo(({ title }) => {
                 </Spoiler>
                 <Spoiler title={t(`${COMPONENT_NAME}cameraProjections`)} defaultIsOpen={false}>
                     <RadioButtonGroup
-                        title="VOID видимость"
-                        action={"projectSettings"}
+                        title={t(`${COMPONENT_NAME}visibleVOID`)}
+                        action={"visibleVOID"}
                         setting={"editorSettings"}
                         settingType={"project"}
                         settingKey={"visibleVOID"}
                         options={[true, false]}
-                        alias={["Видно", "Скрыто"]}
+                        alias={[t(`${COMPONENT_NAME}showVOID`), t(`${COMPONENT_NAME}hideVOID`)]}
                         name="project"
+                    />
+                    <SettingsSlider
+                        title={t(`${COMPONENT_NAME}projectPointSize`)}
+                        action={"projectPointSize"}
+                        setting={"editorSettings"}
+                        settingType={"project"}
+                        settingKey={"projectPointSize"}
+                        min={1}
+                        max={5}
+                        step={0.1}
+                        decimals={1}
                     />
                 </Spoiler>
             </div>

@@ -226,7 +226,7 @@ export const useFramePointsVisibility = (updateGlobalBox) => {
         [filterFramePoints],
     );
 
-    useSubscribeFunction("projectSettings", handleVOIDProject, [filterFramePoints]);
+    useSubscribeFunction("visibleVOID", handleVOIDProject, [filterFramePoints]);
 
     return { filterFramePoints, filterSelectedPoints };
 };

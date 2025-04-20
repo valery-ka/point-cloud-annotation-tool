@@ -143,3 +143,14 @@ export const updateHighlightedPointSize = (
 
     invalidateSize(geometry);
 };
+
+export const updateProjectedPointsSize = (geometry, size) => {
+    const sizeArray = geometry.attributes.size.array;
+    const newSize = convertFloatToUint(size);
+
+    for (let i = 0; i < sizeArray.length; i++) {
+        sizeArray[i] = newSize;
+    }
+
+    invalidateSize(geometry);
+};

@@ -41,4 +41,6 @@ export { useFrameLaneMouseEvents } from "./components/FrameSwitcher/useFrameLane
 export { useImageResize } from "./components/CameraImages/useImageResize";
 export { useImageLoader } from "./components/CameraImages/useImageLoader";
 export { useImageSelector } from "./components/CameraImages/useImageSelector";
+export { useImagePointsSize } from "./components/CameraImages/useImagePointsSize";
 export { useFetchCalibrations } from "./components/CameraImages/useFetchCalibrations";
+export { useImageCanvasMouseEvents } from "./components/CameraImages/useImageCanvasMouseEvents";

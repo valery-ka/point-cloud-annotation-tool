@@ -94,5 +94,10 @@
     "loadingFrames": "Loading frames",
     "loadingImages": "Loading images",
     "BSOD": "Something went wrong :С",
-    "setCamera": "Set camera image"
+    "setCamera": "Set camera image",
+    "cameraProjections": "Camera image points projections",
+    "visibleVOID": "Show / Hide VOID Points",
+    "hideVOID": "Hide",
+    "showVOID": "Show",
+    "projectPointSize": "Projected points size"
 }

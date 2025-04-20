@@ -15,4 +15,8 @@ export const defaultEditorSettings = {
     editor: {
         paintDepth: 0.03,
     },
+    project: {
+        visibleVOID: false,
+        projectPointSize: 5,
+    },
 };

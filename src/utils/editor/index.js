@@ -32,6 +32,7 @@ export {
     updatePointsSize,
     updateSelectedPointsSize,
     updateHighlightedPointSize,
+    updateProjectedPointsSize,
 } from "./sizes/general";
 
 export { rebuildGeometry, drawGlobalBox, drawCircleRuler } from "./geometry/general";
