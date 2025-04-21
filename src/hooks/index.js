@@ -1,3 +1,4 @@
+export { useStats } from "./dev/useStats";
 export { useDebugger } from "./dev/useDebugger";
 export { useWhyUpdate } from "./dev/useWhyUpdate";
 export { useServerLogs } from "./dev/useServerLogs";
@@ -43,4 +44,5 @@ export { useImageLoader } from "./components/CameraImages/useImageLoader";
 export { useImageSelector } from "./components/CameraImages/useImageSelector";
 export { useImagePointsSize } from "./components/CameraImages/useImagePointsSize";
 export { useFetchCalibrations } from "./components/CameraImages/useFetchCalibrations";
+export { useImagePointHighlighter } from "./components/CameraImages/useImagePointHighlighter";
 export { useImageCanvasMouseEvents } from "./components/CameraImages/useImageCanvasMouseEvents";

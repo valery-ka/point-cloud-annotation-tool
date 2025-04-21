@@ -10,7 +10,7 @@ export const invalidateImageColor = (geometry, image, projectedPoints) => {
     if (!image) return;
 
     const url = image.src;
-    const projection = projectedPoints[url];
+    const projection = projectedPoints[url].geometry;
     if (!projection) return;
 
     const indices = projection.attributes.indices.array;

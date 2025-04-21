@@ -5,13 +5,15 @@ import { useEffect, useRef, useCallback } from "react";
 
 import { useImages } from "contexts";
 
-const MIN_ZOOM = 1;
+import { switchViewToPoint } from "utils/calibrations";
+
+const MIN_ZOOM = 0.5;
 const MAX_ZOOM = 10;
 const ZOOM_STEP = 0.3;
 const PAN_SPEED = 2;
 const TEMPORARY_PADDING = 0;
 
-export const ImageCameraControls = ({ image, size }) => {
+export const ImageCameraControls = ({ image, size, enabled = true, normXY = null }) => {
     const { camera, gl } = useThree();
     const { selectedCamera } = useImages();
 
@@ -179,6 +181,7 @@ export const ImageCameraControls = ({ image, size }) => {
     }, [camera, selectedCamera]);
 
     useEffect(() => {
+        if (!enabled) return;
         const domElement = gl.domElement;
 
         domElement.addEventListener("wheel", handleWheel, { passive: false });
@@ -194,7 +197,22 @@ export const ImageCameraControls = ({ image, size }) => {
             domElement.removeEventListener("mousemove", handleMouseMove);
             window.removeEventListener("mouseup", handleMouseUp);
         };
-    }, [handleWheel, handleMouseDown, handleMouseMove, handleMouseUp, gl.domElement]);
+    }, [handleWheel, handleMouseDown, handleMouseMove, handleMouseUp, gl.domElement, enabled]);
+
+    // follow hovered point
+    useEffect(() => {
+        if (!normXY) return;
+        const { normX, normY } = normXY;
+
+        boundsRef.current = {
+            width: image.width + TEMPORARY_PADDING,
+            height: image.height + TEMPORARY_PADDING,
+        };
+
+        camera.position.x = normX * (boundsRef.current.width / 2);
+        camera.position.y = normY * (boundsRef.current.height / 2);
+        camera.updateProjectionMatrix();
+    }, [normXY]);
 
     return null;
 };

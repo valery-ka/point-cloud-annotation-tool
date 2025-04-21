@@ -41,8 +41,8 @@ export const DEFAULT_BRUSH_SIZE = 40;
 // camera
 export const MIN_IMAGE_HEIGHT = 250;
 // вынести в конфиг
-// export const DEFAULT_CAMERA = "camera_front_right";
-export const DEFAULT_CAMERA = "camera_inner_frontal_middle";
+export const DEFAULT_CAMERA = "camera_front_right";
+// export const DEFAULT_CAMERA = "camera_inner_frontal_middle";
 
 // save
 export const SAVE_FRAME_REQUEST_TIME = 500;

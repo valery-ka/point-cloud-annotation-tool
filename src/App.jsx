@@ -11,6 +11,7 @@ import {
     LoadingOverlay,
     EditorContextMenu,
     CameraImages,
+    PointHighlighter,
 } from "components";
 
 import { useServerLogs } from "hooks";
@@ -33,6 +34,7 @@ export const App = () => {
                     <EditorSideLeftControls />
                     <EditorTopRightControls />
                     <CameraImages />
+                    <PointHighlighter />
                 </div>
                 <Sidebar />
             </div>

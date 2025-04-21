@@ -99,6 +99,8 @@ export const buildImageGeometry = (
     const alpha = 1.0;
     const size = 5;
 
+    const indexToPositionMap = new Map();
+
     if (!projectedPointsRef.current[url]) {
         const indices = [];
         const positions = [];
@@ -113,6 +115,8 @@ export const buildImageGeometry = (
             const y = points[i + 1] - img.height / 2;
             const z = 0.1;
 
+            indexToPositionMap.set(pointIndex, [x, y]);
+
             const { r, g, b } = getRGBFromMatchedColorArray(pointIndex, matchedColorArray);
 
             indices.push(pointIndex);
@@ -124,12 +128,15 @@ export const buildImageGeometry = (
 
         const geometry = new BufferGeometry();
 
-        geometry.setAttribute("indices", new BufferAttribute(new Uint32Array(indices), 1));
+        geometry.setAttribute("indices", new BufferAttribute(new Float32Array(indices), 1));
         geometry.setAttribute("position", new BufferAttribute(new Float32Array(positions), 3));
         geometry.setAttribute("color", new BufferAttribute(new Uint8Array(colors), 3, true));
         geometry.setAttribute("size", new BufferAttribute(new Uint8Array(sizes), 1));
         geometry.setAttribute("alpha", new BufferAttribute(new Float32Array(alphas), 1));
 
-        projectedPointsRef.current[url] = geometry;
+        projectedPointsRef.current[url] = {
+            geometry,
+            indexToPositionMap,
+        };
     }
 };

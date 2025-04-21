@@ -7,7 +7,6 @@ const HoveredPointContext = createContext();
 
 export const HoveredPointProvider = ({ children }) => {
     const [highlightedPoint, setHighlightedPoint] = useState(null);
-    const [nearestIndices, setNearestIndies] = useState(null);
     const [searcingRadius, setSearcingRadius] = useState(DEFAULT_SEARCH_RADIUS);
 
     return (
@@ -15,8 +14,6 @@ export const HoveredPointProvider = ({ children }) => {
             value={{
                 highlightedPoint,
                 setHighlightedPoint,
-                nearestIndices,
-                setNearestIndies,
                 searcingRadius,
                 setSearcingRadius,
             }}

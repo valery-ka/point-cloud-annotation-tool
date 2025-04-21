@@ -50,6 +50,8 @@ export const PointCloudEditor = () => {
         requestPixelProjectionsUpdate();
     });
 
+    HOOKS.useStats();
+
     return (
         <>
             <axesHelper args={[5]} />

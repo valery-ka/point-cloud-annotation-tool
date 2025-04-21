@@ -1,19 +1,18 @@
-import React, { memo, useMemo, useState, useCallback, useEffect } from "react";
+import React, { memo, useMemo, useEffect } from "react";
 
 import { Canvas } from "@react-three/fiber";
 import { Image } from "@react-three/drei";
 
-import { useImagePointsSize, useImageCanvasMouseEvents, useImagePointHighlighter } from "hooks";
 import { useCalibrations } from "contexts";
+import { useImagePointHighlighter } from "hooks";
+
+import { ImageCameraControls } from "components/Editor/CameraImages/ImageCameraControls";
 
 import { ImagePointShader } from "shaders";
 
-import { ImageCameraControls } from "../ImageCameraControls";
+const Z_INDEX = 1;
 
-const Z_INDEX = 5;
-
-export const ImageCanvas = memo(({ image, size }) => {
-    const scale = useMemo(() => size?.height / image?.height, [size]);
+export const PointHighlighterCanvas = memo(({ image }) => {
     const imageWidth = useMemo(() => image?.width, [image]);
     const imageHeight = useMemo(() => image?.height, [image]);
 
@@ -38,23 +37,20 @@ export const ImageCanvas = memo(({ image, size }) => {
         [],
     );
 
-    useImagePointsSize(geometry);
-    useImagePointHighlighter({
+    const normXY = useImagePointHighlighter({
         size: { width: imageWidth, height: imageHeight },
         shaderMaterial,
         indexToPosition,
     });
 
-    const { arePointsVisible } = useImageCanvasMouseEvents();
-
     if (!image?.texture) return null;
 
     return (
         <Canvas orthographic className="chessboard">
-            <ImageCameraControls image={image} size={size} />
-            <Image texture={image.texture} scale={[imageWidth * scale, imageHeight * scale, 1]} />
-            {geometry && arePointsVisible && (
-                <group scale={[scale, scale, Z_INDEX]}>
+            <ImageCameraControls image={image} enabled={true} normXY={normXY} />
+            <Image texture={image.texture} scale={[imageWidth, imageHeight, 1]} />
+            {geometry && (
+                <group scale={[1, 1, Z_INDEX]}>
                     <points geometry={geometry} material={shaderMaterial} />
                 </group>
             )}
