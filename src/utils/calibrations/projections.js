@@ -8,6 +8,8 @@ export const project3DPointsTo2D = (positionArray, calibration, imageWidth, imag
     const { extrinsic, intrinsic, distortion } = calibration;
     if (!intrinsic || !extrinsic) return {};
 
+    const MAX_DISTORTION_RADIUS = 3.0;
+
     const points2D = [];
     const extrinsic_matrix = new Matrix4().fromArray(extrinsic).transpose();
     const { fx, cx, fy, cy } = getIntrinsicParameters(intrinsic);
@@ -28,6 +30,9 @@ export const project3DPointsTo2D = (positionArray, calibration, imageWidth, imag
 
         const x_norm = x_cam / z_cam;
         const y_norm = y_cam / z_cam;
+
+        const r = Math.sqrt(x_norm * x_norm + y_norm * y_norm);
+        if (r > MAX_DISTORTION_RADIUS) continue;
 
         const { x_dist, y_dist } = applyFisheyeDistortion(x_norm, y_norm, distortion);
 
@@ -128,11 +133,14 @@ export const buildImageGeometry = (
 
         const geometry = new BufferGeometry();
 
-        geometry.setAttribute("indices", new BufferAttribute(new Float32Array(indices), 1));
         geometry.setAttribute("position", new BufferAttribute(new Float32Array(positions), 3));
+        geometry.setAttribute("indices", new BufferAttribute(new Float32Array(indices), 1));
         geometry.setAttribute("color", new BufferAttribute(new Uint8Array(colors), 3, true));
-        geometry.setAttribute("size", new BufferAttribute(new Uint8Array(sizes), 1));
-        geometry.setAttribute("alpha", new BufferAttribute(new Float32Array(alphas), 1));
+
+        geometry.setAttribute("size_image", new BufferAttribute(new Uint8Array(sizes), 1));
+        geometry.setAttribute("size_highlighter", new BufferAttribute(new Uint8Array(sizes), 1));
+        geometry.setAttribute("alpha_image", new BufferAttribute(new Uint8Array(alphas), 1));
+        geometry.setAttribute("alpha_highlighter", new BufferAttribute(new Uint8Array(alphas), 1));
 
         projectedPointsRef.current[url] = {
             geometry,

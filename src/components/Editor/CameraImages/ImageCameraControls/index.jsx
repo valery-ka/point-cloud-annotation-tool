@@ -5,9 +5,7 @@ import { useEffect, useRef, useCallback } from "react";
 
 import { useImages } from "contexts";
 
-import { switchViewToPoint } from "utils/calibrations";
-
-const MIN_ZOOM = 0.5;
+const MIN_ZOOM = 1;
 const MAX_ZOOM = 10;
 const ZOOM_STEP = 0.3;
 const PAN_SPEED = 2;

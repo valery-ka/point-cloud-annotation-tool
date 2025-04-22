@@ -1,13 +1,15 @@
 export { updatePixelProjections } from "./positions/updatePixelProjections";
 
+// positions (points visibility)
 export {
     hidePoint,
     showPoint,
     getPositionArray,
     findNearestPoints,
-    invalidateCloudPosition,
-    invalidateImagePointsVisibility,
-} from "./positions/general";
+    invalidateCloudPointsPosition,
+} from "./positions/cloud";
+export { invalidateImagePointsVisibility } from "./positions/image";
+export { invalidateHighlighterPointsVisibility } from "./positions/highlighter";
 export {
     ACTIONS,
     filterPoints,
@@ -16,6 +18,7 @@ export {
     updateClassFilter,
 } from "./positions/filters";
 
+// points colors
 export {
     getColorArray,
     invalidateCloudColor,
@@ -23,17 +26,21 @@ export {
     changeClassOfSelection,
     getDefaultPointColor,
     updatePointCloudColors,
-    getRGBFromMatchedColorArray,
-} from "./colors/general";
+} from "./colors/cloud";
+export { invalidateImagePointsColor, getRGBFromMatchedColorArray } from "./colors/image";
+export { invalidateHighlighterPointsColor } from "./colors/highlighter";
 
+// points sizes
 export {
     getSizeArray,
-    invalidateSize,
+    invalidateCloudPointsSize,
     updatePointsSize,
     updateSelectedPointsSize,
     updateHighlightedPointSize,
     updateProjectedPointsSize,
-} from "./sizes/general";
+} from "./sizes/cloud";
+export { invalidateImagePointsSize } from "./sizes/image";
+export { invalidateHighlighterPointsSize } from "./sizes/highlighter";
 
 export { rebuildGeometry, drawGlobalBox, drawCircleRuler } from "./geometry/general";
 export {

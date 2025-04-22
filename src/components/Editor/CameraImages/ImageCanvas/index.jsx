@@ -47,12 +47,17 @@ export const ImageCanvas = memo(({ image, size }) => {
 
     const { arePointsVisible } = useImageCanvasMouseEvents();
 
-    if (!image?.texture) return null;
-
     return (
         <Canvas orthographic className="chessboard">
-            <ImageCameraControls image={image} size={size} />
-            <Image texture={image.texture} scale={[imageWidth * scale, imageHeight * scale, 1]} />
+            {image?.texture && (
+                <>
+                    <ImageCameraControls image={image} size={size} />
+                    <Image
+                        texture={image.texture}
+                        scale={[imageWidth * scale, imageHeight * scale, 1]}
+                    />
+                </>
+            )}
             {geometry && arePointsVisible && (
                 <group scale={[scale, scale, Z_INDEX]}>
                     <points geometry={geometry} material={shaderMaterial} />

@@ -16,6 +16,10 @@
     display: block;
     pointer-events: none;
     resize: none;
+
+    &.hidden {
+        display: none;
+    }
 }
 
 .camera-image {

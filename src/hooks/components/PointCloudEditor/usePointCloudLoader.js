@@ -3,7 +3,7 @@ import { useThree } from "@react-three/fiber";
 
 import { useFileManager, useEditor, useFrames, useSettings, useConfig } from "contexts";
 
-import { PointShader } from "shaders";
+import { CloudPointShader } from "shaders";
 import { PCDLoaderWorker } from "workers";
 import {
     rebuildGeometry,
@@ -34,7 +34,7 @@ export const usePointCloudLoader = (THEME_COLORS) => {
     }, [nonHiddenClasses]);
 
     const POINT_MATERIAL = useMemo(() => {
-        return PointShader({
+        return CloudPointShader({
             sizeMultiplier: POINT_SIZE_MULTIPLIER,
             theme: theme,
             THEME_COLORS: THEME_COLORS,

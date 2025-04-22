@@ -44,22 +44,24 @@ export const CameraImages = memo(() => {
     return (
         <div className="camera-wrapper" ref={cameraWrapperRef}>
             <TopLoader loadingBarRef={loadingBarRef} />
-            {selectedImagePath ? (
-                <div className="camera-image-container" style={imageSize}>
-                    <div className="camera-image-resize" onMouseDown={handleResizeStart}>
-                        <FontAwesomeIcon icon={faMinus} className="camera-image-resize-icon" />
-                    </div>
-                    <div className="camera-image-max" onClick={toggleImageSize}>
-                        <FontAwesomeIcon
-                            icon={imageMaximized ? faCompressAlt : faExpandAlt}
-                            className="camera-image-max-icon"
-                        />
-                    </div>
-                    <div className="camera-image" onMouseUp={handleMouseUp}>
-                        <ImageCanvas image={loadedImages[selectedImagePath]} size={imageSize} />
-                    </div>
+            <div
+                className={`camera-image-container ${!selectedImagePath ? "hidden" : ""}`}
+                style={imageSize}
+            >
+                <div className="camera-image-resize" onMouseDown={handleResizeStart}>
+                    <FontAwesomeIcon icon={faMinus} className="camera-image-resize-icon" />
                 </div>
-            ) : (
+                <div className="camera-image-max" onClick={toggleImageSize}>
+                    <FontAwesomeIcon
+                        icon={imageMaximized ? faCompressAlt : faExpandAlt}
+                        className="camera-image-max-icon"
+                    />
+                </div>
+                <div className="camera-image" onMouseUp={handleMouseUp}>
+                    <ImageCanvas image={loadedImages[selectedImagePath]} size={imageSize} />
+                </div>
+            </div>
+            {selectedImagePath === null && (
                 <RenderEditorButton
                     className={`tool-3d-control-button single`}
                     title={t("setCamera")}

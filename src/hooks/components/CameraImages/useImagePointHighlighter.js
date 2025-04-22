@@ -2,15 +2,15 @@ import { useEffect, useMemo } from "react";
 
 import { useHoveredPoint } from "contexts";
 
-export const useImagePointHighlighter = ({ size, shaderMaterial, indexToPosition }) => {
+export const useImagePointHighlighter = ({ size, shaderMaterial, positions }) => {
     const { highlightedPoint } = useHoveredPoint();
 
     const normXY = useMemo(() => {
-        if (!highlightedPoint || !indexToPosition || !size) return null;
+        if (!highlightedPoint || !positions || !size) return null;
 
         const { index } = highlightedPoint;
-        if (indexToPosition.has(index)) {
-            const [x, y] = indexToPosition.get(index);
+        if (positions.has(index)) {
+            const [x, y] = positions.get(index);
 
             const { width, height } = size;
 
@@ -19,7 +19,7 @@ export const useImagePointHighlighter = ({ size, shaderMaterial, indexToPosition
 
             return { normX, normY };
         }
-    }, [highlightedPoint, indexToPosition, size]);
+    }, [highlightedPoint, positions, size]);
 
     useEffect(() => {
         if (highlightedPoint && shaderMaterial?.uniforms?.uHighlightedIndex) {

@@ -1,9 +1,5 @@
-import {
-    hidePoint,
-    showPoint,
-    invalidateCloudPosition,
-    invalidateImagePointsVisibility,
-} from "./general";
+import { hidePoint, showPoint, invalidateCloudPointsPosition } from "./cloud";
+import { invalidateImagePointsVisibility } from "./image";
 import { MODES } from "tools";
 import * as APP_CONSTANTS from "constants";
 
@@ -49,7 +45,7 @@ export const filterPoints = ({ frameData, filterData, imageData }) => {
         }
     }
 
-    invalidateCloudPosition(geometry);
+    invalidateCloudPointsPosition(geometry);
     invalidateImagePointsVisibility({ frameData, imageData });
 };
 
@@ -79,7 +75,7 @@ export const filterPointsBySelection = ({
         },
     });
 
-    invalidateCloudPosition(geometry);
+    invalidateCloudPointsPosition(geometry);
     invalidateImagePointsVisibility({ frameData, imageData });
 };
 
@@ -103,7 +99,7 @@ export const showFilterPointsBySelection = ({ frameData, filterData, index }) =>
         showPoint(positions, index, originalPositions);
     }
 
-    invalidateCloudPosition(geometry);
+    invalidateCloudPointsPosition(geometry);
 };
 
 export const updateClassFilter = (action, classIndex, classesVisibilityRef) => {

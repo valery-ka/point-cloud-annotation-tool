@@ -3,7 +3,7 @@ import { useRef, useCallback, useEffect } from "react";
 import { useSubscribeFunction } from "hooks";
 import { useSettings } from "contexts";
 
-import { updateProjectedPointsSize } from "utils/editor";
+import { invalidateImagePointsSize } from "utils/editor";
 
 export const useImagePointsSize = (geometry) => {
     const { settings } = useSettings();
@@ -15,13 +15,20 @@ export const useImagePointsSize = (geometry) => {
                 const { value, settingKey } = data;
                 pointProjectRef.current[settingKey] = value;
             }
-            updateProjectedPointsSize(geometry, pointProjectRef.current.projectPointSize);
+            invalidateImagePointsSize({
+                geometry: geometry,
+                size: pointProjectRef.current.projectPointSize,
+            });
         },
         [geometry],
     );
 
     useEffect(() => {
-        updateProjectedPointsSize(geometry, pointProjectRef.current.projectPointSize);
+        if (!geometry) return;
+        invalidateImagePointsSize({
+            geometry: geometry,
+            size: pointProjectRef.current.projectPointSize,
+        });
     }, [geometry]);
 
     useSubscribeFunction("projectPointSize", updatePointsSize, [geometry]);

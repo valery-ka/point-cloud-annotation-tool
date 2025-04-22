@@ -1,6 +1,6 @@
-const convertFloatToUint = (value) => value * 10;
+export const convertFloatToUint = (value) => value * 10;
 
-export const invalidateSize = (geometry) => {
+export const invalidateCloudPointsSize = (geometry) => {
     geometry.attributes.size.needsUpdate = true;
 };
 
@@ -76,7 +76,7 @@ export const updatePointsSize = (pointCloud, pointLabels, sizeSettings, selected
         selectedClassIndex,
     );
 
-    invalidateSize(geometry);
+    invalidateCloudPointsSize(geometry);
 };
 
 export const updateSelectedPointsSize = (
@@ -107,7 +107,7 @@ export const updateSelectedPointsSize = (
         );
     }
 
-    invalidateSize(geometry);
+    invalidateCloudPointsSize(geometry);
 };
 
 export const updateHighlightedPointSize = (
@@ -141,7 +141,7 @@ export const updateHighlightedPointSize = (
         sizeArray[highlightedIndex] += convertFloatToUint(highlightedPointIncrement);
     }
 
-    invalidateSize(geometry);
+    invalidateCloudPointsSize(geometry);
 };
 
 export const updateProjectedPointsSize = (geometry, size) => {
@@ -152,5 +152,5 @@ export const updateProjectedPointsSize = (geometry, size) => {
         sizeArray[i] = newSize;
     }
 
-    invalidateSize(geometry);
+    invalidateCloudPointsSize(geometry);
 };

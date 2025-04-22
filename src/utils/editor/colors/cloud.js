@@ -1,39 +1,10 @@
 import { MODES } from "tools";
 import { filterPointsBySelection } from "../positions/filters";
-import { invalidateImagePointsVisibility } from "../positions/general";
+import { invalidateImagePointsVisibility } from "../positions/image";
+import { invalidateImagePointsColor } from "./image";
 
 export const invalidateCloudColor = (geometry) => {
     geometry.attributes.color.needsUpdate = true;
-};
-
-export const invalidateImageColor = (geometry, image, projectedPoints) => {
-    if (!image) return;
-
-    const url = image.src;
-    const projection = projectedPoints[url].geometry;
-    if (!projection) return;
-
-    const indices = projection.attributes.indices.array;
-    const colorArray = projection.attributes.color.array;
-    const matchedColorArray = geometry.attributes.color.array;
-
-    for (let i = 0; i < indices.length; i++) {
-        const pointIndex = indices[i];
-        const { r, g, b } = getRGBFromMatchedColorArray(pointIndex, matchedColorArray);
-
-        colorArray[i * 3] = r;
-        colorArray[i * 3 + 1] = g;
-        colorArray[i * 3 + 2] = b;
-    }
-
-    projection.attributes.color.needsUpdate = true;
-};
-
-export const getRGBFromMatchedColorArray = (index, matchedColorArray) => {
-    const r = matchedColorArray[index * 3];
-    const g = matchedColorArray[index * 3 + 1];
-    const b = matchedColorArray[index * 3 + 2];
-    return { r, g, b };
 };
 
 export const getColorArray = (pointCloudRefs, filePath) => {
@@ -112,7 +83,8 @@ export const changeClassOfSelection = ({
     }
 
     invalidateCloudColor(geometryRef.geometry);
-    invalidateImageColor(geometryRef.geometry, image, projectedPoints);
+
+    invalidateImagePointsColor({ geometry: geometryRef.geometry, imageData });
     invalidateImagePointsVisibility({
         frameData: {
             geometry: geometryRef.geometry,
@@ -125,7 +97,6 @@ export const changeClassOfSelection = ({
 export const updatePointCloudColors = ({ frameData, colorData, imageData }) => {
     const { ref: pointCloud, labels, intensity } = frameData;
     const { classColorsCache, pointColor } = colorData;
-    const { image, projectedPoints } = imageData;
 
     const geometry = pointCloud.geometry;
     const colorAttribute = geometry.attributes.color;
@@ -158,5 +129,5 @@ export const updatePointCloudColors = ({ frameData, colorData, imageData }) => {
     }
 
     invalidateCloudColor(geometry);
-    invalidateImageColor(geometry, image, projectedPoints);
+    invalidateImagePointsColor({ geometry, imageData });
 };

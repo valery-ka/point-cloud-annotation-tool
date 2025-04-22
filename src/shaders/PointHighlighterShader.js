@@ -1,6 +1,6 @@
 import { ShaderMaterial, Vector3 } from "three";
 
-export const ImagePointShader = ({
+export const PointHighlighterShader = ({
     sizeMultiplier = 1,
     theme = "dark",
     THEME_COLORS = {
@@ -19,8 +19,8 @@ export const ImagePointShader = ({
             uUseAlphaAttribute: { value: useAlpha },
         },
         vertexShader: `
-            attribute float size_image;
-            attribute float alpha_image;
+            attribute float size_highlighter;
+            attribute float alpha_highlighter;
             attribute float indices;
 
             uniform float uSizeMultiplier;
@@ -35,11 +35,11 @@ export const ImagePointShader = ({
                 vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
                 gl_Position = projectionMatrix * mvPosition;
 
-                float multiplier = (indices == uHighlightedIndex) ? uSizeMultiplier * 2.5 : uSizeMultiplier;
-                gl_PointSize = size_image * multiplier;
+                float multiplier = (indices == uHighlightedIndex) ? uSizeMultiplier * 5.0 : uSizeMultiplier;
+                gl_PointSize = size_highlighter * multiplier;
 
                 vColor = color;
-                vAlpha = uUseAlphaAttribute ? alpha_image : 1.0;
+                vAlpha = uUseAlphaAttribute ? alpha_highlighter : 1.0;
             }
         `,
         fragmentShader: `
