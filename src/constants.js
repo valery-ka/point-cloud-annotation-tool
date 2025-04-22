@@ -22,9 +22,6 @@ export const HIDDEN_POSITION = {
 };
 export const HIDDEN_POINT = Math.min(...Object.values(HIDDEN_POSITION));
 
-// highlighted point
-export const DEFAULT_SEARCH_RADIUS = 5;
-
 // canvas selection
 export const SELECTION_OUTLINE = {
     FILL_COLOR: "#FFFFFF15", // rgba !!!

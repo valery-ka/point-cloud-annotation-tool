@@ -1,10 +1,15 @@
-import React, { memo, useMemo, useState, useCallback, useEffect } from "react";
+import React, { memo, useMemo, useCallback } from "react";
 
 import { Canvas } from "@react-three/fiber";
 import { Image } from "@react-three/drei";
 
-import { useImagePointsSize, useImageCanvasMouseEvents, useImagePointHighlighter } from "hooks";
-import { useCalibrations } from "contexts";
+import { useCalibrations, useSettings } from "contexts";
+import {
+    useImagePointsSize,
+    useImageCanvasMouseEvents,
+    useImagePointHighlighter,
+    useSubscribeFunction,
+} from "hooks";
 
 import { ImagePointShader } from "shaders";
 
@@ -13,6 +18,12 @@ import { ImageCameraControls } from "../ImageCameraControls";
 const Z_INDEX = 5;
 
 export const ImageCanvas = memo(({ image, size }) => {
+    const { settings } = useSettings();
+
+    const highlightScale = useMemo(() => {
+        return settings.editorSettings.images.highlightedPointSize;
+    }, [settings.editorSettings.images.highlightedPointSize]);
+
     const scale = useMemo(() => size?.height / image?.height, [size]);
     const imageWidth = useMemo(() => image?.width, [image]);
     const imageHeight = useMemo(() => image?.height, [image]);
@@ -34,9 +45,18 @@ export const ImageCanvas = memo(({ image, size }) => {
             ImagePointShader({
                 sizeMultiplier: 0.3,
                 useAlpha: true,
+                highlightScale: highlightScale,
             }),
         [],
     );
+
+    const updateHighlightedPointSize = useCallback((data) => {
+        if (data && shaderMaterial?.uniforms?.uHighlightScale) {
+            shaderMaterial.uniforms.uHighlightScale.value = data.value;
+        }
+    }, []);
+
+    useSubscribeFunction("highlightedPointSizeImage", updateHighlightedPointSize, []);
 
     useImagePointsSize(geometry);
     useImagePointHighlighter({

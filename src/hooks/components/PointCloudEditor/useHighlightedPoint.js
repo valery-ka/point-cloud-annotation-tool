@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useMemo } from "react";
 import { useThree } from "@react-three/fiber";
 
 import {
@@ -8,6 +8,7 @@ import {
     useFileManager,
     useConfig,
     useTools,
+    useSettings,
 } from "contexts";
 
 import { findNearestPoints } from "utils/editor";
@@ -24,15 +25,46 @@ export const useHighlightedPoint = () => {
     const { activeFramePositionsRef, pointLabelsRef, pixelProjections, setSelectedClassIndex } =
         useEditor();
     const { selectedTool } = useTools();
-    const { highlightedPoint, setHighlightedPoint, searcingRadius } = useHoveredPoint();
+    const { highlightedPoint, setHighlightedPoint } = useHoveredPoint();
+    const { settings } = useSettings();
+
+    const searchingRadius = useMemo(() => {
+        return settings.editorSettings.highlighter.searchingRadius;
+    }, [settings.editorSettings.highlighter.searchingRadius]);
 
     useEffect(() => {
-        if (highlightedPoint === null) {
+        if (!highlightedPoint) {
             gl.domElement.classList.remove("pointer-cursor");
         } else {
             gl.domElement.classList.add("pointer-cursor");
         }
     }, [highlightedPoint]);
+
+    useEffect(() => {
+        if (highlightedPoint) {
+            const { x, y, z, index, u, v } = highlightedPoint;
+            const activeFrameFilePath = pcdFiles[activeFrameIndex];
+            const activeFrameLabels = pointLabelsRef.current[activeFrameFilePath];
+            const label = activeFrameLabels[index];
+
+            const nearestIndices = findNearestPoints(
+                { x, y, z },
+                activeFramePositionsRef,
+                searchingRadius,
+            );
+
+            setHighlightedPoint({
+                index,
+                nearestIndices,
+                label,
+                x,
+                y,
+                z,
+                u,
+                v,
+            });
+        }
+    }, [searchingRadius]);
 
     const onMouseMove = useCallback(
         (event) => {
@@ -85,7 +117,7 @@ export const useHighlightedPoint = () => {
                 const nearestIndices = findNearestPoints(
                     { x, y, z },
                     activeFramePositionsRef,
-                    searcingRadius,
+                    searchingRadius,
                 );
                 setHighlightedPoint({
                     index,

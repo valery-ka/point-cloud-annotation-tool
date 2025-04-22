@@ -39,7 +39,7 @@ export const useFramePointsVisibility = (updateGlobalBox) => {
     const { projectedPointsRef } = useCalibrations();
 
     const { settings } = useSettings();
-    const pointProjectRef = useRef(settings.editorSettings.project);
+    const imagesPointsRef = useRef(settings.editorSettings.images);
 
     useEffect(() => {
         filterFramePoints();
@@ -68,7 +68,7 @@ export const useFramePointsVisibility = (updateGlobalBox) => {
                 imageData: {
                     image,
                     projectedPoints: projectedPointsRef.current,
-                    visibleVOID: pointProjectRef.current.visibleVOID,
+                    visibleVOID: imagesPointsRef.current.visibleVOID,
                 },
             });
             updateGlobalBox();
@@ -105,7 +105,7 @@ export const useFramePointsVisibility = (updateGlobalBox) => {
                     imageData: {
                         image,
                         projectedPoints: projectedPointsRef.current,
-                        visibleVOID: pointProjectRef.current.visibleVOID,
+                        visibleVOID: imagesPointsRef.current.visibleVOID,
                     },
                     showFilterPoints: showFilterPointsBySelection,
                 });
@@ -153,7 +153,7 @@ export const useFramePointsVisibility = (updateGlobalBox) => {
                 imageData: {
                     image,
                     projectedPoints: projectedPointsRef.current,
-                    visibleVOID: pointProjectRef.current.visibleVOID,
+                    visibleVOID: imagesPointsRef.current.visibleVOID,
                 },
             });
         }
@@ -219,7 +219,7 @@ export const useFramePointsVisibility = (updateGlobalBox) => {
         (data) => {
             if (data) {
                 const { value, settingKey } = data;
-                pointProjectRef.current[settingKey] = value;
+                imagesPointsRef.current[settingKey] = value;
             }
             filterFramePoints();
         },

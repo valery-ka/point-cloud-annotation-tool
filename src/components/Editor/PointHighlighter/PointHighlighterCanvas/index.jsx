@@ -1,21 +1,31 @@
-import React, { memo, useMemo } from "react";
+import React, { memo, useMemo, useCallback } from "react";
 
 import { Canvas } from "@react-three/fiber";
 import { Image } from "@react-three/drei";
 
-import { useCalibrations } from "contexts";
-import { useImagePointHighlighter } from "hooks";
+import { useCalibrations, useSettings } from "contexts";
+import { useImagePointHighlighter, useSubscribeFunction } from "hooks";
 
 import { ImageCameraControls } from "components/Editor/CameraImages/ImageCameraControls";
 import { HighlightedPointGeometryUpdater } from "../HighlightedPointGeometryUpdater";
 
 import { PointHighlighterShader } from "shaders";
 
-export const PointHighlighterCanvas = memo(({ image, positions, point }) => {
-    const { projectedPointsRef } = useCalibrations();
+export const PointHighlighterCanvas = memo(({ image, positions }) => {
+    const { settings } = useSettings();
+
+    const highlightedPointScale = useMemo(() => {
+        return settings.editorSettings.highlighter.highlightedPointSize;
+    }, [settings.editorSettings.highlighter.highlightedPointSize]);
+
+    const highlighterZoom = useMemo(() => {
+        return settings.editorSettings.highlighter.highlighterZoom;
+    }, [settings.editorSettings.highlighter.highlighterZoom]);
 
     const imageWidth = useMemo(() => image?.width, [image]);
     const imageHeight = useMemo(() => image?.height, [image]);
+
+    const { projectedPointsRef } = useCalibrations();
 
     const geometry = useMemo(() => {
         if (!image) return;
@@ -27,9 +37,18 @@ export const PointHighlighterCanvas = memo(({ image, positions, point }) => {
             PointHighlighterShader({
                 sizeMultiplier: 0.3,
                 useAlpha: true,
+                highlightScale: highlightedPointScale,
             }),
-        [],
+        [highlightedPointScale],
     );
+
+    const updateHighlightedPointSize = useCallback((data) => {
+        if (data && shaderMaterial?.uniforms?.uHighlightScale) {
+            shaderMaterial.uniforms.uHighlightScale.value = data.value;
+        }
+    }, []);
+
+    useSubscribeFunction("highlightedPointSizeHighlighter", updateHighlightedPointSize, []);
 
     const normXY = useImagePointHighlighter({
         size: { width: imageWidth, height: imageHeight },
@@ -41,8 +60,13 @@ export const PointHighlighterCanvas = memo(({ image, positions, point }) => {
         <Canvas orthographic className="chessboard">
             {image?.texture && (
                 <>
-                    <HighlightedPointGeometryUpdater image={image} point={point} />
-                    <ImageCameraControls image={image} enabled={true} normXY={normXY} />
+                    <HighlightedPointGeometryUpdater image={image} />
+                    <ImageCameraControls
+                        image={image}
+                        enabled={true}
+                        normXY={normXY}
+                        fixedZoomLevel={highlighterZoom}
+                    />
                     <Image texture={image.texture} scale={[imageWidth, imageHeight, 1]} />
                 </>
             )}

@@ -7,12 +7,14 @@ export const PointHighlighterShader = ({
         light: { shadowColor: [0.8, 0.8, 0.8] },
         dark: { shadowColor: [0.0, 0.0, 0.0] },
     },
+    highlightScale = 1.0,
     useAlpha = false,
 }) => {
     return new ShaderMaterial({
         uniforms: {
             uSizeMultiplier: { value: sizeMultiplier },
             uHighlightedIndex: { value: -1 },
+            uHighlightScale: { value: highlightScale * 10 },
             uShadowColor: {
                 value: new Vector3(...THEME_COLORS[theme].shadowColor),
             },
@@ -25,6 +27,7 @@ export const PointHighlighterShader = ({
 
             uniform float uSizeMultiplier;
             uniform float uHighlightedIndex;
+            uniform float uHighlightScale;
 
             uniform bool uUseAlphaAttribute;
 
@@ -35,8 +38,8 @@ export const PointHighlighterShader = ({
                 vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
                 gl_Position = projectionMatrix * mvPosition;
 
-                float multiplier = (indices == uHighlightedIndex) ? uSizeMultiplier * 5.0 : uSizeMultiplier;
-                gl_PointSize = size_highlighter * multiplier;
+                float multiplier = (indices == uHighlightedIndex) ? uSizeMultiplier + uHighlightScale : uSizeMultiplier;
+                gl_PointSize = size_highlighter + multiplier;
 
                 vColor = color;
                 vAlpha = uUseAlphaAttribute ? alpha_highlighter : 1.0;

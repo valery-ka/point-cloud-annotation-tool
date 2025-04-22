@@ -156,19 +156,97 @@ export const SettingsTab = memo(({ title }) => {
                         title={t(`${COMPONENT_NAME}visibleVOID`)}
                         action={"visibleVOID"}
                         setting={"editorSettings"}
-                        settingType={"project"}
+                        settingType={"images"}
                         settingKey={"visibleVOID"}
                         options={[true, false]}
                         alias={[t(`${COMPONENT_NAME}showVOID`), t(`${COMPONENT_NAME}hideVOID`)]}
                         name="project"
                     />
                     <SettingsSlider
-                        title={t(`${COMPONENT_NAME}projectPointSize`)}
-                        action={"projectPointSize"}
+                        title={t(`${COMPONENT_NAME}generalPointSize`)}
+                        action={"imagesPointSize"}
                         setting={"editorSettings"}
-                        settingType={"project"}
-                        settingKey={"projectPointSize"}
+                        settingType={"images"}
+                        settingKey={"imagesPointSize"}
                         min={1}
+                        max={5}
+                        step={0.1}
+                        decimals={1}
+                    />
+                    <SettingsSlider
+                        title={t(`${COMPONENT_NAME}highlightedPointSize`)}
+                        action={"highlightedPointSizeImage"}
+                        setting={"editorSettings"}
+                        settingType={"images"}
+                        settingKey={"highlightedPointSize"}
+                        min={1}
+                        max={5}
+                        step={0.1}
+                        decimals={1}
+                    />
+                </Spoiler>
+                <Spoiler title={t(`${COMPONENT_NAME}pointHighlighter`)} defaultIsOpen={false}>
+                    <RadioButtonGroup
+                        title={t(`${COMPONENT_NAME}isEnabled`)}
+                        action={"enabled"}
+                        setting={"editorSettings"}
+                        settingType={"highlighter"}
+                        settingKey={"enabled"}
+                        options={[true, false]}
+                        alias={[t(`${COMPONENT_NAME}enabled`), t(`${COMPONENT_NAME}disabled`)]}
+                        name="project"
+                    />
+                    <SettingsSlider
+                        title={t(`${COMPONENT_NAME}highlighterSize`)}
+                        action={"highlighterSize"}
+                        setting={"editorSettings"}
+                        settingType={"highlighter"}
+                        settingKey={"highlighterSize"}
+                        min={150}
+                        max={300}
+                        step={10}
+                        decimals={0}
+                    />
+                    <SettingsSlider
+                        title={t(`${COMPONENT_NAME}highlighterZoom`)}
+                        action={"highlighterZoom"}
+                        setting={"editorSettings"}
+                        settingType={"highlighter"}
+                        settingKey={"highlighterZoom"}
+                        min={0.5}
+                        max={5}
+                        step={0.1}
+                        decimals={1}
+                    />
+                    <SettingsSlider
+                        title={t(`${COMPONENT_NAME}generalPointSize`)}
+                        action={"pointSizeHighlighter"}
+                        setting={"editorSettings"}
+                        settingType={"highlighter"}
+                        settingKey={"generalPointSize"}
+                        min={0.1}
+                        max={2}
+                        step={0.1}
+                        decimals={2}
+                    />
+                    <SettingsSlider
+                        title={t(`${COMPONENT_NAME}highlightedPointSize`)}
+                        action={"highlightedPointSizeHighlighter"}
+                        setting={"editorSettings"}
+                        settingType={"highlighter"}
+                        settingKey={"highlightedPointSize"}
+                        min={1}
+                        max={10}
+                        step={0.1}
+                        decimals={1}
+                    />
+                    <SettingsSlider
+                        title={t(`${COMPONENT_NAME}searchingRadius`)}
+                        action={"searchingRadius"}
+                        setting={"editorSettings"}
+                        settingType={"highlighter"}
+                        settingKey={"searchingRadius"}
+                        min={0.1}
                         max={5}
                         step={0.1}
                         decimals={1}

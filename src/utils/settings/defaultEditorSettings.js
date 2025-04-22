@@ -15,8 +15,17 @@ export const defaultEditorSettings = {
     editor: {
         paintDepth: 0.03,
     },
-    project: {
+    images: {
         visibleVOID: false,
-        projectPointSize: 5,
+        imagesPointSize: 1.0,
+        highlightedPointSize: 2.0,
+    },
+    highlighter: {
+        enabled: true,
+        highlighterSize: 200,
+        highlighterZoom: 1.0,
+        generalPointSize: 0.3,
+        highlightedPointSize: 1.0,
+        searchingRadius: 1.0,
     },
 };

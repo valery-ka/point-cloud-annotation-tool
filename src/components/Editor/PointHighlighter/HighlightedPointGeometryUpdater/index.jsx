@@ -1,7 +1,14 @@
-import { memo, useRef } from "react";
+import { memo, useRef, useMemo } from "react";
 import { useFrame } from "@react-three/fiber";
 
-import { useCalibrations, useEditor, useFrames, useFileManager, useSettings } from "contexts";
+import {
+    useCalibrations,
+    useEditor,
+    useFrames,
+    useFileManager,
+    useSettings,
+    useHoveredPoint,
+} from "contexts";
 
 import {
     invalidateHighlighterPointsColor,
@@ -13,14 +20,17 @@ const MS_TO_SEC = 1000;
 const FRAME_LIMIT_FPS = 30;
 const FRAME_INTERVAL_MS = 1000 / FRAME_LIMIT_FPS;
 
-export const HighlightedPointGeometryUpdater = memo(({ image, point }) => {
+export const HighlightedPointGeometryUpdater = memo(({ image }) => {
     const { pcdFiles } = useFileManager();
     const { projectedPointsRef } = useCalibrations();
     const { pointCloudRefs } = useEditor();
     const { activeFrameIndex } = useFrames();
     const { settings } = useSettings();
+    const { highlightedPoint } = useHoveredPoint();
 
-    const pointSizeRef = useRef(settings.editorSettings.project.projectPointSize);
+    const pointSize = useMemo(() => {
+        return settings.editorSettings.highlighter.generalPointSize;
+    }, [settings.editorSettings.highlighter]);
 
     const lastFrameTimeRef = useRef(0);
 
@@ -30,14 +40,15 @@ export const HighlightedPointGeometryUpdater = memo(({ image, point }) => {
 
         lastFrameTimeRef.current = now;
 
-        if (!point) return;
+        if (!highlightedPoint) return;
+
         const activeFrameFilePath = pcdFiles[activeFrameIndex];
         const cloudGeometry = pointCloudRefs.current[activeFrameFilePath].geometry;
         const projectedPoints = projectedPointsRef.current;
         const imageGeometry = projectedPoints[image.src].geometry;
 
         invalidateHighlighterPointsVisibility({
-            geometry: { cloudGeometry, highlightedPoint: point },
+            geometry: { cloudGeometry, highlightedPoint },
             imageData: { image, projectedPoints },
         });
         invalidateHighlighterPointsColor({
@@ -46,9 +57,9 @@ export const HighlightedPointGeometryUpdater = memo(({ image, point }) => {
         });
         invalidateHighlighterPointsSize({
             geometry: imageGeometry,
-            size: pointSizeRef.current,
+            size: pointSize,
         });
-    }, []);
+    });
 
     return null;
 });

@@ -7,29 +7,29 @@ import { invalidateImagePointsSize } from "utils/editor";
 
 export const useImagePointsSize = (geometry) => {
     const { settings } = useSettings();
-    const pointProjectRef = useRef(settings.editorSettings.project);
-
-    const updatePointsSize = useCallback(
-        (data) => {
-            if (data) {
-                const { value, settingKey } = data;
-                pointProjectRef.current[settingKey] = value;
-            }
-            invalidateImagePointsSize({
-                geometry: geometry,
-                size: pointProjectRef.current.projectPointSize,
-            });
-        },
-        [geometry],
-    );
+    const imagesPointsRef = useRef(settings.editorSettings.images);
 
     useEffect(() => {
         if (!geometry) return;
         invalidateImagePointsSize({
             geometry: geometry,
-            size: pointProjectRef.current.projectPointSize,
+            size: imagesPointsRef.current.imagesPointSize,
         });
     }, [geometry]);
 
-    useSubscribeFunction("projectPointSize", updatePointsSize, [geometry]);
+    const updateImagesPointsSize = useCallback(
+        (data) => {
+            if (data && geometry) {
+                const { value, settingKey } = data;
+                imagesPointsRef.current[settingKey] = value;
+                invalidateImagePointsSize({
+                    geometry: geometry,
+                    size: imagesPointsRef.current.imagesPointSize,
+                });
+            }
+        },
+        [geometry],
+    );
+
+    useSubscribeFunction("imagesPointSize", updateImagesPointsSize, [geometry]);
 };

@@ -58,7 +58,6 @@ export const RadioButtonGroup = ({
                     <label key={index} className="radio-button">
                         <input
                             type="radio"
-                            settingType={settingType}
                             value={option}
                             checked={selectedValue === option}
                             onChange={() => handleRadioButtonChange(settingType, option)}

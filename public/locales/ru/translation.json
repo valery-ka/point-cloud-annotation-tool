@@ -99,5 +99,11 @@
     "visibleVOID": "Показать / Скрыть точки без класса",
     "hideVOID": "Скрыть",
     "showVOID": "Показать",
-    "projectPointSize": "Размер точек на изображении"
+    "pointHighlighter": "Настройки подсвеченной точки",
+    "isEnabled": "Подсвеченная точка активна",
+    "enabled": "Активна",
+    "disabled": "Неактивна",
+    "highlighterSize": "Размер кропа изображения",
+    "highlighterZoom": "Уровень зума изображения",
+    "searchingRadius": "Радиус поиска ближайших точек"
 }

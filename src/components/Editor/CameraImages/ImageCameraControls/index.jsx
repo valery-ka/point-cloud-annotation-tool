@@ -11,7 +11,13 @@ const ZOOM_STEP = 0.3;
 const PAN_SPEED = 2;
 const TEMPORARY_PADDING = 0;
 
-export const ImageCameraControls = ({ image, size, enabled = true, normXY = null }) => {
+export const ImageCameraControls = ({
+    image,
+    size,
+    enabled = true,
+    normXY = null,
+    fixedZoomLevel = null,
+}) => {
     const { camera, gl } = useThree();
     const { selectedCamera } = useImages();
 
@@ -211,6 +217,14 @@ export const ImageCameraControls = ({ image, size, enabled = true, normXY = null
         camera.position.y = normY * (boundsRef.current.height / 2);
         camera.updateProjectionMatrix();
     }, [normXY]);
+
+    useEffect(() => {
+        if (fixedZoomLevel) {
+            zoomRef.current = fixedZoomLevel;
+            camera.zoom = fixedZoomLevel;
+            camera.updateProjectionMatrix();
+        }
+    }, [fixedZoomLevel]);
 
     return null;
 };

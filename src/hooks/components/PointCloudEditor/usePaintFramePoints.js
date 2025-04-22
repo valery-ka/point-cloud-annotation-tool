@@ -19,7 +19,7 @@ export const usePaintFramePoints = (updateGlobalBox) => {
 
     const { settings } = useSettings();
     const pointColorRef = useRef(settings.editorSettings.colors);
-    const pointProjectRef = useRef(settings.editorSettings.project);
+    const imagesPointRef = useRef(settings.editorSettings.images);
 
     const { pcdFiles } = useFileManager();
     const { nonHiddenClasses } = useConfig();
@@ -95,7 +95,7 @@ export const usePaintFramePoints = (updateGlobalBox) => {
                 imageData: {
                     image,
                     projectedPoints: projectedPointsRef.current,
-                    visibleVOID: pointProjectRef.current.visibleVOID,
+                    visibleVOID: imagesPointRef.current.visibleVOID,
                 },
                 updateBox: updateGlobalBox,
             });
