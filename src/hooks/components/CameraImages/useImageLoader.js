@@ -1,12 +1,19 @@
 import { Texture } from "three";
 
-import { useEffect } from "react";
-import { useFileManager, useFrames, useImages, useCalibrations, useEditor } from "contexts";
+import { useEffect, useMemo } from "react";
+import {
+    useFileManager,
+    useFrames,
+    useImages,
+    useCalibrations,
+    useEditor,
+    useConfig,
+} from "contexts";
 
 import { buildImageGeometry } from "utils/calibrations";
-import { DEFAULT_CAMERA } from "constants";
 
 export const useImageLoader = (loadingBarRef) => {
+    const { config } = useConfig();
     const { images } = useFileManager();
     const { pointCloudRefs } = useEditor();
     const {
@@ -18,6 +25,12 @@ export const useImageLoader = (loadingBarRef) => {
     } = useImages();
     const { arePointCloudsLoading, setAreImagesLoading, setLoadingProgress } = useFrames();
     const { calibrations, areCalibrationsProcessed, projectedPointsRef } = useCalibrations();
+
+    const defaultCamera = useMemo(() => {
+        if (!config?.job?.default_camera) return "";
+        const { default_camera } = config.job;
+        return default_camera;
+    }, [config.job]);
 
     useEffect(() => {
         if (arePointCloudsLoading || !areCalibrationsProcessed) return;
@@ -62,7 +75,7 @@ export const useImageLoader = (loadingBarRef) => {
 
                     if (loadedCount === total) {
                         setLoadedImages(loaded);
-                        setSelectedCamera(DEFAULT_CAMERA);
+                        setSelectedCamera(defaultCamera);
                         setAreImagesLoading(false);
                         loadingBarRef?.current?.complete();
                     }

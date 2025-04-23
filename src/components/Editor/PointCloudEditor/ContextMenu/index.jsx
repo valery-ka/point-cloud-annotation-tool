@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 
-import { useHoveredPoint, useTools } from "contexts";
+import { useHoveredPoint, useTools, useConfig } from "contexts";
 
 import { ModerationMenu } from "./ModerationMenu";
 
@@ -12,6 +12,7 @@ const CONTEXT_MENU_RESET_POSITION = { x: -1000, y: -1000 };
 export const EditorContextMenu = () => {
     const { highlightedPoint } = useHoveredPoint();
     const { selectedTool } = useTools();
+    const { isModerationJob } = useConfig();
 
     const menuRef = useRef(null);
     const [isTextInputOpened, setIsTextInputOpened] = useState(false);
@@ -57,7 +58,7 @@ export const EditorContextMenu = () => {
 
     const handleModerationMenuOpen = useCallback(
         (event) => {
-            if (selectedTool !== "handPointer") return;
+            if (selectedTool !== "handPointer" || !isModerationJob) return;
 
             const container = document.querySelector(CONTEXT_MENU_CONTAINER);
 

@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect, useMemo } from "react";
 
 import { useFileManager } from "./FileManagerProvider";
 
@@ -14,9 +14,12 @@ export const ConfigProvider = ({ children }) => {
         moderation: null,
         objects: null,
     });
-    const [isConfigLoaded, setIsConfigLoaded] = useState(false);
     const [nonHiddenClasses, setNonHiddenClasses] = useState([]);
     const { folderName } = useFileManager();
+
+    const isModerationJob = useMemo(() => {
+        return config?.job?.type === "moderation";
+    }, [config]);
 
     useEffect(() => {
         if (!folderName.length) return;
@@ -42,7 +45,6 @@ export const ConfigProvider = ({ children }) => {
 
             const config = Object.fromEntries(configEntries);
             setConfig(config);
-            setIsConfigLoaded(true);
         };
 
         loadAllConfigs();
@@ -62,7 +64,7 @@ export const ConfigProvider = ({ children }) => {
     }, [config]);
 
     return (
-        <ConfigContext.Provider value={{ config, nonHiddenClasses, isConfigLoaded }}>
+        <ConfigContext.Provider value={{ config, nonHiddenClasses, isModerationJob }}>
             {children}
         </ConfigContext.Provider>
     );

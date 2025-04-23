@@ -3,17 +3,18 @@ import { useThree } from "@react-three/fiber";
 import { Html } from "@react-three/drei";
 import { useTranslation } from "react-i18next";
 
-import { useEvent } from "contexts";
+import { useEvent, useConfig } from "contexts";
 
 const MODERATION_TAB_INDEX = 2;
 
-export const SceneButton = ({ index, position, buttonIndex, resolved, workerHint }) => {
+export const SceneButton = ({ index, position, buttonIndex, resolved, checked, workerHint }) => {
     const { t } = useTranslation();
 
     const { gl } = useThree();
     const { domElement } = gl;
 
     const { publish } = useEvent();
+    const { isModerationJob } = useConfig();
 
     const [isMouseDown, setIsMouseDown] = useState(false);
     const [showHint, setShowHint] = useState(false);
@@ -50,7 +51,12 @@ export const SceneButton = ({ index, position, buttonIndex, resolved, workerHint
         setShowHint(false);
     }, [publish]);
 
-    if (resolved) return;
+    const checkIssue = useCallback(() => {
+        publish("checkIssue", { index });
+        setShowHint(false);
+    }, [publish]);
+
+    if (resolved || checked) return;
 
     return (
         <Html position={position} zIndexRange={[10, 10]}>
@@ -72,14 +78,28 @@ export const SceneButton = ({ index, position, buttonIndex, resolved, workerHint
                 {showHint && (
                     <div className="issue-hover">
                         <div className="issue-hover-text">{workerHint}</div>
-                        <div className="issue-hover-buttons">
-                            <button className="issue-hover-button" onClick={() => resolveIssue()}>
-                                {t("resolve")}
-                            </button>
-                            <button className="issue-hover-button" onClick={() => removeIssue()}>
-                                {t("remove")}
-                            </button>
-                        </div>
+                        {isModerationJob ? (
+                            <div className="issue-hover-buttons">
+                                <button
+                                    className="issue-hover-button"
+                                    onClick={() => resolveIssue()}
+                                >
+                                    {t("resolve")}
+                                </button>
+                                <button
+                                    className="issue-hover-button"
+                                    onClick={() => removeIssue()}
+                                >
+                                    {t("remove")}
+                                </button>
+                            </div>
+                        ) : (
+                            <div className="issue-hover-buttons">
+                                <button className="issue-hover-button" onClick={() => checkIssue()}>
+                                    {t("check")}
+                                </button>
+                            </div>
+                        )}
                     </div>
                 )}
             </div>

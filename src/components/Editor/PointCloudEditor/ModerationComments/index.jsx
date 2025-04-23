@@ -21,6 +21,7 @@ export const ModerationComments = () => {
                             buttonIndex={acc.length + 1}
                             position={issue.position}
                             resolved={issue.resolved}
+                            checked={issue.checked}
                             workerHint={issue.workerHint}
                         />,
                     );

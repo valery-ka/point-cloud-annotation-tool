@@ -41,6 +41,17 @@ export const ModerationTab = memo(({ title }) => {
         );
     }, [activeFrameIndex, issues]);
 
+    const checkIssue = useCallback((data) => {
+        const issueIndex = data.index;
+        setIssues((prevIssues) =>
+            prevIssues.map((issue, index) =>
+                index === issueIndex ? { ...issue, checked: !issue.checked } : issue,
+            ),
+        );
+    }, []);
+
+    useSubscribeFunction("checkIssue", checkIssue, []);
+
     const removeIssue = useCallback((data) => {
         const issueIndex = data.index;
         setIssues((prevIssues) => prevIssues.filter((_, index) => index !== issueIndex));
