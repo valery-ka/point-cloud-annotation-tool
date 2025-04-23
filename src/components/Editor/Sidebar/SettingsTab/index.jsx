@@ -167,8 +167,19 @@ export const SettingsTab = memo(({ title }) => {
                         action={"imagesPointSize"}
                         setting={"editorSettings"}
                         settingType={"images"}
-                        settingKey={"imagesPointSize"}
+                        settingKey={"generalPointSize"}
                         min={1}
+                        max={5}
+                        step={0.1}
+                        decimals={1}
+                    />
+                    <SettingsSlider
+                        title={t(`${COMPONENT_NAME}selectedClassSize`)}
+                        action={"imagesPointSize"}
+                        setting={"editorSettings"}
+                        settingType={"images"}
+                        settingKey={"selectedClassSize"}
+                        min={0}
                         max={5}
                         step={0.1}
                         decimals={1}

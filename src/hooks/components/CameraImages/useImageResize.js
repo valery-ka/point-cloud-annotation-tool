@@ -13,7 +13,6 @@ export const useImageResize = () => {
         setImageHeight,
         imageMaximized,
         setImageMaximized,
-        cameraWrapperRef,
         loadedImages,
         selectedImagePath,
     } = useImages();
@@ -22,6 +21,7 @@ export const useImageResize = () => {
     const isResizing = useRef(false);
     const startY = useRef(0);
     const startHeight = useRef(imageHeight);
+    const cameraWrapperRef = useRef(null);
 
     const updateToMaxSize = useCallback(() => {
         if (!cameraWrapperRef.current) return;
@@ -128,6 +128,7 @@ export const useImageResize = () => {
     }, [selectedCamera, checkImageBounds]);
 
     return {
+        cameraWrapperRef,
         handleResizeStart,
         toggleImageSize,
     };

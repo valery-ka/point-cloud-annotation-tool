@@ -1,7 +1,5 @@
 import { MODES } from "tools";
 import { filterPointsBySelection } from "../positions/filters";
-import { invalidateImagePointsVisibility } from "../positions/image";
-import { invalidateImagePointsColor } from "./image";
 
 export const invalidateCloudColor = (geometry) => {
     geometry.attributes.color.needsUpdate = true;
@@ -47,7 +45,6 @@ export const changeClassOfSelection = ({
     const { ref: geometryRef, colors, labels, intensity, positions } = frameData;
     const { classColor, classIndex, pointColor } = colorData;
     const { classVisible, minMaxZ } = visibilityData;
-    const { image, projectedPoints, visibleVOID } = imageData;
 
     paintPoints(
         colors,
@@ -78,20 +75,11 @@ export const changeClassOfSelection = ({
                 minZ: minMaxZ[0],
                 maxZ: minMaxZ[1],
             },
-            imageData: { image, projectedPoints },
+            imageData,
         });
     }
 
     invalidateCloudColor(geometryRef.geometry);
-
-    invalidateImagePointsColor({ geometry: geometryRef.geometry, imageData });
-    invalidateImagePointsVisibility({
-        frameData: {
-            geometry: geometryRef.geometry,
-            labels: labels,
-        },
-        imageData,
-    });
 };
 
 export const updatePointCloudColors = ({ frameData, colorData, imageData }) => {
@@ -129,5 +117,4 @@ export const updatePointCloudColors = ({ frameData, colorData, imageData }) => {
     }
 
     invalidateCloudColor(geometry);
-    invalidateImagePointsColor({ geometry, imageData });
 };

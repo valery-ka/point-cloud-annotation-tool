@@ -74,7 +74,7 @@ export const useHighlightedPoint = () => {
             const activeFrameLabels = pointLabelsRef.current[activeFrameFilePath];
 
             let closestPoint = null;
-            let minDistance = 10; // distance to process in pixels
+            let minDistance = 15; // distance to process in pixels
 
             // find closest point to the mouse
             for (let i = 0; i < pixelProjections.length; i += 3) {

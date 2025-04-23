@@ -4,23 +4,19 @@ import { Canvas } from "@react-three/fiber";
 import { Image } from "@react-three/drei";
 
 import { useCalibrations, useSettings } from "contexts";
-import {
-    useImagePointsSize,
-    useImageCanvasMouseEvents,
-    useImagePointHighlighter,
-    useSubscribeFunction,
-} from "hooks";
+import { useImageCanvasMouseEvents, useImagePointHighlighter, useSubscribeFunction } from "hooks";
 
 import { ImagePointShader } from "shaders";
 
 import { ImageCameraControls } from "../ImageCameraControls";
+import { ImageGeometryUpdater } from "../ImageGeometryUpdater";
 
 const Z_INDEX = 5;
 
 export const ImageCanvas = memo(({ image, size }) => {
     const { settings } = useSettings();
 
-    const highlightScale = useMemo(() => {
+    const highlightedPointScale = useMemo(() => {
         return settings.editorSettings.images.highlightedPointSize;
     }, [settings.editorSettings.images.highlightedPointSize]);
 
@@ -45,10 +41,16 @@ export const ImageCanvas = memo(({ image, size }) => {
             ImagePointShader({
                 sizeMultiplier: 0.3,
                 useAlpha: true,
-                highlightScale: highlightScale,
+                highlightScale: highlightedPointScale,
             }),
         [],
     );
+
+    useImagePointHighlighter({
+        size: { width: imageWidth, height: imageHeight },
+        shaderMaterial,
+        indexToPosition,
+    });
 
     const updateHighlightedPointSize = useCallback((data) => {
         if (data && shaderMaterial?.uniforms?.uHighlightScale) {
@@ -58,19 +60,13 @@ export const ImageCanvas = memo(({ image, size }) => {
 
     useSubscribeFunction("highlightedPointSizeImage", updateHighlightedPointSize, []);
 
-    useImagePointsSize(geometry);
-    useImagePointHighlighter({
-        size: { width: imageWidth, height: imageHeight },
-        shaderMaterial,
-        indexToPosition,
-    });
-
     const { arePointsVisible } = useImageCanvasMouseEvents();
 
     return (
         <Canvas orthographic className="chessboard">
             {image?.texture && (
                 <>
+                    <ImageGeometryUpdater image={image} />
                     <ImageCameraControls image={image} size={size} />
                     <Image
                         texture={image.texture}

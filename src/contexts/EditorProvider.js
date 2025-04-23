@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useRef } from "react";
 
 const EditorContext = createContext();
 
+// РАБОТАЕТ - НЕ ТРОГАЙ
 export const EditorProvider = ({ children }) => {
     const pointCloudRefs = useRef({});
 

@@ -13,20 +13,16 @@ import { RenderEditorButton } from "../Controls/RenderEditorButton";
 
 export const CameraImages = memo(() => {
     const { t } = useTranslation();
-    const {
-        imageSize,
-        imageMaximized,
-        cameraWrapperRef,
-        loadedImages,
-        selectedImagePath,
-        imagesByCamera,
-    } = useImages();
+    const { imageSize, imageMaximized, loadedImages, selectedImagePath, imagesByCamera } =
+        useImages();
     const { arePointCloudsLoading } = useFrames();
 
     const loadingBarRef = useRef(null);
 
     useFetchCalibrations();
     useImageLoader(loadingBarRef);
+
+    const { cameraWrapperRef, handleResizeStart, toggleImageSize } = useImageResize();
 
     const {
         handleMouseUp,
@@ -36,8 +32,6 @@ export const CameraImages = memo(() => {
         setMenuDimensions,
         openContextMenu,
     } = useImageSelector(cameraWrapperRef);
-
-    const { handleResizeStart, toggleImageSize } = useImageResize();
 
     if (arePointCloudsLoading) return;
 

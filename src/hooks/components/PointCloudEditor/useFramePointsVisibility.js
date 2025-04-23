@@ -17,7 +17,6 @@ import {
     filterPointsBySelection,
     showFilterPointsBySelection,
 } from "utils/editor";
-import { invalidateImagePointsVisibility } from "utils/editor";
 import * as APP_CONSTANTS from "constants";
 
 const { SELECTION } = APP_CONSTANTS.HIDDEN_POSITION;
@@ -35,7 +34,8 @@ export const useFramePointsVisibility = (updateGlobalBox) => {
         setHasFilterSelectionPoint,
     } = useEditor();
 
-    const { loadedImages, selectedImagePath, selectedCamera } = useImages();
+    const { loadedImages, selectedImagePath, selectedCamera, imagePointsAlphaNeedsUpdateRef } =
+        useImages();
     const { projectedPointsRef } = useCalibrations();
 
     const { settings } = useSettings();
@@ -68,10 +68,11 @@ export const useFramePointsVisibility = (updateGlobalBox) => {
                 imageData: {
                     image,
                     projectedPoints: projectedPointsRef.current,
-                    visibleVOID: imagesPointsRef.current.visibleVOID,
+                    imagesPoints: imagesPointsRef.current,
                 },
             });
             updateGlobalBox();
+            imagePointsAlphaNeedsUpdateRef.current = true;
         }
     }, [pcdFiles, activeFrameIndex, selectedImagePath, loadedImages]);
 
@@ -105,7 +106,7 @@ export const useFramePointsVisibility = (updateGlobalBox) => {
                     imageData: {
                         image,
                         projectedPoints: projectedPointsRef.current,
-                        visibleVOID: imagesPointsRef.current.visibleVOID,
+                        imagesPoints: imagesPointsRef.current,
                     },
                     showFilterPoints: showFilterPointsBySelection,
                 });
@@ -114,6 +115,7 @@ export const useFramePointsVisibility = (updateGlobalBox) => {
                 );
 
                 setHasFilterSelectionPoint(hasFilterSelectionPoint);
+                imagePointsAlphaNeedsUpdateRef.current = true;
             }
         },
         [pcdFiles, activeFrameIndex, selectedImagePath, loadedImages],
@@ -145,17 +147,7 @@ export const useFramePointsVisibility = (updateGlobalBox) => {
             }
             updateGlobalBox();
             setHasFilterSelectionPoint(false);
-            invalidateImagePointsVisibility({
-                frameData: {
-                    geometry: activeFrameRef.geometry,
-                    labels: activeFrameLabels,
-                },
-                imageData: {
-                    image,
-                    projectedPoints: projectedPointsRef.current,
-                    visibleVOID: imagesPointsRef.current.visibleVOID,
-                },
-            });
+            imagePointsAlphaNeedsUpdateRef.current = true;
         }
     }, [pcdFiles, activeFrameIndex, selectedImagePath, loadedImages]);
 

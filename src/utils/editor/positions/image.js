@@ -4,7 +4,7 @@ const { HIDDEN_POINT } = APP_CONSTANTS;
 
 export const invalidateImagePointsVisibility = ({ frameData, imageData }) => {
     const { geometry, labels } = frameData;
-    const { image, projectedPoints, visibleVOID } = imageData;
+    const { image, projectedPoints, imagesPoints } = imageData;
 
     if (!image) return;
 
@@ -20,7 +20,7 @@ export const invalidateImagePointsVisibility = ({ frameData, imageData }) => {
         const label = labels[pointIndex];
         const x = getXFromMatchedPositionArray(pointIndex, matchedPositionArray);
 
-        const shouldHide = (!visibleVOID && label === 0) || x >= HIDDEN_POINT;
+        const shouldHide = (!imagesPoints.visibleVOID && label === 0) || x >= HIDDEN_POINT;
         alpha_image[i] = shouldHide ? 0.0 : 1.0;
     }
 

@@ -17,7 +17,8 @@ export const defaultEditorSettings = {
     },
     images: {
         visibleVOID: false,
-        imagesPointSize: 1.0,
+        generalPointSize: 1.0,
+        selectedClassSize: 1.0,
         highlightedPointSize: 2.0,
     },
     highlighter: {

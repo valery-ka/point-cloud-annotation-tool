@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useMemo, useRef, useEffect } from "react";
+import { createContext, useContext, useState, useMemo, useRef } from "react";
 import { isEmpty } from "lodash";
 
 import { useFrames, useFileManager } from "contexts";
@@ -11,7 +11,6 @@ export const ImagesProvider = ({ children }) => {
     const { images, pcdFiles } = useFileManager();
     const { activeFrameIndex, arePointCloudsLoading } = useFrames();
 
-    const cameraWrapperRef = useRef(null);
     const [imageMaximized, setImageMaximized] = useState(false);
 
     const [loadedImages, setLoadedImages] = useState({});
@@ -45,10 +44,13 @@ export const ImagesProvider = ({ children }) => {
         [imageHeight, imageWidth],
     );
 
+    const imagePointsAlphaNeedsUpdateRef = useRef(true);
+    const imagePointsColorNeedsUpdateRef = useRef(true);
+    const imagePointsSizeNeedsUpdateRef = useRef(true);
+
     return (
         <ImagesContext.Provider
             value={{
-                cameraWrapperRef,
                 selectedCamera,
                 selectedImagePath,
                 setSelectedCamera,
@@ -64,6 +66,9 @@ export const ImagesProvider = ({ children }) => {
                 imagesByCamera,
                 imageSize,
                 activeFrameImagesPath,
+                imagePointsAlphaNeedsUpdateRef,
+                imagePointsColorNeedsUpdateRef,
+                imagePointsSizeNeedsUpdateRef,
             }}
         >
             {children}

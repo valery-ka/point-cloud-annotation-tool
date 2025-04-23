@@ -1,5 +1,4 @@
 import { hidePoint, showPoint, invalidateCloudPointsPosition } from "./cloud";
-import { invalidateImagePointsVisibility } from "./image";
 import { MODES } from "tools";
 import * as APP_CONSTANTS from "constants";
 
@@ -46,7 +45,6 @@ export const filterPoints = ({ frameData, filterData, imageData }) => {
     }
 
     invalidateCloudPointsPosition(geometry);
-    invalidateImagePointsVisibility({ frameData, imageData });
 };
 
 export const filterPointsBySelection = ({
@@ -76,7 +74,6 @@ export const filterPointsBySelection = ({
     });
 
     invalidateCloudPointsPosition(geometry);
-    invalidateImagePointsVisibility({ frameData, imageData });
 };
 
 export const showFilterPointsBySelection = ({ frameData, filterData, index }) => {

@@ -7,6 +7,7 @@ import {
     useFrames,
     useConfig,
     useHoveredPoint,
+    useImages,
 } from "contexts";
 import { useSubscribeFunction } from "hooks";
 
@@ -23,6 +24,7 @@ export const useFramePointsSize = () => {
     const { highlightedPoint } = useHoveredPoint();
     const { settings } = useSettings();
     const { selectedClassIndex, pointCloudRefs, pointLabelsRef } = useEditor();
+    const { imagePointsSizeNeedsUpdateRef } = useImages();
 
     const highlightedIndex = useRef(null);
     const prevIndex = useRef(null);
@@ -66,6 +68,8 @@ export const useFramePointsSize = () => {
                     prevIndex.current,
                     selectedClassRef.current,
                 );
+
+                imagePointsSizeNeedsUpdateRef.current = true;
             }
         },
         [pcdFiles, activeFrameIndex],

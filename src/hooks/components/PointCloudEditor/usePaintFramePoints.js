@@ -33,7 +33,13 @@ export const usePaintFramePoints = (updateGlobalBox) => {
         minMaxZRef,
     } = useEditor();
 
-    const { loadedImages, selectedImagePath, selectedCamera } = useImages();
+    const {
+        loadedImages,
+        selectedImagePath,
+        selectedCamera,
+        imagePointsColorNeedsUpdateRef,
+        imagePointsAlphaNeedsUpdateRef,
+    } = useImages();
     const { projectedPointsRef } = useCalibrations();
 
     useEffect(() => {
@@ -95,10 +101,13 @@ export const usePaintFramePoints = (updateGlobalBox) => {
                 imageData: {
                     image,
                     projectedPoints: projectedPointsRef.current,
-                    visibleVOID: imagesPointRef.current.visibleVOID,
+                    imagesPoints: imagesPointRef.current,
                 },
                 updateBox: updateGlobalBox,
             });
+
+            imagePointsColorNeedsUpdateRef.current = true;
+            imagePointsAlphaNeedsUpdateRef.current = true;
         },
         [
             pcdFiles,
@@ -140,6 +149,7 @@ export const usePaintFramePoints = (updateGlobalBox) => {
                         projectedPoints: projectedPointsRef.current,
                     },
                 });
+                imagePointsColorNeedsUpdateRef.current = true;
             }
         },
         [pcdFiles, activeFrameIndex, selectedImagePath, loadedImages],
