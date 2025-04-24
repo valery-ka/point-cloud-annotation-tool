@@ -103,10 +103,13 @@
     "hideVOID": "Скрыть",
     "showVOID": "Показать",
     "pointHighlighter": "Настройки подсвеченной точки",
-    "isEnabled": "Подсвеченная точка активна",
-    "enabled": "Активна",
-    "disabled": "Неактивна",
+    "isHighlighterEnabled": "Подсвеченная точка активна",
+    "enabled": "Включить",
+    "disabled": "Выключить",
     "highlighterSize": "Размер кропа изображения",
     "highlighterZoom": "Уровень зума изображения",
-    "searchingRadius": "Радиус поиска ближайших точек"
+    "searchingRadius": "Радиус поиска ближайших точек",
+    "performance": "Производительность",
+    "isAutoSaveTimerEnabled": "Включить таймер автоматического сохранения",
+    "autoSaveTimer": "Частота автосохранения (сек.)"
 }

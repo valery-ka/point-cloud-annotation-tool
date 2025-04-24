@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useThree } from "@react-three/fiber";
 
 import { useFileManager, useEditor, useFrames, useSettings, useConfig } from "contexts";
@@ -41,8 +41,26 @@ export const usePointCloudLoader = (THEME_COLORS) => {
         });
     }, [theme]);
 
+    const labelsCacheRef = useRef({});
+    const [areLabelsLoaded, setAreLabelsLoaded] = useState(false);
+
     useEffect(() => {
-        if (!availableLabels.size) return;
+        const loadAllLabels = async () => {
+            if (!labelsCacheRef.current[folderName]) {
+                const labels = await loadLabels(folderName);
+                labelsCacheRef.current[folderName] = labels;
+                console.log(labels);
+            }
+            setAreLabelsLoaded(true);
+        };
+
+        if (availableLabels.size) {
+            loadAllLabels();
+        }
+    }, [availableLabels, pcdFiles]);
+
+    useEffect(() => {
+        if (!availableLabels.size || !areLabelsLoaded) return;
 
         const loaderWorker = PCDLoaderWorker();
         let activeWorkers = 0;
@@ -53,7 +71,7 @@ export const usePointCloudLoader = (THEME_COLORS) => {
         let loadedFrames = 0;
         let loadedLabels = 0;
 
-        const labelsCache = {};
+        const labelsCache = labelsCacheRef.current;
 
         const processNextFile = () => {
             if (loadQueue.length === 0) return;
@@ -122,5 +140,5 @@ export const usePointCloudLoader = (THEME_COLORS) => {
         return () => {
             cleanupPointClouds(scene, pointCloudRefs, pointLabelsRef, prevLabelsRef, loaderWorker);
         };
-    }, [pcdFiles, scene, availableLabels]);
+    }, [pcdFiles, scene, availableLabels, areLabelsLoaded]);
 };

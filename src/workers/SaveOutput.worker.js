@@ -1,4 +1,5 @@
 import { encode } from "@msgpack/msgpack";
+import { compress } from "lz4js";
 
 onmessage = function (e) {
     const { labelsData } = e.data;
@@ -8,16 +9,14 @@ onmessage = function (e) {
         labels: Array.from(labels),
     }));
 
-    // const payload = JSON.stringify(formattedLabels);
-
     // const start = performance.now();
 
     const encoded = encode(formattedLabels);
-    // const buffer = encoded.buffer;
+    const compressed = compress(encoded);
 
     // const end = performance.now();
     // const total = (end - start).toFixed(2);
-    // console.log(`Total time ${total}ms`)
+    // console.log(`Total compression time ${total}ms`);
 
-    postMessage({ shouldSave: true, payload: encoded }, [encoded.buffer]);
+    postMessage({ shouldSave: true, payload: compressed }, [compressed.buffer]);
 };

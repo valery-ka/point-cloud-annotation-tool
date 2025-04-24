@@ -9,11 +9,7 @@ const { CONFIG } = API_PATHS;
 const ConfigContext = createContext();
 
 export const ConfigProvider = ({ children }) => {
-    const [config, setConfig] = useState({
-        classes: null,
-        moderation: null,
-        objects: null,
-    });
+    const [config, setConfig] = useState({});
     const [nonHiddenClasses, setNonHiddenClasses] = useState([]);
     const { folderName } = useFileManager();
 

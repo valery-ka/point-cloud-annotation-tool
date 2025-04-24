@@ -198,7 +198,7 @@ export const SettingsTab = memo(({ title }) => {
                 </Spoiler>
                 <Spoiler title={t(`${COMPONENT_NAME}pointHighlighter`)} defaultIsOpen={false}>
                     <RadioButtonGroup
-                        title={t(`${COMPONENT_NAME}isEnabled`)}
+                        title={t(`${COMPONENT_NAME}isHighlighterEnabled`)}
                         action={"enabled"}
                         setting={"editorSettings"}
                         settingType={"highlighter"}
@@ -261,6 +261,29 @@ export const SettingsTab = memo(({ title }) => {
                         max={5}
                         step={0.1}
                         decimals={1}
+                    />
+                </Spoiler>
+                <Spoiler title={t(`${COMPONENT_NAME}performance`)} defaultIsOpen={false}>
+                    <RadioButtonGroup
+                        title={t(`${COMPONENT_NAME}isAutoSaveTimerEnabled`)}
+                        action={"autoSaveTimerEnabled"}
+                        setting={"editorSettings"}
+                        settingType={"performance"}
+                        settingKey={"autoSaveTimerEnabled"}
+                        options={[true, false]}
+                        alias={[t(`${COMPONENT_NAME}enabled`), t(`${COMPONENT_NAME}disabled`)]}
+                        name="project"
+                    />
+                    <SettingsSlider
+                        title={t(`${COMPONENT_NAME}autoSaveTimer`)}
+                        action={"autoSaveTimer"}
+                        setting={"editorSettings"}
+                        settingType={"performance"}
+                        settingKey={"autoSaveTimer"}
+                        min={30}
+                        max={300}
+                        step={1}
+                        decimals={0}
                     />
                 </Spoiler>
             </div>

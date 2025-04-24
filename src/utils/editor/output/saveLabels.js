@@ -2,7 +2,7 @@ import { API_PATHS } from "config/apiPaths";
 
 const { SOLUTION } = API_PATHS;
 
-export const saveLabels = (folderName, labelsData, worker) => {
+export const saveLabels = (folderName, labelsData, worker, signal) => {
     return new Promise((resolve, reject) => {
         worker.onmessage = (e) => {
             const { shouldSave, payload } = e.data;
@@ -18,6 +18,7 @@ export const saveLabels = (folderName, labelsData, worker) => {
                     "Content-Type": "application/octet-stream",
                 },
                 body: payload,
+                signal,
             })
                 .then((response) => response.json())
                 .then((data) => resolve({ saved: true, data }))

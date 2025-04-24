@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSave } from "@fortawesome/free-solid-svg-icons";
 
-import { useFileManager, useFrames, useEditor } from "contexts";
+import { useFileManager, useFrames, useEditor, useEvent } from "contexts";
 import { useClickOutsideBlur } from "hooks";
 
 import { API_PATHS } from "config/apiPaths";
@@ -23,6 +23,7 @@ export const FileNavigator = memo(() => {
 
     const { t } = useTranslation();
 
+    const { publish } = useEvent();
     const { pendingSaveState } = useEditor();
     const { activeFrameIndex } = useFrames();
     const { handleFileChange, handleFolderChange, pcdFiles } = useFileManager();
@@ -111,6 +112,9 @@ export const FileNavigator = memo(() => {
                     <FontAwesomeIcon
                         icon={faSave}
                         className={`file-navigator-save-icon ${pendingSaveState ? "saving" : ""}`}
+                        onClick={() =>
+                            publish("saveSolution", { updateStack: false, isAutoSave: true })
+                        }
                     />
                 </div>
             </div>

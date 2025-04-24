@@ -8,7 +8,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { useTranslation } from "react-i18next";
 
-import { useModeration, useFrames } from "contexts";
+import { useModeration, useFrames, useConfig } from "contexts";
 import { useSubscribeFunction } from "hooks";
 
 import { IssueItem } from "./IssueItem";
@@ -18,6 +18,7 @@ export const ModerationTab = memo(({ title }) => {
     const { t } = useTranslation();
     const { issues, setIssues, isIssuesHidden, setIsIssuesHidden } = useModeration();
     const { activeFrameIndex, setActiveFrameIndex } = useFrames();
+    const { isModerationJob } = useConfig();
 
     const framesWithIssues = useMemo(() => {
         const uniqueFrames = new Set(issues.map((issue) => issue.frame));
@@ -144,13 +145,15 @@ export const ModerationTab = memo(({ title }) => {
                         icon={isIssuesHidden ? faEye : faEyeSlash}
                         action={"hideIssues"}
                     />
-                    <SidebarIcon
-                        className={`icon-style ${frameHasIssues ? "" : "disabled"}`}
-                        size="20px"
-                        title={t("markAllAsResolved")}
-                        icon={faCheckDouble}
-                        action={"markAllAsResolved"}
-                    />
+                    {isModerationJob && (
+                        <SidebarIcon
+                            className={`icon-style ${frameHasIssues ? "" : "disabled"}`}
+                            size="20px"
+                            title={t("markAllAsResolved")}
+                            icon={faCheckDouble}
+                            action={"markAllAsResolved"}
+                        />
+                    )}
                 </div>
             </div>
             <div className="sidebar-content">

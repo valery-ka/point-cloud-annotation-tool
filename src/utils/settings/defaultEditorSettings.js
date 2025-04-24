@@ -29,4 +29,8 @@ export const defaultEditorSettings = {
         highlightedPointSize: 1.0,
         searchingRadius: 1.0,
     },
+    performance: {
+        autoSaveTimerEnabled: false,
+        autoSaveTimer: 30,
+    },
 };

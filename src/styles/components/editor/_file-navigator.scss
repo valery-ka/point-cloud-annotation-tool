@@ -48,9 +48,22 @@
     font-size: 20px;
     margin-left: 10px;
     filter: drop-shadow(0 0 5px color-mix(in srgb, var(--button-text-color) 50%, transparent));
+    transition:
+        transform 0.1s ease,
+        opacity 0.1s ease;
 
     &.saving {
         color: #b13939;
         filter: drop-shadow(0 0 5px color-mix(in srgb, #b13939 40%, transparent));
+    }
+
+    &:hover {
+        transform: scale(1.1);
+        cursor: pointer;
+    }
+
+    &:active {
+        transform: scale(0.9);
+        opacity: 0.8;
     }
 }

@@ -103,10 +103,13 @@
     "hideVOID": "Hide",
     "showVOID": "Show",
     "pointHighlighter": "Point Highlighter Settings",
-    "isEnabled": "Hover Active",
+    "isHighlighterEnabled": "Hover Active",
     "enabled": "Enabled",
     "disabled": "Disabled",
     "highlighterSize": "Highlighter Image Size",
     "highlighterZoom": "Highlighter Zoom Level",
-    "searchingRadius": "Nearest Points Searching Radius"
+    "searchingRadius": "Nearest Points Searching Radius",
+    "performance": "Performance",
+    "isAutoSaveTimerEnabled": "Enable auto save interval",
+    "autoSaveTimer": "Auto save interval (sec.)"
 }

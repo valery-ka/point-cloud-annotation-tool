@@ -1,3 +1,6 @@
+import { decode } from "@msgpack/msgpack";
+import { decompress } from "lz4js";
+
 import { API_PATHS } from "config/apiPaths";
 
 const { SOLUTION } = API_PATHS;
@@ -9,7 +12,19 @@ export const loadLabels = (folderName) => {
                 if (!response.ok) {
                     return resolve([]);
                 }
-                return response.json();
+
+                const contentType = response.headers.get("Content-Type");
+
+                if (contentType && contentType.includes("application/octet-stream")) {
+                    return response.arrayBuffer().then((buffer) => {
+                        const compressed = new Uint8Array(buffer);
+                        const decompressed = decompress(compressed);
+                        return decode(decompressed);
+                    });
+                } else {
+                    console.warn(`Unsupported Content-Type: ${contentType}`);
+                    return [];
+                }
             })
             .then((data) => {
                 resolve(data);

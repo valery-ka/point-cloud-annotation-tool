@@ -40,7 +40,7 @@ export const useUndoRedo = (requestSaveFrame, onUndoRedo) => {
         onUndoRedo?.();
         updateUndoRedoState();
 
-        requestSaveFrame(false);
+        requestSaveFrame({ updateStack: false, isAutoSave: false });
     }, [arePointCloudsLoading, isPlaying, onUndoRedo]);
 
     useSubscribeFunction("undoAction", undoAction, [arePointCloudsLoading, isPlaying]);
@@ -67,7 +67,7 @@ export const useUndoRedo = (requestSaveFrame, onUndoRedo) => {
         onUndoRedo?.();
         updateUndoRedoState();
 
-        requestSaveFrame(false);
+        requestSaveFrame({ updateStack: false, isAutoSave: false });
     }, [arePointCloudsLoading, isPlaying, onUndoRedo]);
 
     useSubscribeFunction("redoAction", redoAction, [arePointCloudsLoading, isPlaying]);

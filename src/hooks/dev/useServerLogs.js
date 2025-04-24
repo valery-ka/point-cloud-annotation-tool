@@ -2,28 +2,18 @@ import { useEffect } from "react";
 
 export const useServerLogs = () => {
     useEffect(() => {
-        const socket = new WebSocket("ws://localhost:3001");
+        const ws = new WebSocket(
+            `ws://${window.location.hostname}:${process.env.REACT_APP_WS_PORT || 3001}`,
+        );
 
-        socket.onmessage = (event) => {
-            const msg = event.data;
-            if (msg.includes("Error")) {
-                console.log(
-                    `%c${msg}`,
-                    "color: rgba(255, 255, 255, 0.9); background-color:rgba(173, 29, 29, 0.5); padding: 5px; border-radius: 5px;",
-                );
-            } else if (msg.includes("Warn")) {
-                console.log(
-                    `%c${msg}`,
-                    "color: rgba(255, 255, 255, 0.9); background-color: rgba(255, 255, 0, 0.5); padding: 5px; border-radius: 5px;",
-                );
-            } else {
-                console.log(
-                    `%c${msg}`,
-                    "color: rgba(255, 255, 255, 0.9); background-color: rgba(0, 255, 0, 0.5); padding: 5px; border-radius: 5px;",
-                );
-            }
+        ws.onmessage = (event) => {
+            const log = event.data;
+            console.log(`%c${log}`, "color: #0bf; font-weight: bold");
         };
 
-        return () => socket.close();
+        ws.onopen = () => console.log("[WS] connected to server log stream");
+        ws.onclose = () => console.log("[WS] disconnected from server");
+
+        return () => ws.close();
     }, []);
 };
