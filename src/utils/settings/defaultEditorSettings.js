@@ -30,7 +30,10 @@ export const defaultEditorSettings = {
         searchingRadius: 1.0,
     },
     performance: {
+        statsPanelEnabled: false,
         autoSaveTimerEnabled: false,
         autoSaveTimer: 30,
+        imageFPS: 165,
+        highlighterFPS: 165,
     },
 };

@@ -1,4 +1,4 @@
-export function calculateBoundingRectangle(polygon) {
+export const calculateBoundingRectangle = (polygon) => {
     let minX = Number.MAX_VALUE;
     let minY = Number.MAX_VALUE;
     let maxX = Number.MIN_VALUE;
@@ -11,21 +11,20 @@ export function calculateBoundingRectangle(polygon) {
         maxY = Math.max(maxY, y);
     }
     return { minX, minY, maxX, maxY };
-}
+};
 
-export function pointInPolyRaycast(point, polygon) {
-    var x = point[0],
-        y = point[1];
-    var inside = false;
+export const pointInPolyRaycast = ([x, y], polygon) => {
+    let inside = false;
+    const len = polygon.length;
 
-    for (var i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
-        var xi = polygon[i][0],
+    for (let i = 0, j = len - 1; i < len; j = i++) {
+        const xi = polygon[i][0],
             yi = polygon[i][1];
-        var xj = polygon[j][0],
+        const xj = polygon[j][0],
             yj = polygon[j][1];
 
-        var intersect = yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi;
+        const intersect = yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi;
         if (intersect) inside = !inside;
     }
     return inside;
-}
+};

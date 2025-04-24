@@ -24,11 +24,11 @@ export const showPoint = (positions, i, originalPositions) => {
     positions[i] = originalPositions[i];
 };
 
-export const findNearestPoints = (point, activeFramePositionsRef, radius) => {
-    if (!point || !activeFramePositionsRef.current) return [];
+export const findNearestPoints = (point, framePositions, radius) => {
+    if (!point || !framePositions) return [];
 
     const { x: hx, y: hy, z: hz } = point;
-    const positions = activeFramePositionsRef.current;
+    const positions = framePositions;
     const radiusSquared = radius * radius;
 
     const neighbors = [];

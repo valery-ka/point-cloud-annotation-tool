@@ -17,8 +17,6 @@ import {
 } from "utils/editor/";
 
 const MS_TO_SEC = 1000;
-const FRAME_LIMIT_FPS = 30;
-const FRAME_INTERVAL_MS = 1000 / FRAME_LIMIT_FPS;
 
 export const HighlightedPointGeometryUpdater = memo(({ image }) => {
     const { pcdFiles } = useFileManager();
@@ -30,9 +28,14 @@ export const HighlightedPointGeometryUpdater = memo(({ image }) => {
 
     const pointSize = useMemo(() => {
         return settings.editorSettings.highlighter.generalPointSize;
-    }, [settings.editorSettings.highlighter]);
+    }, [settings.editorSettings.highlighter.generalPointSize]);
+
+    const highlighterFPS = useMemo(() => {
+        return settings.editorSettings.performance.highlighterFPS;
+    }, [settings.editorSettings.performance.highlighterFPS]);
 
     const lastFrameTimeRef = useRef(0);
+    const FRAME_INTERVAL_MS = 1000 / highlighterFPS;
 
     useFrame(({ clock }) => {
         const now = clock.elapsedTime * MS_TO_SEC;

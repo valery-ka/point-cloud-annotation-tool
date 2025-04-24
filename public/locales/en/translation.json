@@ -110,6 +110,9 @@
     "highlighterZoom": "Highlighter Zoom Level",
     "searchingRadius": "Nearest Points Searching Radius",
     "performance": "Performance",
+    "statsPanelEnabled": "Enable stats panel",
     "isAutoSaveTimerEnabled": "Enable auto save interval",
-    "autoSaveTimer": "Auto save interval (sec.)"
+    "autoSaveTimer": "Auto save interval (sec.)",
+    "imageFPS": "Image FPS",
+    "highlighterFPS": "Highlighter FPS"
 }

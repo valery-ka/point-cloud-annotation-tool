@@ -1,7 +1,7 @@
 import { MODES } from "tools";
 import { calculateBoundingRectangle, pointInPolyRaycast } from "./polygon.js";
 
-export function selectByPolygon(
+export const selectByPolygon = (
     positions,
     pixelProjections,
     labels,
@@ -9,8 +9,8 @@ export function selectByPolygon(
     selection,
     depthZ,
     polygon,
-) {
-    const polygonProjections = updatePolygonProjections(
+) => {
+    const projections = updatePolygonProjections(
         positions,
         pixelProjections,
         labels,
@@ -19,18 +19,23 @@ export function selectByPolygon(
         depthZ,
         polygon,
     );
+
     const inside = [];
 
-    for (const projection of polygonProjections) {
-        if (pointInPolyRaycast([projection.pixelX, projection.pixelY], polygon)) {
-            inside.push(projection.idx);
+    for (let i = 0; i < projections.length; i += 3) {
+        const idx = projections[i];
+        const pixelX = projections[i + 1];
+        const pixelY = projections[i + 2];
+
+        if (pointInPolyRaycast([pixelX, pixelY], polygon)) {
+            inside.push(idx);
         }
     }
 
     return inside;
-}
+};
 
-function updatePolygonProjections(
+const updatePolygonProjections = (
     positions,
     pixelProjections,
     labels,
@@ -38,37 +43,31 @@ function updatePolygonProjections(
     selection,
     depthZ,
     polygon,
-) {
+) => {
     const { minX, minY, maxX, maxY } = calculateBoundingRectangle(polygon);
 
-    const polygonProjections = new Set();
+    const result = [];
 
     for (let i = 0; i < pixelProjections.length; i += 3) {
         const idx = pixelProjections[i];
         const pixelX = pixelProjections[i + 1];
         const pixelY = pixelProjections[i + 2];
 
-        if (
-            !(
-                MODES[selection.selectionMode]?.shouldProcess?.(
-                    labels,
-                    idx,
-                    classIndex,
-                    positions,
-                    selection,
-                    depthZ,
-                ) ?? false
-            )
-        ) {
-            continue;
-        }
+        const shouldProcess =
+            MODES[selection.selectionMode]?.shouldProcess?.(
+                labels,
+                idx,
+                classIndex,
+                positions,
+                selection,
+                depthZ,
+            ) ?? false;
 
-        if (pixelX < minX || pixelX > maxX || pixelY < minY || pixelY > maxY) {
-            continue;
-        }
+        if (!shouldProcess) continue;
+        if (pixelX < minX || pixelX > maxX || pixelY < minY || pixelY > maxY) continue;
 
-        polygonProjections.add({ idx, pixelX, pixelY });
+        result.push(idx, pixelX, pixelY);
     }
 
-    return polygonProjections;
-}
+    return result;
+};

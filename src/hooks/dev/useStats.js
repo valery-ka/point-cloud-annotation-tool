@@ -1,8 +1,18 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
+
+import { useSettings } from "contexts";
+
 import Stats from "stats.js";
 
 export const useStats = () => {
+    const { settings } = useSettings();
+
+    const showPanel = useMemo(() => {
+        return settings.editorSettings.performance.statsPanelEnabled;
+    }, [settings.editorSettings.performance.statsPanelEnabled]);
+
     useEffect(() => {
+        if (!showPanel) return;
         const fps = new Stats();
         fps.showPanel(0);
 
@@ -30,5 +40,5 @@ export const useStats = () => {
                 fps.dom.parentNode.removeChild(fps.dom);
             }
         };
-    }, []);
+    }, [showPanel]);
 };

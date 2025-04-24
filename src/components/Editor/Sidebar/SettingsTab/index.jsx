@@ -265,6 +265,15 @@ export const SettingsTab = memo(({ title }) => {
                 </Spoiler>
                 <Spoiler title={t(`${COMPONENT_NAME}performance`)} defaultIsOpen={false}>
                     <RadioButtonGroup
+                        title={t(`${COMPONENT_NAME}statsPanelEnabled`)}
+                        action={"statsPanelEnabled"}
+                        setting={"editorSettings"}
+                        settingType={"performance"}
+                        settingKey={"statsPanelEnabled"}
+                        options={[true, false]}
+                        alias={[t(`${COMPONENT_NAME}enabled`), t(`${COMPONENT_NAME}disabled`)]}
+                    />
+                    <RadioButtonGroup
                         title={t(`${COMPONENT_NAME}isAutoSaveTimerEnabled`)}
                         action={"autoSaveTimerEnabled"}
                         setting={"editorSettings"}
@@ -272,7 +281,6 @@ export const SettingsTab = memo(({ title }) => {
                         settingKey={"autoSaveTimerEnabled"}
                         options={[true, false]}
                         alias={[t(`${COMPONENT_NAME}enabled`), t(`${COMPONENT_NAME}disabled`)]}
-                        name="project"
                     />
                     <SettingsSlider
                         title={t(`${COMPONENT_NAME}autoSaveTimer`)}
@@ -283,6 +291,30 @@ export const SettingsTab = memo(({ title }) => {
                         min={30}
                         max={300}
                         step={1}
+                        decimals={0}
+                    />
+                    <SettingsSlider
+                        title={t(`${COMPONENT_NAME}imageFPS`)}
+                        action={"imageFPS"}
+                        setting={"editorSettings"}
+                        settingType={"performance"}
+                        settingKey={"imageFPS"}
+                        min={30}
+                        max={165}
+                        inf={true}
+                        step={5}
+                        decimals={0}
+                    />
+                    <SettingsSlider
+                        title={t(`${COMPONENT_NAME}highlighterFPS`)}
+                        action={"imageFPS"}
+                        setting={"editorSettings"}
+                        settingType={"performance"}
+                        settingKey={"highlighterFPS"}
+                        min={30}
+                        max={165}
+                        inf={true}
+                        step={5}
                         decimals={0}
                     />
                 </Spoiler>

@@ -11,6 +11,7 @@ export const SettingsSlider = ({
     action,
     min,
     max,
+    inf = false,
     step,
     decimals,
 }) => {
@@ -38,12 +39,17 @@ export const SettingsSlider = ({
         [publish, updateSettings, editorSettings, action],
     );
 
+    const getValue = useCallback((value) => {
+        const renderInf = inf && value === max;
+        return renderInf ? "∞" : value.toFixed(decimals);
+    }, []);
+
     return (
         <div className="slider-container">
             <h4>{title}</h4>
             <div className="slider-wrapper">
                 <Slider min={min} max={max} step={step} value={value} onChange={handleChange} />
-                <span className="slider-value">{value.toFixed(decimals)}</span>
+                <span className="slider-value">{getValue(value)}</span>
             </div>
         </div>
     );

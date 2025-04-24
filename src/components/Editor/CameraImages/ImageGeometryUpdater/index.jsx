@@ -18,8 +18,6 @@ import {
 } from "utils/editor";
 
 const MS_TO_SEC = 1000;
-const FRAME_LIMIT_FPS = 60;
-const FRAME_INTERVAL_MS = 1000 / FRAME_LIMIT_FPS;
 
 export const ImageGeometryUpdater = memo(({ image }) => {
     const { nonHiddenClasses } = useConfig();
@@ -47,6 +45,10 @@ export const ImageGeometryUpdater = memo(({ image }) => {
         return settings.editorSettings.images.selectedClassSize;
     }, [settings.editorSettings.images.selectedClassSize]);
 
+    const imageFPS = useMemo(() => {
+        return settings.editorSettings.performance.imageFPS;
+    }, [settings.editorSettings.performance.imageFPS]);
+
     const selectedClass = useMemo(() => {
         return nonHiddenClasses[selectedClassIndex]?.originalIndex;
     }, [nonHiddenClasses, selectedClassIndex]);
@@ -56,6 +58,7 @@ export const ImageGeometryUpdater = memo(({ image }) => {
     }, [selectedClassIndex, generalPointSize, selectedClassSize, image]);
 
     const lastFrameTimeRef = useRef(0);
+    const FRAME_INTERVAL_MS = 1000 / imageFPS;
 
     useFrame(({ clock }) => {
         const now = clock.elapsedTime * MS_TO_SEC;
@@ -110,69 +113,6 @@ export const ImageGeometryUpdater = memo(({ image }) => {
             imagePointsSizeNeedsUpdateRef.current = false;
         }
     });
-
-    // На всякий случай
-    // useFrame(() => {
-    //     if (!imagePointsAlphaNeedsUpdateRef.current) return;
-    //     const activeFrameFilePath = pcdFiles[activeFrameIndex];
-
-    //     const cloudGeometry = pointCloudRefs.current[activeFrameFilePath].geometry;
-    //     const frameLabels = pointLabelsRef.current[activeFrameFilePath];
-
-    //     const projectedPoints = projectedPointsRef.current;
-    //     const imagesPoints = imagesPointRef.current;
-
-    //     invalidateImagePointsVisibility({
-    //         frameData: {
-    //             geometry: cloudGeometry,
-    //             labels: frameLabels,
-    //         },
-    //         imageData: {
-    //             image,
-    //             projectedPoints,
-    //             imagesPoints,
-    //         },
-    //     });
-
-    //     imagePointsAlphaNeedsUpdateRef.current = false;
-    // });
-
-    // useFrame(() => {
-    //     if (!imagePointsColorNeedsUpdateRef.current) return;
-    //     const activeFrameFilePath = pcdFiles[activeFrameIndex];
-
-    //     const cloudGeometry = pointCloudRefs.current[activeFrameFilePath].geometry;
-
-    //     const projectedPoints = projectedPointsRef.current;
-
-    //     invalidateImagePointsColor({
-    //         geometry: cloudGeometry,
-    //         imageData: {
-    //             image,
-    //             projectedPoints,
-    //         },
-    //     });
-
-    //     imagePointsColorNeedsUpdateRef.current = false;
-    // });
-
-    // useFrame(() => {
-    //     if (!imagePointsSizeNeedsUpdateRef.current) return;
-    //     const activeFrameFilePath = pcdFiles[activeFrameIndex];
-
-    //     const frameLabels = pointLabelsRef.current[activeFrameFilePath];
-    //     const imageGeometry = projectedPointsRef.current[image?.src]?.geometry;
-
-    //     invalidateImagePointsSize({
-    //         geometry: imageGeometry,
-    //         labels: frameLabels,
-    //         selectedClass: selectedClass,
-    //         defaultSize: generalPointSize,
-    //         selectedClassIncrement: selectedClassSize,
-    //     });
-
-    //     imagePointsSizeNeedsUpdateRef.current = false;
-    // });
 
     return null;
 });

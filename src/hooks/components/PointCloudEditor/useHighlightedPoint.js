@@ -22,8 +22,13 @@ export const useHighlightedPoint = () => {
     const { pcdFiles } = useFileManager();
     const { activeFrameIndex } = useFrames();
     const { nonHiddenClasses } = useConfig();
-    const { activeFramePositionsRef, pointLabelsRef, pixelProjections, setSelectedClassIndex } =
-        useEditor();
+    const {
+        pointCloudRefs,
+        activeFramePositionsRef,
+        pointLabelsRef,
+        pixelProjections,
+        setSelectedClassIndex,
+    } = useEditor();
     const { selectedTool } = useTools();
     const { highlightedPoint, setHighlightedPoint } = useHoveredPoint();
     const { settings } = useSettings();
@@ -44,12 +49,13 @@ export const useHighlightedPoint = () => {
         if (highlightedPoint) {
             const { x, y, z, index, u, v } = highlightedPoint;
             const activeFrameFilePath = pcdFiles[activeFrameIndex];
+            const activeFrameRef = pointCloudRefs.current[activeFrameFilePath];
             const activeFrameLabels = pointLabelsRef.current[activeFrameFilePath];
             const label = activeFrameLabels[index];
 
             const nearestIndices = findNearestPoints(
                 { x, y, z },
-                activeFramePositionsRef,
+                activeFrameRef.geometry.attributes.original.array,
                 searchingRadius,
             );
 
@@ -71,6 +77,7 @@ export const useHighlightedPoint = () => {
             const { layerX: screenX, layerY: screenY } = event;
 
             const activeFrameFilePath = pcdFiles[activeFrameIndex];
+            const activeFrameRef = pointCloudRefs.current[activeFrameFilePath];
             const activeFrameLabels = pointLabelsRef.current[activeFrameFilePath];
 
             let closestPoint = null;
@@ -116,7 +123,7 @@ export const useHighlightedPoint = () => {
                 const label = activeFrameLabels[index];
                 const nearestIndices = findNearestPoints(
                     { x, y, z },
-                    activeFramePositionsRef,
+                    activeFrameRef.geometry.attributes.original.array,
                     searchingRadius,
                 );
                 setHighlightedPoint({

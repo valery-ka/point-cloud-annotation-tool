@@ -16,9 +16,6 @@ export const ImagesProvider = ({ children }) => {
     const [loadedImages, setLoadedImages] = useState({});
 
     const [selectedCamera, setSelectedCamera] = useState(null);
-    const selectedImagePath = useMemo(() => {
-        return images[selectedCamera]?.[activeFrameIndex] ?? null;
-    }, [images, selectedCamera, activeFrameIndex]);
 
     const imagesByCamera = useMemo(() => {
         return Object.keys(images ?? {});
@@ -43,6 +40,12 @@ export const ImagesProvider = ({ children }) => {
         () => ({ height: imageHeight, width: imageWidth }),
         [imageHeight, imageWidth],
     );
+
+    const selectedImagePath = useMemo(() => {
+        return (
+            images[selectedCamera]?.find((imagePath) => imagePath.includes(frameFileName)) ?? null
+        );
+    }, [images, selectedCamera, frameFileName]);
 
     const imagePointsAlphaNeedsUpdateRef = useRef(true);
     const imagePointsColorNeedsUpdateRef = useRef(true);
