@@ -11,8 +11,6 @@ import { ImagePointShader } from "shaders";
 import { ImageCameraControls } from "../ImageCameraControls";
 import { ImageGeometryUpdater } from "../ImageGeometryUpdater";
 
-const Z_INDEX = 5;
-
 export const ImageCanvas = memo(({ image, size }) => {
     const { settings } = useSettings();
 
@@ -75,7 +73,7 @@ export const ImageCanvas = memo(({ image, size }) => {
                 </>
             )}
             {geometry && arePointsVisible && (
-                <group scale={[scale, scale, Z_INDEX]}>
+                <group scale={[scale, scale, 1]}>
                     <points geometry={geometry} material={shaderMaterial} />
                 </group>
             )}

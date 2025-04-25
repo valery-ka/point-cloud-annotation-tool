@@ -9,7 +9,7 @@ export const useImagePointHighlighter = ({ size, shaderMaterial, positions }) =>
         if (!highlightedPoint || !positions || !size) return null;
 
         const { index } = highlightedPoint;
-        if (positions.has(index)) {
+        if (positions.get(index)) {
             const [x, y] = positions.get(index);
 
             const { width, height } = size;

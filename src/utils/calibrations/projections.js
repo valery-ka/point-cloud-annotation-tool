@@ -1,4 +1,4 @@
-import { Vector2, Vector3, Matrix4, BufferGeometry, BufferAttribute } from "three";
+import { Sphere, Vector2, Vector3, Matrix4, BufferGeometry, BufferAttribute } from "three";
 
 import { getCalibrationByUrl, get3DPointsForImage } from "utils/calibrations";
 import { getMatchingKeyForTimestamp } from "./general";
@@ -84,6 +84,28 @@ const isPointInBounds = ({ u, v, imageWidth, imageHeight, marginFactor }) => {
     return u >= -margin && u < imageWidth + margin && v >= -margin && v < imageHeight + margin;
 };
 
+export const chooseBestCamera = (activeFrameImagesPath, projectedPoints, highlightedPoint) => {
+    let maxResolutionImage = null;
+    let maxResolution = 0;
+
+    for (const { image } of activeFrameImagesPath) {
+        const projected = projectedPoints?.[image.src];
+        if (projected) {
+            const position = projected.indexToPositionMap.get(highlightedPoint.index);
+            if (position) {
+                const resolution = image.width * image.height;
+
+                if (resolution > maxResolution) {
+                    maxResolution = resolution;
+                    maxResolutionImage = image;
+                }
+            }
+        }
+    }
+
+    return maxResolutionImage;
+};
+
 export const buildImageGeometry = (
     url,
     img,
@@ -104,8 +126,6 @@ export const buildImageGeometry = (
     const alpha = 1.0;
     const size = 5;
 
-    const indexToPositionMap = new Map();
-
     if (!projectedPointsRef.current[url]) {
         const indices = [];
         const positions = [];
@@ -113,19 +133,27 @@ export const buildImageGeometry = (
         const sizes = [];
         const alphas = [];
 
+        let maxIndex = 0;
+        for (let i = 0; i < points.length; i += 3) {
+            maxIndex = Math.max(maxIndex, points[i + 2]);
+        }
+
+        const xCoords = new Int16Array(maxIndex + 1);
+        const yCoords = new Int16Array(maxIndex + 1);
+
         for (let i = 0; i < points.length; i += 3) {
             const pointIndex = points[i + 2];
 
             const x = points[i] - img.width / 2;
             const y = points[i + 1] - img.height / 2;
-            const z = 0.1;
 
-            indexToPositionMap.set(pointIndex, [x, y]);
+            xCoords[pointIndex] = Math.round(x);
+            yCoords[pointIndex] = Math.round(y);
 
             const { r, g, b } = getRGBFromMatchedColorArray(pointIndex, matchedColorArray);
 
             indices.push(pointIndex);
-            positions.push(x, y, z);
+            positions.push(x, y);
             colors.push(r, g, b);
             sizes.push(size);
             alphas.push(alpha);
@@ -133,7 +161,7 @@ export const buildImageGeometry = (
 
         const geometry = new BufferGeometry();
 
-        geometry.setAttribute("position", new BufferAttribute(new Float32Array(positions), 3));
+        geometry.setAttribute("position", new BufferAttribute(new Int16Array(positions), 2));
         geometry.setAttribute("indices", new BufferAttribute(new Float32Array(indices), 1));
         geometry.setAttribute("color", new BufferAttribute(new Uint8Array(colors), 3, true));
 
@@ -142,9 +170,23 @@ export const buildImageGeometry = (
         geometry.setAttribute("alpha_image", new BufferAttribute(new Uint8Array(alphas), 1));
         geometry.setAttribute("alpha_highlighter", new BufferAttribute(new Uint8Array(alphas), 1));
 
+        const radius = Math.max(img.width, img.height);
+        geometry.boundingSphere = new Sphere(new Vector3(0, 0, 0), radius);
+
         projectedPointsRef.current[url] = {
             geometry,
-            indexToPositionMap,
+            indexToPositionMap: {
+                xCoords,
+                yCoords,
+                get: (index) => {
+                    const x = xCoords[index];
+                    const y = yCoords[index];
+                    if (x === undefined || y === undefined || (x === 0 && y === 0)) {
+                        return null;
+                    }
+                    return [x, y];
+                },
+            },
         };
     }
 };

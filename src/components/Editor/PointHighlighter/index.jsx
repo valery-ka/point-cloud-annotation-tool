@@ -1,6 +1,7 @@
 import React, { useMemo } from "react";
-
 import { useHoveredPoint, useImages, useCalibrations, useSettings } from "contexts";
+
+import { chooseBestCamera } from "utils/calibrations";
 
 import { PointHighlighterCanvas } from "./PointHighlighterCanvas";
 
@@ -12,15 +13,21 @@ export const PointHighlighter = () => {
 
     const { image, indicesToPositions } = useMemo(() => {
         if (!highlightedPoint || !activeFrameImagesPath?.length) return {};
-        for (const { image } of activeFrameImagesPath) {
-            const projected = projectedPointsRef.current?.[image.src];
-            if (projected && projected.indexToPositionMap.has(highlightedPoint.index)) {
-                return {
-                    image,
-                    indicesToPositions: projected.indexToPositionMap,
-                };
-            }
+
+        const bestCamera = chooseBestCamera(
+            activeFrameImagesPath,
+            projectedPointsRef.current,
+            highlightedPoint,
+        );
+
+        if (bestCamera) {
+            const projected = projectedPointsRef.current?.[bestCamera.src];
+            return {
+                image: bestCamera,
+                indicesToPositions: projected.indexToPositionMap,
+            };
         }
+
         return {};
     }, [highlightedPoint, activeFrameImagesPath]);
 
