@@ -1,20 +1,10 @@
 import { selectByPolygon } from "../selection";
-
-function makePixelProjections(n) {
-    const arr = [];
-    for (let i = 0; i < n; i++) {
-        arr.push(i, Math.random() * 1000, Math.random() * 1000);
-    }
-    return arr;
-}
-
-function makePositions(n) {
-    const arr = [];
-    for (let i = 0; i < n; i++) {
-        arr.push(Math.random() * 10, Math.random() * 10, Math.random() * 10);
-    }
-    return arr;
-}
+import { positions } from "../__fixtures__/positions";
+import { pixelProjections } from "../__fixtures__/pixelProjections";
+import { labels } from "../__fixtures__/labels";
+import { classIndex } from "../__fixtures__/classIndex";
+import { selection } from "../__fixtures__/selection";
+import { depthZ } from "../__fixtures__/depthZ";
 
 jest.mock("constants", () => ({
     HIDDEN_POSITION: {
@@ -23,38 +13,95 @@ jest.mock("constants", () => ({
         CLASS_FILTER: 1e7,
     },
     HIDDEN_POINT: Math.min(1e5, 1e6, 1e7),
+
     SELECTION_OUTLINE: {
         FILL_COLOR: "#FFFFFF15",
         FILL_TYPE: "evenodd",
         BORDER_COLOR: "#FFFF00",
         BORDER_WIDTH: 1.5,
     },
+
     DEFAULT_MODE: "paintFill",
     DEFAULT_TOOL: "handPointer",
     DEFAULT_BRUSH_SIZE: 40,
 }));
 
-const n = 100000;
+const basePolygon = [
+    [0, 0],
+    [1000, 0],
+    [1000, 1000],
+    [0, 1000],
+];
 
-test(`selectByPolygon performance on ${n} points`, () => {
-    const pixelProjections = makePixelProjections(n);
-    const positions = makePositions(n);
+function getRandomOffsetPolygon(base, maxOffset = 50) {
+    const offsetX = Math.random() * maxOffset * 2 - maxOffset;
+    const offsetY = Math.random() * maxOffset * 2 - maxOffset;
 
-    const polygon = [
-        [100, 100],
-        [100, 900],
-        [900, 900],
-        [900, 100],
-    ];
+    return base.map(([x, y]) => [x + offsetX, y + offsetY]);
+}
 
-    const labels = Array(n).fill(0);
-    const selection = { selectionMode: "paintFill", highlightedPoint: null, paintDepth: 0.03 };
-    const classIndex = 1;
-    const depthZ = 0.05;
+test("measure continuous selectByPolygon calls", async () => {
+    const callCount = 50;
+    const executionTimes = [];
 
-    const t0 = performance.now();
-    selectByPolygon(positions, pixelProjections, labels, classIndex, selection, depthZ, polygon);
-    const t1 = performance.now();
+    const coldStartTime = performance.now();
+    selectByPolygon(
+        positions,
+        pixelProjections,
+        labels,
+        classIndex,
+        selection,
+        depthZ,
+        basePolygon,
+    );
+    const coldStartDuration = performance.now() - coldStartTime;
+    console.log(`Cold start time: ${coldStartDuration.toFixed(2)}ms`);
 
-    console.log(`selectByPolygon on ${n} points took ${(t1 - t0).toFixed(2)} ms`);
+    const totalStartTime = performance.now();
+
+    for (let i = 0; i < callCount; i++) {
+        const polygon = getRandomOffsetPolygon(basePolygon);
+        const startTime = performance.now();
+
+        selectByPolygon(
+            positions,
+            pixelProjections,
+            labels,
+            classIndex,
+            selection,
+            depthZ,
+            polygon,
+        );
+
+        const duration = performance.now() - startTime;
+        executionTimes.push(duration);
+
+        if (i < callCount - 1) {
+            await new Promise((resolve) => setTimeout(resolve, 8));
+        }
+    }
+
+    const totalDuration = performance.now() - totalStartTime;
+
+    const avgTime = executionTimes.reduce((sum, t) => sum + t, 0) / executionTimes.length;
+    const minTime = Math.min(...executionTimes);
+    const maxTime = Math.max(...executionTimes);
+
+    console.log(`Total calls: ${callCount}`);
+    console.log(`Total duration: ${totalDuration.toFixed(2)}ms`);
+    console.log(`Average per call: ${avgTime.toFixed(2)}ms`);
+    console.log(`Min time: ${minTime.toFixed(2)}ms`);
+    console.log(`Max time: ${maxTime.toFixed(2)}ms`);
+    console.log(
+        "All execution times:",
+        executionTimes.map((t) => t.toFixed(2)).join("ms, ") + "ms",
+    );
+
+    expect(avgTime).toBeLessThan(100);
+
+    console.log("Performance graph:");
+    executionTimes.forEach((t, i) => {
+        const bar = "■".repeat(Math.round(t / 5));
+        console.log(`Call ${i + 1}: ${bar} ${t.toFixed(2)}ms`);
+    });
 });
