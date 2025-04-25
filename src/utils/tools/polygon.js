@@ -28,3 +28,9 @@ export const pointInPolyRaycast = ([x, y], polygon) => {
     }
     return inside;
 };
+
+export const pointInCircle = ([x, y], centerX, centerY, radius) => {
+    const dx = x - centerX;
+    const dy = y - centerY;
+    return dx * dx + dy * dy <= radius * radius;
+};

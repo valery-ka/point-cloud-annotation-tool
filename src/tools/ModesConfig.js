@@ -11,18 +11,20 @@ import {
 
 const { Z_FILTER, SELECTION, CLASS_FILTER } = APP_CONSTANTS.HIDDEN_POSITION;
 
+// я хочу умереть (терпим)
 export const MODES = {
     paintFill: {
         type: "paint",
         title: "paintFill",
         icon: faFill,
         iconPosition: "top-left",
-        shouldProcess: (label, index, cls, position) => {
-            if (position) {
-                const x = position[index * 3];
-                if (x >= Z_FILTER) return false;
-            }
-            return label[index] === 0;
+        shouldProcess: ({ cloudData, index }) => {
+            const { positions, labels } = cloudData;
+            const x = positions[index * 3];
+
+            if (x >= Z_FILTER) return false;
+
+            return labels[index] === 0;
         },
         paint: (frameColors, framsLabels, points, classColor, classIndex) => {
             if (!points.length) return;
@@ -39,10 +41,15 @@ export const MODES = {
         icon: faEraser,
         iconPosition: "",
         hotkey: "Shift",
-        shouldProcess: (label, index, cls, position) => {
-            if (label[index] === 0) return false;
-            if (position[index * 3] >= Z_FILTER) return false;
-            return label[index] === cls;
+        shouldProcess: ({ cloudData, selection, index }) => {
+            const { positions, labels } = cloudData;
+            const { originalClassIndex } = selection;
+            const x = positions[index * 3];
+
+            if (labels[index] === 0) return false;
+            if (x >= Z_FILTER) return false;
+
+            return labels[index] === originalClassIndex;
         },
         paint: (
             frameColors,
@@ -81,12 +88,14 @@ export const MODES = {
         icon: faSprayCan,
         iconPosition: "",
         hotkey: "Control",
-        shouldProcess: (label, index, cls, position) => {
-            if (position) {
-                const x = position[index * 3];
-                if (x >= Z_FILTER) return false;
-            }
-            return label[index] !== cls;
+        shouldProcess: ({ cloudData, selection, index }) => {
+            const { positions, labels } = cloudData;
+            const { originalClassIndex } = selection;
+            const x = positions[index * 3];
+
+            if (x >= Z_FILTER) return false;
+
+            return labels[index] !== originalClassIndex;
         },
         paint: (frameColors, framsLabels, points, classColor, classIndex) => {
             if (!points.length) return;
@@ -102,12 +111,16 @@ export const MODES = {
         title: "paintDepth",
         icon: faPencilRuler,
         iconPosition: "bottom",
-        shouldProcess: (label, index, cls, position, selection, depthZ) => {
-            if (depthZ) {
-                const z = position[index * 3 + 2];
-                const paintDepth = selection.paintDepth;
-                if (z >= Z_FILTER || z <= depthZ + paintDepth) return false;
-                return label[index] === 0;
+        shouldProcess: ({ cloudData, selection, index }) => {
+            const { positions, labels } = cloudData;
+            const { paintDepth, highlightedPointZ } = selection;
+
+            if (highlightedPointZ) {
+                const x = positions[index * 3];
+                const z = positions[index * 3 + 2];
+
+                if (x >= Z_FILTER || z <= highlightedPointZ + paintDepth) return false;
+                return labels[index] === 0;
             }
         },
         paint: (frameColors, framsLabels, points, classColor, classIndex) => {
@@ -124,11 +137,13 @@ export const MODES = {
         title: "filterHide",
         icon: faEyeSlash,
         iconPosition: "top-right",
-        shouldProcess: (label, index, cls, position) => {
-            const x = position[index * 3];
+        shouldProcess: ({ cloudData, index }) => {
+            const { positions } = cloudData;
+            const x = positions[index * 3];
+
             if (x < Z_FILTER) return true;
         },
-        filter: ({ frameData, filterData, selectionData, imageData, callbacks }) => {
+        filter: ({ frameData, selectionData, callbacks }) => {
             const { positions } = frameData;
             const { isSelection } = selectionData;
             const { points } = selectionData;
@@ -151,11 +166,13 @@ export const MODES = {
         title: "filterCrop",
         icon: faCropSimple,
         iconPosition: "",
-        shouldProcess: (label, index, cls, position) => {
-            const x = position[index * 3];
+        shouldProcess: ({ cloudData, index }) => {
+            const { positions } = cloudData;
+            const x = positions[index * 3];
+
             if (x < Z_FILTER) return true;
         },
-        filter: ({ frameData, filterData, selectionData, imageData, callbacks }) => {
+        filter: ({ frameData, filterData, selectionData, callbacks }) => {
             const { positions, originalPositions, labels } = frameData;
             const { minZ, maxZ, visibility } = filterData;
             const { points } = selectionData;
@@ -197,11 +214,13 @@ export const MODES = {
         title: "filterReveal",
         icon: faEye,
         iconPosition: "bottom-right",
-        shouldProcess: (label, index, cls, position) => {
-            const x = position[index * 3];
+        shouldProcess: ({ cloudData, index }) => {
+            const { positions } = cloudData;
+            const x = positions[index * 3];
+
             if (x >= Z_FILTER) return true;
         },
-        filter: ({ frameData, filterData, selectionData, imageData, callbacks }) => {
+        filter: ({ frameData, filterData, selectionData, callbacks }) => {
             const { geometry, positions, originalPositions, labels } = frameData;
             const { minZ, maxZ, visibility } = filterData;
             const { points } = selectionData;
@@ -225,7 +244,6 @@ export const MODES = {
                         maxZ,
                     },
                     index,
-                    imageData: { imageData },
                 });
             }
 

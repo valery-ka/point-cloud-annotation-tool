@@ -53,7 +53,7 @@ export default class BrushTool extends SelectorTools {
     handleMouseUp(ev) {
         if (ev.which === this.leftMouseButton) {
             this.clearHoveredPoint();
-            this.actions.requestSaveFrame({ updateStack: true, isAutoSave: false });
+            this.callbacks.requestSaveFrame({ updateStack: true, isAutoSave: false });
         }
     }
 

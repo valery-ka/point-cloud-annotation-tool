@@ -17,8 +17,8 @@ app.use(cors());
 app.use(express.raw({ type: "application/octet-stream", limit: "50mb" }));
 app.use(express.json({ type: "application/json", limit: "50mb" }));
 
-const trafficLogger = require("./middleware/trafficLogger");
-app.use(trafficLogger);
+// const trafficLogger = require("./middleware/trafficLogger");
+// app.use(trafficLogger);
 
 app.use("/api/navigator", require("./routes/navigator"));
 app.use("/api/config", require("./routes/config"));

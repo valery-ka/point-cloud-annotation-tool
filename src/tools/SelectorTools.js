@@ -43,7 +43,7 @@ export default class SelectorTools {
     }
 
     clearProjections() {
-        this.frameData.pixelProjections = new Float32Array();
+        this.cloudData.pixelProjections = new Float32Array();
     }
 
     animate() {
@@ -78,8 +78,8 @@ export default class SelectorTools {
 
     updateDrawingStatus(isDrawing) {
         this.isDrawing = isDrawing;
-        if (this.actions.setIsDrawing) {
-            this.actions.setIsDrawing(isDrawing);
+        if (this.callbacks.setIsDrawing) {
+            this.callbacks.setIsDrawing(isDrawing);
         }
     }
 
@@ -104,26 +104,34 @@ export default class SelectorTools {
     }
 
     selectByPolygon(polygon) {
-        const selectedPoints = selectByPolygon(
-            this.frameData.positions.current,
-            this.frameData.pixelProjections,
-            this.frameData.activeLabels,
-            this.classData.originalClassIndex,
-            this.selection,
-            this.hoveredPoint?.z,
-            polygon,
-        );
+        const polygonParams = {
+            isBrushTool: this.constructor.name === "BrushTool",
+            brushCenter: [this.lastMouseX, this.lastMouseY],
+            brushRadius: this.radius,
+            polygon: polygon,
+        };
 
+        const selectedPoints = selectByPolygon({
+            cloudData: this.cloudData,
+            selection: {
+                ...this.selection,
+                highlightedPointZ: this.hoveredPoint?.z,
+            },
+            params: polygonParams,
+        });
         this.handleSelectedPoint(selectedPoints);
     }
 
     handleSelectedPoint(selectedPoints) {
         const modeType = MODES[this.selection.selectionMode]?.type;
+        const { paintSelectedPoints, handleSelectedPointsSize, filterSelectedPoints } =
+            this.callbacks;
+
         if (modeType === "paint") {
-            this.actions.paintSelectedPoints?.(this.selection.selectionMode, selectedPoints);
-            this.actions.handleSelectedPointsSize?.(selectedPoints);
+            paintSelectedPoints?.(this.selection.selectionMode, selectedPoints);
+            handleSelectedPointsSize?.(selectedPoints);
         } else if (modeType === "filter") {
-            this.actions.filterSelectedPoints?.(this.selection.selectionMode, selectedPoints);
+            filterSelectedPoints?.(this.selection.selectionMode, selectedPoints);
         }
     }
 }

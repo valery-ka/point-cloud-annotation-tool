@@ -54,7 +54,7 @@ export const useSelectorTools = (
 
     const toolProps = useMemo(
         () => ({
-            actions: {
+            callbacks: {
                 setIsDrawing,
                 paintSelectedPoints,
                 filterSelectedPoints,
@@ -65,22 +65,18 @@ export const useSelectorTools = (
                 selectionMode,
                 highlightedPoint,
                 paintDepth: paintDepth.current,
-            },
-            frameData: {
-                activeFrameIndex,
-                pixelProjections,
-                positions: activeFramePositionsRef,
-                activeLabels: pointLabelsRef.current[pcdFiles[activeFrameIndex]],
-            },
-            classData: {
                 originalClassIndex: nonHiddenClasses[selectedClassIndex]?.originalIndex,
+            },
+            cloudData: {
+                pixelProjections,
+                positions: activeFramePositionsRef.current,
+                labels: pointLabelsRef.current[pcdFiles[activeFrameIndex]],
             },
         }),
         [
             setIsDrawing,
             pixelProjections,
             highlightedPoint,
-            activeFrameIndex,
             selectedClassIndex,
             selectionMode,
             nonHiddenClasses,
