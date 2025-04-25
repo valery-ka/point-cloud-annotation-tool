@@ -1,6 +1,7 @@
 const express = require("express");
 const fs = require("fs").promises;
 const path = require("path");
+const sharp = require("sharp");
 const settings = require("../config/settings");
 
 const router = express.Router();
@@ -8,7 +9,7 @@ const DATA_DIR = settings.dataPath;
 
 const SUBDIRECTORIES = [
     { name: "pointclouds", extensions: [".pcd"] },
-    { name: "images", extensions: [".jpg", ".jpeg", ".png"] },
+    { name: "images", extensions: [".jpg", ".jpeg", ".png", ".webp"] },
     { name: "calibrations", extensions: [".json"] },
 ];
 
@@ -70,17 +71,33 @@ router.get("/", async (req, res) => {
 router.get("/:folder/:subdir/*", async (req, res) => {
     const { folder, subdir } = req.params;
     const remainingPath = req.params[0];
+    const acceptHeader = req.headers["accept"] || "";
 
     const allowedSubdir = SUBDIRECTORIES.find((s) => s.name === subdir);
     if (!allowedSubdir) {
         return res.status(400).json({ error: `Unsupported subdirectory: ${subdir}` });
     }
 
-    const filePath = path.join(DATA_DIR, folder, subdir, remainingPath);
+    const basePath = path.join(DATA_DIR, folder, subdir);
+    const originalPath = path.join(basePath, remainingPath);
+    const ext = path.extname(originalPath).toLowerCase();
 
     try {
-        await fs.access(filePath);
-        res.sendFile(filePath);
+        await fs.access(originalPath);
+
+        if (acceptHeader.includes("image/webp") && [".jpg", ".jpeg", ".png"].includes(ext)) {
+            res.set("Content-Type", "image/webp");
+
+            sharp(originalPath)
+                .webp({ quality: 80 })
+                .pipe(res)
+                .on("error", (err) => {
+                    console.error("WebP conversion error:", err.message);
+                    res.status(500).end("Image processing error");
+                });
+        } else {
+            res.sendFile(originalPath);
+        }
     } catch {
         res.status(404).json({ error: "File not found" });
     }

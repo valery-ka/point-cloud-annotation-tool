@@ -9,10 +9,10 @@ export const API_PATHS = {
             `${API_BASE}/navigator/${folder}/calibrations/${camera}.json`,
     },
     CONFIG: {
-        JOB: (folder) => `${API_BASE}/config/${folder}/job.json`,
-        CLASSES: (folder) => `${API_BASE}/config/${folder}/classes.json`,
-        OBJECTS: (folder) => `${API_BASE}/config/${folder}/objects.json`,
-        MODERATION: (folder) => `${API_BASE}/config/${folder}/moderation.json`,
+        JOB: (folder) => `${API_BASE}/config/${folder}/job-config.json`,
+        CLASSES: (folder) => `${API_BASE}/config/${folder}/classes-config.json`,
+        OBJECTS: (folder) => `${API_BASE}/config/${folder}/objects-config.json`,
+        MODERATION: (folder) => `${API_BASE}/config/${folder}/moderation-config.json`,
     },
     SOLUTION: {
         LABELS: (folder) => `${API_BASE}/solution/${folder}/labels.msgpack.lz4`,
