@@ -60,7 +60,7 @@ export const useSelectorTools = (
                 handleSelectedPointsSize,
                 requestSaveFrame,
             },
-            selection: {
+            selectionData: {
                 selectionMode,
                 highlightedPoint,
                 paintDepth: paintDepth.current,

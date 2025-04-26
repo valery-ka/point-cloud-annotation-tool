@@ -1,11 +1,11 @@
 import { MODES } from "tools";
 import { calculateBoundingRectangle, pointInPolyRaycast, pointInCircle } from "./polygon.js";
 
-export const selectByPolygon = ({ cloudData, selection, params }) => {
-    const { polygon } = params;
-    const projections = updatePolygonProjections({ cloudData, selection, polygon });
+export const selectByPolygon = ({ cloudData, selectionData, polygonParams }) => {
+    const { polygon } = polygonParams;
+    const projections = updatePolygonProjections({ cloudData, selectionData, polygon });
 
-    const { isBrushTool = false, brushCenter = [0, 0], brushRadius = 0 } = params ?? {};
+    const { isBrushTool = false, brushCenter = [0, 0], brushRadius = 0 } = polygonParams ?? {};
 
     const inside = [];
 
@@ -26,9 +26,9 @@ export const selectByPolygon = ({ cloudData, selection, params }) => {
     return inside;
 };
 
-const updatePolygonProjections = ({ cloudData, selection, polygon }) => {
+const updatePolygonProjections = ({ cloudData, selectionData, polygon }) => {
     const { pixelProjections } = cloudData;
-    const { selectionMode } = selection;
+    const { selectionMode } = selectionData;
 
     const { minX, minY, maxX, maxY } = calculateBoundingRectangle(polygon);
 
@@ -40,7 +40,7 @@ const updatePolygonProjections = ({ cloudData, selection, polygon }) => {
         const pixelY = pixelProjections[i + 2];
 
         const shouldProcess =
-            MODES[selectionMode]?.shouldProcess?.({ cloudData, selection, index }) ?? false;
+            MODES[selectionMode]?.shouldProcess?.({ cloudData, selectionData, index }) ?? false;
 
         if (!shouldProcess) continue;
         if (pixelX < minX || pixelX > maxX || pixelY < minY || pixelY > maxY) continue;

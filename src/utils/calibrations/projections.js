@@ -4,7 +4,7 @@ import { getCalibrationByUrl, get3DPointsForImage } from "utils/calibrations";
 import { getMatchingKeyForTimestamp } from "./general";
 import { getRGBFromMatchedColorArray } from "utils/editor";
 
-export const project3DPointsTo2D = (positionArray, calibration, imageWidth, imageHeight) => {
+const project3DPointsTo2D = (positionArray, calibration, imageWidth, imageHeight) => {
     const { extrinsic, intrinsic, distortion } = calibration;
     if (!intrinsic || !extrinsic) return {};
 
@@ -34,7 +34,7 @@ export const project3DPointsTo2D = (positionArray, calibration, imageWidth, imag
         const r = Math.sqrt(x_norm * x_norm + y_norm * y_norm);
         if (r > MAX_DISTORTION_RADIUS) continue;
 
-        const { x_dist, y_dist } = applyFisheyeDistortion(x_norm, y_norm, distortion);
+        const { x_dist, y_dist } = applyBrownConradyDistortion(x_norm, y_norm, distortion);
 
         const u = Math.round(fx * x_dist + cx);
         const v = imageHeight - Math.round(fy * y_dist + cy);
@@ -47,16 +47,16 @@ export const project3DPointsTo2D = (positionArray, calibration, imageWidth, imag
     return new Int32Array(points2D);
 };
 
-export const getIntrinsicParameters = ([fx, , cx, , fy, cy]) => {
+const getIntrinsicParameters = ([fx, , cx, , fy, cy]) => {
     return { fx, cx, fy, cy };
 };
 
-export const applyFisheyeDistortion = (x_norm, y_norm, distortion, applyDistortion = true) => {
+const applyBrownConradyDistortion = (x_norm, y_norm, distortion, applyDistortion = true) => {
     if (!applyDistortion || !distortion) {
         return { x_dist: x_norm, y_dist: y_norm };
     }
 
-    const [k1, k2, p1, p2, k3, k4 = 0, k5 = 0, k6 = 0] = distortion;
+    const [k1 = 0, k2 = 0, p1 = 0, p2 = 0, k3 = 0, k4 = 0, k5 = 0, k6 = 0] = distortion;
 
     const point = new Vector2(x_norm, y_norm);
 
@@ -75,6 +75,38 @@ export const applyFisheyeDistortion = (x_norm, y_norm, distortion, applyDistorti
 
     const x_dist = x + 2 * p1 * x * y + p2 * (r2 + 2 * x * x);
     const y_dist = y + p1 * (r2 + 2 * y * y) + 2 * p2 * x * y;
+
+    return { x_dist, y_dist };
+};
+
+const applyKannalaBrandtDistortion = (x_norm, y_norm, distortion, applyDistortion = true) => {
+    if (!applyDistortion || !distortion || distortion.length === 0) {
+        return { x_dist: x_norm, y_dist: y_norm };
+    }
+
+    const [k1 = 0, k2 = 0, k3 = 0, k4 = 0] = distortion;
+
+    const point = new Vector2(x_norm, y_norm);
+
+    const r = point.length();
+
+    let scale = 1.0;
+
+    if (r > 1e-8) {
+        const theta = Math.atan(r);
+
+        const theta2 = theta * theta;
+        const theta4 = theta2 * theta2;
+        const theta6 = theta4 * theta2;
+        const theta8 = theta4 * theta4;
+
+        const theta_d = theta * (1 + k1 * theta2 + k2 * theta4 + k3 * theta6 + k4 * theta8);
+
+        scale = theta_d / r;
+    }
+
+    const x_dist = x_norm * scale;
+    const y_dist = y_norm * scale;
 
     return { x_dist, y_dist };
 };

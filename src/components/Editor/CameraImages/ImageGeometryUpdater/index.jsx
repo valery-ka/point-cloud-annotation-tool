@@ -36,7 +36,9 @@ export const ImageGeometryUpdater = memo(({ image }) => {
 
     const { settings } = useSettings();
 
-    const imagesPointRef = useRef(settings.editorSettings.images);
+    const visibleVOID = useMemo(() => {
+        return settings.editorSettings.images.visibleVOID;
+    }, [settings.editorSettings.images.visibleVOID]);
 
     const generalPointSize = useMemo(() => {
         return settings.editorSettings.images.generalPointSize;
@@ -64,6 +66,10 @@ export const ImageGeometryUpdater = memo(({ image }) => {
         imagePointsSizeNeedsUpdateRef.current = true;
     }, [selectedCamera]);
 
+    useEffect(() => {
+        imagePointsAlphaNeedsUpdateRef.current = true;
+    }, [visibleVOID]);
+
     const lastFrameTimeRef = useRef(0);
     const FRAME_INTERVAL_MS = MS_TO_SEC / imageFPS;
 
@@ -77,7 +83,6 @@ export const ImageGeometryUpdater = memo(({ image }) => {
         const activeFrameCloudGeometry = pointCloudRefs.current[activeFrameFilePath]?.geometry;
         const activeFrameLabels = pointLabelsRef.current[activeFrameFilePath];
         const projectedPoints = projectedPointsRef.current;
-        const imagesPoints = imagesPointRef.current;
         const imageGeometry = projectedPointsRef.current[image?.src]?.geometry;
 
         // Alpha (visibility) update
@@ -90,7 +95,7 @@ export const ImageGeometryUpdater = memo(({ image }) => {
                 imageData: {
                     image,
                     projectedPoints,
-                    imagesPoints,
+                    visibleVOID,
                 },
             });
             imagePointsAlphaNeedsUpdateRef.current = false;

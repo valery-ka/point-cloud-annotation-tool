@@ -47,9 +47,9 @@ export const MODES = {
         icon: faEraser,
         iconPosition: "",
         hotkey: "Shift",
-        shouldProcess: ({ cloudData, selection, index }) => {
+        shouldProcess: ({ cloudData, selectionData, index }) => {
             const { positions, labels } = cloudData;
-            const { originalClassIndex } = selection;
+            const { originalClassIndex } = selectionData;
             const x = positions[index * 3];
 
             if (labels[index] === 0) return false;
@@ -94,9 +94,9 @@ export const MODES = {
         icon: faSprayCan,
         iconPosition: "",
         hotkey: "Control",
-        shouldProcess: ({ cloudData, selection, index }) => {
+        shouldProcess: ({ cloudData, selectionData, index }) => {
             const { positions, labels } = cloudData;
-            const { originalClassIndex } = selection;
+            const { originalClassIndex } = selectionData;
             const x = positions[index * 3];
 
             if (x >= Z_FILTER) return false;
@@ -124,9 +124,9 @@ export const MODES = {
         title: "paintDepth",
         icon: faPencilRuler,
         iconPosition: "bottom",
-        shouldProcess: ({ cloudData, selection, index }) => {
+        shouldProcess: ({ cloudData, selectionData, index }) => {
             const { positions, labels } = cloudData;
-            const { paintDepth, highlightedPointZ } = selection;
+            const { paintDepth, highlightedPointZ } = selectionData;
 
             if (highlightedPointZ) {
                 const x = positions[index * 3];

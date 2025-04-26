@@ -1,6 +1,6 @@
-import { useEffect, useCallback, useRef } from "react";
+import { useEffect, useCallback } from "react";
 
-import { useFileManager, useEditor, useFrames, useConfig, useImages, useSettings } from "contexts";
+import { useFileManager, useEditor, useFrames, useConfig, useImages } from "contexts";
 import { useSubscribeFunction } from "hooks";
 
 import {
@@ -26,9 +26,6 @@ export const useFramePointsVisibility = (updateGlobalBox) => {
     } = useEditor();
 
     const { imagePointsAlphaNeedsUpdateRef } = useImages();
-
-    const { settings } = useSettings();
-    const imagesPointsRef = useRef(settings.editorSettings.images);
 
     const filterFramePoints = useCallback(() => {
         const activeFrameFilePath = pcdFiles[activeFrameIndex];
@@ -175,19 +172,6 @@ export const useFramePointsVisibility = (updateGlobalBox) => {
     );
 
     useSubscribeFunction("filterClass", updateClassesVisibility, []);
-
-    const handleVOIDProject = useCallback(
-        (data) => {
-            if (data) {
-                const { value, settingKey } = data;
-                imagesPointsRef.current[settingKey] = value;
-            }
-            filterFramePoints();
-        },
-        [filterFramePoints],
-    );
-
-    useSubscribeFunction("visibleVOID", handleVOIDProject, []);
 
     return { filterFramePoints, filterSelectedPoints };
 };
