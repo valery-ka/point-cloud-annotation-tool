@@ -76,7 +76,7 @@ export const ImageGeometryUpdater = memo(({ image }) => {
         // Alpha (visibility) update
         if (imagePointsAlphaNeedsUpdateRef.current) {
             invalidateImagePointsVisibility({
-                frameData: {
+                cloudData: {
                     geometry: cloudGeometry,
                     labels: frameLabels,
                 },
@@ -92,7 +92,7 @@ export const ImageGeometryUpdater = memo(({ image }) => {
         // Color update
         if (imagePointsColorNeedsUpdateRef.current) {
             invalidateImagePointsColor({
-                geometry: cloudGeometry,
+                cloudData: { geometry: cloudGeometry },
                 imageData: {
                     image,
                     projectedPoints,
@@ -104,11 +104,15 @@ export const ImageGeometryUpdater = memo(({ image }) => {
         // Size update
         if (imagePointsSizeNeedsUpdateRef.current) {
             invalidateImagePointsSize({
-                geometry: imageGeometry,
-                labels: frameLabels,
-                selectedClass: selectedClass,
-                defaultSize: generalPointSize,
-                selectedClassIncrement: selectedClassSize,
+                cloudData: { labels: frameLabels },
+                imageData: {
+                    geometry: imageGeometry,
+                },
+                sizeData: {
+                    selectedClass: selectedClass,
+                    defaultSize: generalPointSize,
+                    selectedClassIncrement: selectedClassSize,
+                },
             });
             imagePointsSizeNeedsUpdateRef.current = false;
         }

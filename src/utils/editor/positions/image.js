@@ -2,8 +2,8 @@ import * as APP_CONSTANTS from "constants";
 
 const { HIDDEN_POINT } = APP_CONSTANTS;
 
-export const invalidateImagePointsVisibility = ({ frameData, imageData }) => {
-    const { geometry, labels } = frameData;
+export const invalidateImagePointsVisibility = ({ cloudData, imageData }) => {
+    const { geometry, labels } = cloudData;
     const { image, projectedPoints, imagesPoints } = imageData;
 
     if (!image) return;

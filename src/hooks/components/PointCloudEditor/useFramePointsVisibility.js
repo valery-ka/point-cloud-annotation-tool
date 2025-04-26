@@ -1,14 +1,6 @@
 import { useEffect, useCallback, useRef } from "react";
 
-import {
-    useFileManager,
-    useEditor,
-    useFrames,
-    useConfig,
-    useImages,
-    useCalibrations,
-    useSettings,
-} from "contexts";
+import { useFileManager, useEditor, useFrames, useConfig, useImages, useSettings } from "contexts";
 import { useSubscribeFunction } from "hooks";
 
 import {
@@ -34,9 +26,7 @@ export const useFramePointsVisibility = (updateGlobalBox) => {
         setHasFilterSelectionPoint,
     } = useEditor();
 
-    const { loadedImages, selectedImagePath, selectedCamera, imagePointsAlphaNeedsUpdateRef } =
-        useImages();
-    const { projectedPointsRef } = useCalibrations();
+    const { loadedImages, selectedCamera, imagePointsAlphaNeedsUpdateRef } = useImages();
 
     const { settings } = useSettings();
     const imagesPointsRef = useRef(settings.editorSettings.images);
@@ -50,11 +40,9 @@ export const useFramePointsVisibility = (updateGlobalBox) => {
         const activeFrameRef = pointCloudRefs.current[activeFrameFilePath];
         const activeFrameLabels = pointLabelsRef.current[activeFrameFilePath];
 
-        const image = loadedImages[selectedImagePath];
-
         if (activeFrameRef && activeFrameRef.geometry.attributes.original.array) {
             filterPoints({
-                frameData: {
+                cloudData: {
                     geometry: activeFrameRef.geometry,
                     positions: activeFramePositionsRef.current,
                     originalPositions: activeFrameRef.geometry.attributes.original.array,
@@ -65,16 +53,11 @@ export const useFramePointsVisibility = (updateGlobalBox) => {
                     minZ: minMaxZRef.current[0],
                     maxZ: minMaxZRef.current[1],
                 },
-                imageData: {
-                    image,
-                    projectedPoints: projectedPointsRef.current,
-                    imagesPoints: imagesPointsRef.current,
-                },
             });
             updateGlobalBox();
             imagePointsAlphaNeedsUpdateRef.current = true;
         }
-    }, [pcdFiles, activeFrameIndex, selectedImagePath, loadedImages]);
+    }, [pcdFiles, activeFrameIndex, ,]);
 
     const filterSelectedPoints = useCallback(
         (mode, points) => {
@@ -82,19 +65,17 @@ export const useFramePointsVisibility = (updateGlobalBox) => {
             const activeFrameRef = pointCloudRefs.current[activeFrameFilePath];
             const activeFrameLabels = pointLabelsRef.current[activeFrameFilePath];
 
-            const image = loadedImages[selectedImagePath];
-
             if (activeFrameRef && activeFrameRef.geometry.attributes.original.array) {
                 filterPointsBySelection({
-                    frameData: {
+                    cloudData: {
                         geometry: activeFrameRef.geometry,
                         positions: activeFramePositionsRef.current,
                         originalPositions: activeFrameRef.geometry.attributes.original.array,
                         labels: activeFrameLabels,
                     },
                     selectionData: {
-                        points,
-                        mode,
+                        selectedPoints: points,
+                        selectionMode: mode,
                         isSelection: false,
                         updateGlobalBox,
                     },
@@ -102,11 +83,6 @@ export const useFramePointsVisibility = (updateGlobalBox) => {
                         visibility: classesVisibilityRef.current,
                         minZ: minMaxZRef.current[0],
                         maxZ: minMaxZRef.current[1],
-                    },
-                    imageData: {
-                        image,
-                        projectedPoints: projectedPointsRef.current,
-                        imagesPoints: imagesPointsRef.current,
                     },
                     showFilterPoints: showFilterPointsBySelection,
                 });
@@ -118,7 +94,7 @@ export const useFramePointsVisibility = (updateGlobalBox) => {
                 imagePointsAlphaNeedsUpdateRef.current = true;
             }
         },
-        [pcdFiles, activeFrameIndex, selectedImagePath, loadedImages],
+        [pcdFiles, activeFrameIndex],
     );
 
     const showFilterSelectedPoints = useCallback(() => {
@@ -126,12 +102,10 @@ export const useFramePointsVisibility = (updateGlobalBox) => {
         const activeFrameRef = pointCloudRefs.current[activeFrameFilePath];
         const activeFrameLabels = pointLabelsRef.current[activeFrameFilePath];
 
-        const image = loadedImages[selectedImagePath];
-
         if (activeFrameRef && activeFrameRef.geometry.attributes.original.array) {
             for (let i = 0; i < activeFramePositionsRef.current.length; i += 3) {
                 showFilterPointsBySelection({
-                    frameData: {
+                    cloudData: {
                         geometry: activeFrameRef.geometry,
                         positions: activeFramePositionsRef.current,
                         originalPositions: activeFrameRef.geometry.attributes.original.array,
@@ -149,13 +123,11 @@ export const useFramePointsVisibility = (updateGlobalBox) => {
             setHasFilterSelectionPoint(false);
             imagePointsAlphaNeedsUpdateRef.current = true;
         }
-    }, [pcdFiles, activeFrameIndex, selectedImagePath, loadedImages]);
+    }, [pcdFiles, activeFrameIndex, ,]);
 
     useSubscribeFunction("showFilteredPoints", showFilterSelectedPoints, [
         pcdFiles,
         activeFrameIndex,
-        selectedImagePath,
-        loadedImages,
     ]);
 
     useEffect(() => {

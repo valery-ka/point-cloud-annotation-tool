@@ -51,16 +51,16 @@ export const HighlightedPointGeometryUpdater = memo(({ image }) => {
         const imageGeometry = projectedPoints[image.src].geometry;
 
         invalidateHighlighterPointsVisibility({
-            geometry: { cloudGeometry, highlightedPoint },
+            cloudData: { geometry: cloudGeometry, point: highlightedPoint },
             imageData: { image, projectedPoints },
         });
         invalidateHighlighterPointsColor({
-            geometry: cloudGeometry,
+            cloudData: { geometry: cloudGeometry },
             imageData: { image, projectedPoints },
         });
         invalidateHighlighterPointsSize({
-            geometry: imageGeometry,
-            size: pointSize,
+            imageData: { geometry: imageGeometry },
+            sizeData: { defaultSize: pointSize },
         });
     });
 

@@ -11,7 +11,6 @@ import {
 
 const { Z_FILTER, SELECTION, CLASS_FILTER } = APP_CONSTANTS.HIDDEN_POSITION;
 
-// я хочу умереть (терпим)
 export const MODES = {
     paintFill: {
         type: "paint",
@@ -26,12 +25,17 @@ export const MODES = {
 
             return labels[index] === 0;
         },
-        paint: (frameColors, framsLabels, points, classColor, classIndex) => {
-            if (!points.length) return;
-            for (let i = 0; i < points.length; i++) {
-                const pointIndex = points[i];
-                framsLabels[pointIndex] = classIndex;
-                frameColors.set(classColor, pointIndex * 3);
+        paint: ({ cloudData, selectionData, colorData }) => {
+            const { labels, colors } = cloudData;
+            const { selectedPoints } = selectionData;
+            const { originalClassIndex, selectedClassColor } = colorData;
+
+            if (!selectedPoints.length) return;
+
+            for (let i = 0; i < selectedPoints.length; i++) {
+                const pointIndex = selectedPoints[i];
+                labels[pointIndex] = originalClassIndex;
+                colors.set(selectedClassColor, pointIndex * 3);
             }
         },
     },
@@ -51,34 +55,31 @@ export const MODES = {
 
             return labels[index] === originalClassIndex;
         },
-        paint: (
-            frameColors,
-            framsLabels,
-            points,
-            classColor,
-            classIndex,
-            frameIntensity,
-            pointColor,
-            getDefaultPointColor,
-        ) => {
-            if (!points.length) return;
+        paint: ({ cloudData, selectionData, colorData, callbacks }) => {
+            const { colors, intensity, labels } = cloudData;
+            const { selectedPoints } = selectionData;
+            const { pointColor } = colorData;
+            const { getDefaultPointColor } = callbacks;
+
+            if (!selectedPoints.length) return;
+
             const brightnessFactor = pointColor.pointBrightness;
             const intensityFactor = pointColor.pointIntensity;
 
-            for (let i = 0; i < points.length; i++) {
-                const pointIndex = points[i];
+            for (let i = 0; i < selectedPoints.length; i++) {
+                const pointIndex = selectedPoints[i];
 
                 const pointColor = getDefaultPointColor(
                     pointIndex,
-                    frameIntensity,
+                    intensity,
                     brightnessFactor,
                     intensityFactor,
                 );
 
                 const defaultColor = [pointColor, pointColor, pointColor];
 
-                framsLabels[pointIndex] = 0;
-                frameColors.set(defaultColor, pointIndex * 3);
+                labels[pointIndex] = 0;
+                colors.set(defaultColor, pointIndex * 3);
             }
         },
     },
@@ -97,12 +98,17 @@ export const MODES = {
 
             return labels[index] !== originalClassIndex;
         },
-        paint: (frameColors, framsLabels, points, classColor, classIndex) => {
-            if (!points.length) return;
-            for (let i = 0; i < points.length; i++) {
-                const pointIndex = points[i];
-                framsLabels[pointIndex] = classIndex;
-                frameColors.set(classColor, pointIndex * 3);
+        paint: ({ cloudData, selectionData, colorData }) => {
+            const { labels, colors } = cloudData;
+            const { selectedPoints } = selectionData;
+            const { originalClassIndex, selectedClassColor } = colorData;
+
+            if (!selectedPoints.length) return;
+
+            for (let i = 0; i < selectedPoints.length; i++) {
+                const pointIndex = selectedPoints[i];
+                labels[pointIndex] = originalClassIndex;
+                colors.set(selectedClassColor, pointIndex * 3);
             }
         },
     },
@@ -123,12 +129,17 @@ export const MODES = {
                 return labels[index] === 0;
             }
         },
-        paint: (frameColors, framsLabels, points, classColor, classIndex) => {
-            if (!points.length) return;
-            for (let i = 0; i < points.length; i++) {
-                const pointIndex = points[i];
-                framsLabels[pointIndex] = classIndex;
-                frameColors.set(classColor, pointIndex * 3);
+        paint: ({ cloudData, selectionData, colorData }) => {
+            const { labels, colors } = cloudData;
+            const { selectedPoints } = selectionData;
+            const { originalClassIndex, selectedClassColor } = colorData;
+
+            if (!selectedPoints.length) return;
+
+            for (let i = 0; i < selectedPoints.length; i++) {
+                const pointIndex = selectedPoints[i];
+                labels[pointIndex] = originalClassIndex;
+                colors.set(selectedClassColor, pointIndex * 3);
             }
         },
     },
@@ -143,18 +154,18 @@ export const MODES = {
 
             if (x < Z_FILTER) return true;
         },
-        filter: ({ frameData, selectionData, callbacks }) => {
-            const { positions } = frameData;
+        filter: ({ cloudData, selectionData, callbacks }) => {
+            const { positions } = cloudData;
             const { isSelection } = selectionData;
-            const { points } = selectionData;
+            const { selectedPoints } = selectionData;
             const { hidePoint, updateGlobalBox } = callbacks;
 
-            if (!points.length) return;
+            if (!selectedPoints.length) return;
 
             const reason = isSelection ? CLASS_FILTER : SELECTION;
 
-            for (let i = 0; i < points.length; i++) {
-                const pointIndex = points[i];
+            for (let i = 0; i < selectedPoints.length; i++) {
+                const pointIndex = selectedPoints[i];
                 hidePoint(positions, pointIndex * 3, reason);
             }
 
@@ -172,15 +183,15 @@ export const MODES = {
 
             if (x < Z_FILTER) return true;
         },
-        filter: ({ frameData, filterData, selectionData, callbacks }) => {
-            const { positions, originalPositions, labels } = frameData;
+        filter: ({ cloudData, filterData, selectionData, callbacks }) => {
+            const { positions, originalPositions, labels } = cloudData;
             const { minZ, maxZ, visibility } = filterData;
-            const { points } = selectionData;
+            const { selectedPoints } = selectionData;
             const { hidePoint, showPoint, updateGlobalBox } = callbacks;
 
-            if (!points.length) return;
+            if (!selectedPoints.length) return;
 
-            const visiblePointsSet = new Set(points);
+            const visiblePointsSet = new Set(selectedPoints);
 
             for (let i = 0; i < positions.length; i += 3) {
                 const pointIndex = i / 3;
@@ -220,19 +231,19 @@ export const MODES = {
 
             if (x >= Z_FILTER) return true;
         },
-        filter: ({ frameData, filterData, selectionData, callbacks }) => {
-            const { geometry, positions, originalPositions, labels } = frameData;
+        filter: ({ cloudData, filterData, selectionData, callbacks }) => {
+            const { geometry, positions, originalPositions, labels } = cloudData;
             const { minZ, maxZ, visibility } = filterData;
-            const { points } = selectionData;
+            const { selectedPoints } = selectionData;
             const { showFilterPoints, updateGlobalBox } = callbacks;
 
-            if (!points.length) return;
+            if (!selectedPoints.length) return;
 
-            for (let i = 0; i < points.length; i++) {
-                const index = points[i] * 3;
+            for (let i = 0; i < selectedPoints.length; i++) {
+                const index = selectedPoints[i] * 3;
 
                 showFilterPoints({
-                    frameData: {
+                    cloudData: {
                         geometry,
                         positions,
                         originalPositions,

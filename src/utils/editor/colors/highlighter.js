@@ -1,6 +1,7 @@
 import { getRGBFromMatchedColorArray } from "./image";
 
-export const invalidateHighlighterPointsColor = ({ geometry, imageData }) => {
+export const invalidateHighlighterPointsColor = ({ cloudData, imageData }) => {
+    const { geometry } = cloudData;
     const { image, projectedPoints } = imageData;
     if (!image) return;
 

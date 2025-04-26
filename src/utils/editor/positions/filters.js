@@ -20,8 +20,8 @@ const getPointData = (
     return { visible, originalZ, currentX };
 };
 
-export const filterPoints = ({ frameData, filterData, imageData }) => {
-    const { geometry, positions, originalPositions, labels } = frameData;
+export const filterPoints = ({ cloudData, filterData }) => {
+    const { geometry, positions, originalPositions, labels } = cloudData;
     const { visibility, minZ, maxZ } = filterData;
 
     for (let i = 0; i < positions.length; i += 3) {
@@ -48,23 +48,21 @@ export const filterPoints = ({ frameData, filterData, imageData }) => {
 };
 
 export const filterPointsBySelection = ({
-    frameData,
+    cloudData,
     selectionData,
     filterData,
-    imageData,
     showFilterPoints,
 }) => {
-    const { geometry } = frameData;
-    const { mode, updateGlobalBox } = selectionData;
+    const { geometry } = cloudData;
+    const { selectionMode, updateGlobalBox } = selectionData;
 
-    const filterPoints = MODES[mode]?.filter;
+    const filterPoints = MODES[selectionMode]?.filter;
     if (!filterPoints) return;
 
     filterPoints({
-        frameData: frameData,
+        cloudData: cloudData,
         filterData: filterData,
         selectionData: selectionData,
-        imageData: imageData,
         callbacks: {
             hidePoint,
             showPoint,
@@ -76,8 +74,8 @@ export const filterPointsBySelection = ({
     invalidateCloudPointsPosition(geometry);
 };
 
-export const showFilterPointsBySelection = ({ frameData, filterData, index }) => {
-    const { geometry, positions, originalPositions, labels } = frameData;
+export const showFilterPointsBySelection = ({ cloudData, filterData, index }) => {
+    const { geometry, positions, originalPositions, labels } = cloudData;
     const { visibility, minZ, maxZ } = filterData;
 
     const { visible, originalZ } = getPointData(

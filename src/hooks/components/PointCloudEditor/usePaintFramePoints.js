@@ -1,14 +1,6 @@
 import { useEffect, useRef, useCallback } from "react";
 
-import {
-    useFileManager,
-    useSettings,
-    useEditor,
-    useFrames,
-    useConfig,
-    useImages,
-    useCalibrations,
-} from "contexts";
+import { useFileManager, useSettings, useEditor, useFrames, useConfig, useImages } from "contexts";
 import { useSubscribeFunction } from "hooks";
 
 import { hexToRgb, changeClassOfSelection, updatePointCloudColors } from "utils/editor";
@@ -19,7 +11,6 @@ export const usePaintFramePoints = (updateGlobalBox) => {
 
     const { settings } = useSettings();
     const pointColorRef = useRef(settings.editorSettings.colors);
-    const imagesPointRef = useRef(settings.editorSettings.images);
 
     const { pcdFiles } = useFileManager();
     const { nonHiddenClasses } = useConfig();
@@ -33,14 +24,8 @@ export const usePaintFramePoints = (updateGlobalBox) => {
         minMaxZRef,
     } = useEditor();
 
-    const {
-        loadedImages,
-        selectedImagePath,
-        selectedCamera,
-        imagePointsColorNeedsUpdateRef,
-        imagePointsAlphaNeedsUpdateRef,
-    } = useImages();
-    const { projectedPointsRef } = useCalibrations();
+    const { selectedCamera, imagePointsColorNeedsUpdateRef, imagePointsAlphaNeedsUpdateRef } =
+        useImages();
 
     useEffect(() => {
         if (selectedClassIndex === null) return;
@@ -77,13 +62,13 @@ export const usePaintFramePoints = (updateGlobalBox) => {
             const classVisible = classesVisibilityRef.current[originalClassIndex].visible;
             const activeFrameIntensity = activeFrameRef?.geometry?.attributes?.intensity?.array;
 
-            const image = loadedImages[selectedImagePath];
-
             changeClassOfSelection({
-                mode,
-                points,
-                frameData: {
-                    ref: activeFrameRef,
+                selectionData: {
+                    selectionMode: mode,
+                    selectedPoints: points,
+                },
+                cloudData: {
+                    cloud: activeFrameRef,
                     colors: activeFrameColors,
                     labels: activeFrameLabels,
                     intensity: activeFrameIntensity,
@@ -91,32 +76,22 @@ export const usePaintFramePoints = (updateGlobalBox) => {
                 },
                 colorData: {
                     pointColor: pointColorRef.current,
-                    classColor: selectedClassColor.current,
-                    classIndex: originalClassIndex,
+                    selectedClassColor: selectedClassColor.current,
+                    originalClassIndex: originalClassIndex,
                 },
                 visibilityData: {
                     classVisible,
                     minMaxZ: minMaxZRef.current,
                 },
-                imageData: {
-                    image,
-                    projectedPoints: projectedPointsRef.current,
-                    imagesPoints: imagesPointRef.current,
+                callbacks: {
+                    updateGlobalBox: updateGlobalBox,
                 },
-                updateBox: updateGlobalBox,
             });
 
             imagePointsColorNeedsUpdateRef.current = true;
             imagePointsAlphaNeedsUpdateRef.current = true;
         },
-        [
-            pcdFiles,
-            activeFrameIndex,
-            selectedClassIndex,
-            nonHiddenClasses,
-            selectedImagePath,
-            loadedImages,
-        ],
+        [pcdFiles, activeFrameIndex, selectedClassIndex, nonHiddenClasses],
     );
 
     const handlePointCloudColors = useCallback(
@@ -131,12 +106,11 @@ export const usePaintFramePoints = (updateGlobalBox) => {
             const activeFrameLabels = pointLabelsRef.current[activeFrameFilePath];
 
             const activeFrameIntensity = activeFrameRef?.geometry?.attributes?.intensity?.array;
-            const image = loadedImages[selectedImagePath];
 
             if (activeFrameRef?.geometry?.attributes?.color) {
                 updatePointCloudColors({
-                    frameData: {
-                        ref: activeFrameRef,
+                    cloudData: {
+                        cloud: activeFrameRef,
                         labels: activeFrameLabels,
                         intensity: activeFrameIntensity,
                     },
@@ -144,23 +118,14 @@ export const usePaintFramePoints = (updateGlobalBox) => {
                         classColorsCache,
                         pointColor: pointColorRef.current,
                     },
-                    imageData: {
-                        image,
-                        projectedPoints: projectedPointsRef.current,
-                    },
                 });
                 imagePointsColorNeedsUpdateRef.current = true;
             }
         },
-        [pcdFiles, activeFrameIndex, selectedImagePath, loadedImages],
+        [pcdFiles, activeFrameIndex],
     );
 
-    useSubscribeFunction("pointColor", handlePointCloudColors, [
-        pcdFiles,
-        activeFrameIndex,
-        selectedImagePath,
-        loadedImages,
-    ]);
+    useSubscribeFunction("pointColor", handlePointCloudColors, [pcdFiles, activeFrameIndex]);
 
     useEffect(() => {
         handlePointCloudColors();

@@ -1,4 +1,5 @@
-export const invalidateImagePointsColor = ({ geometry, imageData }) => {
+export const invalidateImagePointsColor = ({ cloudData, imageData }) => {
+    const { geometry } = cloudData;
     const { image, projectedPoints } = imageData;
     if (!image) return;
 

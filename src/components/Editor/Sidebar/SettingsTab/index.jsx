@@ -246,8 +246,8 @@ export const SettingsTab = memo(({ title }) => {
                         setting={"editorSettings"}
                         settingType={"highlighter"}
                         settingKey={"highlightedPointSize"}
-                        min={1}
-                        max={10}
+                        min={0.5}
+                        max={2}
                         step={0.1}
                         decimals={1}
                     />

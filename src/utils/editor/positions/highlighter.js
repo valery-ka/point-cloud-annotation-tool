@@ -3,8 +3,8 @@ import * as APP_CONSTANTS from "constants";
 
 const { HIDDEN_POINT } = APP_CONSTANTS;
 
-export const invalidateHighlighterPointsVisibility = ({ geometry, imageData }) => {
-    const { cloudGeometry, highlightedPoint } = geometry;
+export const invalidateHighlighterPointsVisibility = ({ cloudData, imageData }) => {
+    const { geometry, point } = cloudData;
     const { image, projectedPoints } = imageData;
 
     if (!image) return;
@@ -15,8 +15,8 @@ export const invalidateHighlighterPointsVisibility = ({ geometry, imageData }) =
 
     const indices = projection.attributes.indices.array;
     const alpha_highlighter = projection.attributes.alpha_highlighter.array;
-    const matchedPositionArray = cloudGeometry.attributes.position.array;
-    const { nearestIndices } = highlightedPoint;
+    const matchedPositionArray = geometry.attributes.position.array;
+    const { nearestIndices } = point;
 
     const nearestSet = new Set(nearestIndices);
 

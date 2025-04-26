@@ -31,62 +31,57 @@ export const getDefaultPointColor = (index, frameIntensity, brightnessFactor, in
 };
 
 export const changeClassOfSelection = ({
-    mode,
-    points,
-    frameData,
+    selectionData,
+    cloudData,
     colorData,
     visibilityData,
-    imageData,
-    updateBox,
+    callbacks,
 }) => {
-    const paintPoints = MODES[mode]?.paint;
+    const { selectionMode, selectedPoints } = selectionData;
+
+    const paintPoints = MODES[selectionMode]?.paint;
     if (!paintPoints) return;
 
-    const { ref: geometryRef, colors, labels, intensity, positions } = frameData;
-    const { classColor, classIndex, pointColor } = colorData;
+    const { cloud, labels, positions } = cloudData;
     const { classVisible, minMaxZ } = visibilityData;
+    const { updateGlobalBox } = callbacks;
 
-    paintPoints(
-        colors,
-        labels,
-        points,
-        classColor,
-        classIndex,
-        intensity,
-        pointColor,
-        getDefaultPointColor,
-    );
+    paintPoints({
+        cloudData: cloudData,
+        selectionData: { selectedPoints: selectedPoints },
+        colorData: colorData,
+        callbacks: { updateGlobalBox, getDefaultPointColor },
+    });
 
     if (!classVisible) {
         filterPointsBySelection({
-            frameData: {
-                geometry: geometryRef.geometry,
+            cloudData: {
+                geometry: cloud.geometry,
                 positions: positions,
                 labels,
             },
             selectionData: {
-                points,
-                mode: "filterHide",
+                selectedPoints,
+                selectionMode: "filterHide",
                 isSelection: true,
-                updateGlobalBox: updateBox,
+                updateGlobalBox,
             },
             filterData: {
                 visibility: visibilityData.classVisible,
                 minZ: minMaxZ[0],
                 maxZ: minMaxZ[1],
             },
-            imageData,
         });
     }
 
-    invalidateCloudColor(geometryRef.geometry);
+    invalidateCloudColor(cloud.geometry);
 };
 
-export const updatePointCloudColors = ({ frameData, colorData, imageData }) => {
-    const { ref: pointCloud, labels, intensity } = frameData;
+export const updatePointCloudColors = ({ cloudData, colorData }) => {
+    const { cloud, labels, intensity } = cloudData;
     const { classColorsCache, pointColor } = colorData;
 
-    const geometry = pointCloud.geometry;
+    const geometry = cloud.geometry;
     const colorAttribute = geometry.attributes.color;
     if (!colorAttribute) return;
 
