@@ -21,26 +21,26 @@ const createSizeMap = (sizeSettings) => {
 };
 
 const calculatePointSize = (
-    pointLabel,
+    label,
     sizeMap,
     generalPointSize,
     selectedClassPointSize,
     selectedClassIndex,
 ) => {
-    const labelSize = sizeMap.get(pointLabel) ?? 0;
+    const labelSize = sizeMap.get(label) ?? 0;
     const baseSize =
-        pointLabel === 0
+        label === 0
             ? convertFloatToUint(generalPointSize)
             : convertFloatToUint(generalPointSize + labelSize);
 
-    return pointLabel === selectedClassIndex
+    return label === selectedClassIndex
         ? baseSize + convertFloatToUint(selectedClassPointSize)
         : baseSize;
 };
 
 const updateSizeArray = (
     sizeArray,
-    pointLabels,
+    labels,
     sizeMap,
     generalPointSize,
     selectedClassPointSize,
@@ -48,7 +48,7 @@ const updateSizeArray = (
 ) => {
     for (let i = 0; i < sizeArray.length; i++) {
         sizeArray[i] = calculatePointSize(
-            pointLabels[i],
+            labels[i],
             sizeMap,
             generalPointSize,
             selectedClassPointSize,
@@ -57,99 +57,86 @@ const updateSizeArray = (
     }
 };
 
-export const updatePointsSize = (pointCloud, pointLabels, sizeSettings, selectedClassIndex) => {
-    const geometry = pointCloud.geometry;
+export const updatePointsSize = ({ cloudData, sizesData }) => {
+    const { cloud, labels } = cloudData;
+    const { pointSizes, selectedClass } = sizesData;
+
+    const geometry = cloud.geometry;
     const sizeAttribute = geometry.attributes.size;
     if (!sizeAttribute) return;
 
-    const generalPointSize = sizeSettings.generalPointSize.value;
-    const selectedClassPointSize = sizeSettings.selectedClassSize.value;
-    const sizeMap = createSizeMap(sizeSettings);
+    const generalPointSize = pointSizes.generalPointSize.value;
+    const selectedClassPointSize = pointSizes.selectedClassSize.value;
+    const sizeMap = createSizeMap(pointSizes);
     const sizeArray = sizeAttribute.array;
 
     updateSizeArray(
         sizeArray,
-        pointLabels,
+        labels,
         sizeMap,
         generalPointSize,
         selectedClassPointSize,
-        selectedClassIndex,
+        selectedClass,
     );
 
     invalidateCloudPointsSize(geometry);
 };
 
-export const updateSelectedPointsSize = (
-    pointCloud,
-    pointLabels,
-    sizeSettings,
-    selectedClassIndex,
-    selectedPointIndices,
-) => {
-    const geometry = pointCloud.geometry;
+export const updateSelectedPointsSize = ({ cloudData, sizesData, selectionData }) => {
+    const { cloud, labels } = cloudData;
+    const { pointSizes, selectedClass } = sizesData;
+    const { selectedPoints } = selectionData;
+
+    const geometry = cloud.geometry;
     const sizeAttribute = geometry.attributes.size;
     if (!sizeAttribute) return;
 
-    const generalPointSize = sizeSettings.generalPointSize.value;
-    const selectedClassPointSize = sizeSettings.selectedClassSize.value;
-    const sizeMap = createSizeMap(sizeSettings);
+    const generalPointSize = pointSizes.generalPointSize.value;
+    const selectedClassPointSize = pointSizes.selectedClassSize.value;
+    const sizeMap = createSizeMap(pointSizes);
     const sizeArray = sizeAttribute.array;
 
-    for (let i = 0; i < selectedPointIndices.length; i++) {
-        const index = selectedPointIndices[i];
-        const pointLabel = pointLabels[index];
+    for (let i = 0; i < selectedPoints.length; i++) {
+        const index = selectedPoints[i];
+        const pointLabel = labels[index];
         sizeArray[index] = calculatePointSize(
             pointLabel,
             sizeMap,
             generalPointSize,
             selectedClassPointSize,
-            selectedClassIndex,
+            selectedClass,
         );
     }
 
     invalidateCloudPointsSize(geometry);
 };
 
-export const updateHighlightedPointSize = (
-    pointCloud,
-    pointLabels,
-    sizeSettings,
-    highlightedIndex,
-    previousIndex,
-    selectedClassIndex,
-) => {
-    const geometry = pointCloud.geometry;
+export const updateHighlightedPointSize = ({ cloudData, highlightedPoint, sizesData }) => {
+    const { cloud, labels } = cloudData;
+    const { current, previous } = highlightedPoint;
+    const { selectedClass, pointSizes } = sizesData;
+
+    const geometry = cloud.geometry;
     const sizeAttribute = geometry.attributes.size;
     if (!sizeAttribute) return;
 
-    const generalPointSize = sizeSettings.generalPointSize.value;
-    const highlightedPointIncrement = sizeSettings.highlightedPointSize.value;
-    const selectedClassPointSize = sizeSettings.selectedClassSize.value;
+    const generalPointSize = pointSizes.generalPointSize?.value;
+    const highlightedPointIncrement = pointSizes.highlightedPointSize?.value;
+    const selectedClassPointSize = pointSizes.selectedClassSize?.value;
 
-    const sizeMap = createSizeMap(sizeSettings);
+    const sizeMap = createSizeMap(pointSizes);
     const sizeArray = sizeAttribute.array;
 
-    sizeArray[previousIndex] = calculatePointSize(
-        pointLabels[previousIndex],
+    sizeArray[previous] = calculatePointSize(
+        labels[previous],
         sizeMap,
         generalPointSize,
         selectedClassPointSize,
-        selectedClassIndex,
+        selectedClass,
     );
 
-    if (highlightedIndex !== undefined) {
-        sizeArray[highlightedIndex] += convertFloatToUint(highlightedPointIncrement);
-    }
-
-    invalidateCloudPointsSize(geometry);
-};
-
-export const updateProjectedPointsSize = (geometry, size) => {
-    const sizeArray = geometry.attributes.size.array;
-    const newSize = convertFloatToUint(size);
-
-    for (let i = 0; i < sizeArray.length; i++) {
-        sizeArray[i] = newSize;
+    if (current !== undefined) {
+        sizeArray[current] += convertFloatToUint(highlightedPointIncrement);
     }
 
     invalidateCloudPointsSize(geometry);

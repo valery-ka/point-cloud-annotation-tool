@@ -27,8 +27,7 @@ export const useSelectorTools = (
     const { nonHiddenClasses } = useConfig();
     const { isPlaying, activeFrameIndex } = useFrames();
     const { subscribe, unsubscribe } = useEvent();
-    const { pointLabelsRef, activeFramePositionsRef, selectedClassIndex, pixelProjections } =
-        useEditor();
+    const { pointCloudRefs, pointLabelsRef, selectedClassIndex, pixelProjections } = useEditor();
     const { selectedTool, setIsDrawing, selectionMode, setSelectionMode } = useTools();
 
     const { highlightedPoint } = useHoveredPoint();
@@ -69,7 +68,9 @@ export const useSelectorTools = (
             },
             cloudData: {
                 pixelProjections,
-                positions: activeFramePositionsRef.current,
+                positions:
+                    pointCloudRefs.current[pcdFiles[activeFrameIndex]]?.geometry.attributes.position
+                        .array,
                 labels: pointLabelsRef.current[pcdFiles[activeFrameIndex]],
             },
         }),

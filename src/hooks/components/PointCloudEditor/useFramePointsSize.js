@@ -27,7 +27,7 @@ export const useFramePointsSize = () => {
     const { imagePointsSizeNeedsUpdateRef } = useImages();
 
     const highlightedIndex = useRef(null);
-    const prevIndex = useRef(null);
+    const prevHighlightedIndex = useRef(null);
     const pointSizeRef = useRef([]);
     const selectedClassRef = useRef(null);
 
@@ -39,35 +39,39 @@ export const useFramePointsSize = () => {
             }
 
             const activeFrameFilePath = pcdFiles[activeFrameIndex];
-            const activeFrameRef = pointCloudRefs.current[activeFrameFilePath];
+
+            const activeFrameCloud = pointCloudRefs.current[activeFrameFilePath];
             const activeFrameLabels = pointLabelsRef.current[activeFrameFilePath];
 
-            if (activeFrameRef?.geometry?.attributes?.size) {
-                if (points) {
-                    updateSelectedPointsSize(
-                        activeFrameRef,
-                        activeFrameLabels,
-                        pointSizeRef.current,
-                        selectedClassRef.current,
-                        points,
-                    );
-                } else {
-                    updatePointsSize(
-                        activeFrameRef,
-                        activeFrameLabels,
-                        pointSizeRef.current,
-                        selectedClassRef.current,
-                    );
-                }
+            if (activeFrameCloud?.geometry?.attributes?.size) {
+                const cloudData = {
+                    cloud: activeFrameCloud,
+                    labels: activeFrameLabels,
+                };
+                const sizesData = {
+                    pointSizes: pointSizeRef.current,
+                    selectedClass: selectedClassRef.current,
+                };
 
-                updateHighlightedPointSize(
-                    activeFrameRef,
-                    activeFrameLabels,
-                    pointSizeRef.current,
-                    highlightedIndex.current,
-                    prevIndex.current,
-                    selectedClassRef.current,
-                );
+                points
+                    ? updateSelectedPointsSize({
+                          cloudData,
+                          sizesData,
+                          selectionData: { selectedPoints: points },
+                      })
+                    : updatePointsSize({
+                          cloudData,
+                          sizesData,
+                      });
+
+                updateHighlightedPointSize({
+                    cloudData,
+                    sizesData,
+                    highlightedPoint: {
+                        current: highlightedIndex.current,
+                        previous: prevHighlightedIndex.current,
+                    },
+                });
 
                 imagePointsSizeNeedsUpdateRef.current = true;
             }
@@ -80,32 +84,39 @@ export const useFramePointsSize = () => {
         [handlePointsSize],
     );
 
-    useSubscribeFunction("pointSize", handlePointsSize, [activeFrameIndex, pcdFiles]);
+    useSubscribeFunction("pointSize", handlePointsSize, []);
 
     useEffect(() => {
-        const selectedClass = nonHiddenClasses[selectedClassIndex]?.originalIndex;
-        selectedClassRef.current = selectedClass;
+        const originalClassIndex = nonHiddenClasses[selectedClassIndex]?.originalIndex;
+        selectedClassRef.current = originalClassIndex;
         handlePointsSize(null, null);
     }, [nonHiddenClasses, selectedClassIndex]);
 
     useEffect(() => {
         const activeFrameFilePath = pcdFiles[activeFrameIndex];
-        const activeFrameRef = pointCloudRefs.current[activeFrameFilePath];
+
+        const activeFrameCloud = pointCloudRefs.current[activeFrameFilePath];
         const activeFrameLabels = pointLabelsRef.current[activeFrameFilePath];
 
         highlightedIndex.current = highlightedPoint?.index;
 
-        if (activeFrameRef?.geometry?.attributes?.size) {
-            updateHighlightedPointSize(
-                activeFrameRef,
-                activeFrameLabels,
-                pointSizeRef.current,
-                highlightedIndex.current,
-                prevIndex.current,
-                selectedClassRef.current,
-            );
+        if (activeFrameCloud?.geometry?.attributes?.size) {
+            updateHighlightedPointSize({
+                cloudData: {
+                    cloud: activeFrameCloud,
+                    labels: activeFrameLabels,
+                },
+                highlightedPoint: {
+                    current: highlightedIndex.current,
+                    previous: prevHighlightedIndex.current,
+                },
+                sizesData: {
+                    selectedClass: selectedClassRef.current,
+                    pointSizes: pointSizeRef.current,
+                },
+            });
 
-            prevIndex.current = highlightedPoint?.index;
+            prevHighlightedIndex.current = highlightedPoint?.index;
         }
     }, [highlightedPoint]);
 

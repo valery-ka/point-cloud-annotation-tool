@@ -11,6 +11,10 @@ export const ImagesProvider = ({ children }) => {
     const { images, pcdFiles } = useFileManager();
     const { activeFrameIndex, arePointCloudsLoading } = useFrames();
 
+    const imagePointsAlphaNeedsUpdateRef = useRef(true);
+    const imagePointsColorNeedsUpdateRef = useRef(true);
+    const imagePointsSizeNeedsUpdateRef = useRef(true);
+
     const [imageMaximized, setImageMaximized] = useState(false);
 
     const [loadedImages, setLoadedImages] = useState({});
@@ -46,10 +50,6 @@ export const ImagesProvider = ({ children }) => {
             images[selectedCamera]?.find((imagePath) => imagePath.includes(frameFileName)) ?? null
         );
     }, [images, selectedCamera, frameFileName]);
-
-    const imagePointsAlphaNeedsUpdateRef = useRef(true);
-    const imagePointsColorNeedsUpdateRef = useRef(true);
-    const imagePointsSizeNeedsUpdateRef = useRef(true);
 
     return (
         <ImagesContext.Provider

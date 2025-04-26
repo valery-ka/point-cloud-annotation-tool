@@ -11,7 +11,7 @@ export const useEditorHelpers = () => {
     const { settings } = useSettings();
 
     const { pcdFiles } = useFileManager();
-    const { activeFramePositionsRef } = useEditor();
+    const { pointCloudRefs } = useEditor();
     const { activeFrameIndex, arePointCloudsLoading } = useFrames();
 
     const boundingBoxRef = useRef(null);
@@ -21,13 +21,29 @@ export const useEditorHelpers = () => {
     const isCircleRulerActive = useRef(settings.activeButtons.toggleCircleRuler);
 
     const updateGlobalBox = useCallback(() => {
-        drawGlobalBox(activeFramePositionsRef.current, scene, boundingBoxRef, isBoxActive.current);
+        const activeFrameFilePath = pcdFiles[activeFrameIndex];
+        const activeFrameCloud = pointCloudRefs.current[activeFrameFilePath];
+
+        drawGlobalBox(
+            activeFrameCloud.geometry.attributes.position.array,
+            scene,
+            boundingBoxRef,
+            isBoxActive.current,
+        );
     }, [pcdFiles, activeFrameIndex, arePointCloudsLoading]);
 
     const toggleGlobalBox = useCallback(() => {
+        const activeFrameFilePath = pcdFiles[activeFrameIndex];
+        const activeFrameCloud = pointCloudRefs.current[activeFrameFilePath];
+
         isBoxActive.current = !isBoxActive.current;
-        drawGlobalBox(activeFramePositionsRef.current, scene, boundingBoxRef, isBoxActive.current);
-    }, []);
+        drawGlobalBox(
+            activeFrameCloud.geometry.attributes.position.array,
+            scene,
+            boundingBoxRef,
+            isBoxActive.current,
+        );
+    }, [pcdFiles, activeFrameIndex, arePointCloudsLoading]);
 
     useSubscribeFunction("toggleGlobalBox", toggleGlobalBox, []);
 

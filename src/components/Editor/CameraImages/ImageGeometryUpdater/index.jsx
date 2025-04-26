@@ -30,6 +30,7 @@ export const ImageGeometryUpdater = memo(({ image }) => {
         imagePointsAlphaNeedsUpdateRef,
         imagePointsColorNeedsUpdateRef,
         imagePointsSizeNeedsUpdateRef,
+        selectedCamera,
     } = useImages();
     const { projectedPointsRef } = useCalibrations();
 
@@ -57,8 +58,14 @@ export const ImageGeometryUpdater = memo(({ image }) => {
         imagePointsSizeNeedsUpdateRef.current = true;
     }, [selectedClassIndex, generalPointSize, selectedClassSize, image]);
 
+    useEffect(() => {
+        imagePointsAlphaNeedsUpdateRef.current = true;
+        imagePointsColorNeedsUpdateRef.current = true;
+        imagePointsSizeNeedsUpdateRef.current = true;
+    }, [selectedCamera]);
+
     const lastFrameTimeRef = useRef(0);
-    const FRAME_INTERVAL_MS = 1000 / imageFPS;
+    const FRAME_INTERVAL_MS = MS_TO_SEC / imageFPS;
 
     useFrame(({ clock }) => {
         const now = clock.elapsedTime * MS_TO_SEC;
@@ -67,8 +74,8 @@ export const ImageGeometryUpdater = memo(({ image }) => {
         lastFrameTimeRef.current = now;
 
         const activeFrameFilePath = pcdFiles[activeFrameIndex];
-        const cloudGeometry = pointCloudRefs.current[activeFrameFilePath]?.geometry;
-        const frameLabels = pointLabelsRef.current[activeFrameFilePath];
+        const activeFrameCloudGeometry = pointCloudRefs.current[activeFrameFilePath]?.geometry;
+        const activeFrameLabels = pointLabelsRef.current[activeFrameFilePath];
         const projectedPoints = projectedPointsRef.current;
         const imagesPoints = imagesPointRef.current;
         const imageGeometry = projectedPointsRef.current[image?.src]?.geometry;
@@ -77,8 +84,8 @@ export const ImageGeometryUpdater = memo(({ image }) => {
         if (imagePointsAlphaNeedsUpdateRef.current) {
             invalidateImagePointsVisibility({
                 cloudData: {
-                    geometry: cloudGeometry,
-                    labels: frameLabels,
+                    geometry: activeFrameCloudGeometry,
+                    labels: activeFrameLabels,
                 },
                 imageData: {
                     image,
@@ -92,7 +99,7 @@ export const ImageGeometryUpdater = memo(({ image }) => {
         // Color update
         if (imagePointsColorNeedsUpdateRef.current) {
             invalidateImagePointsColor({
-                cloudData: { geometry: cloudGeometry },
+                cloudData: { geometry: activeFrameCloudGeometry },
                 imageData: {
                     image,
                     projectedPoints,
@@ -104,7 +111,7 @@ export const ImageGeometryUpdater = memo(({ image }) => {
         // Size update
         if (imagePointsSizeNeedsUpdateRef.current) {
             invalidateImagePointsSize({
-                cloudData: { labels: frameLabels },
+                cloudData: { labels: activeFrameLabels },
                 imageData: {
                     geometry: imageGeometry,
                 },

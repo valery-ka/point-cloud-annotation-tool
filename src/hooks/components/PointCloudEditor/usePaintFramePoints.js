@@ -15,23 +15,15 @@ export const usePaintFramePoints = (updateGlobalBox) => {
     const { pcdFiles } = useFileManager();
     const { nonHiddenClasses } = useConfig();
     const { activeFrameIndex, arePointCloudsLoading } = useFrames();
-    const {
-        pointCloudRefs,
-        activeFramePositionsRef,
-        selectedClassIndex,
-        pointLabelsRef,
-        classesVisibilityRef,
-        minMaxZRef,
-    } = useEditor();
+    const { pointCloudRefs, selectedClassIndex, pointLabelsRef, classesVisibilityRef, minMaxZRef } =
+        useEditor();
 
-    const { selectedCamera, imagePointsColorNeedsUpdateRef, imagePointsAlphaNeedsUpdateRef } =
-        useImages();
+    const { imagePointsColorNeedsUpdateRef, imagePointsAlphaNeedsUpdateRef } = useImages();
 
     useEffect(() => {
         if (selectedClassIndex === null) return;
-
-        const originalIndex = nonHiddenClasses[selectedClassIndex]?.originalIndex;
-        selectedClassColor.current = classColorsCache.current[originalIndex];
+        const originalClassIndex = nonHiddenClasses[selectedClassIndex]?.originalIndex;
+        selectedClassColor.current = classColorsCache.current[originalClassIndex];
     }, [selectedClassIndex, nonHiddenClasses]);
 
     useEffect(() => {
@@ -51,33 +43,29 @@ export const usePaintFramePoints = (updateGlobalBox) => {
     const paintSelectedPoints = useCallback(
         (mode, points) => {
             const activeFrameFilePath = pcdFiles[activeFrameIndex];
-            const activeFrameRef = pointCloudRefs.current[activeFrameFilePath];
 
-            const activeFrameColors = activeFrameRef?.geometry?.attributes?.color?.array;
-
-            if (!activeFrameColors || !selectedClassColor.current) return;
-
+            const activeFrameCloud = pointCloudRefs.current[activeFrameFilePath];
             const activeFrameLabels = pointLabelsRef.current[activeFrameFilePath];
+
+            if (!activeFrameCloud?.geometry.attributes.color.array || !selectedClassColor.current)
+                return;
+
             const originalClassIndex = nonHiddenClasses[selectedClassIndex].originalIndex;
             const classVisible = classesVisibilityRef.current[originalClassIndex].visible;
-            const activeFrameIntensity = activeFrameRef?.geometry?.attributes?.intensity?.array;
 
             changeClassOfSelection({
-                selectionData: {
-                    selectionMode: mode,
-                    selectedPoints: points,
-                },
                 cloudData: {
-                    cloud: activeFrameRef,
-                    colors: activeFrameColors,
+                    cloud: activeFrameCloud,
                     labels: activeFrameLabels,
-                    intensity: activeFrameIntensity,
-                    positions: activeFramePositionsRef.current,
                 },
                 colorData: {
                     pointColor: pointColorRef.current,
                     selectedClassColor: selectedClassColor.current,
                     originalClassIndex: originalClassIndex,
+                },
+                selectionData: {
+                    selectionMode: mode,
+                    selectedPoints: points,
                 },
                 visibilityData: {
                     classVisible,
@@ -100,19 +88,16 @@ export const usePaintFramePoints = (updateGlobalBox) => {
                 const { value, settingKey } = data;
                 pointColorRef.current[settingKey] = value;
             }
-
             const activeFrameFilePath = pcdFiles[activeFrameIndex];
-            const activeFrameRef = pointCloudRefs.current[activeFrameFilePath];
+
+            const activeFrameCloud = pointCloudRefs.current[activeFrameFilePath];
             const activeFrameLabels = pointLabelsRef.current[activeFrameFilePath];
 
-            const activeFrameIntensity = activeFrameRef?.geometry?.attributes?.intensity?.array;
-
-            if (activeFrameRef?.geometry?.attributes?.color) {
+            if (activeFrameCloud?.geometry?.attributes?.color) {
                 updatePointCloudColors({
                     cloudData: {
-                        cloud: activeFrameRef,
+                        cloud: activeFrameCloud,
                         labels: activeFrameLabels,
-                        intensity: activeFrameIntensity,
                     },
                     colorData: {
                         classColorsCache,
@@ -125,11 +110,7 @@ export const usePaintFramePoints = (updateGlobalBox) => {
         [pcdFiles, activeFrameIndex],
     );
 
-    useSubscribeFunction("pointColor", handlePointCloudColors, [pcdFiles, activeFrameIndex]);
-
-    useEffect(() => {
-        handlePointCloudColors();
-    }, [selectedCamera]);
+    useSubscribeFunction("pointColor", handlePointCloudColors, []);
 
     return { handlePointCloudColors, paintSelectedPoints };
 };

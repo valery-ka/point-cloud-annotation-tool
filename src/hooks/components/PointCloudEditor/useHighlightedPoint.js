@@ -22,13 +22,7 @@ export const useHighlightedPoint = () => {
     const { pcdFiles } = useFileManager();
     const { activeFrameIndex } = useFrames();
     const { nonHiddenClasses } = useConfig();
-    const {
-        pointCloudRefs,
-        activeFramePositionsRef,
-        pointLabelsRef,
-        pixelProjections,
-        setSelectedClassIndex,
-    } = useEditor();
+    const { pointCloudRefs, pointLabelsRef, pixelProjections, setSelectedClassIndex } = useEditor();
     const { selectedTool } = useTools();
     const { highlightedPoint, setHighlightedPoint } = useHoveredPoint();
     const { settings } = useSettings();
@@ -49,13 +43,13 @@ export const useHighlightedPoint = () => {
         if (highlightedPoint) {
             const { x, y, z, index, u, v } = highlightedPoint;
             const activeFrameFilePath = pcdFiles[activeFrameIndex];
-            const activeFrameRef = pointCloudRefs.current[activeFrameFilePath];
+            const activeFrameCloud = pointCloudRefs.current[activeFrameFilePath];
             const activeFrameLabels = pointLabelsRef.current[activeFrameFilePath];
             const label = activeFrameLabels[index];
 
             const nearestIndices = findNearestPoints(
                 { x, y, z },
-                activeFrameRef.geometry.attributes.original.array,
+                activeFrameCloud.geometry.attributes.original.array,
                 searchingRadius,
             );
 
@@ -77,7 +71,7 @@ export const useHighlightedPoint = () => {
             const { layerX: screenX, layerY: screenY } = event;
 
             const activeFrameFilePath = pcdFiles[activeFrameIndex];
-            const activeFrameRef = pointCloudRefs.current[activeFrameFilePath];
+            const activeFrameCloud = pointCloudRefs.current[activeFrameFilePath];
             const activeFrameLabels = pointLabelsRef.current[activeFrameFilePath];
 
             let closestPoint = null;
@@ -98,14 +92,14 @@ export const useHighlightedPoint = () => {
             }
 
             // setting highlighted point index and 3d coordinates
-            if (!closestPoint || !activeFramePositionsRef.current) {
+            if (!closestPoint || !activeFrameCloud.geometry.attributes.position.array) {
                 setHighlightedPoint(null);
 
                 return;
             }
 
             const { index, u, v } = closestPoint;
-            const positions = activeFramePositionsRef.current;
+            const positions = activeFrameCloud.geometry.attributes.position.array;
 
             if (index * 3 + 2 >= positions.length) {
                 setHighlightedPoint(null);
@@ -123,7 +117,7 @@ export const useHighlightedPoint = () => {
                 const label = activeFrameLabels[index];
                 const nearestIndices = findNearestPoints(
                     { x, y, z },
-                    activeFrameRef.geometry.attributes.original.array,
+                    activeFrameCloud.geometry.attributes.original.array,
                     searchingRadius,
                 );
                 setHighlightedPoint({

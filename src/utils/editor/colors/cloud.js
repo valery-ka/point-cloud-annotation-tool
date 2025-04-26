@@ -31,9 +31,9 @@ export const getDefaultPointColor = (index, frameIntensity, brightnessFactor, in
 };
 
 export const changeClassOfSelection = ({
-    selectionData,
     cloudData,
     colorData,
+    selectionData,
     visibilityData,
     callbacks,
 }) => {
@@ -42,7 +42,7 @@ export const changeClassOfSelection = ({
     const paintPoints = MODES[selectionMode]?.paint;
     if (!paintPoints) return;
 
-    const { cloud, labels, positions } = cloudData;
+    const { cloud, labels } = cloudData;
     const { classVisible, minMaxZ } = visibilityData;
     const { updateGlobalBox } = callbacks;
 
@@ -56,21 +56,20 @@ export const changeClassOfSelection = ({
     if (!classVisible) {
         filterPointsBySelection({
             cloudData: {
-                geometry: cloud.geometry,
-                positions: positions,
+                cloud,
                 labels,
             },
             selectionData: {
                 selectedPoints,
                 selectionMode: "filterHide",
                 isSelection: true,
-                updateGlobalBox,
             },
             filterData: {
                 visibility: visibilityData.classVisible,
                 minZ: minMaxZ[0],
                 maxZ: minMaxZ[1],
             },
+            callbacks,
         });
     }
 
@@ -78,14 +77,17 @@ export const changeClassOfSelection = ({
 };
 
 export const updatePointCloudColors = ({ cloudData, colorData }) => {
-    const { cloud, labels, intensity } = cloudData;
+    const { cloud, labels } = cloudData;
     const { classColorsCache, pointColor } = colorData;
 
     const geometry = cloud.geometry;
     const colorAttribute = geometry.attributes.color;
+    const intensityAttribute = geometry.attributes.intensity;
+
     if (!colorAttribute) return;
 
     const colorArray = colorAttribute.array;
+    const intensityArray = intensityAttribute?.array;
     const brightnessFactor = pointColor.pointBrightness;
     const intensityFactor = pointColor.pointIntensity;
 
@@ -95,7 +97,7 @@ export const updatePointCloudColors = ({ cloudData, colorData }) => {
         if (labelIndex === 0) {
             const defaultColor = getDefaultPointColor(
                 i / 3,
-                intensity,
+                intensityArray,
                 brightnessFactor,
                 intensityFactor,
             );

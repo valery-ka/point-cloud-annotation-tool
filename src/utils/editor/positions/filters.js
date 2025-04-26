@@ -20,9 +20,19 @@ const getPointData = (
     return { visible, originalZ, currentX };
 };
 
+const getCloudData = (cloud) => {
+    const geometry = cloud.geometry;
+    const positions = geometry.attributes.position.array;
+    const originalPositions = geometry.attributes.original.array;
+
+    return { geometry, positions, originalPositions };
+};
+
 export const filterPoints = ({ cloudData, filterData }) => {
-    const { geometry, positions, originalPositions, labels } = cloudData;
+    const { cloud, labels } = cloudData;
     const { visibility, minZ, maxZ } = filterData;
+
+    const { geometry, positions, originalPositions } = getCloudData(cloud);
 
     for (let i = 0; i < positions.length; i += 3) {
         const { visible, originalZ, currentX } = getPointData(
@@ -47,14 +57,11 @@ export const filterPoints = ({ cloudData, filterData }) => {
     invalidateCloudPointsPosition(geometry);
 };
 
-export const filterPointsBySelection = ({
-    cloudData,
-    selectionData,
-    filterData,
-    showFilterPoints,
-}) => {
-    const { geometry } = cloudData;
-    const { selectionMode, updateGlobalBox } = selectionData;
+export const filterPointsBySelection = ({ cloudData, selectionData, filterData, callbacks }) => {
+    const { cloud } = cloudData;
+    const { selectionMode } = selectionData;
+
+    const { geometry } = getCloudData(cloud);
 
     const filterPoints = MODES[selectionMode]?.filter;
     if (!filterPoints) return;
@@ -64,10 +71,9 @@ export const filterPointsBySelection = ({
         filterData: filterData,
         selectionData: selectionData,
         callbacks: {
+            ...callbacks,
             hidePoint,
             showPoint,
-            updateGlobalBox,
-            showFilterPoints,
         },
     });
 
@@ -75,9 +81,10 @@ export const filterPointsBySelection = ({
 };
 
 export const showFilterPointsBySelection = ({ cloudData, filterData, index }) => {
-    const { geometry, positions, originalPositions, labels } = cloudData;
+    const { cloud, labels } = cloudData;
     const { visibility, minZ, maxZ } = filterData;
 
+    const { geometry, positions, originalPositions } = getCloudData(cloud);
     const { visible, originalZ } = getPointData(
         index,
         labels,

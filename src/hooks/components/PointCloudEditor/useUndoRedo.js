@@ -43,7 +43,7 @@ export const useUndoRedo = (requestSaveFrame, onUndoRedo) => {
         requestSaveFrame({ updateStack: false, isAutoSave: false });
     }, [arePointCloudsLoading, isPlaying, onUndoRedo]);
 
-    useSubscribeFunction("undoAction", undoAction, [arePointCloudsLoading, isPlaying]);
+    useSubscribeFunction("undoAction", undoAction, []);
 
     const redoAction = useCallback(() => {
         if (!pcdFiles.length || arePointCloudsLoading || isPlaying) return;
@@ -70,7 +70,7 @@ export const useUndoRedo = (requestSaveFrame, onUndoRedo) => {
         requestSaveFrame({ updateStack: false, isAutoSave: false });
     }, [arePointCloudsLoading, isPlaying, onUndoRedo]);
 
-    useSubscribeFunction("redoAction", redoAction, [arePointCloudsLoading, isPlaying]);
+    useSubscribeFunction("redoAction", redoAction, []);
 
     useEffect(() => {
         if (arePointCloudsLoading || isPlaying) return;

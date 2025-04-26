@@ -12,11 +12,9 @@ export const EditorProvider = ({ children }) => {
         new Float32Array(), // [idx0, pixelX0, pixelY0, idx1, pixelX1, pixelY1, ...]
     );
 
-    const classesVisibilityRef = useRef({});
     const minMaxZRef = useRef([Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY]);
+    const classesVisibilityRef = useRef({});
     const [hasFilterSelectionPoint, setHasFilterSelectionPoint] = useState(false);
-
-    const activeFramePositionsRef = useRef([]);
 
     const pointLabelsRef = useRef({});
     const prevLabelsRef = useRef({});
@@ -30,7 +28,6 @@ export const EditorProvider = ({ children }) => {
                 selectedClassIndex,
                 setSelectedClassIndex,
                 pointCloudRefs,
-                activeFramePositionsRef,
                 pointLabelsRef,
                 prevLabelsRef,
                 pixelProjections,

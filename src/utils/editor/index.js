@@ -37,7 +37,6 @@ export {
     updatePointsSize,
     updateSelectedPointsSize,
     updateHighlightedPointSize,
-    updateProjectedPointsSize,
 } from "./sizes/cloud";
 export { invalidateImagePointsSize } from "./sizes/image";
 export { invalidateHighlighterPointsSize } from "./sizes/highlighter";

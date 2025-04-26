@@ -35,7 +35,7 @@ export const HighlightedPointGeometryUpdater = memo(({ image }) => {
     }, [settings.editorSettings.performance.highlighterFPS]);
 
     const lastFrameTimeRef = useRef(0);
-    const FRAME_INTERVAL_MS = 1000 / highlighterFPS;
+    const FRAME_INTERVAL_MS = MS_TO_SEC / highlighterFPS;
 
     useFrame(({ clock }) => {
         const now = clock.elapsedTime * MS_TO_SEC;
@@ -46,16 +46,16 @@ export const HighlightedPointGeometryUpdater = memo(({ image }) => {
         if (!highlightedPoint) return;
 
         const activeFrameFilePath = pcdFiles[activeFrameIndex];
-        const cloudGeometry = pointCloudRefs.current[activeFrameFilePath].geometry;
+        const activeFrameCloudGeometry = pointCloudRefs.current[activeFrameFilePath].geometry;
         const projectedPoints = projectedPointsRef.current;
         const imageGeometry = projectedPoints[image.src].geometry;
 
         invalidateHighlighterPointsVisibility({
-            cloudData: { geometry: cloudGeometry, point: highlightedPoint },
+            cloudData: { geometry: activeFrameCloudGeometry, point: highlightedPoint },
             imageData: { image, projectedPoints },
         });
         invalidateHighlighterPointsColor({
-            cloudData: { geometry: cloudGeometry },
+            cloudData: { geometry: activeFrameCloudGeometry },
             imageData: { image, projectedPoints },
         });
         invalidateHighlighterPointsSize({

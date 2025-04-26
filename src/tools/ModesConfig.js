@@ -26,9 +26,11 @@ export const MODES = {
             return labels[index] === 0;
         },
         paint: ({ cloudData, selectionData, colorData }) => {
-            const { labels, colors } = cloudData;
+            const { cloud, labels } = cloudData;
             const { selectedPoints } = selectionData;
             const { originalClassIndex, selectedClassColor } = colorData;
+
+            const colors = cloud.geometry.attributes.color.array;
 
             if (!selectedPoints.length) return;
 
@@ -56,10 +58,13 @@ export const MODES = {
             return labels[index] === originalClassIndex;
         },
         paint: ({ cloudData, selectionData, colorData, callbacks }) => {
-            const { colors, intensity, labels } = cloudData;
+            const { cloud, labels } = cloudData;
             const { selectedPoints } = selectionData;
             const { pointColor } = colorData;
             const { getDefaultPointColor } = callbacks;
+
+            const colors = cloud.geometry.attributes.color.array;
+            const intensity = cloud.geometry.attributes.intensity?.array;
 
             if (!selectedPoints.length) return;
 
@@ -99,9 +104,11 @@ export const MODES = {
             return labels[index] !== originalClassIndex;
         },
         paint: ({ cloudData, selectionData, colorData }) => {
-            const { labels, colors } = cloudData;
+            const { labels, cloud } = cloudData;
             const { selectedPoints } = selectionData;
             const { originalClassIndex, selectedClassColor } = colorData;
+
+            const colors = cloud.geometry.attributes.color.array;
 
             if (!selectedPoints.length) return;
 
@@ -130,9 +137,11 @@ export const MODES = {
             }
         },
         paint: ({ cloudData, selectionData, colorData }) => {
-            const { labels, colors } = cloudData;
+            const { cloud, labels } = cloudData;
             const { selectedPoints } = selectionData;
             const { originalClassIndex, selectedClassColor } = colorData;
+
+            const colors = cloud.geometry.attributes.color.array;
 
             if (!selectedPoints.length) return;
 
@@ -155,10 +164,12 @@ export const MODES = {
             if (x < Z_FILTER) return true;
         },
         filter: ({ cloudData, selectionData, callbacks }) => {
-            const { positions } = cloudData;
+            const { cloud } = cloudData;
             const { isSelection } = selectionData;
             const { selectedPoints } = selectionData;
             const { hidePoint, updateGlobalBox } = callbacks;
+
+            const positions = cloud.geometry.attributes.position.array;
 
             if (!selectedPoints.length) return;
 
@@ -184,10 +195,13 @@ export const MODES = {
             if (x < Z_FILTER) return true;
         },
         filter: ({ cloudData, filterData, selectionData, callbacks }) => {
-            const { positions, originalPositions, labels } = cloudData;
+            const { cloud, labels } = cloudData;
             const { minZ, maxZ, visibility } = filterData;
             const { selectedPoints } = selectionData;
             const { hidePoint, showPoint, updateGlobalBox } = callbacks;
+
+            const positions = cloud.geometry.attributes.position.array;
+            const originalPositions = cloud.geometry.attributes.original.array;
 
             if (!selectedPoints.length) return;
 
@@ -232,7 +246,7 @@ export const MODES = {
             if (x >= Z_FILTER) return true;
         },
         filter: ({ cloudData, filterData, selectionData, callbacks }) => {
-            const { geometry, positions, originalPositions, labels } = cloudData;
+            const { cloud, labels } = cloudData;
             const { minZ, maxZ, visibility } = filterData;
             const { selectedPoints } = selectionData;
             const { showFilterPoints, updateGlobalBox } = callbacks;
@@ -244,10 +258,8 @@ export const MODES = {
 
                 showFilterPoints({
                     cloudData: {
-                        geometry,
-                        positions,
-                        originalPositions,
-                        labels,
+                        cloud: cloud,
+                        labels: labels,
                     },
                     filterData: {
                         visibility,

@@ -78,21 +78,23 @@ export const useSaveOutput = (updateUndoRedoState) => {
         ({ updateStack = true, isAutoSave = false }) => {
             if (!pcdFiles.length) return;
 
-            const filePath = pcdFiles[activeFrameIndex];
-            const currentLabels = pointLabelsRef.current[filePath];
+            const activeFrameFilePath = pcdFiles[activeFrameIndex];
+            const activeFrameLabels = pointLabelsRef.current[activeFrameFilePath];
 
             if (updateStack) {
-                undoStackRef.current[filePath] ??= [];
-                redoStackRef.current[filePath] = [];
+                undoStackRef.current[activeFrameFilePath] ??= [];
+                redoStackRef.current[activeFrameFilePath] = [];
 
-                const previousLabels = prevLabelsRef.current[filePath];
-                undoStackRef.current[filePath] = [
-                    ...undoStackRef.current[filePath].slice(-(UNDO_REDO_STACK_DEPTH - 1)),
+                const previousLabels = prevLabelsRef.current[activeFrameFilePath];
+                undoStackRef.current[activeFrameFilePath] = [
+                    ...undoStackRef.current[activeFrameFilePath].slice(
+                        -(UNDO_REDO_STACK_DEPTH - 1),
+                    ),
                     { labels: new Uint8Array(previousLabels) },
                 ];
             }
 
-            prevLabelsRef.current[filePath] = new Uint8Array(currentLabels);
+            prevLabelsRef.current[activeFrameFilePath] = new Uint8Array(activeFrameLabels);
             updateUndoRedoState?.();
 
             if (controller.current) {
@@ -131,7 +133,7 @@ export const useSaveOutput = (updateUndoRedoState) => {
         }
     }, [autoSaveTimer, arePointCloudsLoading, isAutoSaveTimerEnabled]);
 
-    useSubscribeFunction("saveSolution", requestSaveFrame, []); // видимо, везде лучше удалить deps list
+    useSubscribeFunction("saveSolution", requestSaveFrame, []);
 
     useEffect(() => {
         const handleBeforeUnload = (event) => {

@@ -23,11 +23,11 @@ export const useUpdatePixelProjections = (glSize) => {
     const requestPixelProjectionsUpdate = useCallback(
         debounce(() => {
             const activeFrameFilePath = pcdFilesRef.current[activeFrameIndexRef.current];
-            const activeFrameRef = pointCloudRefs.current[activeFrameFilePath];
+            const activeFrameCloud = pointCloudRefs.current[activeFrameFilePath];
 
-            if (isEmpty(activeFrameRef?.geometry?.attributes?.original)) return;
+            if (isEmpty(activeFrameCloud?.geometry?.attributes?.original)) return;
             const projections = updatePixelProjections(
-                activeFrameRef.geometry.attributes.original.array,
+                activeFrameCloud.geometry.attributes.original.array,
                 camera,
                 glSizeRef.current,
             );
