@@ -82,11 +82,12 @@ export const FileNavigator = memo(() => {
                         <option value="" disabled>
                             {t(`${COMPONENT_NAME}selectScene`)}
                         </option>
-                        {scenes.map((folder) => (
-                            <option key={folder.name} value={folder.name}>
-                                {folder.name}
-                            </option>
-                        ))}
+                        {Array.isArray(scenes) &&
+                            scenes.map((folder) => (
+                                <option key={folder.name} value={folder.name}>
+                                    {folder.name}
+                                </option>
+                            ))}
                     </select>
                     {frame.length > 0 && (
                         <>

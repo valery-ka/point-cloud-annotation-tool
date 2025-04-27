@@ -2,15 +2,35 @@ const { logToClients } = require("./wsLogger");
 
 let totalSentToClient = 0;
 let totalReceivedFromClient = 0;
+let requestBytes = 0;
+let responseBytes = 0;
 
 const bytesToMB = (bytes) => (bytes / (1024 * 1024)).toFixed(2);
 
+const sendTrafficLog = () => {
+    const log = [
+        `[TRAFFIC] Total traffic in the last minute:`,
+        `  Client downloaded: ${bytesToMB(responseBytes)} MB`,
+        `  Client uploaded:   ${bytesToMB(requestBytes)} MB`,
+        `  Total downloaded:  ${bytesToMB(totalSentToClient)} MB`,
+        `  Total uploaded:    ${bytesToMB(totalReceivedFromClient)} MB`,
+    ].join("\n");
+
+    console.log("\n" + log + "\n");
+    logToClients(log);
+
+    responseBytes = 0;
+    requestBytes = 0;
+};
+
+setInterval(sendTrafficLog, 60 * 1000);
+
 const trafficLogger = (req, res, next) => {
-    let requestBytes = 0;
-    let responseBytes = 0;
+    let requestBytesTemp = 0;
+    let responseBytesTemp = 0;
 
     req.on("data", (chunk) => {
-        requestBytes += chunk.length;
+        requestBytesTemp += chunk.length;
     });
 
     const originalWrite = res.write;
@@ -30,25 +50,17 @@ const trafficLogger = (req, res, next) => {
         }
 
         const body = Buffer.concat(chunks);
-        responseBytes = body.length;
+        responseBytesTemp = body.length;
 
-        if (requestBytes === 0 && Buffer.isBuffer(req.body)) {
-            requestBytes = req.body.length;
+        if (requestBytesTemp === 0 && Buffer.isBuffer(req.body)) {
+            requestBytesTemp = req.body.length;
         }
 
-        totalSentToClient += responseBytes;
-        totalReceivedFromClient += requestBytes;
+        totalSentToClient += responseBytesTemp;
+        totalReceivedFromClient += requestBytesTemp;
 
-        const log = [
-            `[TRAFFIC] ${req.method} ${req.originalUrl}`,
-            `  Client downloaded: ${bytesToMB(responseBytes)} MB`,
-            `  Client uploaded:   ${bytesToMB(requestBytes)} MB`,
-            `  Total downloaded:  ${bytesToMB(totalSentToClient)} MB`,
-            `  Total uploaded:    ${bytesToMB(totalReceivedFromClient)} MB`,
-        ].join("\n");
-
-        console.log("\n" + log + "\n");
-        logToClients(log);
+        responseBytes += responseBytesTemp;
+        requestBytes += requestBytesTemp;
 
         return originalEnd.apply(res, [chunk, ...args]);
     };
