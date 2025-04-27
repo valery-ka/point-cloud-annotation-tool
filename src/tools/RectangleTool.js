@@ -23,7 +23,7 @@ export default class RectangleTool extends SelectorTools {
         this.rightButtonPressed = false;
         this.canvasSelectionIsDirty = true;
         this.clearHoveredPoint();
-        this.callbacks.requestSaveFrame({ updateStack: true, isAutoSave: false });
+        this.saveFrame();
     }
 
     handleMouseDrag(ev) {

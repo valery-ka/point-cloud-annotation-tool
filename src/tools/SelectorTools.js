@@ -72,6 +72,13 @@ export default class SelectorTools {
         }
     }
 
+    saveFrame() {
+        const doSaveFrame = this.selectionData.selectionMode.includes("paint");
+        if (doSaveFrame) {
+            this.callbacks.requestSaveFrame({ updateStack: true, isAutoSave: false });
+        }
+    }
+
     pushPoint(x, y) {
         this.polygon.push([x, y]);
     }

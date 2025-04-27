@@ -1,10 +1,10 @@
 import React from "react";
 import LoadingBar from "react-top-loading-bar";
 
-import { useFrames } from "contexts";
+import { useImages } from "contexts";
 
 export const TopLoader = ({ loadingBarRef }) => {
-    const { areImagesLoading } = useFrames();
+    const { areImagesLoading } = useImages();
 
     return (
         <>

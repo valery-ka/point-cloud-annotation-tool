@@ -12,7 +12,7 @@ export const POINT_SIZE_MULTIPLIER = 0.2;
 // points position
 export const Z_FILTER = {
     MIN: -2,
-    MAX: 2,
+    MAX: 15,
     STEP: 0.05,
 };
 export const HIDDEN_POSITION = {

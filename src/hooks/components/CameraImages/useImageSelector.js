@@ -4,7 +4,7 @@ import { useImages } from "contexts";
 const CONTEXT_MENU_RESET_POSITION = { x: -1000, y: -1000 };
 
 export const useImageSelector = (cameraWrapperRef) => {
-    const { setSelectedCamera } = useImages();
+    const { areImagesLoading, setSelectedCamera } = useImages();
 
     const [contextMenuPosition, setContextMenuPosition] = useState(CONTEXT_MENU_RESET_POSITION);
     const [menuDimensions, setMenuDimensions] = useState({ width: 0, height: 0 });
@@ -37,8 +37,7 @@ export const useImageSelector = (cameraWrapperRef) => {
 
     const openContextMenu = useCallback(
         ({ offsetX = 0, offsetY = 0 }) => {
-            if (!cameraWrapperRef.current) return;
-
+            if (!cameraWrapperRef.current || areImagesLoading) return;
             const wrapperRect = cameraWrapperRef.current.getBoundingClientRect();
             const { width: menuWidth, height: menuHeight } = menuDimensions;
 
@@ -47,7 +46,7 @@ export const useImageSelector = (cameraWrapperRef) => {
 
             setContextMenuPosition({ x, y });
         },
-        [menuDimensions],
+        [menuDimensions, areImagesLoading],
     );
 
     const handleSelectCamera = useCallback(

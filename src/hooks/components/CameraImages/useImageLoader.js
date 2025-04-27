@@ -22,8 +22,9 @@ export const useImageLoader = (loadingBarRef) => {
         selectedImagePath,
         imagesByCamera,
         setSelectedCamera,
+        setAreImagesLoading,
     } = useImages();
-    const { arePointCloudsLoading, setAreImagesLoading, setLoadingProgress } = useFrames();
+    const { arePointCloudsLoading, setLoadingProgress } = useFrames();
     const { calibrations, areCalibrationsProcessed, projectedPointsRef } = useCalibrations();
 
     const defaultCamera = useMemo(() => {

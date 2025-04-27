@@ -16,10 +16,9 @@ export const ImagesProvider = ({ children }) => {
     const imagePointsSizeNeedsUpdateRef = useRef(true);
 
     const [imageMaximized, setImageMaximized] = useState(false);
-
     const [loadedImages, setLoadedImages] = useState({});
-
     const [selectedCamera, setSelectedCamera] = useState(null);
+    const [areImagesLoading, setAreImagesLoading] = useState(true);
 
     const imagesByCamera = useMemo(() => {
         return Object.keys(images ?? {});
@@ -72,6 +71,8 @@ export const ImagesProvider = ({ children }) => {
                 imagePointsAlphaNeedsUpdateRef,
                 imagePointsColorNeedsUpdateRef,
                 imagePointsSizeNeedsUpdateRef,
+                areImagesLoading,
+                setAreImagesLoading,
             }}
         >
             {children}

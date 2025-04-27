@@ -6,7 +6,6 @@ export const FramesProvider = ({ children }) => {
     const [isPlaying, setIsPlaying] = useState(false);
     const [activeFrameIndex, setActiveFrameIndex] = useState(0);
     const [arePointCloudsLoading, setArePointCloudsLoading] = useState(false);
-    const [areImagesLoading, setAreImagesLoading] = useState(true);
     const [loadingProgress, setLoadingProgress] = useState(0);
 
     return (
@@ -18,8 +17,6 @@ export const FramesProvider = ({ children }) => {
                 setActiveFrameIndex,
                 arePointCloudsLoading,
                 setArePointCloudsLoading,
-                areImagesLoading,
-                setAreImagesLoading,
                 loadingProgress,
                 setLoadingProgress,
             }}

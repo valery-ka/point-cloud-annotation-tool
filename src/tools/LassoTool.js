@@ -20,7 +20,7 @@ export default class LassoTool extends SelectorTools {
         this.canvasSelectionIsDirty = true;
         this.rightButtonPressed = false;
         this.clearHoveredPoint();
-        this.callbacks.requestSaveFrame({ updateStack: true, isAutoSave: false });
+        this.saveFrame();
     }
 
     handleMouseDrag(ev) {

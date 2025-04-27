@@ -4,25 +4,51 @@ import { getCalibrationByUrl, get3DPointsForImage } from "utils/calibrations";
 import { getMatchingKeyForTimestamp } from "./general";
 import { getRGBFromMatchedColorArray } from "utils/editor";
 
-const project3DPointsTo2D = (positionArray, calibration, imageWidth, imageHeight) => {
+const getIntrinsicParameters = ([fx, , cx, , fy, cy]) => {
+    return { fx, cx, fy, cy };
+};
+
+const getDistortionFunction = (distortion) => {
+    const isDistortionAvailable = distortion && distortion.length > 0;
+
+    const isBrownConradyDistortion = isDistortionAvailable && distortion.length === 8;
+    const isKannalaBrandtDistortion = isDistortionAvailable && distortion.length === 4;
+
+    if (isBrownConradyDistortion) {
+        return applyBrownConradyDistortion;
+    } else if (isKannalaBrandtDistortion) {
+        return applyKannalaBrandtDistortion;
+    }
+    return null;
+};
+
+const isPointInImageBounds = ({ u, v, imageWidth, imageHeight, marginFactor }) => {
+    const margin = Math.max(imageWidth, imageHeight) * marginFactor;
+    return u >= -margin && u < imageWidth + margin && v >= -margin && v < imageHeight + margin;
+};
+
+export const project3DPointsTo2D = (positionArray, calibration, imageWidth, imageHeight) => {
     const { extrinsic, intrinsic, distortion } = calibration;
-    if (!intrinsic || !extrinsic) return {};
+    if (!intrinsic || !extrinsic) return new Int32Array(0);
 
     const MAX_DISTORTION_RADIUS = 3.0;
 
     const points2D = [];
+
     const extrinsic_matrix = new Matrix4().fromArray(extrinsic).transpose();
     const { fx, cx, fy, cy } = getIntrinsicParameters(intrinsic);
 
-    for (let i = 0; i < positionArray.length; i += 3) {
-        const point_world = new Vector3(
-            positionArray[i],
-            positionArray[i + 1],
-            positionArray[i + 2],
-        );
+    const point_world = new Vector3();
+    const point_camera = new Vector3();
 
+    // временное решение
+    const distortionFunction = getDistortionFunction(distortion);
+
+    for (let i = 0; i < positionArray.length; i += 3) {
         const index = i / 3;
-        const point_camera = point_world.clone().applyMatrix4(extrinsic_matrix);
+
+        point_world.fromArray(positionArray, i);
+        point_camera.copy(point_world).applyMatrix4(extrinsic_matrix);
 
         const { x: x_cam, y: y_cam, z: z_cam } = point_camera;
 
@@ -32,23 +58,23 @@ const project3DPointsTo2D = (positionArray, calibration, imageWidth, imageHeight
         const y_norm = y_cam / z_cam;
 
         const r = Math.sqrt(x_norm * x_norm + y_norm * y_norm);
-        if (r > MAX_DISTORTION_RADIUS) continue;
 
-        const { x_dist, y_dist } = applyBrownConradyDistortion(x_norm, y_norm, distortion);
+        if (distortionFunction === applyBrownConradyDistortion && r > MAX_DISTORTION_RADIUS)
+            continue;
+
+        const { x_dist, y_dist } = distortionFunction
+            ? distortionFunction(x_norm, y_norm, distortion)
+            : { x_dist: x_norm, y_dist: y_norm };
 
         const u = Math.round(fx * x_dist + cx);
         const v = imageHeight - Math.round(fy * y_dist + cy);
 
-        if (isPointInBounds({ u, v, imageWidth, imageHeight, marginFactor: 0 })) {
+        if (isPointInImageBounds({ u, v, imageWidth, imageHeight, marginFactor: 0 })) {
             points2D.push(u, v, index);
         }
     }
 
     return new Int32Array(points2D);
-};
-
-const getIntrinsicParameters = ([fx, , cx, , fy, cy]) => {
-    return { fx, cx, fy, cy };
 };
 
 const applyBrownConradyDistortion = (x_norm, y_norm, distortion, applyDistortion = true) => {
@@ -92,7 +118,8 @@ const applyKannalaBrandtDistortion = (x_norm, y_norm, distortion, applyDistortio
 
     let scale = 1.0;
 
-    if (r > 1e-8) {
+    const epsilon = 1e-10;
+    if (r > epsilon) {
         const theta = Math.atan(r);
 
         const theta2 = theta * theta;
@@ -109,11 +136,6 @@ const applyKannalaBrandtDistortion = (x_norm, y_norm, distortion, applyDistortio
     const y_dist = y_norm * scale;
 
     return { x_dist, y_dist };
-};
-
-const isPointInBounds = ({ u, v, imageWidth, imageHeight, marginFactor }) => {
-    const margin = Math.max(imageWidth, imageHeight) * marginFactor;
-    return u >= -margin && u < imageWidth + margin && v >= -margin && v < imageHeight + margin;
 };
 
 export const chooseBestCamera = (activeFrameImagesPath, projectedPoints, highlightedPoint) => {
@@ -153,7 +175,7 @@ export const buildImageGeometry = (
     const points = project3DPointsTo2D(positionArray, calibration, width, height);
 
     const cloud = getMatchingKeyForTimestamp(url, pointCloudRefs.current);
-    const matchedColorArray = pointCloudRefs.current[cloud].geometry.attributes.color.array;
+    const matchedColorArray = pointCloudRefs.current[cloud]?.geometry.attributes.color.array;
 
     const alpha = 1.0;
     const size = 5;

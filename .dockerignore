@@ -4,3 +4,6 @@ data
 .gitignore
 Dockerfile
 docker-compose.yml
+
+**/__tests__
+**/__fixtures__
