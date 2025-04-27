@@ -4,7 +4,8 @@ import { compress } from "lz4js";
 onmessage = function (e) {
     const { labelsData } = e.data;
 
-    const formattedLabels = labelsData.map(({ fileName, labels }) => ({
+    const formattedLabels = labelsData.map(({ folderName, fileName, labels }) => ({
+        folderName,
         fileName,
         labels: Array.from(labels),
     }));

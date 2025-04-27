@@ -57,7 +57,7 @@ export const useSaveOutput = (updateUndoRedoState) => {
             signal?.addEventListener("abort", abortHandler);
 
             try {
-                const formattedData = formatPointLabels(pointLabelsRef.current);
+                const formattedData = formatPointLabels(folderName, pointLabelsRef.current);
                 const result = await saveLabels(folderName, formattedData, worker.current, signal);
                 if (result.saved) {
                     setPendingSaveState(false);

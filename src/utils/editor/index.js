@@ -51,6 +51,6 @@ export {
     cleanupPointClouds,
 } from "./geometry/loader";
 
-export { LempelZivWelch, arraysAreEqual, formatPointLabels } from "./output/LempelZivWelch";
+export { formatPointLabels } from "./output/general";
 export { saveLabels } from "./output/saveLabels";
 export { loadLabels } from "./output/loadLabels";
