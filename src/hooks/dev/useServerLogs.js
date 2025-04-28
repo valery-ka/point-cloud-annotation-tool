@@ -2,7 +2,9 @@ import { useEffect } from "react";
 
 export const useServerLogs = () => {
     useEffect(() => {
-        const ws = new WebSocket("ws://localhost:3001");
+        const ws = new WebSocket(
+            `ws://${window.location.hostname}:${process.env.REACT_APP_WS_PORT || 3001}`,
+        );
 
         ws.onopen = () => console.log("[WS] connected to server log stream");
 
