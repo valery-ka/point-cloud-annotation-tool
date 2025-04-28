@@ -63,11 +63,11 @@ export const useFrameLaneMouseEvents = (frameLaneRef) => {
 
     useEffect(() => {
         document.addEventListener("mousemove", handleMouseMoveLane);
-        document.addEventListener("mouseup", handleMouseUpLane);
+        document.addEventListener("pointerup", handleMouseUpLane);
 
         return () => {
             document.removeEventListener("mousemove", handleMouseMoveLane);
-            document.removeEventListener("mouseup", handleMouseUpLane);
+            document.removeEventListener("pointerup", handleMouseUpLane);
         };
     }, [handleMouseMoveLane, handleMouseUpLane]);
 

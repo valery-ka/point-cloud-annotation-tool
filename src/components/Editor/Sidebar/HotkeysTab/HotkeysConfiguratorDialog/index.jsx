@@ -199,7 +199,11 @@ export const HotkeyConfiguratorDialog = () => {
             Object.fromEntries(
                 Object.keys(obj).map((key) => [
                     key,
-                    typeof obj[key] === "object" ? clearHotkeys(obj[key]) : EMPTY_KEY,
+                    key === "fixed"
+                        ? obj[key]
+                        : typeof obj[key] === "object"
+                          ? clearHotkeys(obj[key])
+                          : EMPTY_KEY,
                 ]),
             ),
         [],
