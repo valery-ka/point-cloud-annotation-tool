@@ -14,6 +14,10 @@ import { PointHighlighterShader } from "shaders";
 export const PointHighlighterCanvas = memo(({ image, positions }) => {
     const { settings } = useSettings();
 
+    const theme = useMemo(() => {
+        return settings.general.theme;
+    }, [settings.general.theme]);
+
     const highlightedPointScale = useMemo(() => {
         return settings.editorSettings.highlighter.highlightedPointSize;
     }, [settings.editorSettings.highlighter.highlightedPointSize]);
@@ -38,8 +42,9 @@ export const PointHighlighterCanvas = memo(({ image, positions }) => {
                 sizeMultiplier: 0.3,
                 useAlpha: true,
                 highlightScale: highlightedPointScale,
+                theme: theme,
             }),
-        [highlightedPointScale],
+        [highlightedPointScale, theme],
     );
 
     const updateHighlightedPointSize = useCallback((data) => {

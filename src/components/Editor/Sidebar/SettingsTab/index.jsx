@@ -141,7 +141,7 @@ export const SettingsTab = memo(({ title }) => {
                 <Spoiler title={t(`${COMPONENT_NAME}editorSettings`)} defaultIsOpen={false}>
                     <SettingsSlider
                         title={t(`${COMPONENT_NAME}paintDepth`)}
-                        action={"paintDepth"}
+                        action={"paintDepthValue"}
                         setting={"editorSettings"}
                         settingType={"editor"}
                         settingKey={"paintDepth"}

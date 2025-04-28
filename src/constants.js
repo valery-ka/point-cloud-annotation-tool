@@ -24,10 +24,12 @@ export const HIDDEN_POINT = Math.min(...Object.values(HIDDEN_POSITION));
 
 // canvas selection
 export const SELECTION_OUTLINE = {
-    FILL_COLOR: "#FFFFFF15", // rgba !!!
     FILL_TYPE: "evenodd",
-    BORDER_COLOR: "#FFFF00", // rgb
     BORDER_WIDTH: 1.5,
+    FILL_COLOR_LIGHT: "#00000015", // rgba !!!
+    FILL_COLOR_DARK: "#FFFFFF15", // rgba !!!
+    BORDER_COLOR_LIGHT: "#667788", // rgb
+    BORDER_COLOR_DARK: "#FFFF00", // rgb
 };
 
 // tools

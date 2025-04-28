@@ -14,6 +14,10 @@ import { ImageGeometryUpdater } from "../ImageGeometryUpdater";
 export const ImageCanvas = memo(({ image, size }) => {
     const { settings } = useSettings();
 
+    const theme = useMemo(() => {
+        return settings.general.theme;
+    }, [settings.general.theme]);
+
     const highlightedPointScale = useMemo(() => {
         return settings.editorSettings.images.highlightedPointSize;
     }, [settings.editorSettings.images.highlightedPointSize]);
@@ -40,8 +44,9 @@ export const ImageCanvas = memo(({ image, size }) => {
                 sizeMultiplier: 0.3,
                 useAlpha: true,
                 highlightScale: highlightedPointScale,
+                theme: theme,
             }),
-        [],
+        [highlightedPointScale, theme],
     );
 
     useImagePointHighlighter({

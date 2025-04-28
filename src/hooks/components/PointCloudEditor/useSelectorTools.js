@@ -10,7 +10,6 @@ import {
     useSettings,
     useHoveredPoint,
 } from "contexts";
-import { useSubscribeFunction } from "hooks";
 
 import { BrushTool, PolygonTool, LassoTool, RectangleTool, MODES } from "tools";
 import * as APP_CONSTANTS from "constants";
@@ -33,16 +32,14 @@ export const useSelectorTools = (
     const { highlightedPoint } = useHoveredPoint();
 
     const { settings } = useSettings();
-    const paintDepth = useRef(settings.editorSettings.editor.paintDepth);
 
-    const updatePaintDepth = useCallback((data) => {
-        if (data) {
-            const value = data.value;
-            paintDepth.current = value;
-        }
-    }, []);
+    const theme = useMemo(() => {
+        return settings.general.theme;
+    }, [settings.general.theme]);
 
-    useSubscribeFunction("paintDepth", updatePaintDepth, []);
+    const paintDepth = useMemo(() => {
+        return settings.editorSettings.editor.paintDepth;
+    }, [settings.editorSettings.editor.paintDepth]);
 
     const toolClasses = {
         brushTool: BrushTool,
@@ -61,9 +58,10 @@ export const useSelectorTools = (
                 requestSaveFrame,
             },
             selectionData: {
+                theme,
                 selectionMode,
                 highlightedPoint,
-                paintDepth: paintDepth.current,
+                paintDepth: paintDepth,
                 originalClassIndex: nonHiddenClasses[selectedClassIndex]?.originalIndex,
             },
             cloudData: {
@@ -81,6 +79,8 @@ export const useSelectorTools = (
             selectedClassIndex,
             selectionMode,
             nonHiddenClasses,
+            theme,
+            paintDepth,
         ],
     );
 

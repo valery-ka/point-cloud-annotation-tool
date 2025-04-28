@@ -92,13 +92,14 @@ export default class SelectorTools {
 
     drawCanvasSelection() {
         if (!this.canvasSelectionIsDirty) return;
+        const theme = this.selectionData.theme;
 
         updateCanvasSize(this.canvasSelection);
         clearCanvas(this.contextSelection, this.canvasSelection);
         const ctx = this.contextSelection;
 
         if (this.polygon && this.polygon.length) {
-            drawPolyLine(ctx, this.polygon);
+            drawPolyLine(ctx, theme, this.polygon);
         }
         this.drawHoveredPoint();
         this.canvasSelectionIsDirty = false;
@@ -106,7 +107,8 @@ export default class SelectorTools {
 
     drawHoveredPoint() {
         if (this.hoveredPoint && this.selectionData.selectionMode === "paintDepth") {
-            hoveredPoint(this.contextSelection, this.hoveredPoint);
+            const theme = this.selectionData.theme;
+            hoveredPoint(this.contextSelection, theme, this.hoveredPoint);
         }
     }
 
