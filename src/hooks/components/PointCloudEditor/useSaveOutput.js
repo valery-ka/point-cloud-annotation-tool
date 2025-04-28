@@ -60,8 +60,8 @@ export const useSaveOutput = (updateUndoRedoState) => {
                 const formattedData = formatPointLabels(folderName, pointLabelsRef.current);
                 const result = await saveLabels(folderName, formattedData, worker.current, signal);
                 if (result.saved) {
-                    setPendingSaveState(false);
                     setHasUnsavedSolution(false);
+                    setPendingSaveState(false);
                 }
             } catch (err) {
             } finally {
@@ -104,8 +104,8 @@ export const useSaveOutput = (updateUndoRedoState) => {
             const newController = new AbortController();
             controller.current = newController;
 
+            setHasUnsavedSolution(true);
             if (isAutoSaveTimerEnabled && !isAutoSave) {
-                setHasUnsavedSolution(true);
                 return;
             }
 

@@ -3,7 +3,7 @@ const router = express.Router();
 
 const { asyncHandler } = require("../middleware/asyncHandler");
 
-const { getFoldersStructure } = require("../services/fileStructure");
+const { getSingleNavigatorFolder, getAllNavigatorFolders } = require("../services/fileStructure");
 const {
     handlePointcloudRequest,
     handleImageRequest,
@@ -13,7 +13,8 @@ const {
     handleSolutionPost,
 } = require("../services/fileHandler");
 
-router.get("/", asyncHandler(getFoldersStructure));
+router.get("/", asyncHandler(getAllNavigatorFolders));
+router.get("/:folder", asyncHandler(getSingleNavigatorFolder));
 
 router.get("/:folder/calibrations/:file", asyncHandler(handleCalibrationRequest));
 router.get("/:folder/config/:file", asyncHandler(handleConfigRequest));
