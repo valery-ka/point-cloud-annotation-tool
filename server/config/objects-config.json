@@ -1,0 +1,12 @@
+{
+    "car": {
+        "title": "Легковое авто",
+        "description": "Легковые автомобили",
+        "dimensions": {
+            "height": 1.7,
+            "length": 4.5,
+            "width": 2.0
+        },
+        "color": "#fcc203"
+    }
+}

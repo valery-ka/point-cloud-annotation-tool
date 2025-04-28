@@ -1,42 +1,26 @@
 const express = require("express");
-const fsp = require("fs").promises;
-const path = require("path");
+const router = express.Router();
 
 const { asyncHandler } = require("../middleware/asyncHandler");
-const { getFolderStructure, handleFileRequest } = require("../services/navigator");
-const settings = require("../config/settings");
 
-const router = express.Router();
-const DATA_DIR = settings.dataPath;
+const { getFoldersStructure } = require("../services/fileStructure");
+const {
+    handlePointcloudRequest,
+    handleImageRequest,
+    handleCalibrationRequest,
+    handleConfigRequest,
+    handleSolutionGet,
+    handleSolutionPost,
+} = require("../services/fileHandler");
 
-router.get(
-    "/",
-    asyncHandler(async (req, res) => {
-        const entries = await fsp.readdir(DATA_DIR, { withFileTypes: true });
-        const folders = entries.filter((entry) => entry.isDirectory());
-        const results = await Promise.all(
-            folders.map((dir) => getFolderStructure(path.join(DATA_DIR, dir.name))),
-        );
+router.get("/", asyncHandler(getFoldersStructure));
 
-        res.json(results);
-    }),
-);
+router.get("/:folder/calibrations/:file", asyncHandler(handleCalibrationRequest));
+router.get("/:folder/config/:file", asyncHandler(handleConfigRequest));
+router.get("/:folder/images/:camera/:file", asyncHandler(handleImageRequest));
+router.get("/:folder/pointclouds/:file", asyncHandler(handlePointcloudRequest));
 
-router.get(
-    "/:folder/:subdir/*",
-    asyncHandler(async (req, res) => {
-        const { folder, subdir } = req.params;
-        const remainingPath = req.params[0];
-        const filePath = path.join(DATA_DIR, folder, subdir, remainingPath);
-
-        try {
-            await fsp.access(filePath);
-        } catch (error) {
-            throw error;
-        }
-
-        await handleFileRequest(filePath, req.headers["accept"], res);
-    }),
-);
+router.get("/:folder/:file", asyncHandler(handleSolutionGet));
+router.post("/:folder/:file", asyncHandler(handleSolutionPost));
 
 module.exports = router;

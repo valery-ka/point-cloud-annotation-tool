@@ -1,0 +1,12 @@
+[
+    {
+        "label": "VOID",
+        "color": "#bbbbbb",
+        "hidden": true
+    },
+    {
+        "label": "Road",
+        "color": "#f2a813",
+        "hidden": false
+    }
+]

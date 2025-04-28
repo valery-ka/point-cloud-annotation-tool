@@ -4,7 +4,7 @@ import { useFileManager } from "./FileManagerProvider";
 
 import { API_PATHS } from "config/apiPaths";
 
-const { CONFIG } = API_PATHS;
+const { NAVIGATOR } = API_PATHS;
 
 const ConfigContext = createContext();
 
@@ -33,7 +33,7 @@ export const ConfigProvider = ({ children }) => {
 
         const loadAllConfigs = async () => {
             const configEntries = await Promise.all(
-                Object.entries(CONFIG).map(async ([key, pathFn]) => {
+                Object.entries(NAVIGATOR.CONFIG).map(async ([key, pathFn]) => {
                     const data = await fetchConfig(pathFn(folderName));
                     return [key.toLowerCase(), data];
                 }),

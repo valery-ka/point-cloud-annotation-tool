@@ -1,6 +1,6 @@
 import { API_PATHS } from "config/apiPaths";
 
-const { SOLUTION } = API_PATHS;
+const { NAVIGATOR } = API_PATHS;
 
 export const saveLabels = (folderName, labelsData, worker, signal) => {
     return new Promise((resolve, reject) => {
@@ -12,7 +12,7 @@ export const saveLabels = (folderName, labelsData, worker, signal) => {
                 return;
             }
 
-            fetch(SOLUTION.LABELS(folderName), {
+            fetch(NAVIGATOR.SOLUTION.LABELS(folderName), {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/octet-stream",

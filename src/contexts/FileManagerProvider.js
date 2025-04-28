@@ -1,4 +1,6 @@
 import React, { createContext, useContext, useState } from "react";
+import { isEmpty } from "lodash";
+
 import { useFrames } from "./FramesProvider";
 
 import { API_PATHS } from "config/apiPaths";
@@ -16,10 +18,13 @@ export const FileManagerProvider = ({ children }) => {
 
     const handleFolderChange = (folder, folderFiles) => {
         const pointclouds = folderFiles.pointclouds;
-        const imagesByCamera = folderFiles.images;
-
         const pcdPaths = pointclouds.map((file) => NAVIGATOR.PCD(folder, file));
 
+        if (isEmpty(pcdPaths)) {
+            throw new Error("No PCD files provided in this folder");
+        }
+
+        const imagesByCamera = folderFiles.images;
         const imagesPaths = Object.fromEntries(
             Object.entries(imagesByCamera).map(([cameraName, files]) => [
                 cameraName,

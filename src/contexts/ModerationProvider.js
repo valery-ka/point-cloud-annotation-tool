@@ -4,7 +4,7 @@ import { useFileManager } from "./FileManagerProvider";
 
 import { API_PATHS } from "config/apiPaths";
 
-const { SOLUTION } = API_PATHS;
+const { NAVIGATOR } = API_PATHS;
 
 const ModerationContext = createContext();
 
@@ -16,7 +16,7 @@ export const ModerationProvider = ({ children }) => {
     useEffect(() => {
         if (!folderName.length) return;
 
-        fetch(SOLUTION.MODERATION(folderName))
+        fetch(NAVIGATOR.SOLUTION.MODERATION(folderName))
             .then((res) => res.json())
             .then((data) => {
                 if (data.error) {

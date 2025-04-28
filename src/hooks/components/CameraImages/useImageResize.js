@@ -125,7 +125,7 @@ export const useImageResize = () => {
             setAspectRatio(ratio);
             checkImageBounds();
         }
-    }, [selectedCamera, checkImageBounds]);
+    }, [selectedImagePath, checkImageBounds]);
 
     return {
         cameraWrapperRef,

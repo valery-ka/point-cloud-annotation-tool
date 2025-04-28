@@ -8,8 +8,6 @@ const errorHandler = require("./middleware/errorHandler");
 const trafficLogger = require("./middleware/trafficLogger");
 
 const navigatorRoutes = require("./routes/navigator");
-const configRoutes = require("./routes/config");
-const solutionRoutes = require("./routes/solution");
 
 const app = express();
 const server = http.createServer(app);
@@ -24,14 +22,10 @@ app.use(express.json({ type: "application/json", limit: "50mb" }));
 app.use(trafficLogger);
 
 app.use("/api/navigator", navigatorRoutes);
-app.use("/api/config", configRoutes);
-app.use("/api/solution", solutionRoutes);
 
 if (process.env.NODE_ENV === "production") {
     const buildPath = path.join(__dirname, "../build");
-
     app.use(express.static(buildPath));
-
     app.get("*", (req, res) => {
         res.sendFile(path.join(buildPath, "index.html"));
     });

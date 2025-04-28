@@ -30,11 +30,8 @@ export const FileNavigator = memo(() => {
 
     const handleSceneChange = (event) => {
         const folderName = event.target.value;
-        setSelectedScene(folderName);
-
         const folder = scenes.find((f) => f.name === folderName);
         const folderFiles = folder ? folder : [];
-        setFrame(folderFiles.pointclouds);
 
         if (folderFiles.length > 0) {
             setSelectedFrame(folderFiles.pointclouds[0]);
@@ -44,6 +41,9 @@ export const FileNavigator = memo(() => {
         }
 
         handleFolderChange(folderName, folderFiles);
+
+        setSelectedScene(folderName);
+        setFrame(folderFiles.pointclouds);
         event.target.blur();
     };
 
