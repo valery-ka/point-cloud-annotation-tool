@@ -63,9 +63,9 @@ The application expects the following directory structure inside the specified `
 data/
     folder_name_0/
         calibrations/
-            camera_name_0/
-            camera_name_1/
-            camera_name_2/
+            camera_name_0.json
+            camera_name_1.json
+            camera_name_2.json
             ... (other camera names)
         config/
             classes-config.json
