@@ -1,17 +1,18 @@
 import React, { useState, useEffect, memo } from "react";
+import { faSave, faDownload } from "@fortawesome/free-solid-svg-icons";
 import { useTranslation } from "react-i18next";
-
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSave } from "@fortawesome/free-solid-svg-icons";
+import { isEmpty } from "lodash";
 
 import { useFileManager, useFrames, useEditor, useEvent } from "contexts";
 import { useClickOutsideBlur } from "hooks";
+
+import { RenderFileNavigatorButton } from "./RenderFileNavigatorButton";
 
 import { API_PATHS } from "config/apiPaths";
 
 // const COMPONENT_NAME = "FileNavigator.";
 const COMPONENT_NAME = "";
-const { NAVIGATOR } = API_PATHS;
+const { NAVIGATOR, DOWNLOAD } = API_PATHS;
 
 export const FileNavigator = memo(() => {
     const sceneSelectRef = useClickOutsideBlur();
@@ -26,7 +27,7 @@ export const FileNavigator = memo(() => {
     const { publish } = useEvent();
     const { pendingSaveState } = useEditor();
     const { activeFrameIndex } = useFrames();
-    const { handleFileChange, handleFolderChange, pcdFiles } = useFileManager();
+    const { handleFileChange, handleFolderChange, folderName, pcdFiles } = useFileManager();
 
     const handleSceneChange = (event) => {
         const folderName = event.target.value;
@@ -52,6 +53,16 @@ export const FileNavigator = memo(() => {
         setSelectedFrame(fileName);
         handleFileChange(selectedScene, fileName);
         event.target.blur();
+    };
+
+    const handleDownloadClick = () => {
+        if (isEmpty(folderName)) return;
+        window.open(DOWNLOAD.PCD(folderName), "_blank");
+    };
+
+    const handleSaveClick = () => {
+        if (isEmpty(folderName)) return;
+        publish("saveSolution", { updateStack: false, isAutoSave: true });
     };
 
     useEffect(() => {
@@ -109,13 +120,18 @@ export const FileNavigator = memo(() => {
                         </>
                     )}
                 </div>
-                <div className="file-navigator-save-state">
-                    <FontAwesomeIcon
+                <div className="file-navigator-buttons-group">
+                    <RenderFileNavigatorButton
+                        icon={faDownload}
+                        title={t(`${COMPONENT_NAME}downloadFolder`)}
+                        className={""}
+                        onClick={handleDownloadClick}
+                    />
+                    <RenderFileNavigatorButton
                         icon={faSave}
-                        className={`file-navigator-save-icon ${pendingSaveState ? "saving" : ""}`}
-                        onClick={() =>
-                            publish("saveSolution", { updateStack: false, isAutoSave: true })
-                        }
+                        title={t(`${COMPONENT_NAME}saveFolder`)}
+                        className={`${pendingSaveState ? "saving" : ""}`}
+                        onClick={handleSaveClick}
                     />
                 </div>
             </div>

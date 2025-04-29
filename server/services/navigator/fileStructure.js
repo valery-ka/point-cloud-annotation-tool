@@ -1,7 +1,7 @@
 const fsp = require("fs").promises;
 const path = require("path");
 
-const settings = require("../config/settings");
+const settings = require("../../config/settings");
 const DATA_DIR = settings.dataPath;
 
 const FileTypes = {

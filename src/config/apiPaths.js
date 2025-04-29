@@ -1,5 +1,6 @@
 const API_BASE = "/api";
 const API_NAVIGATOR_BASE = `${API_BASE}/navigator`;
+const API_DOWNLOAD_BASE = `${API_BASE}/download`;
 
 export const API_PATHS = {
     NAVIGATOR: {
@@ -19,5 +20,8 @@ export const API_PATHS = {
             OBJECTS: (folder) => `${API_NAVIGATOR_BASE}/${folder}/objects.json`,
             MODERATION: (folder) => `${API_NAVIGATOR_BASE}/${folder}/moderation.json`,
         },
+    },
+    DOWNLOAD: {
+        PCD: (folder) => `${API_DOWNLOAD_BASE}/${folder}/labels.msgpack.lz4`,
     },
 };

@@ -30,6 +30,8 @@
     "selectScene": "Выберите сцену",
     "frame": "Кадр",
     "selectFrame": "Выберите кадр",
+    "saveFolder": "Сохранить",
+    "downloadFolder": "Экспорт размеченных PCD файлов",
     "goToFirstFrame": "Перейти на первый кадр",
     "goToPreviousFrame": "Перейти на предыдущий кадр",
     "play": "Воспроизвести",

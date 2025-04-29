@@ -30,6 +30,8 @@
     "selectScene": "Select scene",
     "frame": "Frame",
     "selectFrame": "Select frame",
+    "saveFolder": "Save",
+    "downloadFolder": "Export Labeled PCD Files",
     "goToFirstFrame": "Go to first frame",
     "goToPreviousFrame": "Go to previous frame",
     "play": "Play",

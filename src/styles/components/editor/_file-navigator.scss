@@ -34,19 +34,19 @@
     margin-left: 10px;
 }
 
-.file-navigator-save-state {
+.file-navigator-buttons-group {
     display: flex;
     flex-direction: row;
     justify-content: flex-end;
     align-items: center;
     width: auto;
+    gap: 10px;
     margin-right: 10px;
 }
 
-.file-navigator-save-icon {
+.file-navigator-button {
     color: var(--text-color);
     font-size: 20px;
-    margin-left: 10px;
     filter: drop-shadow(0 0 5px color-mix(in srgb, var(--button-text-color) 50%, transparent));
     transition:
         transform 0.1s ease,

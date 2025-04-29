@@ -3,11 +3,11 @@ const fsp = fs.promises;
 const path = require("path");
 const sharp = require("sharp");
 
-const settings = require("../config/settings");
+const settings = require("../../config/settings");
 const { FileTypes } = require("./fileStructure");
 
 const DATA_DIR = settings.dataPath;
-const FALLBACK_CONFIG_DIR = path.join(__dirname, "../config");
+const FALLBACK_CONFIG_DIR = path.join(__dirname, "../../config");
 
 function validateFileExtension(filename, allowedExtensions) {
     const ext = path.extname(filename).toLowerCase();

@@ -18,7 +18,7 @@ export const useStats = () => {
 
         fps.dom.style.position = "absolute";
         fps.dom.style.top = "4px";
-        fps.dom.style.right = "37px";
+        fps.dom.style.right = "67px";
         fps.dom.style.left = "auto";
         fps.dom.style.zIndex = "10000";
 
