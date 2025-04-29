@@ -10,7 +10,7 @@ import {
 } from "three";
 import * as APP_CONSTANTS from "constants";
 
-const { CIRCLE_RULER_RADIUS } = APP_CONSTANTS;
+const { CIRCLE_RULER_RADIUS, HIDDEN_POINT } = APP_CONSTANTS;
 
 export const rebuildGeometry = (geom) => {
     const geometry = new BufferGeometry();
@@ -55,8 +55,7 @@ export const drawGlobalBox = (positions, scene, boundingBoxRef, isBoxActive) => 
         return;
     }
 
-    const numPoints = positions.length / 3;
-    if (numPoints === 0) return;
+    if (positions.length === 0) return;
 
     let minX = Infinity,
         minY = Infinity,
@@ -65,21 +64,21 @@ export const drawGlobalBox = (positions, scene, boundingBoxRef, isBoxActive) => 
         maxY = -Infinity,
         maxZ = -Infinity;
 
-    for (let i = 0; i < numPoints; i++) {
-        const idx = i * 3;
-        const x = positions[idx];
-        const y = positions[idx + 1];
-        const z = positions[idx + 2];
+    for (let i = 0; i < positions.length; i += 3) {
+        const x = positions[i];
+        if (x >= HIDDEN_POINT) continue;
 
-        if (x >= 1e5) continue;
+        const y = positions[i + 1];
+        const z = positions[i + 2];
 
-        minX = Math.min(minX, x);
-        minY = Math.min(minY, y);
-        minZ = Math.min(minZ, z);
+        minX = x < minX ? x : minX;
+        maxX = x > maxX ? x : maxX;
 
-        maxX = Math.max(maxX, x);
-        maxY = Math.max(maxY, y);
-        maxZ = Math.max(maxZ, z);
+        minY = y < minY ? y : minY;
+        maxY = y > maxY ? y : maxY;
+
+        minZ = z < minZ ? z : minZ;
+        maxZ = z > maxZ ? z : maxZ;
     }
 
     if (minX === Infinity || minY === Infinity || minZ === Infinity) {
