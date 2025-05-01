@@ -20,6 +20,7 @@ export const defaultEditorSettings = {
         generalPointSize: 1.0,
         selectedClassSize: 1.0,
         highlightedPointSize: 2.0,
+        distortionThreshold: 350,
     },
     highlighter: {
         enabled: true,

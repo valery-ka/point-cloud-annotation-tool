@@ -47,6 +47,7 @@ export const rebuildGeometry = (geom) => {
 };
 
 export const drawGlobalBox = (positions, scene, boundingBoxRef, isBoxActive) => {
+    if (!positions) return;
     if (!isBoxActive) {
         if (boundingBoxRef.current) {
             scene.remove(boundingBoxRef.current);

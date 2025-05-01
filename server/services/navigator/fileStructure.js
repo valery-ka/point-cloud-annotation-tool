@@ -59,26 +59,20 @@ async function getFolderStructure(folderPath) {
 
     const structure = {
         name: folderName,
-        pointclouds: [],
-        images: {},
-        calibrations: [],
-        config: [],
         rootFiles: [],
     };
 
     const dirHandlers = {
-        [FileTypes.POINTCLOUDS.dir]: async (p) => {
-            structure.pointclouds = await readFilesByExtension(p, FileTypes.POINTCLOUDS.ext);
-        },
-        [FileTypes.IMAGES.dir]: async (p) => {
-            structure.images = await getSubdirFolderStructure(p, FileTypes.IMAGES.ext);
-        },
-        [FileTypes.CALIBRATIONS.dir]: async (p) => {
-            structure.calibrations = await readFilesByExtension(p, FileTypes.CALIBRATIONS.ext);
-        },
-        [FileTypes.CONFIG.dir]: async (p) => {
-            structure.config = await readFilesByExtension(p, FileTypes.CONFIG.ext);
-        },
+        [FileTypes.POINTCLOUDS.dir]: async (p) =>
+            await readFilesByExtension(p, FileTypes.POINTCLOUDS.ext),
+
+        [FileTypes.IMAGES.dir]: async (p) =>
+            await getSubdirFolderStructure(p, FileTypes.IMAGES.ext),
+
+        [FileTypes.CALIBRATIONS.dir]: async (p) =>
+            await readFilesByExtension(p, FileTypes.CALIBRATIONS.ext),
+
+        [FileTypes.CONFIG.dir]: async (p) => await readFilesByExtension(p, FileTypes.CONFIG.ext),
     };
 
     await Promise.all(
@@ -86,7 +80,7 @@ async function getFolderStructure(folderPath) {
             const entryPath = path.join(folderPath, entry.name);
 
             if (entry.isDirectory() && dirHandlers[entry.name]) {
-                await dirHandlers[entry.name](entryPath);
+                structure[entry.name] = await dirHandlers[entry.name](entryPath);
             } else if (entry.isFile()) {
                 structure.rootFiles.push(entry.name);
             }

@@ -25,7 +25,7 @@ export const useEditorHelpers = () => {
         const activeFrameCloud = pointCloudRefs.current[activeFrameFilePath];
 
         drawGlobalBox(
-            activeFrameCloud.geometry.attributes.position.array,
+            activeFrameCloud?.geometry?.attributes?.position?.array,
             scene,
             boundingBoxRef,
             isBoxActive.current,
@@ -38,7 +38,7 @@ export const useEditorHelpers = () => {
 
         isBoxActive.current = !isBoxActive.current;
         drawGlobalBox(
-            activeFrameCloud.geometry.attributes.position.array,
+            activeFrameCloud?.geometry?.attributes?.position?.array,
             scene,
             boundingBoxRef,
             isBoxActive.current,

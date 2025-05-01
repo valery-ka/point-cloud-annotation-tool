@@ -111,6 +111,7 @@
     "highlighterSize": "Highlighter Image Size",
     "highlighterZoom": "Highlighter Zoom Level",
     "searchingRadius": "Nearest Points Searching Radius",
+    "distortionThreshold": "Distortion Threshold",
     "performance": "Performance",
     "statsPanelEnabled": "Enable stats panel",
     "isAutoSaveTimerEnabled": "Enable auto save interval",

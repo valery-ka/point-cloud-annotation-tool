@@ -195,6 +195,17 @@ export const SettingsTab = memo(({ title }) => {
                         step={0.1}
                         decimals={1}
                     />
+                    <SettingsSlider
+                        title={t(`${COMPONENT_NAME}distortionThreshold`)}
+                        action={"distortionThreshold"}
+                        setting={"editorSettings"}
+                        settingType={"images"}
+                        settingKey={"distortionThreshold"}
+                        min={100}
+                        max={500}
+                        step={10}
+                        decimals={0}
+                    />
                 </Spoiler>
                 <Spoiler title={t(`${COMPONENT_NAME}pointHighlighter`)} defaultIsOpen={false}>
                     <RadioButtonGroup

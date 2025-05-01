@@ -6,7 +6,6 @@ import { MIN_IMAGE_HEIGHT } from "constants";
 
 export const useImageResize = () => {
     const {
-        selectedCamera,
         aspectRatio,
         setAspectRatio,
         imageHeight,

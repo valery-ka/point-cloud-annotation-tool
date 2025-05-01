@@ -77,9 +77,13 @@ export const ImageCanvas = memo(({ image, size }) => {
                     />
                 </>
             )}
-            {geometry && arePointsVisible && (
+            {geometry && (
                 <group scale={[scale, scale, 1]}>
-                    <points geometry={geometry} material={shaderMaterial} />
+                    <points
+                        geometry={geometry}
+                        material={shaderMaterial}
+                        visible={arePointsVisible}
+                    />
                 </group>
             )}
         </Canvas>

@@ -8,12 +8,14 @@ import {
     useCalibrations,
     useEditor,
     useConfig,
+    useSettings,
 } from "contexts";
 
 import { buildImageGeometry } from "utils/calibrations";
 
 export const useImageLoader = (loadingBarRef) => {
     const { config } = useConfig();
+    const { settings } = useSettings();
     const { images } = useFileManager();
     const { pointCloudRefs } = useEditor();
     const {
@@ -32,6 +34,10 @@ export const useImageLoader = (loadingBarRef) => {
         const { default_camera } = config.job;
         return default_camera;
     }, [config.job]);
+
+    const distortionThreshold = useMemo(() => {
+        return settings.editorSettings.images.distortionThreshold;
+    }, []);
 
     useEffect(() => {
         if (arePointCloudsLoading || !areCalibrationsProcessed) return;
@@ -67,6 +73,7 @@ export const useImageLoader = (loadingBarRef) => {
                         calibrations,
                         pointCloudRefs,
                         projectedPointsRef,
+                        distortionThreshold,
                     );
 
                     if (url === selectedImagePath) {

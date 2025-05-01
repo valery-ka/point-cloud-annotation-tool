@@ -111,6 +111,7 @@
     "highlighterSize": "Размер кропа изображения",
     "highlighterZoom": "Уровень зума изображения",
     "searchingRadius": "Радиус поиска ближайших точек",
+    "distortionThreshold": "Порог дисторсии",
     "performance": "Производительность",
     "statsPanelEnabled": "Включить панель статистики",
     "isAutoSaveTimerEnabled": "Включить таймер автоматического сохранения",
