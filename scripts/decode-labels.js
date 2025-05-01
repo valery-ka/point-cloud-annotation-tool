@@ -2,7 +2,7 @@ const fs = require("fs");
 const { decode } = require("@msgpack/msgpack");
 const { decompress } = require("lz4js");
 
-// node decode-labels.js labels.msgpack.lz4
+// node scripts/decode-labels.js scripts/labels.msgpack.lz4
 const filePath = process.argv[2];
 
 if (!filePath) {
