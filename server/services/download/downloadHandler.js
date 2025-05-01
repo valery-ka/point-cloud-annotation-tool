@@ -1,7 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const archiver = require("archiver");
-const { decompress } = require("lz4js");
+const { inflate } = require("pako");
 const { decode } = require("@msgpack/msgpack");
 
 const settings = require("../../config/settings");
@@ -23,7 +23,7 @@ async function handleDownloadSolution(req, res) {
     }
 
     const compressed = fs.readFileSync(solutionPath);
-    const decompressed = decompress(compressed);
+    const decompressed = inflate(compressed);
     const decoded = decode(decompressed);
 
     res.setHeader("Content-Disposition", `attachment; filename="${folder}_labeled.zip"`);

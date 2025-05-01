@@ -1,8 +1,8 @@
 const fs = require("fs");
 const { decode } = require("@msgpack/msgpack");
-const { decompress } = require("lz4js");
+const { inflate } = require("pako");
 
-// node scripts/decode-labels.js scripts/labels.msgpack.lz4
+// node scripts/decode-labels.js scripts/labels.msgpack.pako
 const filePath = process.argv[2];
 
 if (!filePath) {
@@ -18,7 +18,7 @@ const decodeLabels = (filePath) => {
         }
 
         try {
-            const decompressedData = decompress(new Uint8Array(data));
+            const decompressedData = inflate(new Uint8Array(data));
             const decodedData = decode(decompressedData);
 
             const formattedLabels = decodedData.map(({ folderName, fileName, labels }) => ({
@@ -27,7 +27,7 @@ const decodeLabels = (filePath) => {
                 labels: Array.from(labels),
             }));
 
-            const outputFileName = filePath.replace(/\.msgpack\.lz4$/, ".json");
+            const outputFileName = filePath.replace(/\.msgpack\.pako$/, ".json");
 
             fs.writeFile(outputFileName, JSON.stringify(formattedLabels, null, 2), (err) => {
                 if (err) {

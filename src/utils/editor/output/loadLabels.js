@@ -1,5 +1,5 @@
 import { decode } from "@msgpack/msgpack";
-import { decompress } from "lz4js";
+import { inflate } from "pako";
 
 import { API_PATHS } from "config/apiPaths";
 
@@ -18,7 +18,7 @@ export const loadLabels = (folderName) => {
                 if (contentType && contentType.includes("application/octet-stream")) {
                     return response.arrayBuffer().then((buffer) => {
                         const compressed = new Uint8Array(buffer);
-                        const decompressed = decompress(compressed);
+                        const decompressed = inflate(compressed);
                         return decode(decompressed);
                     });
                 } else {

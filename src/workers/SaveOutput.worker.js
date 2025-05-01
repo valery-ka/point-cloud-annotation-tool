@@ -1,5 +1,5 @@
 import { encode } from "@msgpack/msgpack";
-import { compress } from "lz4js";
+import { deflate } from "pako";
 
 onmessage = function (e) {
     const { labelsData } = e.data;
@@ -7,17 +7,11 @@ onmessage = function (e) {
     const formattedLabels = labelsData.map(({ folderName, fileName, labels }) => ({
         folderName,
         fileName,
-        labels: Array.from(labels),
+        labels: new Uint8Array(labels),
     }));
 
-    // const start = performance.now();
-
     const encoded = encode(formattedLabels);
-    const compressed = compress(encoded);
-
-    // const end = performance.now();
-    // const total = (end - start).toFixed(2);
-    // console.log(`Total compression time ${total}ms`);
+    const compressed = deflate(encoded, { level: 5 });
 
     postMessage({ shouldSave: true, payload: compressed }, [compressed.buffer]);
 };

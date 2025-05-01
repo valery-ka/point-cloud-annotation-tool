@@ -16,12 +16,12 @@ export const API_PATHS = {
             MODERATION: (folder) => `${API_NAVIGATOR_BASE}/${folder}/config/moderation-config.json`,
         },
         SOLUTION: {
-            LABELS: (folder) => `${API_NAVIGATOR_BASE}/${folder}/labels.msgpack.lz4`,
+            LABELS: (folder) => `${API_NAVIGATOR_BASE}/${folder}/labels.msgpack.pako`,
             OBJECTS: (folder) => `${API_NAVIGATOR_BASE}/${folder}/objects.json`,
             MODERATION: (folder) => `${API_NAVIGATOR_BASE}/${folder}/moderation.json`,
         },
     },
     DOWNLOAD: {
-        PCD: (folder) => `${API_DOWNLOAD_BASE}/${folder}/labels.msgpack.lz4`,
+        PCD: (folder) => `${API_DOWNLOAD_BASE}/${folder}/labels.msgpack.pako`,
     },
 };
