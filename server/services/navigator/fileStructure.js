@@ -9,6 +9,7 @@ const FileTypes = {
     IMAGES: { dir: "images", ext: [".jpg", ".jpeg", ".png", ".webp"] },
     CALIBRATIONS: { dir: "calibrations", ext: [".json"] },
     CONFIG: { dir: "config", ext: [".json"] },
+    ODOMETRY: { dir: "odometry", ext: [".json"] },
 };
 
 async function getAllNavigatorFolders(req, res) {
@@ -73,6 +74,9 @@ async function getFolderStructure(folderPath) {
             await readFilesByExtension(p, FileTypes.CALIBRATIONS.ext),
 
         [FileTypes.CONFIG.dir]: async (p) => await readFilesByExtension(p, FileTypes.CONFIG.ext),
+
+        [FileTypes.ODOMETRY.dir]: async (p) =>
+            await readFilesByExtension(p, FileTypes.ODOMETRY.ext),
     };
 
     await Promise.all(

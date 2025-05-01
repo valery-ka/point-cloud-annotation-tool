@@ -77,6 +77,14 @@ async function handleConfigRequest(req, res, next) {
     }
 }
 
+async function handleOdometryRequest(req, res) {
+    const { folder, file } = req.params;
+    const filePath = path.join(DATA_DIR, folder, FileTypes.ODOMETRY.dir, file);
+    validateFileExtension(file, FileTypes.ODOMETRY.ext);
+    res.set("Content-Type", "application/json");
+    res.sendFile(filePath);
+}
+
 async function handleSolutionGet(req, res) {
     const { folder, file } = req.params;
     const filePath = path.join(DATA_DIR, folder, file);
@@ -109,4 +117,5 @@ module.exports = {
     handleConfigRequest,
     handleSolutionGet,
     handleSolutionPost,
+    handleOdometryRequest,
 };
