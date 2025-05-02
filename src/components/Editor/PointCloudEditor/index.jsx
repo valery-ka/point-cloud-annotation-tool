@@ -2,6 +2,7 @@ import React from "react";
 import * as HOOKS from "hooks";
 
 import { ModerationComments } from "./ModerationComments";
+import { CuboidManager } from "./CuboidManager";
 
 export const PointCloudEditor = () => {
     const { THEME_COLORS } = HOOKS.useEditorTheme();
@@ -55,6 +56,7 @@ export const PointCloudEditor = () => {
         <>
             <axesHelper args={[5]} />
             <ModerationComments />
+            <CuboidManager />
         </>
     );
 };
