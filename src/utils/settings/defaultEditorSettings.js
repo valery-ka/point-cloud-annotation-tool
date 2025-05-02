@@ -16,6 +16,7 @@ export const defaultEditorSettings = {
         paintDepth: 0.03,
     },
     images: {
+        cameraPositions: true,
         visibleVOID: false,
         generalPointSize: 1.0,
         selectedClassSize: 1.0,

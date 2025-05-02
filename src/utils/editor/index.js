@@ -41,7 +41,13 @@ export {
 export { invalidateImagePointsSize } from "./sizes/image";
 export { invalidateHighlighterPointsSize } from "./sizes/highlighter";
 
-export { rebuildGeometry, drawGlobalBox, drawCircleRuler } from "./geometry/general";
+export {
+    rebuildGeometry,
+    drawGlobalBox,
+    drawCircleRuler,
+    drawFrustumMesh,
+    drawWireframe,
+} from "./geometry/general";
 export {
     handleIntensityAttribute,
     handleLabelAttribute,

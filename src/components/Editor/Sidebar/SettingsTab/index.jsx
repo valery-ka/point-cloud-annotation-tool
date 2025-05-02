@@ -153,14 +153,22 @@ export const SettingsTab = memo(({ title }) => {
                 </Spoiler>
                 <Spoiler title={t(`${COMPONENT_NAME}cameraProjections`)} defaultIsOpen={false}>
                     <RadioButtonGroup
+                        title={t(`${COMPONENT_NAME}cameraPositions`)}
+                        action={"cameraPositions"}
+                        setting={"editorSettings"}
+                        settingType={"images"}
+                        settingKey={"cameraPositions"}
+                        options={[true, false]}
+                        alias={[t(`${COMPONENT_NAME}show`), t(`${COMPONENT_NAME}hide`)]}
+                    />
+                    <RadioButtonGroup
                         title={t(`${COMPONENT_NAME}visibleVOID`)}
                         action={"visibleVOID"}
                         setting={"editorSettings"}
                         settingType={"images"}
                         settingKey={"visibleVOID"}
                         options={[true, false]}
-                        alias={[t(`${COMPONENT_NAME}showVOID`), t(`${COMPONENT_NAME}hideVOID`)]}
-                        name="project"
+                        alias={[t(`${COMPONENT_NAME}show`), t(`${COMPONENT_NAME}hide`)]}
                     />
                     <SettingsSlider
                         title={t(`${COMPONENT_NAME}generalPointSize`)}
@@ -216,7 +224,6 @@ export const SettingsTab = memo(({ title }) => {
                         settingKey={"enabled"}
                         options={[true, false]}
                         alias={[t(`${COMPONENT_NAME}enabled`), t(`${COMPONENT_NAME}disabled`)]}
-                        name="project"
                     />
                     <SettingsSlider
                         title={t(`${COMPONENT_NAME}highlighterSize`)}

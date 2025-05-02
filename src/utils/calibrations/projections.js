@@ -1,4 +1,12 @@
-import { Sphere, Vector2, Vector3, Matrix4, BufferGeometry, BufferAttribute } from "three";
+import {
+    Sphere,
+    Quaternion,
+    Vector2,
+    Vector3,
+    Matrix4,
+    BufferGeometry,
+    BufferAttribute,
+} from "three";
 
 import { getCalibrationByUrl, get3DPointsForImage } from "utils/calibrations";
 import { getMatchingKeyForTimestamp } from "./general";
@@ -14,7 +22,7 @@ export const getIntrinsicParameters = ([fx, , cx, , fy, cy]) => {
     return { fx, cx, fy, cy };
 };
 
-const getDistorionParameters = (distortion = [], modelType = "brownConrady") => {
+export const getDistorionParameters = (distortion = [], modelType = "brownConrady") => {
     if (modelType === "kannalaBrandt") {
         return {
             k1: distortion[0] || 0,
@@ -228,6 +236,29 @@ export const chooseBestCamera = (activeFrameImagesPath, projectedPoints, highlig
     }
 
     return maxResolutionImage;
+};
+
+export const getCameraWorldPosition = (extrinsic) => {
+    const extrinsicMatrix = new Matrix4().fromArray(extrinsic).transpose();
+
+    const rotationMatrix = new Matrix4().copy(extrinsicMatrix);
+    rotationMatrix.setPosition(0, 0, 0);
+
+    const quaternion = new Quaternion();
+    quaternion.setFromRotationMatrix(rotationMatrix);
+
+    quaternion.invert();
+
+    const translation = new Vector3();
+    translation.setFromMatrixPosition(extrinsicMatrix);
+
+    rotationMatrix.transpose();
+    const cameraWorldPos = translation.applyMatrix4(rotationMatrix).negate();
+
+    return {
+        position: cameraWorldPos,
+        rotation: quaternion,
+    };
 };
 
 export const buildImageGeometry = (

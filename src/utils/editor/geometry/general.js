@@ -7,6 +7,9 @@ import {
     LineSegments,
     Float32BufferAttribute,
     LineLoop,
+    MeshBasicMaterial,
+    Mesh,
+    DoubleSide,
 } from "three";
 import * as APP_CONSTANTS from "constants";
 
@@ -143,4 +146,73 @@ export const drawCircleRuler = (scene, circleRulerRef, isCircleRulerActive) => {
     });
 
     circleRulerRef.current = circles;
+};
+
+export const drawFrustumMesh = (fovYRad, aspect, color = 0x0084ff) => {
+    const near = 0.025;
+    const far = 0.15;
+
+    const nearHalfHeight = Math.tan(fovYRad / 2) * near;
+    const nearHalfWidth = nearHalfHeight * aspect;
+
+    const farHalfHeight = Math.tan(fovYRad / 2) * far;
+    const farHalfWidth = farHalfHeight * aspect;
+
+    const vertices = new Float32Array([
+        -nearHalfWidth,
+        -nearHalfHeight,
+        near,
+        nearHalfWidth,
+        -nearHalfHeight,
+        near,
+        nearHalfWidth,
+        nearHalfHeight,
+        near,
+        -nearHalfWidth,
+        nearHalfHeight,
+        near,
+
+        -farHalfWidth,
+        -farHalfHeight,
+        far,
+        farHalfWidth,
+        -farHalfHeight,
+        far,
+        farHalfWidth,
+        farHalfHeight,
+        far,
+        -farHalfWidth,
+        farHalfHeight,
+        far,
+    ]);
+
+    const indices = [
+        0, 4, 1, 1, 4, 5, 1, 5, 2, 2, 5, 6, 2, 6, 3, 3, 6, 7, 3, 7, 0, 0, 7, 4, 0, 1, 2, 0, 2, 3, 4,
+        6, 5, 4, 7, 6,
+    ];
+
+    const geometry = new BufferGeometry();
+    geometry.setIndex(indices);
+    geometry.setAttribute("position", new BufferAttribute(vertices, 3));
+    geometry.computeVertexNormals();
+
+    const material = new MeshBasicMaterial({
+        color,
+        transparent: true,
+        opacity: 0.25,
+        side: DoubleSide,
+    });
+
+    return new Mesh(geometry, material);
+};
+
+export const drawWireframe = (geometry, color = 0x0084ff) => {
+    const edges = new EdgesGeometry(geometry);
+    const lineMaterial = new LineBasicMaterial({
+        color,
+        linewidth: 1,
+        transparent: true,
+        opacity: 0.75,
+    });
+    return new LineSegments(edges, lineMaterial);
 };
