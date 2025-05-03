@@ -19,14 +19,15 @@ export const Cuboid = ({
     const cubeRef = useRef();
     const edgesRef = useRef();
     const transformControlsRef = useRef(null);
-    const isEditingRef = useRef(false);
+    const isCuboidEditingRef = useRef(false);
 
     useEffect(() => {
         const geometry = new THREE.BoxGeometry();
         const material = new THREE.MeshBasicMaterial({
             color: new THREE.Color(color),
             transparent: true,
-            opacity: 0.05,
+            opacity: 0.025,
+            side: THREE.DoubleSide,
         });
         const edgesMaterial = new THREE.LineBasicMaterial({
             color: new THREE.Color(color),
@@ -55,7 +56,6 @@ export const Cuboid = ({
 
         transformControls.addEventListener("mouseDown", onMouseDown);
         transformControls.addEventListener("mouseUp", onMouseUp);
-        transformControls.attach(cube);
 
         return () => {
             transformControls.removeEventListener("mouseDown", onMouseDown);
@@ -73,18 +73,48 @@ export const Cuboid = ({
     }, [camera, color, gl.domElement, position, rotation, scale, scene]);
 
     const transformStart = () => {
-        console.log("start editing", id);
-        isEditingRef.current = true;
+        isCuboidEditingRef.current = true;
         controlsRef.current.enabled = false;
     };
 
     const transformFinished = () => {
-        if (isEditingRef.current) {
-            console.log("finish editing", id);
-            isEditingRef.current = false;
+        if (isCuboidEditingRef.current) {
+            isCuboidEditingRef.current = false;
             controlsRef.current.enabled = true;
+
+            const cube = cubeRef.current;
+            const actualPosition = cube.position.toArray();
+            const actualScale = cube.scale.toArray();
+            const actualRotation = [cube.rotation.x, cube.rotation.y, cube.rotation.z];
+
+            console.log("finish editing", id);
+            console.log("Actual position:", actualPosition);
+            console.log("Actual scale:", actualScale);
+            console.log("Actual rotation:", actualRotation);
         }
     };
+
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (e.key === "x") {
+                transformControlsRef.current.detach();
+            } else if (e.key === "w") {
+                transformControlsRef.current.attach(cubeRef.current);
+            } else if (e.key === "a") {
+                transformControlsRef.current.mode = "translate";
+            } else if (e.key === "s") {
+                transformControlsRef.current.mode = "scale";
+            } else if (e.key === "d") {
+                transformControlsRef.current.mode = "rotate";
+            }
+        };
+
+        document.addEventListener("keydown", handleKeyDown);
+
+        return () => {
+            document.removeEventListener("keydown", handleKeyDown);
+        };
+    }, []);
 
     return null;
 };

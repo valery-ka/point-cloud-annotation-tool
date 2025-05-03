@@ -18,6 +18,7 @@ import {
     SphereGeometry,
     TorusGeometry,
     Vector3,
+    Group,
 } from "three";
 
 const _raycaster = new Raycaster();
@@ -413,7 +414,7 @@ class TransformControls extends Object3D {
             this._offset.copy(this.pointEnd).sub(this.pointStart);
 
             const ROTATION_SPEED =
-                20 /
+                5 /
                 this.worldPosition.distanceTo(
                     _tempVector.setFromMatrixPosition(this.camera.matrixWorld),
                 );
@@ -748,11 +749,61 @@ class TransformControlsGizmo extends Object3D {
         const lineGeometry2 = new CylinderGeometry(0.004, 0.004, 0.25, 3);
         lineGeometry2.translate(0, 0.25, 0);
 
-        function CircleGeometry(radius, arc) {
-            const geometry = new TorusGeometry(radius, 0.0075, 3, 64, arc * Math.PI * 2);
+        function CircleGeometry(radius, arc, tube = 0.004) {
+            const geometry = new TorusGeometry(radius, tube, 3, 64, arc * Math.PI * 2);
             geometry.rotateY(Math.PI / 2);
             geometry.rotateX(Math.PI / 2);
             return geometry;
+        }
+
+        function RotationArrow(
+            axis,
+            radius,
+            arc,
+            color,
+            isStartArrow = true,
+            top = 0,
+            bottom = 0.02,
+            height = 0.1,
+        ) {
+            const geometry = new CylinderGeometry(top, bottom, height, 12);
+            const arrow = new Mesh(geometry, color);
+
+            const angle = isStartArrow ? 0 : arc * Math.PI * 2;
+
+            switch (axis) {
+                case "X":
+                    geometry.rotateX(-Math.PI / 2);
+                    break;
+                case "Y":
+                    geometry.rotateX(-Math.PI / 2);
+                    break;
+                case "Z":
+                    geometry.rotateZ(Math.PI / 2);
+                    break;
+            }
+
+            switch (axis) {
+                case "X":
+                    arrow.rotation.x = isStartArrow ? angle : Math.PI + angle;
+                    arrow.position.y = radius * Math.cos(angle);
+                    arrow.position.z = radius * Math.sin(angle);
+                    break;
+
+                case "Y":
+                    arrow.position.x = radius * Math.cos(angle);
+                    arrow.rotation.y = isStartArrow ? -angle : Math.PI - angle;
+                    arrow.position.z = radius * Math.sin(angle);
+                    break;
+
+                case "Z":
+                    arrow.position.x = radius * Math.sin(angle);
+                    arrow.position.y = radius * Math.cos(angle);
+                    arrow.rotation.z = isStartArrow ? -angle : Math.PI - angle;
+                    break;
+            }
+
+            return arrow;
         }
 
         // Special geometry for transform helper. If scaled with position vector it spans from [0,0,0] to position
@@ -802,31 +853,31 @@ class TransformControlsGizmo extends Object3D {
         const pickerTranslate = {
             X: [
                 [
-                    new Mesh(new CylinderGeometry(0.2, 0, 0.6, 4), matInvisible),
+                    new Mesh(new CylinderGeometry(0.05, 0.05, 0.4, 4), matInvisible),
                     [0.3, 0, 0],
                     [0, 0, -Math.PI / 2],
                 ],
             ],
-            Y: [[new Mesh(new CylinderGeometry(0.2, 0, 0.6, 4), matInvisible), [0, 0.3, 0]]],
+            Y: [[new Mesh(new CylinderGeometry(0.05, 0.05, 0.4, 4), matInvisible), [0, 0.3, 0]]],
             Z: [
                 [
-                    new Mesh(new CylinderGeometry(0.2, 0, 0.6, 4), matInvisible),
+                    new Mesh(new CylinderGeometry(0.05, 0.05, 0.4, 4), matInvisible),
                     [0, 0, 0.3],
                     [Math.PI / 2, 0, 0],
                 ],
             ],
-            XY: [[new Mesh(new BoxGeometry(0.2, 0.2, 0.01), matInvisible), [0.15, 0.15, 0]]],
+            XY: [[new Mesh(new BoxGeometry(0.1, 0.1, 0.01), matInvisible), [0.05, 0.05, 0]]],
             YZ: [
                 [
-                    new Mesh(new BoxGeometry(0.2, 0.2, 0.01), matInvisible),
-                    [0, 0.15, 0.15],
+                    new Mesh(new BoxGeometry(0.1, 0.1, 0.01), matInvisible),
+                    [0, 0.05, 0.05],
                     [0, Math.PI / 2, 0],
                 ],
             ],
             XZ: [
                 [
-                    new Mesh(new BoxGeometry(0.2, 0.2, 0.01), matInvisible),
-                    [0.15, 0, 0.15],
+                    new Mesh(new BoxGeometry(0.1, 0.1, 0.01), matInvisible),
+                    [0.05, 0, 0.05],
                     [-Math.PI / 2, 0, 0],
                 ],
             ],
@@ -842,56 +893,63 @@ class TransformControlsGizmo extends Object3D {
             // DELTA: [[new Line(TranslateHelperGeometry(), matHelper), null, null, null, "helper"]],
         };
 
-        const gizmoRotate = {
-            XYZE: [[new Mesh(CircleGeometry(0.5, 1), matGray), null, [0, Math.PI / 2, 0]]],
-            X: [[new Mesh(CircleGeometry(0.5, 0.5), matRed)]],
-            Y: [[new Mesh(CircleGeometry(0.5, 0.5), matGreen), null, [0, 0, -Math.PI / 2]]],
-            Z: [[new Mesh(CircleGeometry(0.5, 0.5), matBlue), null, [0, Math.PI / 2, 0]]],
-            E: [
-                [
-                    new Mesh(CircleGeometry(0.75, 1), matYellowTransparent),
-                    null,
-                    [0, Math.PI / 2, 0],
-                ],
-            ],
-        };
+        const arc = 0.3;
+        const radius = 0.4;
 
-        const helperRotate = {
-            AXIS: [
-                [
-                    new Line(lineGeometry, matHelper.clone()),
-                    [-1e3, 0, 0],
-                    null,
-                    [1e6, 1, 1],
-                    "helper",
-                ],
+        const gizmoRotate = {
+            X: [
+                [RotationArrow("X", radius, arc, matRed, true)],
+                [new Mesh(CircleGeometry(radius, arc), matRed)],
+                [RotationArrow("X", radius, arc, matRed, false)],
+            ],
+            Y: [
+                [RotationArrow("Y", radius, arc, matGreen, true)],
+                [new Mesh(CircleGeometry(radius, arc), matGreen), null, [0, 0, -Math.PI / 2]],
+                [RotationArrow("Y", radius, arc, matGreen, false)],
+            ],
+            Z: [
+                [RotationArrow("Z", radius, arc, matBlue, true)],
+                [new Mesh(CircleGeometry(radius, arc), matBlue), null, [0, Math.PI / 2, 0]],
+                [RotationArrow("Z", radius, arc, matBlue, false)],
             ],
         };
 
         const pickerRotate = {
-            XYZE: [[new Mesh(new SphereGeometry(0.25, 10, 8), matInvisible)]],
             X: [
-                [
-                    new Mesh(new TorusGeometry(0.5, 0.1, 4, 24), matInvisible),
-                    [0, 0, 0],
-                    [0, -Math.PI / 2, -Math.PI / 2],
-                ],
+                [RotationArrow("X", radius, arc, matInvisible, true, 0, 0.04, 0.2)],
+                [new Mesh(CircleGeometry(radius, arc, 0.05), matInvisible)],
+                [RotationArrow("X", radius, arc, matInvisible, false, 0, 0.04, 0.2)],
             ],
             Y: [
+                [RotationArrow("Y", radius, arc, matInvisible, true, 0, 0.04, 0.2)],
                 [
-                    new Mesh(new TorusGeometry(0.5, 0.1, 4, 24), matInvisible),
-                    [0, 0, 0],
-                    [Math.PI / 2, 0, 0],
-                ],
-            ],
-            Z: [
-                [
-                    new Mesh(new TorusGeometry(0.5, 0.1, 4, 24), matInvisible),
-                    [0, 0, 0],
+                    new Mesh(CircleGeometry(radius, arc, 0.05), matInvisible),
+                    null,
                     [0, 0, -Math.PI / 2],
                 ],
+                [RotationArrow("Y", radius, arc, matInvisible, false, 0, 0.04, 0.2)],
             ],
-            E: [[new Mesh(new TorusGeometry(0.75, 0.1, 2, 24), matInvisible)]],
+            Z: [
+                [RotationArrow("Z", radius, arc, matInvisible, true, 0, 0.04, 0.2)],
+                [
+                    new Mesh(CircleGeometry(radius, arc, 0.05), matInvisible),
+                    null,
+                    [0, Math.PI / 2, 0],
+                ],
+                [RotationArrow("Z", radius, arc, matInvisible, true, 0, 0.04, 0.2)],
+            ],
+        };
+
+        const helperRotate = {
+            // AXIS: [
+            //     [
+            //         new Line(lineGeometry, matHelper.clone()),
+            //         [-1e3, 0, 0],
+            //         null,
+            //         [1e6, 1, 1],
+            //         "helper",
+            //     ],
+            // ],
         };
 
         const gizmoScale = {
@@ -927,7 +985,6 @@ class TransformControlsGizmo extends Object3D {
                     [-Math.PI / 2, 0, 0],
                 ],
             ],
-            XYZ: [[new Mesh(new BoxGeometry(0.1, 0.1, 0.1), matWhiteTransparent.clone())]],
         };
 
         const pickerScale = {
@@ -978,7 +1035,6 @@ class TransformControlsGizmo extends Object3D {
                     [-Math.PI / 2, 0, 0],
                 ],
             ],
-            XYZ: [[new Mesh(new BoxGeometry(0.2, 0.2, 0.2), matInvisible), [0, 0, 0]]],
         };
 
         const helperScale = {
