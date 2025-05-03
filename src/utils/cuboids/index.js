@@ -3,3 +3,5 @@ export {
     TransformControlsGizmo,
     TransformControlsPlane,
 } from "./TransformControls";
+
+export { createCubeGeometry, createEdgesGeometry, createArrowGeometry } from "./geometry";

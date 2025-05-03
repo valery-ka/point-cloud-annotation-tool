@@ -1,10 +1,14 @@
-import * as THREE from "three";
 import { useThree } from "@react-three/fiber";
 import { useEffect, useRef } from "react";
 
 import { useEditor } from "contexts";
 
-import { TransformControls } from "utils/cuboids";
+import {
+    TransformControls,
+    createCubeGeometry,
+    createEdgesGeometry,
+    createArrowGeometry,
+} from "utils/cuboids";
 
 export const Cuboid = ({
     id = 0,
@@ -22,30 +26,13 @@ export const Cuboid = ({
     const isCuboidEditingRef = useRef(false);
 
     useEffect(() => {
-        const geometry = new THREE.BoxGeometry();
-        const material = new THREE.MeshBasicMaterial({
-            color: new THREE.Color(color),
-            transparent: true,
-            opacity: 0.025,
-            side: THREE.DoubleSide,
-        });
-        const edgesMaterial = new THREE.LineBasicMaterial({
-            color: new THREE.Color(color),
-            linewidth: 2,
-        });
+        const cube = createCubeGeometry(color, position, scale, rotation);
+        const edges = createEdgesGeometry(cube.mesh.geometry, color);
+        const arrow = createArrowGeometry(color, scale, rotation, -cube.mesh.position.z);
 
-        const cube = new THREE.Mesh(geometry, material);
-        cube.position.set(...position);
-        cube.scale.set(...scale);
-        cube.rotation.set(...rotation);
-        cubeRef.current = cube;
-
-        const edgesGeometry = new THREE.EdgesGeometry(geometry);
-        const edges = new THREE.LineSegments(edgesGeometry, edgesMaterial);
-        edgesRef.current = edges;
-
-        cube.add(edges);
-        scene.add(cube);
+        cube.mesh.add(edges.mesh);
+        cube.mesh.add(arrow.mesh);
+        scene.add(cube.mesh);
 
         const transformControls = new TransformControls(camera, gl.domElement);
         transformControlsRef.current = transformControls;
@@ -57,18 +44,20 @@ export const Cuboid = ({
         transformControls.addEventListener("mouseDown", onMouseDown);
         transformControls.addEventListener("mouseUp", onMouseUp);
 
+        cubeRef.current = cube.mesh;
+        edgesRef.current = edges.mesh;
+
         return () => {
             transformControls.removeEventListener("mouseDown", onMouseDown);
             transformControls.removeEventListener("mouseUp", onMouseUp);
             transformControls.detach();
 
-            scene.remove(cube);
+            scene.remove(cube.mesh);
             scene.remove(transformControls);
 
-            geometry.dispose();
-            material.dispose();
-            edgesGeometry.dispose();
-            edgesMaterial.dispose();
+            cube.cleanup();
+            edges.cleanup();
+            arrow.cleanup();
         };
     }, [camera, color, gl.domElement, position, rotation, scale, scene]);
 

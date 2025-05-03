@@ -359,11 +359,17 @@ class TransformControls extends Object3D {
                 }
             }
         } else if (mode === "scale") {
+            const MIN_DIMENSION_SIZE = 0.1;
+
+            const MIN_SCALE = new Vector3(
+                MIN_DIMENSION_SIZE,
+                MIN_DIMENSION_SIZE,
+                MIN_DIMENSION_SIZE,
+            );
+
             if (axis.search("XYZ") !== -1) {
                 let d = this.pointEnd.length() / this.pointStart.length();
-
                 if (this.pointEnd.dot(this.pointStart) < 0) d *= -1;
-
                 _tempVector2.set(d, d, d);
             } else {
                 _tempVector.copy(this.pointStart);
@@ -376,38 +382,60 @@ class TransformControls extends Object3D {
 
                 if (axis.search("X") === -1) {
                     _tempVector2.x = 1;
+                } else {
+                    _tempVector2.x = Math.max(_tempVector2.x, MIN_SCALE.x);
                 }
 
                 if (axis.search("Y") === -1) {
                     _tempVector2.y = 1;
+                } else {
+                    _tempVector2.y = Math.max(_tempVector2.y, MIN_SCALE.y);
                 }
 
                 if (axis.search("Z") === -1) {
                     _tempVector2.z = 1;
+                } else {
+                    _tempVector2.z = Math.max(_tempVector2.z, MIN_SCALE.z);
                 }
             }
 
-            // Apply scale
+            const newScale = this._scaleStart.clone().multiply(_tempVector2);
 
-            object.scale.copy(this._scaleStart).multiply(_tempVector2);
+            if (axis.search("X") !== -1) {
+                newScale.x = Math.max(newScale.x, MIN_SCALE.x);
+            }
+            if (axis.search("Y") !== -1) {
+                newScale.y = Math.max(newScale.y, MIN_SCALE.y);
+            }
+            if (axis.search("Z") !== -1) {
+                newScale.z = Math.max(newScale.z, MIN_SCALE.z);
+            }
+
+            object.scale.copy(newScale);
 
             if (this.scaleSnap) {
                 if (axis.search("X") !== -1) {
-                    object.scale.x =
+                    object.scale.x = Math.max(
                         Math.round(object.scale.x / this.scaleSnap) * this.scaleSnap ||
-                        this.scaleSnap;
+                            this.scaleSnap,
+                        MIN_SCALE.x,
+                    );
                 }
 
                 if (axis.search("Y") !== -1) {
-                    object.scale.y =
+                    object.scale.y = Math.max(
                         Math.round(object.scale.y / this.scaleSnap) * this.scaleSnap ||
-                        this.scaleSnap;
+                            this.scaleSnap,
+                        MIN_SCALE.y,
+                    );
                 }
 
                 if (axis.search("Z") !== -1) {
-                    object.scale.z =
+                    object.scale.z = Math.max(
                         Math.round(object.scale.z / this.scaleSnap) * this.scaleSnap ||
-                        this.scaleSnap;
+                            this.scaleSnap,
+                        MIN_SCALE.z,
+                    );
                 }
             }
         } else if (mode === "rotate") {
