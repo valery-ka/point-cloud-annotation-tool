@@ -22,6 +22,8 @@ export const EditorProvider = ({ children }) => {
     const undoStackRef = useRef({});
     const redoStackRef = useRef({});
 
+    const controlsRef = useRef(null);
+
     return (
         <EditorContext.Provider
             value={{
@@ -40,6 +42,7 @@ export const EditorProvider = ({ children }) => {
                 setHasFilterSelectionPoint,
                 pendingSaveState,
                 setPendingSaveState,
+                controlsRef,
             }}
         >
             {children}

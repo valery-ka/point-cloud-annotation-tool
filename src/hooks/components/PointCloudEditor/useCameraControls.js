@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useCallback } from "react";
 import { useThree, useFrame } from "@react-three/fiber";
 import { Group } from "@tweenjs/tween.js";
 
@@ -16,12 +16,10 @@ export const useCameraControls = (requestPixelProjectionsUpdate) => {
     const { camera, gl } = useThree();
 
     const { settings } = useSettings();
-    const { setPixelProjections } = useEditor();
+    const { controlsRef, setPixelProjections } = useEditor();
     const { subscribe, unsubscribe } = useEvent();
     const { selectedTool, isDrawing } = useTools();
     const { setHighlightedPoint } = useHoveredPoint();
-
-    const controlsRef = useRef(null);
 
     // setup camera and camera controls
     useEffect(() => {
