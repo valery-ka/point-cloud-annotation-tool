@@ -359,6 +359,8 @@ class TransformControls extends Object3D {
                 }
             }
         } else if (mode === "scale") {
+            const SENSITIVITY = 1.0;
+
             const MIN_DIMENSION_SIZE = 0.1;
 
             const MIN_SCALE = new Vector3(
@@ -367,77 +369,77 @@ class TransformControls extends Object3D {
                 MIN_DIMENSION_SIZE,
             );
 
-            if (axis.search("XYZ") !== -1) {
-                let d = this.pointEnd.length() / this.pointStart.length();
-                if (this.pointEnd.dot(this.pointStart) < 0) d *= -1;
-                _tempVector2.set(d, d, d);
-            } else {
-                _tempVector.copy(this.pointStart);
-                _tempVector2.copy(this.pointEnd);
+            const deltaWorld = new Vector3().copy(this.pointEnd).sub(this.pointStart);
 
-                _tempVector.applyQuaternion(this._worldQuaternionInv);
-                _tempVector2.applyQuaternion(this._worldQuaternionInv);
-
-                _tempVector2.divide(_tempVector);
-
-                if (axis.search("X") === -1) {
-                    _tempVector2.x = 1;
-                } else {
-                    _tempVector2.x = Math.max(_tempVector2.x, MIN_SCALE.x);
-                }
-
-                if (axis.search("Y") === -1) {
-                    _tempVector2.y = 1;
-                } else {
-                    _tempVector2.y = Math.max(_tempVector2.y, MIN_SCALE.y);
-                }
-
-                if (axis.search("Z") === -1) {
-                    _tempVector2.z = 1;
-                } else {
-                    _tempVector2.z = Math.max(_tempVector2.z, MIN_SCALE.z);
-                }
+            const localAxis = new Vector3();
+            if (axis.includes("posX") || axis.includes("negX")) {
+                localAxis.set(1, 0, 0);
+            } else if (axis.includes("posY") || axis.includes("negY")) {
+                localAxis.set(0, 1, 0);
+            } else if (axis.includes("posZ") || axis.includes("negZ")) {
+                localAxis.set(0, 0, 1);
             }
 
-            const newScale = this._scaleStart.clone().multiply(_tempVector2);
+            const worldAxis = localAxis.clone().applyQuaternion(object.quaternion).normalize();
 
-            if (axis.search("X") !== -1) {
-                newScale.x = Math.max(newScale.x, MIN_SCALE.x);
+            const projectedDelta = worldAxis.dot(deltaWorld);
+
+            const scaleDelta = projectedDelta * SENSITIVITY;
+
+            const newScale = object.scale.clone();
+
+            if (axis.includes("posX")) {
+                newScale.x = Math.max(this._scaleStart.x + scaleDelta, MIN_SCALE.x);
+            } else if (axis.includes("negX")) {
+                newScale.x = Math.max(this._scaleStart.x - scaleDelta, MIN_SCALE.x);
             }
-            if (axis.search("Y") !== -1) {
-                newScale.y = Math.max(newScale.y, MIN_SCALE.y);
+
+            if (axis.includes("posY")) {
+                newScale.y = Math.max(this._scaleStart.y + scaleDelta, MIN_SCALE.y);
+            } else if (axis.includes("negY")) {
+                newScale.y = Math.max(this._scaleStart.y - scaleDelta, MIN_SCALE.y);
             }
-            if (axis.search("Z") !== -1) {
-                newScale.z = Math.max(newScale.z, MIN_SCALE.z);
+
+            if (axis.includes("posZ")) {
+                newScale.z = Math.max(this._scaleStart.z + scaleDelta, MIN_SCALE.z);
+            } else if (axis.includes("negZ")) {
+                newScale.z = Math.max(this._scaleStart.z - scaleDelta, MIN_SCALE.z);
+            }
+
+            const scaleOffset = new Vector3();
+
+            if (axis.includes("posX")) {
+                scaleOffset.add(
+                    worldAxis.clone().multiplyScalar((newScale.x - this._scaleStart.x) * 0.5),
+                );
+            } else if (axis.includes("negX")) {
+                scaleOffset.add(
+                    worldAxis.clone().multiplyScalar(-(newScale.x - this._scaleStart.x) * 0.5),
+                );
+            }
+
+            if (axis.includes("posY")) {
+                scaleOffset.add(
+                    worldAxis.clone().multiplyScalar((newScale.y - this._scaleStart.y) * 0.5),
+                );
+            } else if (axis.includes("negY")) {
+                scaleOffset.add(
+                    worldAxis.clone().multiplyScalar(-(newScale.y - this._scaleStart.y) * 0.5),
+                );
+            }
+
+            if (axis.includes("posZ")) {
+                scaleOffset.add(
+                    worldAxis.clone().multiplyScalar((newScale.z - this._scaleStart.z) * 0.5),
+                );
+            } else if (axis.includes("negZ")) {
+                scaleOffset.add(
+                    worldAxis.clone().multiplyScalar(-(newScale.z - this._scaleStart.z) * 0.5),
+                );
             }
 
             object.scale.copy(newScale);
-
-            if (this.scaleSnap) {
-                if (axis.search("X") !== -1) {
-                    object.scale.x = Math.max(
-                        Math.round(object.scale.x / this.scaleSnap) * this.scaleSnap ||
-                            this.scaleSnap,
-                        MIN_SCALE.x,
-                    );
-                }
-
-                if (axis.search("Y") !== -1) {
-                    object.scale.y = Math.max(
-                        Math.round(object.scale.y / this.scaleSnap) * this.scaleSnap ||
-                            this.scaleSnap,
-                        MIN_SCALE.y,
-                    );
-                }
-
-                if (axis.search("Z") !== -1) {
-                    object.scale.z = Math.max(
-                        Math.round(object.scale.z / this.scaleSnap) * this.scaleSnap ||
-                            this.scaleSnap,
-                        MIN_SCALE.z,
-                    );
-                }
-            }
+            object.position.copy(this._positionStart).add(scaleOffset);
         } else if (mode === "rotate") {
             this._offset.copy(this.pointEnd).sub(this.pointStart);
 
@@ -710,7 +712,7 @@ class TransformControlsGizmo extends Object3D {
         const YELLOW = "0xFFFF33";
         const MAGENTA = "0xFF4CFF";
 
-        const WHITE = "0xFFFFFF";
+        const GRAY = "0x787878";
 
         // Make unique material for each axis/color
 
@@ -757,30 +759,66 @@ class TransformControlsGizmo extends Object3D {
         matWhiteTransparent.opacity = 0.25;
 
         const matYellowTransparent = gizmoMaterial.clone();
-        matYellowTransparent.color.setHex(0xffff00);
+        matYellowTransparent.color.setHex(YELLOW);
         matYellowTransparent.opacity = 0.25;
 
         const matGray = gizmoMaterial.clone();
-        matGray.color.setHex(0x787878);
+        matGray.color.setHex(GRAY);
 
         // reusable geometry
 
-        const arrowGeometry = new CylinderGeometry(0, 0.02, 0.1, 12);
-        arrowGeometry.translate(0, 0.05, 0);
+        // Arrow geometry
+        const ARROW_CONE_TOP_RADIUS = 0;
+        const ARROW_CONE_BOTTOM_RADIUS = 0.02;
+        const ARROW_CONE_HEIGHT = 0.1;
+        const ARROW_CONE_SEGMENTS = 12;
+        const ARROW_CONE_POSITION_OFFSET = 0.125;
 
-        const scaleHandleGeometry = new BoxGeometry(0.08, 0.08, 0.08);
-        scaleHandleGeometry.translate(0, 0.04, 0);
+        const arrowGeometry = new CylinderGeometry(
+            ARROW_CONE_TOP_RADIUS,
+            ARROW_CONE_BOTTOM_RADIUS,
+            ARROW_CONE_HEIGHT,
+            ARROW_CONE_SEGMENTS,
+        );
+        arrowGeometry.translate(0, ARROW_CONE_POSITION_OFFSET, 0);
 
-        const lineGeometry = new BufferGeometry();
-        lineGeometry.setAttribute("position", new Float32BufferAttribute([0, 0, 0, 1, 0, 0], 3));
+        // Line geometry
+        const LINE_CYLINDER_RADIUS = 0.004;
+        const LINE_CYLINDER_HEIGHT = 0.5;
+        const LINE_CYLINDER_SEGMENTS = 3;
+        const LINE_CYLINDER_POSITION_OFFSET = 0.25;
 
-        const lineGeometry2 = new CylinderGeometry(0.004, 0.004, 0.25, 3);
-        lineGeometry2.translate(0, 0.25, 0);
+        const lineGeometryMain = new CylinderGeometry(
+            LINE_CYLINDER_RADIUS,
+            LINE_CYLINDER_RADIUS,
+            LINE_CYLINDER_HEIGHT,
+            LINE_CYLINDER_SEGMENTS,
+        );
+        lineGeometryMain.translate(0, LINE_CYLINDER_POSITION_OFFSET, 0);
+
+        // Scale handles
+        const SCALE_HANDLE_WIDTH = 0.06;
+        const SCALE_HANDLE_HEIGHT = SCALE_HANDLE_WIDTH;
+        const SCALE_HANDLE_DEPTH = SCALE_HANDLE_WIDTH;
+        const SCALE_HANDLE_POSITION_OFFSET = 0.04;
+
+        const scaleHandleGeometry = new BoxGeometry(
+            SCALE_HANDLE_WIDTH,
+            SCALE_HANDLE_HEIGHT,
+            SCALE_HANDLE_DEPTH,
+        );
+        scaleHandleGeometry.translate(0, SCALE_HANDLE_POSITION_OFFSET, 0);
+
+        const lineGeometryHelperScale = new BufferGeometry();
+        lineGeometryHelperScale.setAttribute(
+            "position",
+            new Float32BufferAttribute([0, 0, 0, 1, 0, 0], 3),
+        );
 
         function CircleGeometry(radius, arc, tube = 0.004) {
             const geometry = new TorusGeometry(radius, tube, 3, 64, arc * Math.PI * 2);
             geometry.rotateY(Math.PI / 2);
-            geometry.rotateX(Math.PI / 2);
+            geometry.rotateX((3 * Math.PI) / 4);
             return geometry;
         }
 
@@ -797,7 +835,7 @@ class TransformControlsGizmo extends Object3D {
             const geometry = new CylinderGeometry(top, bottom, height, 12);
             const arrow = new Mesh(geometry, color);
 
-            const angle = isStartArrow ? 0 : arc * Math.PI * 2;
+            const angle = isStartArrow ? arc * Math.PI * 2 : arc * Math.PI * 2;
 
             switch (axis) {
                 case "X":
@@ -846,66 +884,147 @@ class TransformControlsGizmo extends Object3D {
 
         // Gizmo definitions - custom hierarchy definitions for setupGizmo() function
 
+        // Gizmo constants
+        const GIZMO_ARROW_LENGTH = 0.35;
+        const GIZMO_PLANE_SIZE = 0.1;
+        const GIZMO_PLANE_OFFSET = GIZMO_PLANE_SIZE / 2 + 0.05;
+        const GIZMO_PLANE_THICKNESS = 0.001;
+
         const gizmoTranslate = {
             X: [
-                [new Mesh(arrowGeometry, matRed), [0.35, 0, 0], [0, 0, -Math.PI / 2]],
-                [new Mesh(lineGeometry2, matRed), [0, 0, 0], [0, 0, -Math.PI / 2]],
+                [new Mesh(arrowGeometry, matRed), [GIZMO_ARROW_LENGTH, 0, 0], [0, 0, -Math.PI / 2]],
+                [new Mesh(lineGeometryMain, matRed), [0, 0, 0], [0, 0, -Math.PI / 2]],
             ],
             Y: [
-                [new Mesh(arrowGeometry, matGreen), [0, 0.35, 0]],
-                [new Mesh(lineGeometry2, matGreen)],
+                [new Mesh(arrowGeometry, matGreen), [0, GIZMO_ARROW_LENGTH, 0]],
+                [new Mesh(lineGeometryMain, matGreen)],
             ],
             Z: [
-                [new Mesh(arrowGeometry, matBlue), [0, 0, 0.35], [Math.PI / 2, 0, 0]],
-                [new Mesh(lineGeometry2, matBlue), null, [Math.PI / 2, 0, 0]],
+                [new Mesh(arrowGeometry, matBlue), [0, 0, GIZMO_ARROW_LENGTH], [Math.PI / 2, 0, 0]],
+                [new Mesh(lineGeometryMain, matBlue), null, [Math.PI / 2, 0, 0]],
             ],
             XY: [
-                [new Mesh(new BoxGeometry(0.07, 0.07, 0.001), matYellow.clone()), [0.05, 0.05, 0]],
+                [
+                    new Mesh(
+                        new BoxGeometry(GIZMO_PLANE_SIZE, GIZMO_PLANE_SIZE, GIZMO_PLANE_THICKNESS),
+                        matYellow.clone(),
+                    ),
+                    [GIZMO_PLANE_OFFSET, GIZMO_PLANE_OFFSET, 0],
+                ],
             ],
             YZ: [
                 [
-                    new Mesh(new BoxGeometry(0.07, 0.07, 0.001), matCyan.clone()),
-                    [0, 0.05, 0.05],
+                    new Mesh(
+                        new BoxGeometry(GIZMO_PLANE_SIZE, GIZMO_PLANE_SIZE, GIZMO_PLANE_THICKNESS),
+                        matCyan.clone(),
+                    ),
+                    [0, GIZMO_PLANE_OFFSET, GIZMO_PLANE_OFFSET],
                     [0, Math.PI / 2, 0],
                 ],
             ],
             XZ: [
                 [
-                    new Mesh(new BoxGeometry(0.07, 0.07, 0.001), matMagenta.clone()),
-                    [0.05, 0, 0.05],
+                    new Mesh(
+                        new BoxGeometry(GIZMO_PLANE_SIZE, GIZMO_PLANE_SIZE, GIZMO_PLANE_THICKNESS),
+                        matMagenta.clone(),
+                    ),
+                    [GIZMO_PLANE_OFFSET, 0, GIZMO_PLANE_OFFSET],
                     [-Math.PI / 2, 0, 0],
                 ],
             ],
         };
 
+        // Picker constants
+        const PICKER_CYLINDER_RADIUS = 0.05;
+        const PICKER_CYLINDER_HEIGHT = LINE_CYLINDER_HEIGHT * 1.1;
+        const PICKER_CYLINDER_SEGMENTS = 4;
+        const PICKER_CYLINDER_OFFSET = 0.35;
+        const PICKER_PLANE_SIZE = GIZMO_PLANE_SIZE + 0.1;
+        const PICKER_PLANE_THICKNESS = 0.01;
+
         const pickerTranslate = {
             X: [
                 [
-                    new Mesh(new CylinderGeometry(0.05, 0.05, 0.4, 4), matInvisible),
-                    [0.3, 0, 0],
+                    new Mesh(
+                        new CylinderGeometry(
+                            PICKER_CYLINDER_RADIUS,
+                            PICKER_CYLINDER_RADIUS,
+                            PICKER_CYLINDER_HEIGHT,
+                            PICKER_CYLINDER_SEGMENTS,
+                        ),
+                        matInvisible,
+                    ),
+                    [PICKER_CYLINDER_OFFSET, 0, 0],
                     [0, 0, -Math.PI / 2],
                 ],
             ],
-            Y: [[new Mesh(new CylinderGeometry(0.05, 0.05, 0.4, 4), matInvisible), [0, 0.3, 0]]],
+            Y: [
+                [
+                    new Mesh(
+                        new CylinderGeometry(
+                            PICKER_CYLINDER_RADIUS,
+                            PICKER_CYLINDER_RADIUS,
+                            PICKER_CYLINDER_HEIGHT,
+                            PICKER_CYLINDER_SEGMENTS,
+                        ),
+                        matInvisible,
+                    ),
+                    [0, PICKER_CYLINDER_OFFSET, 0],
+                ],
+            ],
             Z: [
                 [
-                    new Mesh(new CylinderGeometry(0.05, 0.05, 0.4, 4), matInvisible),
-                    [0, 0, 0.3],
+                    new Mesh(
+                        new CylinderGeometry(
+                            PICKER_CYLINDER_RADIUS,
+                            PICKER_CYLINDER_RADIUS,
+                            PICKER_CYLINDER_HEIGHT,
+                            PICKER_CYLINDER_SEGMENTS,
+                        ),
+                        matInvisible,
+                    ),
+                    [0, 0, PICKER_CYLINDER_OFFSET],
                     [Math.PI / 2, 0, 0],
                 ],
             ],
-            XY: [[new Mesh(new BoxGeometry(0.1, 0.1, 0.01), matInvisible), [0.05, 0.05, 0]]],
+            XY: [
+                [
+                    new Mesh(
+                        new BoxGeometry(
+                            PICKER_PLANE_SIZE,
+                            PICKER_PLANE_SIZE,
+                            PICKER_PLANE_THICKNESS,
+                        ),
+                        matInvisible,
+                    ),
+                    [GIZMO_PLANE_OFFSET, GIZMO_PLANE_OFFSET, 0],
+                ],
+            ],
             YZ: [
                 [
-                    new Mesh(new BoxGeometry(0.1, 0.1, 0.01), matInvisible),
-                    [0, 0.05, 0.05],
+                    new Mesh(
+                        new BoxGeometry(
+                            PICKER_PLANE_SIZE,
+                            PICKER_PLANE_SIZE,
+                            PICKER_PLANE_THICKNESS,
+                        ),
+                        matInvisible,
+                    ),
+                    [0, GIZMO_PLANE_OFFSET, GIZMO_PLANE_OFFSET],
                     [0, Math.PI / 2, 0],
                 ],
             ],
             XZ: [
                 [
-                    new Mesh(new BoxGeometry(0.1, 0.1, 0.01), matInvisible),
-                    [0.05, 0, 0.05],
+                    new Mesh(
+                        new BoxGeometry(
+                            PICKER_PLANE_SIZE,
+                            PICKER_PLANE_SIZE,
+                            PICKER_PLANE_THICKNESS,
+                        ),
+                        matInvisible,
+                    ),
+                    [GIZMO_PLANE_OFFSET, 0, GIZMO_PLANE_OFFSET],
                     [-Math.PI / 2, 0, 0],
                 ],
             ],
@@ -921,57 +1040,148 @@ class TransformControlsGizmo extends Object3D {
             // DELTA: [[new Line(TranslateHelperGeometry(), matHelper), null, null, null, "helper"]],
         };
 
-        const arc = 0.3;
-        const radius = 0.4;
+        // Rotation constants
+        const ROTATION_ARC = 0.25;
+        const ROTATION_RADIUS = 0.4;
+        const ROTATION_PICKER_THICKNESS = 0.05;
+        const ROTATION_ARROW_WIDTH = 0.04;
+        const ROTATION_ARROW_HEIGHT = 0.2;
 
+        // Gizmo rotation
         const gizmoRotate = {
             X: [
-                [RotationArrow("X", radius, arc, matRed, true)],
-                [new Mesh(CircleGeometry(radius, arc), matRed)],
-                [RotationArrow("X", radius, arc, matRed, false)],
+                [RotationArrow("X", ROTATION_RADIUS, ROTATION_ARC * 0.5, matRed, true)],
+                [new Mesh(CircleGeometry(ROTATION_RADIUS, ROTATION_ARC), matRed)],
+                [RotationArrow("X", ROTATION_RADIUS, ROTATION_ARC * 1.5, matRed, false)],
             ],
             Y: [
-                [RotationArrow("Y", radius, arc, matGreen, true)],
-                [new Mesh(CircleGeometry(radius, arc), matGreen), null, [0, 0, -Math.PI / 2]],
-                [RotationArrow("Y", radius, arc, matGreen, false)],
-            ],
-            Z: [
-                [RotationArrow("Z", radius, arc, matBlue, true)],
-                [new Mesh(CircleGeometry(radius, arc), matBlue), null, [0, Math.PI / 2, 0]],
-                [RotationArrow("Z", radius, arc, matBlue, false)],
-            ],
-        };
-
-        const pickerRotate = {
-            X: [
-                [RotationArrow("X", radius, arc, matInvisible, true, 0, 0.04, 0.2)],
-                [new Mesh(CircleGeometry(radius, arc, 0.05), matInvisible)],
-                [RotationArrow("X", radius, arc, matInvisible, false, 0, 0.04, 0.2)],
-            ],
-            Y: [
-                [RotationArrow("Y", radius, arc, matInvisible, true, 0, 0.04, 0.2)],
+                [RotationArrow("Y", ROTATION_RADIUS, ROTATION_ARC * 0.5, matGreen, true)],
                 [
-                    new Mesh(CircleGeometry(radius, arc, 0.05), matInvisible),
+                    new Mesh(CircleGeometry(ROTATION_RADIUS, ROTATION_ARC), matGreen),
                     null,
                     [0, 0, -Math.PI / 2],
                 ],
-                [RotationArrow("Y", radius, arc, matInvisible, false, 0, 0.04, 0.2)],
+                [RotationArrow("Y", ROTATION_RADIUS, ROTATION_ARC * 1.5, matGreen, false)],
             ],
             Z: [
-                [RotationArrow("Z", radius, arc, matInvisible, true, 0, 0.04, 0.2)],
+                [RotationArrow("Z", ROTATION_RADIUS, ROTATION_ARC * 0.5, matBlue, true)],
                 [
-                    new Mesh(CircleGeometry(radius, arc, 0.05), matInvisible),
+                    new Mesh(CircleGeometry(ROTATION_RADIUS, ROTATION_ARC), matBlue),
                     null,
                     [0, Math.PI / 2, 0],
                 ],
-                [RotationArrow("Z", radius, arc, matInvisible, true, 0, 0.04, 0.2)],
+                [RotationArrow("Z", ROTATION_RADIUS, ROTATION_ARC * 1.5, matBlue, false)],
+            ],
+        };
+
+        // Picker rotation
+        const pickerRotate = {
+            X: [
+                [
+                    RotationArrow(
+                        "X",
+                        ROTATION_RADIUS,
+                        ROTATION_ARC * 0.5,
+                        matInvisible,
+                        true,
+                        0,
+                        ROTATION_ARROW_WIDTH,
+                        ROTATION_ARROW_HEIGHT,
+                    ),
+                ],
+                [
+                    new Mesh(
+                        CircleGeometry(ROTATION_RADIUS, ROTATION_ARC, ROTATION_PICKER_THICKNESS),
+                        matInvisible,
+                    ),
+                ],
+                [
+                    RotationArrow(
+                        "X",
+                        ROTATION_RADIUS,
+                        ROTATION_ARC * 1.5,
+                        matInvisible,
+                        false,
+                        0,
+                        ROTATION_ARROW_WIDTH,
+                        ROTATION_ARROW_HEIGHT,
+                    ),
+                ],
+            ],
+            Y: [
+                [
+                    RotationArrow(
+                        "Y",
+                        ROTATION_RADIUS,
+                        ROTATION_ARC * 0.5,
+                        matInvisible,
+                        true,
+                        0,
+                        ROTATION_ARROW_WIDTH,
+                        ROTATION_ARROW_HEIGHT,
+                    ),
+                ],
+                [
+                    new Mesh(
+                        CircleGeometry(ROTATION_RADIUS, ROTATION_ARC, ROTATION_PICKER_THICKNESS),
+                        matInvisible,
+                    ),
+                    null,
+                    [0, 0, -Math.PI / 2],
+                ],
+                [
+                    RotationArrow(
+                        "Y",
+                        ROTATION_RADIUS,
+                        ROTATION_ARC * 1.5,
+                        matInvisible,
+                        false,
+                        0,
+                        ROTATION_ARROW_WIDTH,
+                        ROTATION_ARROW_HEIGHT,
+                    ),
+                ],
+            ],
+            Z: [
+                [
+                    RotationArrow(
+                        "Z",
+                        ROTATION_RADIUS,
+                        ROTATION_ARC * 0.5,
+                        matInvisible,
+                        true,
+                        0,
+                        ROTATION_ARROW_WIDTH,
+                        ROTATION_ARROW_HEIGHT,
+                    ),
+                ],
+                [
+                    new Mesh(
+                        CircleGeometry(ROTATION_RADIUS, ROTATION_ARC, ROTATION_PICKER_THICKNESS),
+                        matInvisible,
+                    ),
+                    null,
+                    [0, Math.PI / 2, 0],
+                ],
+                [
+                    RotationArrow(
+                        "Z",
+                        ROTATION_RADIUS,
+                        ROTATION_ARC * 1.5,
+                        matInvisible,
+                        false,
+                        0,
+                        ROTATION_ARROW_WIDTH,
+                        ROTATION_ARROW_HEIGHT,
+                    ),
+                ],
             ],
         };
 
         const helperRotate = {
             // AXIS: [
             //     [
-            //         new Line(lineGeometry, matHelper.clone()),
+            //         new Line(lineGeometryHelperScale, matHelper.clone()),
             //         [-1e3, 0, 0],
             //         null,
             //         [1e6, 1, 1],
@@ -980,119 +1190,190 @@ class TransformControlsGizmo extends Object3D {
             // ],
         };
 
+        function createScaleGizmo(geometry, material) {
+            return new Mesh(geometry.clone(), material.clone());
+        }
+
         const gizmoScale = {
-            X: [
-                [new Mesh(scaleHandleGeometry, matRed), [0.5, 0, 0], [0, 0, -Math.PI / 2]],
-                [new Mesh(lineGeometry2, matRed), [0, 0, 0], [0, 0, -Math.PI / 2]],
-                [new Mesh(scaleHandleGeometry, matRed), [-0.5, 0, 0], [0, 0, Math.PI / 2]],
+            posX: [
+                [createScaleGizmo(scaleHandleGeometry, matRed), [0.5, 0, 0], [0, 0, -Math.PI / 2]],
+                [createScaleGizmo(lineGeometryMain, matRed), [0, 0, 0], [0, 0, -Math.PI / 2]],
             ],
-            Y: [
-                [new Mesh(scaleHandleGeometry, matGreen), [0, 0.5, 0]],
-                [new Mesh(lineGeometry2, matGreen)],
-                [new Mesh(scaleHandleGeometry, matGreen), [0, -0.5, 0], [0, 0, Math.PI]],
+            posY: [
+                [createScaleGizmo(scaleHandleGeometry, matGreen), [0, 0.5, 0]],
+                [createScaleGizmo(lineGeometryMain, matGreen)],
             ],
-            Z: [
-                [new Mesh(scaleHandleGeometry, matBlue), [0, 0, 0.5], [Math.PI / 2, 0, 0]],
-                [new Mesh(lineGeometry2, matBlue), [0, 0, 0], [Math.PI / 2, 0, 0]],
-                [new Mesh(scaleHandleGeometry, matBlue), [0, 0, -0.5], [-Math.PI / 2, 0, 0]],
+            posZ: [
+                [createScaleGizmo(scaleHandleGeometry, matBlue), [0, 0, 0.5], [Math.PI / 2, 0, 0]],
+                [createScaleGizmo(lineGeometryMain, matBlue), [0, 0, 0], [Math.PI / 2, 0, 0]],
             ],
-            XY: [
-                [new Mesh(new BoxGeometry(0.15, 0.15, 0.01), matBlueTransparent), [0.15, 0.15, 0]],
+            negX: [
+                [createScaleGizmo(lineGeometryMain, matRed), [0, 0, 0], [0, 0, Math.PI / 2]],
+                [createScaleGizmo(scaleHandleGeometry, matRed), [-0.5, 0, 0], [0, 0, Math.PI / 2]],
             ],
-            YZ: [
+            negY: [
+                [createScaleGizmo(lineGeometryMain, matGreen), [0, 0, 0], [0, 0, Math.PI]],
+                [createScaleGizmo(scaleHandleGeometry, matGreen), [0, -0.5, 0], [0, 0, Math.PI]],
+            ],
+            negZ: [
+                [createScaleGizmo(lineGeometryMain, matBlue), [0, 0, 0], [-Math.PI / 2, 0, 0]],
                 [
-                    new Mesh(new BoxGeometry(0.15, 0.15, 0.01), matRedTransparent),
-                    [0, 0.15, 0.15],
-                    [0, Math.PI / 2, 0],
-                ],
-            ],
-            XZ: [
-                [
-                    new Mesh(new BoxGeometry(0.15, 0.15, 0.01), matGreenTransparent),
-                    [0.15, 0, 0.15],
+                    createScaleGizmo(scaleHandleGeometry, matBlue),
+                    [0, 0, -0.5],
                     [-Math.PI / 2, 0, 0],
                 ],
             ],
+            // XY: [
+            //     [
+            //         new Mesh(
+            //             new BoxGeometry(GIZMO_PLANE_SIZE, GIZMO_PLANE_SIZE, GIZMO_PLANE_THICKNESS),
+            //             matYellow.clone(),
+            //         ),
+            //         [GIZMO_PLANE_OFFSET, GIZMO_PLANE_OFFSET, 0],
+            //     ],
+            // ],
+            // YZ: [
+            //     [
+            //         new Mesh(
+            //             new BoxGeometry(GIZMO_PLANE_SIZE, GIZMO_PLANE_SIZE, GIZMO_PLANE_THICKNESS),
+            //             matCyan.clone(),
+            //         ),
+            //         [0, GIZMO_PLANE_OFFSET, GIZMO_PLANE_OFFSET],
+            //         [0, Math.PI / 2, 0],
+            //     ],
+            // ],
+            // XZ: [
+            //     [
+            //         new Mesh(
+            //             new BoxGeometry(GIZMO_PLANE_SIZE, GIZMO_PLANE_SIZE, GIZMO_PLANE_THICKNESS),
+            //             matMagenta.clone(),
+            //         ),
+            //         [GIZMO_PLANE_OFFSET, 0, GIZMO_PLANE_OFFSET],
+            //         [-Math.PI / 2, 0, 0],
+            //     ],
+            // ],
         };
 
         const pickerScale = {
-            X: [
+            posX: [
                 [
-                    new Mesh(new CylinderGeometry(0.2, 0, 0.6, 4), matInvisible),
-                    [0.3, 0, 0],
+                    new Mesh(
+                        new CylinderGeometry(
+                            PICKER_CYLINDER_RADIUS,
+                            PICKER_CYLINDER_RADIUS,
+                            PICKER_CYLINDER_HEIGHT,
+                            PICKER_CYLINDER_SEGMENTS,
+                        ),
+                        matInvisible,
+                    ),
+                    [PICKER_CYLINDER_OFFSET, 0, 0],
                     [0, 0, -Math.PI / 2],
                 ],
+            ],
+            posY: [
                 [
-                    new Mesh(new CylinderGeometry(0.2, 0, 0.6, 4), matInvisible),
-                    [-0.3, 0, 0],
+                    new Mesh(
+                        new CylinderGeometry(
+                            PICKER_CYLINDER_RADIUS,
+                            PICKER_CYLINDER_RADIUS,
+                            PICKER_CYLINDER_HEIGHT,
+                            PICKER_CYLINDER_SEGMENTS,
+                        ),
+                        matInvisible,
+                    ),
+                    [0, PICKER_CYLINDER_OFFSET, 0],
+                ],
+            ],
+            posZ: [
+                [
+                    new Mesh(
+                        new CylinderGeometry(
+                            PICKER_CYLINDER_RADIUS,
+                            PICKER_CYLINDER_RADIUS,
+                            PICKER_CYLINDER_HEIGHT,
+                            PICKER_CYLINDER_SEGMENTS,
+                        ),
+                        matInvisible,
+                    ),
+                    [0, 0, PICKER_CYLINDER_OFFSET],
+                    [Math.PI / 2, 0, 0],
+                ],
+            ],
+            negX: [
+                [
+                    new Mesh(
+                        new CylinderGeometry(
+                            PICKER_CYLINDER_RADIUS,
+                            PICKER_CYLINDER_RADIUS,
+                            PICKER_CYLINDER_HEIGHT,
+                            PICKER_CYLINDER_SEGMENTS,
+                        ),
+                        matInvisible,
+                    ),
+                    [-PICKER_CYLINDER_OFFSET, 0, 0],
                     [0, 0, Math.PI / 2],
                 ],
             ],
-            Y: [
-                [new Mesh(new CylinderGeometry(0.2, 0, 0.6, 4), matInvisible), [0, 0.3, 0]],
+            negY: [
                 [
-                    new Mesh(new CylinderGeometry(0.2, 0, 0.6, 4), matInvisible),
-                    [0, -0.3, 0],
+                    new Mesh(
+                        new CylinderGeometry(
+                            PICKER_CYLINDER_RADIUS,
+                            PICKER_CYLINDER_RADIUS,
+                            PICKER_CYLINDER_HEIGHT,
+                            PICKER_CYLINDER_SEGMENTS,
+                        ),
+                        matInvisible,
+                    ),
+                    [0, -PICKER_CYLINDER_OFFSET, 0],
                     [0, 0, Math.PI],
                 ],
             ],
-            Z: [
+            negZ: [
                 [
-                    new Mesh(new CylinderGeometry(0.2, 0, 0.6, 4), matInvisible),
-                    [0, 0, 0.3],
-                    [Math.PI / 2, 0, 0],
-                ],
-                [
-                    new Mesh(new CylinderGeometry(0.2, 0, 0.6, 4), matInvisible),
-                    [0, 0, -0.3],
-                    [-Math.PI / 2, 0, 0],
-                ],
-            ],
-            XY: [[new Mesh(new BoxGeometry(0.2, 0.2, 0.01), matInvisible), [0.15, 0.15, 0]]],
-            YZ: [
-                [
-                    new Mesh(new BoxGeometry(0.2, 0.2, 0.01), matInvisible),
-                    [0, 0.15, 0.15],
-                    [0, Math.PI / 2, 0],
-                ],
-            ],
-            XZ: [
-                [
-                    new Mesh(new BoxGeometry(0.2, 0.2, 0.01), matInvisible),
-                    [0.15, 0, 0.15],
+                    new Mesh(
+                        new CylinderGeometry(
+                            PICKER_CYLINDER_RADIUS,
+                            PICKER_CYLINDER_RADIUS,
+                            PICKER_CYLINDER_HEIGHT,
+                            PICKER_CYLINDER_SEGMENTS,
+                        ),
+                        matInvisible,
+                    ),
+                    [0, 0, -PICKER_CYLINDER_OFFSET],
                     [-Math.PI / 2, 0, 0],
                 ],
             ],
         };
 
         const helperScale = {
-            X: [
-                [
-                    new Line(lineGeometry, matHelper.clone()),
-                    [-1e3, 0, 0],
-                    null,
-                    [1e6, 1, 1],
-                    "helper",
-                ],
-            ],
-            Y: [
-                [
-                    new Line(lineGeometry, matHelper.clone()),
-                    [0, -1e3, 0],
-                    [0, 0, Math.PI / 2],
-                    [1e6, 1, 1],
-                    "helper",
-                ],
-            ],
-            Z: [
-                [
-                    new Line(lineGeometry, matHelper.clone()),
-                    [0, 0, -1e3],
-                    [0, -Math.PI / 2, 0],
-                    [1e6, 1, 1],
-                    "helper",
-                ],
-            ],
+            // X: [
+            //     [
+            //         new Line(lineGeometryHelperScale, matHelper.clone()),
+            //         [-1e3, 0, 0],
+            //         null,
+            //         [1e6, 1, 1],
+            //         "helper",
+            //     ],
+            // ],
+            // Y: [
+            //     [
+            //         new Line(lineGeometryHelperScale, matHelper.clone()),
+            //         [0, -1e3, 0],
+            //         [0, 0, Math.PI / 2],
+            //         [1e6, 1, 1],
+            //         "helper",
+            //     ],
+            // ],
+            // Z: [
+            //     [
+            //         new Line(lineGeometryHelperScale, matHelper.clone()),
+            //         [0, 0, -1e3],
+            //         [0, -Math.PI / 2, 0],
+            //         [1e6, 1, 1],
+            //         "helper",
+            //     ],
+            // ],
         };
 
         // Creates an Object3D with gizmos described in custom hierarchy definition.
@@ -1394,12 +1675,6 @@ class TransformControlsGizmo extends Object3D {
                     .copy(this.eye)
                     .applyQuaternion(_tempQuaternion.copy(quaternion).invert());
 
-                if (handle.name.search("E") !== -1) {
-                    handle.quaternion.setFromRotationMatrix(
-                        _lookAtMatrix.lookAt(this.eye, _zeroVector, _unitY),
-                    );
-                }
-
                 if (handle.name === "X") {
                     _tempQuaternion.setFromAxisAngle(
                         _unitX,
@@ -1446,17 +1721,6 @@ class TransformControlsGizmo extends Object3D {
 
             if (this.enabled && this.axis) {
                 if (handle.name === this.axis) {
-                    if (!handle.userData.originalColor) {
-                        handle.userData.originalColor = handle.material.color.clone();
-                    }
-                    const lightenFactor = 0.3;
-                    handle.material.color.lerp(new Color(0xffffff), lightenFactor);
-                    handle.material.opacity = 1.0;
-                } else if (
-                    this.axis.split("").some(function (a) {
-                        return handle.name === a;
-                    })
-                ) {
                     if (!handle.userData.originalColor) {
                         handle.userData.originalColor = handle.material.color.clone();
                     }

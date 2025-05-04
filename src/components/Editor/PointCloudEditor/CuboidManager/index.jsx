@@ -5,7 +5,7 @@ export const CuboidManager = memo(() => {
     const [cuboids, setCuboids] = useState([
         {
             id: "1",
-            position: [-1, -1, 0.5],
+            position: [0, 0, 0],
             scale: [4.5, 2, 1.7],
             rotation: [0, 0, 0],
             color: "red",

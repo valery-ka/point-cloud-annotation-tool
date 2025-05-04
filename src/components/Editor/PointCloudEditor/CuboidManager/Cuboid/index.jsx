@@ -28,13 +28,14 @@ export const Cuboid = ({
     useEffect(() => {
         const cube = createCubeGeometry(color, position, scale, rotation);
         const edges = createEdgesGeometry(cube.mesh.geometry, color);
-        const arrow = createArrowGeometry(color, scale, rotation, -cube.mesh.position.z);
+        const arrow = createArrowGeometry(color, scale, rotation, -0.5);
 
         cube.mesh.add(edges.mesh);
         cube.mesh.add(arrow.mesh);
         scene.add(cube.mesh);
 
         const transformControls = new TransformControls(camera, gl.domElement);
+        transformControls.setSpace("local");
         transformControlsRef.current = transformControls;
         scene.add(transformControls);
 

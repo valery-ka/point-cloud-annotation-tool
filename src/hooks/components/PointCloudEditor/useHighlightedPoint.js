@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useMemo } from "react";
+import { useEffect, useCallback, useMemo, useRef } from "react";
 import { useThree } from "@react-three/fiber";
 
 import {
@@ -30,6 +30,9 @@ export const useHighlightedPoint = () => {
     const searchingRadius = useMemo(() => {
         return settings.editorSettings.highlighter.searchingRadius;
     }, [settings.editorSettings.highlighter.searchingRadius]);
+
+    const isDraggingRef = useRef(false);
+    const mouseDownPositionRef = useRef({ x: 0, y: 0 });
 
     useEffect(() => {
         if (!highlightedPoint) {
@@ -69,6 +72,14 @@ export const useHighlightedPoint = () => {
     const onMouseMove = useCallback(
         (event) => {
             const { layerX: screenX, layerY: screenY } = event;
+
+            const dx = Math.abs(screenX - mouseDownPositionRef.current?.x);
+            const dy = Math.abs(screenY - mouseDownPositionRef.current?.y);
+            const distance = Math.max(dx, dy);
+
+            if (distance > 1) {
+                isDraggingRef.current = true;
+            }
 
             const activeFrameFilePath = pcdFiles[activeFrameIndex];
             const activeFrameCloud = pointCloudRefs.current[activeFrameFilePath];
@@ -145,6 +156,7 @@ export const useHighlightedPoint = () => {
 
     const onClick = useCallback(
         (event) => {
+            if (isDraggingRef.current === true) return;
             if (highlightedPoint && selectedTool === DEFAULT_TOOL && !event.ctrlKey) {
                 const index = highlightedPoint.label
                     ? nonHiddenClasses.findIndex(
@@ -159,14 +171,21 @@ export const useHighlightedPoint = () => {
         [highlightedPoint, selectedTool, nonHiddenClasses],
     );
 
+    const onMouseDown = useCallback((event) => {
+        mouseDownPositionRef.current = { x: event.layerX, y: event.layerY };
+        isDraggingRef.current = false;
+    }, []);
+
     useEffect(() => {
         gl.domElement.addEventListener("mousemove", onMouseMove);
         gl.domElement.addEventListener("mouseleave", onMouseLeave);
+        gl.domElement.addEventListener("mousedown", onMouseDown);
         gl.domElement.addEventListener("click", onClick);
 
         return () => {
             gl.domElement.removeEventListener("mousemove", onMouseMove);
             gl.domElement.removeEventListener("mouseleave", onMouseLeave);
+            gl.domElement.removeEventListener("mousedown", onMouseDown);
             gl.domElement.removeEventListener("click", onClick);
         };
     }, [onMouseMove, onMouseLeave, onClick]);
