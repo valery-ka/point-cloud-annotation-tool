@@ -1591,7 +1591,7 @@ class TransformControlsGizmo extends Object3D {
 
             handle.quaternion.copy(quaternion);
 
-            if (this.mode === "translate" || this.mode === "scale") {
+            if (this.mode === "translate") {
                 const AXIS_HIDE_THRESHOLD = 0.99;
                 const PLANE_HIDE_THRESHOLD = 0.2;
                 const AXIS_INVERT_THRESHOLD = 0;
@@ -1744,11 +1744,11 @@ class TransformControlsPlane extends Mesh {
         super(
             new PlaneGeometry(100000, 100000, 2, 2),
             new MeshBasicMaterial({
-                visible: false,
+                visible: true, // кажется пофиксил, но пока оставлю включенной
                 wireframe: true,
                 side: DoubleSide,
                 transparent: true,
-                opacity: 0.1,
+                opacity: 0.25,
                 toneMapped: false,
             }),
         );
@@ -1781,7 +1781,6 @@ class TransformControlsPlane extends Mesh {
 
         switch (this.mode) {
             case "translate":
-            case "scale":
                 switch (this.axis) {
                     case "X":
                         _alignVector.copy(this.eye).cross(_v1);
@@ -1813,8 +1812,9 @@ class TransformControlsPlane extends Mesh {
 
                 break;
             case "rotate":
+            case "scale":
             default:
-                // special case for rotate
+                // reset dir for rotate and scale
                 _dirVector.set(0, 0, 0);
         }
 
