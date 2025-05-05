@@ -1,4 +1,4 @@
-import React, { memo, useMemo, useCallback } from "react";
+import React, { memo, useMemo, useCallback, useRef, useEffect } from "react";
 
 import { Canvas } from "@react-three/fiber";
 import { Image } from "@react-three/drei";
@@ -13,66 +13,81 @@ import { PointHighlighterShader } from "shaders";
 
 export const PointHighlighterCanvas = memo(({ image, positions }) => {
     const { settings } = useSettings();
-
-    const theme = useMemo(() => {
-        return settings.general.theme;
-    }, [settings.general.theme]);
-
-    const highlightedPointScale = useMemo(() => {
-        return settings.editorSettings.highlighter.highlightedPointSize;
-    }, [settings.editorSettings.highlighter.highlightedPointSize]);
-
-    const highlighterZoom = useMemo(() => {
-        return settings.editorSettings.highlighter.highlighterZoom;
-    }, [settings.editorSettings.highlighter.highlighterZoom]);
-
-    const imageWidth = useMemo(() => image?.width, [image]);
-    const imageHeight = useMemo(() => image?.height, [image]);
-
     const { projectedPointsRef } = useCalibrations();
 
-    const geometry = useMemo(() => {
-        if (!image) return;
-        return projectedPointsRef.current[image.src].geometry;
+    const prevGeometryRef = useRef();
+    const prevTextureRef = useRef();
+
+    const texture = useMemo(() => {
+        if (!image) return null;
+        return image?.texture;
     }, [image]);
 
-    const shaderMaterial = useMemo(
-        () =>
-            PointHighlighterShader({
-                sizeMultiplier: 0.3,
-                useAlpha: true,
-                highlightScale: highlightedPointScale,
-                theme: theme,
-            }),
-        [highlightedPointScale, theme],
-    );
+    const geometry = useMemo(() => {
+        if (!image) return null;
+        return projectedPointsRef.current[image.src]?.geometry;
+    }, [image]);
 
-    const updateHighlightedPointSize = useCallback((data) => {
-        if (data && shaderMaterial?.uniforms?.uHighlightScale) {
-            shaderMaterial.uniforms.uHighlightScale.value = data.value;
+    useEffect(() => {
+        const prevGeometry = prevGeometryRef.current;
+        if (prevGeometry && prevGeometry !== geometry) {
+            prevGeometry.dispose();
         }
-    }, []);
+        prevGeometryRef.current = geometry;
+    }, [geometry]);
+
+    useEffect(() => {
+        const prevTexture = prevTextureRef.current;
+        if (prevTexture && prevTexture !== texture) {
+            prevTexture.dispose();
+        }
+        prevTextureRef.current = texture;
+    }, [texture]);
+
+    const shaderMaterial = useMemo(() => {
+        return PointHighlighterShader({
+            sizeMultiplier: 0.3,
+            useAlpha: true,
+            highlightScale: settings.editorSettings.highlighter.highlightedPointSize,
+            theme: settings.general.theme,
+        });
+    }, [settings.editorSettings.highlighter.highlightedPointSize, settings.general.theme]);
+
+    useEffect(() => {
+        return () => {
+            shaderMaterial.dispose();
+        };
+    }, [shaderMaterial]);
+
+    const updateHighlightedPointSize = useCallback(
+        (data) => {
+            if (data && shaderMaterial?.uniforms?.uHighlightScale) {
+                shaderMaterial.uniforms.uHighlightScale.value = data.value;
+            }
+        },
+        [shaderMaterial],
+    );
 
     useSubscribeFunction("highlightedPointSizeHighlighter", updateHighlightedPointSize, []);
 
     const normXY = useImagePointHighlighter({
-        size: { width: imageWidth, height: imageHeight },
+        size: { width: image?.width, height: image?.height },
         shaderMaterial,
         positions,
     });
 
     return (
         <Canvas orthographic className="chessboard">
-            {image?.texture && (
+            {texture && (
                 <>
                     <HighlightedPointGeometryUpdater image={image} />
                     <ImageCameraControls
                         image={image}
                         enabled={true}
                         normXY={normXY}
-                        fixedZoomLevel={highlighterZoom}
+                        fixedZoomLevel={settings.editorSettings.highlighter.highlighterZoom}
                     />
-                    <Image texture={image.texture} scale={[imageWidth, imageHeight, 1]} />
+                    <Image texture={texture} scale={[image.width, image.height, 1]} />
                 </>
             )}
             {geometry && (

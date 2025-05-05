@@ -94,7 +94,6 @@ export const usePointCloudLoader = (THEME_COLORS) => {
                 const pointCloud = createPointCloud(geometry, POINT_MATERIAL);
                 loadedPointClouds[filePath] = pointCloud;
 
-                scene.add(pointCloud);
                 pointCloudRefs.current[filePath] = pointCloud;
 
                 getLabelsForFile({

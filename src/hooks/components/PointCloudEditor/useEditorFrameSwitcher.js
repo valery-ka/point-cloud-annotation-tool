@@ -1,6 +1,8 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 import { useFileManager, useEditor, useFrames } from "contexts";
+
+import { useThree } from "@react-three/fiber";
 
 import * as APP_CONSTANTS from "constants";
 
@@ -10,25 +12,32 @@ export const useEditorFrameSwitcher = (onFrameChanged) => {
     const { pcdFiles } = useFileManager();
     const { activeFrameIndex, arePointCloudsLoading } = useFrames();
     const { pointCloudRefs, setHasFilterSelectionPoint } = useEditor();
+    const { gl, scene } = useThree();
 
-    // update geometry attributes (positions, sizes, colors) for active frame
+    const previousFrameRef = useRef(null);
+
     useEffect(() => {
         if (arePointCloudsLoading || !pcdFiles.length) return;
 
-        pcdFiles.forEach((filePath, index) => {
-            const pointCloud = pointCloudRefs.current[filePath];
-            if (pointCloud) {
-                pointCloud.visible = index === activeFrameIndex;
-            }
-        });
+        const newFilePath = pcdFiles[activeFrameIndex];
+        const newPointCloud = pointCloudRefs.current[newFilePath];
 
-        const activeFrameFilePath = pcdFiles[activeFrameIndex];
-        const activeFrameCloud = pointCloudRefs.current[activeFrameFilePath];
+        if (previousFrameRef.current && scene.children.includes(previousFrameRef.current)) {
+            scene.remove(previousFrameRef.current);
+            previousFrameRef.current.geometry?.dispose();
+            previousFrameRef.current.material?.dispose();
+        }
 
-        const hasFilterSelectionPoint = activeFrameCloud.geometry.attributes.position.array.some(
-            (coord) => coord === SELECTION,
-        );
-        setHasFilterSelectionPoint(hasFilterSelectionPoint);
+        if (newPointCloud) {
+            scene.add(newPointCloud);
+            previousFrameRef.current = newPointCloud;
+
+            const hasFilterSelectionPoint = newPointCloud.geometry.attributes.position.array.some(
+                (coord) => coord === SELECTION,
+            );
+            setHasFilterSelectionPoint(hasFilterSelectionPoint);
+        }
+
         onFrameChanged?.();
     }, [activeFrameIndex, arePointCloudsLoading, pcdFiles]);
 };

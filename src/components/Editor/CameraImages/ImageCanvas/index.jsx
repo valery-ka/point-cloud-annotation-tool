@@ -1,4 +1,4 @@
-import React, { memo, useMemo, useCallback } from "react";
+import React, { memo, useMemo, useCallback, useRef, useEffect } from "react";
 
 import { Canvas } from "@react-three/fiber";
 import { Image } from "@react-three/drei";
@@ -28,15 +28,39 @@ export const ImageCanvas = memo(({ image, size }) => {
 
     const { projectedPointsRef } = useCalibrations();
 
+    const prevGeometryRef = useRef();
+    const prevTextureRef = useRef();
+
+    const texture = useMemo(() => {
+        if (!image) return null;
+        return image?.texture;
+    }, [image]);
+
     const geometry = useMemo(() => {
-        if (!image) return;
-        return projectedPointsRef.current[image.src].geometry;
+        if (!image) return null;
+        return projectedPointsRef.current[image.src]?.geometry;
     }, [image]);
 
     const indexToPosition = useMemo(() => {
         if (!image) return;
         return projectedPointsRef.current[image.src].indexToPositionMap;
     }, [image]);
+
+    useEffect(() => {
+        const prevGeometry = prevGeometryRef.current;
+        if (prevGeometry && prevGeometry !== geometry) {
+            prevGeometry.dispose();
+        }
+        prevGeometryRef.current = geometry;
+    }, [geometry]);
+
+    useEffect(() => {
+        const prevTexture = prevTextureRef.current;
+        if (prevTexture && prevTexture !== texture) {
+            prevTexture.dispose();
+        }
+        prevTextureRef.current = texture;
+    }, [texture]);
 
     const shaderMaterial = useMemo(
         () =>
@@ -48,6 +72,12 @@ export const ImageCanvas = memo(({ image, size }) => {
             }),
         [highlightedPointScale, theme],
     );
+
+    useEffect(() => {
+        return () => {
+            shaderMaterial.dispose();
+        };
+    }, [shaderMaterial]);
 
     useImagePointHighlighter({
         size: { width: imageWidth, height: imageHeight },
@@ -67,13 +97,13 @@ export const ImageCanvas = memo(({ image, size }) => {
 
     return (
         <Canvas orthographic className="chessboard">
-            {image?.texture && (
+            {texture && (
                 <>
                     <ImageGeometryUpdater image={image} />
                     <ImageCameraControls image={image} size={size} />
                     <Image
-                        texture={image.texture}
-                        scale={[imageWidth * scale, imageHeight * scale, 1]}
+                        texture={texture}
+                        scale={[image.width * scale, image.height * scale, 1]}
                     />
                 </>
             )}
