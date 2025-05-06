@@ -41,8 +41,9 @@ export const createEdgesGeometry = (cubeGeometry, color) => {
     };
 };
 
-export const createArrowGeometry = (color, scale, rotation, zOffset) => {
-    const arrowSize = Math.min(...scale) * 0.5;
+export const createArrowGeometry = (color) => {
+    const ARROW_SIZE = 0.85;
+    const Z_OFFSET = -0.5;
 
     const rawPoints = [
         [-0.5, 0],
@@ -53,9 +54,9 @@ export const createArrowGeometry = (color, scale, rotation, zOffset) => {
     ];
 
     const arrowPoints = rawPoints.map(([x, y]) => {
-        const normalizedX = (x / 2) * arrowSize;
-        const normalizedY = (y / 2) * arrowSize;
-        return new THREE.Vector3(normalizedX, normalizedY, zOffset);
+        const normalizedX = (x / 2) * ARROW_SIZE;
+        const normalizedY = (y / 2) * ARROW_SIZE;
+        return new THREE.Vector3(normalizedX, normalizedY, Z_OFFSET);
     });
 
     const arrowGeometry = new THREE.BufferGeometry().setFromPoints(arrowPoints);
@@ -64,7 +65,6 @@ export const createArrowGeometry = (color, scale, rotation, zOffset) => {
     });
 
     const arrow = new THREE.Line(arrowGeometry, arrowMaterial);
-    arrow.rotation.set(...rotation);
 
     return {
         mesh: arrow,
