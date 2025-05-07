@@ -74,3 +74,27 @@ export const createArrowGeometry = (color) => {
         },
     };
 };
+
+export const addCuboid = (scene, cuboid) => {
+    const { color, position, scale, rotation } = cuboid;
+
+    const cube = createCubeGeometry(color, position, scale, rotation);
+    const edges = createEdgesGeometry(cube.mesh.geometry, color);
+    const arrow = createArrowGeometry(color);
+
+    cube.mesh.add(edges.mesh);
+    cube.mesh.add(arrow.mesh);
+
+    scene.add(cube.mesh);
+
+    return { cube, edges, arrow };
+};
+
+export const removeCuboid = (scene, cuboid) => {
+    const { cube, edges, arrow } = cuboid;
+
+    scene.remove(cube.mesh);
+    cube.cleanup();
+    edges.cleanup();
+    arrow.cleanup();
+};

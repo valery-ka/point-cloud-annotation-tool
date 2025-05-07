@@ -30,6 +30,7 @@ export { useToolsMouseEvents } from "./components/PointCloudEditor/useToolsMouse
 export { usePaintFramePoints } from "./components/PointCloudEditor/usePaintFramePoints";
 export { useHighlightedPoint } from "./components/PointCloudEditor/useHighlightedPoint";
 export { usePointCloudLoader } from "./components/PointCloudEditor/usePointCloudLoader";
+export { useRaycastClickSelect } from "./components/PointCloudEditor/useRaycastClickSelect";
 export { useEditorFrameSwitcher } from "./components/PointCloudEditor/useEditorFrameSwitcher";
 export { useFramePointsVisibility } from "./components/PointCloudEditor/useFramePointsVisibility";
 export { useUpdatePixelProjections } from "./components/PointCloudEditor/useUpdatePixelProjections";
@@ -45,3 +46,5 @@ export { useImageSelector } from "./components/CameraImages/useImageSelector";
 export { useFetchCalibrations } from "./components/CameraImages/useFetchCalibrations";
 export { useImagePointHighlighter } from "./components/CameraImages/useImagePointHighlighter";
 export { useImageCanvasMouseEvents } from "./components/CameraImages/useImageCanvasMouseEvents";
+
+export { useTransformControls } from "./components/CuboidManager/useTransformControls";

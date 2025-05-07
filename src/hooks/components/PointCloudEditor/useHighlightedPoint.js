@@ -22,7 +22,13 @@ export const useHighlightedPoint = () => {
     const { pcdFiles } = useFileManager();
     const { activeFrameIndex } = useFrames();
     const { nonHiddenClasses } = useConfig();
-    const { pointCloudRefs, pointLabelsRef, pixelProjections, setSelectedClassIndex } = useEditor();
+    const {
+        pointCloudRefs,
+        pointLabelsRef,
+        pixelProjections,
+        setSelectedClassIndex,
+        isIntersectingMap,
+    } = useEditor();
     const { selectedTool } = useTools();
     const { highlightedPoint, setHighlightedPoint } = useHoveredPoint();
     const { settings } = useSettings();
@@ -156,7 +162,12 @@ export const useHighlightedPoint = () => {
 
     const onClick = useCallback(
         (event) => {
-            if (isDraggingRef.current === true) return;
+            if (
+                isDraggingRef.current === true ||
+                [...isIntersectingMap.current.values()].some(Boolean)
+            )
+                return;
+
             if (highlightedPoint && selectedTool === DEFAULT_TOOL && !event.ctrlKey) {
                 const index = highlightedPoint.label
                     ? nonHiddenClasses.findIndex(

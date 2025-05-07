@@ -1,7 +1,6 @@
 import { useEffect, useRef, useCallback, useMemo } from "react";
 import { useThree } from "@react-three/fiber";
 import { isEmpty } from "lodash";
-import { Vector2, Raycaster } from "three";
 
 import {
     useFileManager,
@@ -10,22 +9,18 @@ import {
     useSettings,
     useImages,
     useCalibrations,
-    useTools,
 } from "contexts";
-import { useSubscribeFunction } from "hooks";
+import { useSubscribeFunction, useRaycastClickSelect } from "hooks";
 
 import { drawGlobalBox, drawCircleRuler, drawFrustumMesh, drawWireframe } from "utils/editor";
 import { getIntrinsicParameters, getCameraWorldPosition } from "utils/calibrations";
 
-import { DEFAULT_TOOL } from "constants";
-
 export const useEditorHelpers = () => {
-    const { gl, camera, scene } = useThree();
+    const { scene } = useThree();
     const { settings } = useSettings();
 
     const { pcdFiles } = useFileManager();
     const { pointCloudRefs } = useEditor();
-    const { selectedTool } = useTools();
     const { activeFrameIndex, arePointCloudsLoading } = useFrames();
 
     const { loadedImages, selectedCamera, setSelectedCamera } = useImages();
@@ -82,84 +77,16 @@ export const useEditorHelpers = () => {
     const SELECTED_COLOR = 0xffd500;
 
     const cameraMeshes = useRef({});
-    const raycasterRef = useRef(new Raycaster());
-    const mouseRef = useRef(new Vector2());
 
     const showCameraPositions = useMemo(() => {
         return settings.editorSettings.images.cameraPositions;
     }, [settings.editorSettings.images.cameraPositions]);
 
-    useEffect(() => {
-        raycasterRef.current.params.Line.threshold = 0;
-    }, []);
-
-    const handleMouseDown = useCallback(
-        (event) => {
-            if (event.button !== 0) return;
-
-            const { current: raycaster } = raycasterRef;
-            const { current: mouse } = mouseRef;
-
-            const canvas = event.currentTarget;
-            const rect = canvas.getBoundingClientRect();
-
-            mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-            mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-
-            raycaster.setFromCamera(mouse, camera);
-
-            const meshes = Object.values(cameraMeshes.current).filter((obj) => obj.isMesh);
-            const intersects = raycaster.intersectObjects(meshes);
-
-            mouseRef.current.downIntersect = intersects[0]?.object || null;
-        },
-        [camera],
-    );
-
-    const handleMouseUp = useCallback(
-        (event) => {
-            const { current: raycaster } = raycasterRef;
-            const { current: mouse } = mouseRef;
-
-            if (!mouse.downIntersect) return;
-
-            const canvas = event.currentTarget;
-            const rect = canvas.getBoundingClientRect();
-
-            mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-            mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-
-            raycaster.setFromCamera(mouse, camera);
-
-            const meshes = Object.values(cameraMeshes.current).filter((obj) => obj.isMesh);
-            const intersects = raycaster.intersectObjects(meshes);
-
-            const isSameObject = intersects.some(
-                (intersect) => intersect.object === mouse.downIntersect,
-            );
-
-            if (isSameObject && selectedTool === DEFAULT_TOOL) {
-                const clickedCamera = Object.keys(cameraMeshes.current).find(
-                    (name) => cameraMeshes.current[name] === mouse.downIntersect,
-                );
-                setSelectedCamera(clickedCamera);
-            }
-
-            mouseRef.current.downIntersect = null;
-        },
-        [selectedTool, camera],
-    );
-
-    useEffect(() => {
-        const canvas = gl.domElement;
-        canvas.addEventListener("mousedown", handleMouseDown);
-        canvas.addEventListener("mouseup", handleMouseUp);
-
-        return () => {
-            canvas.removeEventListener("mousedown", handleMouseDown);
-            canvas.removeEventListener("mouseup", handleMouseUp);
-        };
-    }, [handleMouseDown, handleMouseUp, gl.domElement]);
+    useRaycastClickSelect({
+        getMeshMap: () => cameraMeshes.current,
+        onSelect: setSelectedCamera,
+        groupKey: "camera",
+    });
 
     const setCameraColor = useCallback((selectedCamera) => {
         if (!cameraMeshes.current) return;

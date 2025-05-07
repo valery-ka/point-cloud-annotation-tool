@@ -4,4 +4,10 @@ export {
     TransformControlsPlane,
 } from "./TransformControls";
 
-export { createCubeGeometry, createEdgesGeometry, createArrowGeometry } from "./geometry";
+export {
+    createCubeGeometry,
+    createEdgesGeometry,
+    createArrowGeometry,
+    addCuboid,
+    removeCuboid,
+} from "./geometry";

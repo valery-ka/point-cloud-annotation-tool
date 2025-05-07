@@ -24,6 +24,8 @@ export const EditorProvider = ({ children }) => {
 
     const controlsRef = useRef(null);
 
+    const isIntersectingMap = useRef(new Map());
+
     return (
         <EditorContext.Provider
             value={{
@@ -43,6 +45,7 @@ export const EditorProvider = ({ children }) => {
                 pendingSaveState,
                 setPendingSaveState,
                 controlsRef,
+                isIntersectingMap,
             }}
         >
             {children}
