@@ -7,6 +7,8 @@ import { useTools, useEditor } from "contexts";
 
 import { DEFAULT_TOOL } from "constants";
 
+const DRAG_ACTION_PX = 1;
+
 export const useRaycastClickSelect = ({ getMeshMap, onSelect, groupKey }) => {
     const { gl, camera } = useThree();
 
@@ -15,6 +17,8 @@ export const useRaycastClickSelect = ({ getMeshMap, onSelect, groupKey }) => {
 
     const raycasterRef = useRef(new Raycaster());
     const mouseRef = useRef(new Vector2());
+    const mouseDownPosRef = useRef({ x: 0, y: 0 });
+    const isDragRef = useRef(false);
     const downIntersectRef = useRef(null);
     const isObjectIntersectRef = useRef(false);
 
@@ -42,6 +46,9 @@ export const useRaycastClickSelect = ({ getMeshMap, onSelect, groupKey }) => {
 
             const intersects = getIntersects(event);
             downIntersectRef.current = intersects[0]?.object || null;
+
+            mouseDownPosRef.current = { x: event.clientX, y: event.clientY };
+            isDragRef.current = false;
         },
         [getIntersects],
     );
@@ -50,24 +57,31 @@ export const useRaycastClickSelect = ({ getMeshMap, onSelect, groupKey }) => {
         (event) => {
             if (!downIntersectRef.current) return;
 
-            const intersects = getIntersects(event);
+            if (!isDragRef.current && selectedTool === DEFAULT_TOOL) {
+                const intersects = getIntersects(event);
+                const isSame = intersects.some((i) => i.object === downIntersectRef.current);
 
-            const isSame = intersects.some((i) => i.object === downIntersectRef.current);
-
-            if (isSame && selectedTool === DEFAULT_TOOL) {
-                const key = Object.entries(getMeshMap()).find(
-                    ([_, obj]) => obj === downIntersectRef.current,
-                )?.[0];
-                if (key) onSelect(key);
+                if (isSame) {
+                    const key = Object.entries(getMeshMap()).find(
+                        ([_, obj]) => obj === downIntersectRef.current,
+                    )?.[0];
+                    if (key) onSelect(key);
+                }
             }
 
             downIntersectRef.current = null;
+            isDragRef.current = false;
         },
         [getIntersects, selectedTool, DEFAULT_TOOL, onSelect],
     );
 
     const handleMouseMove = useCallback(
         (event) => {
+            const dx = event.clientX - mouseDownPosRef.current.x;
+            const dy = event.clientY - mouseDownPosRef.current.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            if (distance > DRAG_ACTION_PX) isDragRef.current = true;
+
             const intersects = getIntersects(event);
             const isIntersecting = intersects.length > 0;
             isObjectIntersectRef.current = isIntersecting;
