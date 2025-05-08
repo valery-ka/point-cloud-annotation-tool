@@ -72,7 +72,7 @@ export const useRaycastClickSelect = ({ getMeshMap, onSelect, groupKey }) => {
             downIntersectRef.current = null;
             isDragRef.current = false;
         },
-        [getIntersects, selectedTool, DEFAULT_TOOL, onSelect],
+        [getIntersects, selectedTool, onSelect],
     );
 
     const handleMouseMove = useCallback(
@@ -86,6 +86,12 @@ export const useRaycastClickSelect = ({ getMeshMap, onSelect, groupKey }) => {
             const isIntersecting = intersects.length > 0;
             isObjectIntersectRef.current = isIntersecting;
             isIntersectingMap.current.set(groupKey, isIntersecting);
+
+            if ([...isIntersectingMap.current.values()].some(Boolean)) {
+                gl.domElement.classList.add("pointer-cursor");
+            } else {
+                gl.domElement.classList.remove("pointer-cursor");
+            }
         },
         [getIntersects, gl.domElement],
     );

@@ -1,4 +1,3 @@
-import React from "react";
 import { Canvas } from "@react-three/fiber";
 import {
     PointCloudEditor,
@@ -12,6 +11,7 @@ import {
     EditorContextMenu,
     CameraImages,
     PointHighlighter,
+    SideViews,
 } from "components";
 
 import { useServerLogs } from "hooks";
@@ -24,6 +24,7 @@ export const App = () => {
             <LoadingOverlay />
             <FileNavigator />
             <div className="tool-3d-scene">
+                <SideViews />
                 <div className="tool-3d-container">
                     <EditorContextMenu />
                     <canvas id="canvasSelection" className="tool-3d-canvas-selection"></canvas>

@@ -1,0 +1,25 @@
+.side-views-container {
+    position: relative;
+    width: 400px;
+    display: flex;
+    flex-direction: column;
+    z-index: 1001;
+    border-right: 1px solid var(--border-color);
+    background-color: var(--primary-theme-color);
+    padding: 5px;
+}
+
+.top-view {
+    position: relative;
+    flex: 1;
+}
+
+.left-view {
+    position: relative;
+    flex: 1;
+}
+
+.front-view {
+    position: relative;
+    flex: 1;
+}

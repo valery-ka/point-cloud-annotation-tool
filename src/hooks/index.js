@@ -47,4 +47,5 @@ export { useFetchCalibrations } from "./components/CameraImages/useFetchCalibrat
 export { useImagePointHighlighter } from "./components/CameraImages/useImagePointHighlighter";
 export { useImageCanvasMouseEvents } from "./components/CameraImages/useImageCanvasMouseEvents";
 
+export { useOrthographicView } from "./components/CuboidManager/useOrthographicView";
 export { useTransformControls } from "./components/CuboidManager/useTransformControls";

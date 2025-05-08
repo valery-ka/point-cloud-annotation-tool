@@ -8,7 +8,12 @@ import { useEditor, useFrames, useFileManager } from "contexts";
 import { isEmpty } from "lodash";
 import { TransformControls } from "utils/cuboids";
 
-export const useTransformControls = ({ cubeRefs, selectedCuboidRef }) => {
+export const useTransformControls = ({
+    cubeRefs,
+    selectedCuboidRef,
+    onTransformFinished,
+    updateAllSideViewCameras,
+}) => {
     const { gl, camera, scene } = useThree();
 
     const { pcdFiles } = useFileManager();
@@ -23,19 +28,24 @@ export const useTransformControls = ({ cubeRefs, selectedCuboidRef }) => {
         if (controlsRef.current) {
             controlsRef.current.enabled = !event.value;
         }
+        if (!isDraggingRef.current) {
+            onTransformFinished();
+        }
     }, []);
 
     const onTransformChange = useCallback(() => {
         if (!isDraggingRef.current || !cubeRefs.current[selectedCuboidRef.current]) return;
 
+        const cube = cubeRefs.current[selectedCuboidRef.current];
+        const position = cube.position;
+        const scale = cube.scale;
+
+        updateAllSideViewCameras(cube);
+
         if (isEmpty(pcdFiles)) {
             // console.log("no points");
             return;
         }
-
-        const cube = cubeRefs.current[selectedCuboidRef.current];
-        const position = cube.position;
-        const scale = cube.scale;
 
         const activeFrameFilePath = pcdFiles[activeFrameIndex];
         const activeFrame = pointCloudRefs.current[activeFrameFilePath];

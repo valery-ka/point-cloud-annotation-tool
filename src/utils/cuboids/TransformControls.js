@@ -5,7 +5,6 @@ import {
     DoubleSide,
     Euler,
     Float32BufferAttribute,
-    Line,
     LineBasicMaterial,
     Matrix4,
     Mesh,
@@ -15,10 +14,8 @@ import {
     PlaneGeometry,
     Quaternion,
     Raycaster,
-    SphereGeometry,
     TorusGeometry,
     Vector3,
-    Group,
 } from "three";
 
 const _raycaster = new Raycaster();
@@ -1744,7 +1741,7 @@ class TransformControlsPlane extends Mesh {
         super(
             new PlaneGeometry(100000, 100000, 2, 2),
             new MeshBasicMaterial({
-                visible: true, // кажется пофиксил, но пока оставлю включенной
+                visible: false,
                 wireframe: true,
                 side: DoubleSide,
                 transparent: true,
