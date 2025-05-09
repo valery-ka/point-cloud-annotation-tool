@@ -10,10 +10,9 @@ import {
     MeshBasicMaterial,
     Mesh,
     DoubleSide,
+    AxesHelper,
 } from "three";
-import * as APP_CONSTANTS from "constants";
-
-const { CIRCLE_RULER_RADIUS, HIDDEN_POINT } = APP_CONSTANTS;
+import { CIRCLE_RULER_RADIUS, HIDDEN_POINT } from "constants";
 
 export const rebuildGeometry = (geom) => {
     const geometry = new BufferGeometry();
@@ -215,4 +214,9 @@ export const drawWireframe = (geometry, color = 0x0084ff) => {
         opacity: 0.75,
     });
     return new LineSegments(edges, lineMaterial);
+};
+
+export const drawAxesHelper = () => {
+    const axes = new AxesHelper(5);
+    return axes;
 };

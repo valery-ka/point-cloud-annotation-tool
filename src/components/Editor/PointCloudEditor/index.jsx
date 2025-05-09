@@ -52,9 +52,9 @@ export const PointCloudEditor = () => {
 
     HOOKS.useStats();
 
+    // в идеале тоже в хуки перенести
     return (
         <>
-            <axesHelper args={[5]} />
             <ModerationComments />
             <CuboidManager />
         </>

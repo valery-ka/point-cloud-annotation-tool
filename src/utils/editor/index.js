@@ -47,6 +47,7 @@ export {
     drawCircleRuler,
     drawFrustumMesh,
     drawWireframe,
+    drawAxesHelper,
 } from "./geometry/general";
 export {
     handleIntensityAttribute,

@@ -1,4 +1,4 @@
-import * as THREE from "three";
+import { CameraHelper, OrthographicCamera, WebGLRenderer } from "three";
 import { useThree } from "@react-three/fiber";
 
 import { useEffect, useRef, useCallback } from "react";
@@ -6,12 +6,22 @@ import { useEffect, useRef, useCallback } from "react";
 export const useOrthographicView = ({ viewId, scaleOrder, computeCameraOrientation }) => {
     const { scene } = useThree();
     const orthoCameraRef = useRef();
+    // const cameraHelperRef = useRef();
     const rendererRef = useRef();
 
     useEffect(() => {
         const asp = 1;
-        const camera = new THREE.OrthographicCamera(-3 * asp, 3 * asp, 3, -3, -3, 3);
+        const camera = new OrthographicCamera(-3 * asp, 3 * asp, 3, -3, -3, 3);
+        // const helper = new CameraHelper(camera);
+
         orthoCameraRef.current = camera;
+        // cameraHelperRef.current = helper;
+
+        // scene.add(helper);
+
+        // return () => {
+        //     scene.remove(helper);
+        // };
     }, [scene]);
 
     const updateCamera = useCallback(
@@ -49,6 +59,7 @@ export const useOrthographicView = ({ viewId, scaleOrder, computeCameraOrientati
 
             camera.updateProjectionMatrix();
             camera.updateMatrixWorld(true);
+            // cameraHelperRef.current.update();
         },
         [computeCameraOrientation, scaleOrder],
     );
@@ -61,7 +72,7 @@ export const useOrthographicView = ({ viewId, scaleOrder, computeCameraOrientati
         canvas.id = `canvas-${viewId}`;
         container.appendChild(canvas);
 
-        const renderer = new THREE.WebGLRenderer({ canvas, alpha: true });
+        const renderer = new WebGLRenderer({ canvas, alpha: true });
         renderer.setSize(container.clientWidth, container.clientHeight);
         renderer.setPixelRatio(window.devicePixelRatio);
         rendererRef.current = renderer;

@@ -18,7 +18,10 @@ import {
     Vector3,
 } from "three";
 
+import { LAYERS } from "constants";
+
 const _raycaster = new Raycaster();
+_raycaster.layers.set(LAYERS.SECONDARY);
 
 const _tempVector = new Vector3();
 const _tempVector2 = new Vector3();
@@ -50,10 +53,12 @@ class TransformControls extends Object3D {
         this.domElement.style.touchAction = "none"; // disable touch scroll
 
         const _gizmo = new TransformControlsGizmo();
+        _gizmo.layers.set(LAYERS.SECONDARY);
         this._gizmo = _gizmo;
         this.add(_gizmo);
 
         const _plane = new TransformControlsPlane();
+        _plane.layers.set(LAYERS.SECONDARY);
         this._plane = _plane;
         this.add(_plane);
 
@@ -1412,6 +1417,7 @@ class TransformControlsGizmo extends Object3D {
                     object.position.set(0, 0, 0);
                     object.rotation.set(0, 0, 0);
                     object.scale.set(1, 1, 1);
+                    object.layers.set(LAYERS.SECONDARY);
 
                     gizmo.add(object);
                 }

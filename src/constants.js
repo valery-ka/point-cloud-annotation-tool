@@ -2,6 +2,10 @@
 export const DISTANCE_TO_CENTER = 15;
 export const TWEEN_DURATION = 200;
 export const PIXEL_PROJECTION_REQUEST_TIME = 100;
+export const LAYERS = {
+    PRIMARY: 0,
+    SECONDARY: 1,
+};
 
 // editor helpers
 export const CIRCLE_RULER_RADIUS = [35, 75]; // add elements if you need more circles (i.g. [35, 50, 75])

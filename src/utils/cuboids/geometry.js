@@ -1,15 +1,29 @@
-import * as THREE from "three";
+import {
+    BoxGeometry,
+    MeshBasicMaterial,
+    Color,
+    EdgesGeometry,
+    LineBasicMaterial,
+    Vector3,
+    BufferGeometry,
+    Line,
+    DoubleSide,
+    Mesh,
+    LineSegments,
+} from "three";
+
+import { LAYERS } from "constants";
 
 export const createCubeGeometry = (color, position, scale, rotation) => {
-    const geometry = new THREE.BoxGeometry();
-    const material = new THREE.MeshBasicMaterial({
-        color: new THREE.Color(color),
+    const geometry = new BoxGeometry();
+    const material = new MeshBasicMaterial({
+        color: new Color(color),
         transparent: true,
         opacity: 0.025,
-        side: THREE.DoubleSide,
+        side: DoubleSide,
     });
 
-    const cube = new THREE.Mesh(geometry, material);
+    const cube = new Mesh(geometry, material);
     cube.position.set(...position);
     cube.scale.set(...scale);
     cube.rotation.set(...rotation);
@@ -24,13 +38,13 @@ export const createCubeGeometry = (color, position, scale, rotation) => {
 };
 
 export const createEdgesGeometry = (cubeGeometry, color) => {
-    const edgesGeometry = new THREE.EdgesGeometry(cubeGeometry);
-    const edgesMaterial = new THREE.LineBasicMaterial({
-        color: new THREE.Color(color),
+    const edgesGeometry = new EdgesGeometry(cubeGeometry);
+    const edgesMaterial = new LineBasicMaterial({
+        color: new Color(color),
         linewidth: 2,
     });
 
-    const edges = new THREE.LineSegments(edgesGeometry, edgesMaterial);
+    const edges = new LineSegments(edgesGeometry, edgesMaterial);
 
     return {
         mesh: edges,
@@ -56,15 +70,15 @@ export const createArrowGeometry = (color) => {
     const arrowPoints = rawPoints.map(([x, y]) => {
         const normalizedX = (x / 2) * ARROW_SIZE;
         const normalizedY = (y / 2) * ARROW_SIZE;
-        return new THREE.Vector3(normalizedX, normalizedY, Z_OFFSET);
+        return new Vector3(normalizedX, normalizedY, Z_OFFSET);
     });
 
-    const arrowGeometry = new THREE.BufferGeometry().setFromPoints(arrowPoints);
-    const arrowMaterial = new THREE.LineBasicMaterial({
+    const arrowGeometry = new BufferGeometry().setFromPoints(arrowPoints);
+    const arrowMaterial = new LineBasicMaterial({
         color: color,
     });
 
-    const arrow = new THREE.Line(arrowGeometry, arrowMaterial);
+    const arrow = new Line(arrowGeometry, arrowMaterial);
 
     return {
         mesh: arrow,
@@ -81,6 +95,10 @@ export const addCuboid = (scene, cuboid) => {
     const cube = createCubeGeometry(color, position, scale, rotation);
     const edges = createEdgesGeometry(cube.mesh.geometry, color);
     const arrow = createArrowGeometry(color);
+
+    cube.mesh.layers.set(LAYERS.SECONDARY);
+    // edges.mesh.layers.set(LAYERS.SECONDARY);;
+    arrow.mesh.layers.set(LAYERS.SECONDARY);
 
     cube.mesh.add(edges.mesh);
     cube.mesh.add(arrow.mesh);

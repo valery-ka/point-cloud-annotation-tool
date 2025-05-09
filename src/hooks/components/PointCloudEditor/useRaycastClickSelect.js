@@ -5,7 +5,7 @@ import { useThree } from "@react-three/fiber";
 
 import { useTools, useEditor } from "contexts";
 
-import { DEFAULT_TOOL } from "constants";
+import { DEFAULT_TOOL, LAYERS } from "constants";
 
 const DRAG_ACTION_PX = 1;
 
@@ -23,6 +23,7 @@ export const useRaycastClickSelect = ({ getMeshMap, onSelect, groupKey }) => {
     const isObjectIntersectRef = useRef(false);
 
     useEffect(() => {
+        raycasterRef.current.layers.set(LAYERS.SECONDARY);
         raycasterRef.current.params.Line.threshold = 0;
     }, []);
 

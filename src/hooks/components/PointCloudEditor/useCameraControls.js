@@ -7,10 +7,9 @@ import { useSubscribeFunction, useChangeTarget } from "hooks";
 
 import { getToolsConfig } from "tools";
 import { CameraControls, createCameraViews } from "utils/camera";
-import * as APP_CONSTANTS from "constants";
+import { DISTANCE_TO_CENTER, LAYERS } from "constants";
 
 const tweenGroup = new Group();
-const { DISTANCE_TO_CENTER } = APP_CONSTANTS;
 
 export const useCameraControls = (requestPixelProjectionsUpdate) => {
     const { camera, gl } = useThree();
@@ -98,6 +97,9 @@ export const useCameraControls = (requestPixelProjectionsUpdate) => {
     });
 
     useEffect(() => {
+        camera.layers.set(LAYERS.SECONDARY);
+        camera.layers.enable(LAYERS.MAIN);
+
         const cameraViews = createCameraViews(camera, controlsRef.current, tweenGroup, () => {
             onEnd();
         });
@@ -119,7 +121,7 @@ export const useCameraControls = (requestPixelProjectionsUpdate) => {
                 unsubscribe(event, wrappedHandler);
             });
         };
-    }, [subscribe, unsubscribe]);
+    }, [camera, subscribe, unsubscribe]);
 
     // setup controls behaviour for each selection tool when it's active
     useEffect(() => {

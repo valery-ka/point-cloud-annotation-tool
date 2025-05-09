@@ -12,8 +12,16 @@ import {
 } from "contexts";
 import { useSubscribeFunction, useRaycastClickSelect } from "hooks";
 
-import { drawGlobalBox, drawCircleRuler, drawFrustumMesh, drawWireframe } from "utils/editor";
+import {
+    drawGlobalBox,
+    drawCircleRuler,
+    drawFrustumMesh,
+    drawWireframe,
+    drawAxesHelper,
+} from "utils/editor";
 import { getIntrinsicParameters, getCameraWorldPosition } from "utils/calibrations";
+
+import { LAYERS } from "constants";
 
 export const useEditorHelpers = () => {
     const { scene } = useThree();
@@ -25,6 +33,13 @@ export const useEditorHelpers = () => {
 
     const { loadedImages, selectedCamera, setSelectedCamera } = useImages();
     const { calibrations } = useCalibrations();
+
+    // Axes
+    useEffect(() => {
+        const axes = drawAxesHelper();
+        axes.layers.set(LAYERS.SECONDARY);
+        scene.add(axes);
+    }, [scene]);
 
     // Global Box
     const boundingBoxRef = useRef(null);
@@ -142,6 +157,9 @@ export const useEditorHelpers = () => {
 
             const frustumMesh = drawFrustumMesh(fovYRad, aspect);
             const wireframe = drawWireframe(frustumMesh.geometry);
+
+            frustumMesh.layers.set(LAYERS.SECONDARY);
+            wireframe.layers.set(LAYERS.SECONDARY);
 
             frustumMesh.add(wireframe);
             frustumMesh.position.copy(position);
