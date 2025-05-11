@@ -28,39 +28,7 @@ export const CuboidManager = memo(() => {
         },
     ]);
 
-    const { updateCamera: updateTopViewCamera } = useOrthographicView({
-        viewId: "top-view",
-        scaleOrder: ["x", "y", "z"],
-        computeCameraOrientation: (camera) => {
-            camera.up.set(0, 1, 0);
-            camera.rotateZ(-Math.PI / 2);
-        },
-    });
-
-    const { updateCamera: updateLeftViewCamera } = useOrthographicView({
-        viewId: "left-view",
-        scaleOrder: ["z", "x", "y"],
-        computeCameraOrientation: (camera) => {
-            camera.up.set(0, 0, 1);
-            camera.rotateX(Math.PI / 2);
-        },
-    });
-
-    const { updateCamera: updateFrontViewCamera } = useOrthographicView({
-        viewId: "front-view",
-        scaleOrder: ["y", "z", "x"],
-        computeCameraOrientation: (camera) => {
-            camera.up.set(0, 1, 0);
-            camera.rotateX(Math.PI / 2);
-            camera.rotateY(-Math.PI / 2);
-        },
-    });
-
-    const updateAllSideViewCameras = useCallback((mesh) => {
-        updateTopViewCamera(mesh);
-        updateLeftViewCamera(mesh);
-        updateFrontViewCamera(mesh);
-    }, []);
+    const { updateAllCameras: updateAllSideViewCameras } = useOrthographicView();
 
     const onTransformFinished = useCallback(() => {
         const mesh = cubeRefs.current[selectedCuboidRef.current];

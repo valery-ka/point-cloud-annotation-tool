@@ -12,6 +12,7 @@ import {
     DoubleSide,
     AxesHelper,
 } from "three";
+
 import { CIRCLE_RULER_RADIUS, HIDDEN_POINT } from "constants";
 
 export const rebuildGeometry = (geom) => {
@@ -48,12 +49,13 @@ export const rebuildGeometry = (geom) => {
     return geometry;
 };
 
+const BOX_MATERIAL = new LineBasicMaterial({ color: 0x555555 });
+
 export const drawGlobalBox = (positions, scene, boundingBoxRef, isBoxActive) => {
     if (!positions) return;
     if (!isBoxActive) {
         if (boundingBoxRef.current) {
-            scene.remove(boundingBoxRef.current);
-            boundingBoxRef.current = null;
+            disposeMesh(scene, boundingBoxRef.current);
         }
         return;
     }
@@ -86,8 +88,7 @@ export const drawGlobalBox = (positions, scene, boundingBoxRef, isBoxActive) => 
 
     if (minX === Infinity || minY === Infinity || minZ === Infinity) {
         if (boundingBoxRef.current) {
-            scene.remove(boundingBoxRef.current);
-            boundingBoxRef.current = null;
+            disposeMesh(scene, boundingBoxRef.current);
         }
         return;
     }
@@ -101,7 +102,7 @@ export const drawGlobalBox = (positions, scene, boundingBoxRef, isBoxActive) => 
     boxMesh.position.set((minX + maxX) / 2, (minY + maxY) / 2, (minZ + maxZ) / 2);
 
     if (boundingBoxRef.current) {
-        scene.remove(boundingBoxRef.current);
+        disposeMesh(scene, boundingBoxRef.current);
     }
 
     scene.add(boxMesh);
@@ -109,42 +110,43 @@ export const drawGlobalBox = (positions, scene, boundingBoxRef, isBoxActive) => 
 };
 
 export const drawCircleRuler = (scene, circleRulerRef, isCircleRulerActive) => {
-    if (!isCircleRulerActive) {
-        circleRulerRef.current?.forEach((circle) => scene.remove(circle));
-        circleRulerRef.current = [];
-        return;
-    }
-
     const radii = CIRCLE_RULER_RADIUS;
     const segments = 1024;
 
-    if (circleRulerRef.current) {
-        circleRulerRef.current.forEach((circle) => scene.remove(circle));
-    }
+    if (!circleRulerRef.current || circleRulerRef.current.length === 0) {
+        const circles = radii.map((radius) => {
+            const positions = [];
 
-    const circles = radii.map((radius) => {
-        const positions = [];
+            for (let i = 0; i < segments; i++) {
+                const angle = (i / segments) * Math.PI * 2;
+                positions.push(radius * Math.cos(angle), radius * Math.sin(angle), 0);
+            }
 
-        for (let i = 0; i < segments; i++) {
-            const angle = (i / segments) * Math.PI * 2;
-            positions.push(radius * Math.cos(angle), radius * Math.sin(angle), 0);
-        }
+            const geometry = new BufferGeometry();
+            geometry.setAttribute("position", new Float32BufferAttribute(positions, 3));
 
-        const geometry = new BufferGeometry();
-        geometry.setAttribute("position", new Float32BufferAttribute(positions, 3));
+            const material = new LineBasicMaterial({
+                color: 0xffff00,
+                transparent: true,
+                opacity: 0.2,
+                depthWrite: false,
+            });
 
-        const material = new LineBasicMaterial({
-            color: 0xffff00,
-            transparent: true,
-            opacity: 0.2,
+            const circle = new LineLoop(geometry, material);
+            scene.add(circle);
+            return circle;
         });
 
-        const circle = new LineLoop(geometry, material);
-        scene.add(circle);
-        return circle;
-    });
+        circleRulerRef.current = circles;
+    }
 
-    circleRulerRef.current = circles;
+    circleRulerRef.current.forEach((circle) => {
+        if (isCircleRulerActive) {
+            circle.visible = true;
+        } else {
+            circle.visible = false;
+        }
+    });
 };
 
 export const drawFrustumMesh = (fovYRad, aspect, color = 0x0084ff) => {
@@ -219,4 +221,15 @@ export const drawWireframe = (geometry, color = 0x0084ff) => {
 export const drawAxesHelper = () => {
     const axes = new AxesHelper(5);
     return axes;
+};
+
+export const disposeMesh = (scene, mesh) => {
+    if (!mesh) return;
+    scene.remove(mesh);
+
+    const { geometry } = mesh;
+
+    requestAnimationFrame(() => {
+        geometry?.dispose();
+    });
 };

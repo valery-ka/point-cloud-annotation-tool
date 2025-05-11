@@ -1,94 +1,143 @@
-import { CameraHelper, OrthographicCamera, WebGLRenderer } from "three";
-import { useThree } from "@react-three/fiber";
-
 import { useEffect, useRef, useCallback } from "react";
+import { useThree, useFrame } from "@react-three/fiber";
+import { OrthographicCamera, WebGLRenderer } from "three";
 
-export const useOrthographicView = ({ viewId, scaleOrder, computeCameraOrientation }) => {
+export const useOrthographicView = () => {
     const { scene } = useThree();
-    const orthoCameraRef = useRef();
-    // const cameraHelperRef = useRef();
-    const rendererRef = useRef();
+
+    const canvasRef = useRef(null);
+    const rendererRef = useRef(null);
+
+    const viewsRef = useRef([]);
+
+    const setupCamera = () => {
+        const aspect = 1;
+        const camera = new OrthographicCamera(-3 * aspect, 3 * aspect, 3, -3, -3, 3);
+        camera.zoom = 0.75;
+        return camera;
+    };
 
     useEffect(() => {
-        const asp = 1;
-        const camera = new OrthographicCamera(-3 * asp, 3 * asp, 3, -3, -3, 3);
-        // const helper = new CameraHelper(camera);
+        viewsRef.current = [
+            {
+                name: "top",
+                camera: setupCamera(),
+                scaleOrder: ["x", "y", "z"],
+                computeOrientation: (cam) => {
+                    cam.up.set(0, 1, 0);
+                    cam.rotation.set(0, 0, 0);
+                    cam.rotateZ(-Math.PI / 2);
+                },
+            },
+            {
+                name: "left",
+                camera: setupCamera(),
+                scaleOrder: ["z", "x", "y"],
+                computeOrientation: (cam) => {
+                    cam.up.set(0, 0, 1);
+                    cam.rotation.set(0, 0, 0);
+                    cam.rotateX(Math.PI / 2);
+                },
+            },
+            {
+                name: "front",
+                camera: setupCamera(),
+                scaleOrder: ["y", "z", "x"],
+                computeOrientation: (cam) => {
+                    cam.up.set(0, 1, 0);
+                    cam.rotation.set(0, 0, 0);
+                    cam.rotateX(Math.PI / 2);
+                    cam.rotateY(-Math.PI / 2);
+                },
+            },
+        ];
+    }, []);
 
-        orthoCameraRef.current = camera;
-        // cameraHelperRef.current = helper;
+    const updateCamera = useCallback((camera, mesh, scaleOrder, computeOrientation) => {
+        if (!camera || !mesh) return;
 
-        // scene.add(helper);
+        const aspect = 1;
+        const cameraDepth = 0;
 
-        // return () => {
-        //     scene.remove(helper);
-        // };
-    }, [scene]);
+        const scale = mesh.scale;
+        const [w, h, d] = scaleOrder.map((axis) => scale[axis] + cameraDepth);
 
-    const updateCamera = useCallback(
+        let camWidth = w;
+        let camHeight = h;
+        let camDepth = d;
+
+        if (camWidth / camHeight > aspect) {
+            camHeight = camWidth / aspect;
+        } else {
+            camWidth = camHeight * aspect;
+        }
+
+        camera.left = -camWidth / 2;
+        camera.right = camWidth / 2;
+        camera.top = camHeight / 2;
+        camera.bottom = -camHeight / 2;
+        camera.near = -camDepth / 2;
+        camera.far = camDepth / 2;
+
+        camera.position.copy(mesh.position);
+        computeOrientation(camera);
+
+        camera.updateProjectionMatrix();
+        camera.updateMatrixWorld(true);
+    }, []);
+
+    const updateAllCameras = useCallback(
         (mesh) => {
-            if (!mesh) return;
-
-            const camera = orthoCameraRef.current;
-            const aspect = 1;
-            const cameraDepth = 1;
-
-            const scale = mesh.scale;
-            const [w, h, d] = scaleOrder.map((axis) => scale[axis] + cameraDepth);
-
-            let camWidth = w;
-            let camHeight = h;
-            let camDepth = d;
-
-            if (camWidth / camHeight > aspect) {
-                camHeight = camWidth / aspect;
-            } else {
-                camWidth = camHeight * aspect;
-            }
-
-            camera.left = -camWidth / 2;
-            camera.right = camWidth / 2;
-            camera.top = camHeight / 2;
-            camera.bottom = -camHeight / 2;
-            camera.near = -camDepth / 2;
-            camera.far = camDepth / 2;
-
-            camera.position.copy(mesh.position);
-            camera.rotation.copy(mesh.rotation);
-
-            computeCameraOrientation(camera);
-
-            camera.updateProjectionMatrix();
-            camera.updateMatrixWorld(true);
-            // cameraHelperRef.current.update();
+            viewsRef.current.forEach(({ camera, scaleOrder, computeOrientation }) => {
+                updateCamera(camera, mesh, scaleOrder, computeOrientation);
+            });
         },
-        [computeCameraOrientation, scaleOrder],
+        [updateCamera],
     );
 
     useEffect(() => {
-        const container = document.getElementById(viewId);
-        if (!container || !scene || !orthoCameraRef.current) return;
+        const canvas = document.getElementById("side-views-canvas");
+        if (!canvas || !scene) return;
 
-        const canvas = document.createElement("canvas");
-        canvas.id = `canvas-${viewId}`;
-        container.appendChild(canvas);
+        canvasRef.current = canvas;
 
         const renderer = new WebGLRenderer({ canvas, alpha: true });
-        renderer.setSize(container.clientWidth, container.clientHeight);
         renderer.setPixelRatio(window.devicePixelRatio);
         rendererRef.current = renderer;
 
-        const animate = () => {
-            renderer.render(scene, orthoCameraRef.current);
-            requestAnimationFrame(animate);
-        };
-
-        animate();
-
         return () => {
             renderer.dispose();
-            container.removeChild(canvas);
         };
-    }, [scene, viewId]);
+    }, [scene]);
 
-    return { updateCamera };
+    useFrame(() => {
+        if (!rendererRef.current || !canvasRef.current) return;
+
+        const width = canvasRef.current.clientWidth;
+        const height = canvasRef.current.clientHeight;
+        rendererRef.current.setSize(width, height);
+        rendererRef.current.setScissorTest(true);
+
+        const GAP = 5;
+        const viewCount = viewsRef.current.length;
+        const viewHeight = (height - GAP * (viewCount - 1)) / viewCount;
+
+        viewsRef.current.forEach((view, idx) => {
+            const y = (viewCount - 1 - idx) * (viewHeight + GAP);
+            rendererRef.current.setViewport(0, y, width, viewHeight);
+            rendererRef.current.setScissor(0, y, width, viewHeight);
+            rendererRef.current.render(scene, view.camera);
+        });
+    });
+
+    return {
+        updateAllCameras,
+        addView: (name, scaleOrder, computeOrientation) => {
+            const camera = setupCamera();
+            viewsRef.current.push({ name, camera, scaleOrder, computeOrientation });
+        },
+        removeView: (name) => {
+            viewsRef.current = viewsRef.current.filter((view) => view.name !== name);
+        },
+    };
 };

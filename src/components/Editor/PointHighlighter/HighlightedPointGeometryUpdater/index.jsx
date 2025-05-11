@@ -48,7 +48,7 @@ export const HighlightedPointGeometryUpdater = memo(({ image }) => {
         const activeFrameFilePath = pcdFiles[activeFrameIndex];
         const activeFrameCloudGeometry = pointCloudRefs.current[activeFrameFilePath].geometry;
         const projectedPoints = projectedPointsRef.current;
-        const imageGeometry = projectedPoints[image.src].geometry;
+        const imageGeometry = projectedPoints[image?.src]?.geometry;
 
         invalidateHighlighterPointsVisibility({
             cloudData: { geometry: activeFrameCloudGeometry, point: highlightedPoint },

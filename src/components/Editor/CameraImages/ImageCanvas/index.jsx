@@ -10,6 +10,7 @@ import { ImagePointShader } from "shaders";
 
 import { ImageCameraControls } from "../ImageCameraControls";
 import { ImageGeometryUpdater } from "../ImageGeometryUpdater";
+import { ImageScene } from "../ImageScene";
 
 export const ImageCanvas = memo(({ image, size }) => {
     const { settings } = useSettings();
@@ -28,9 +29,6 @@ export const ImageCanvas = memo(({ image, size }) => {
 
     const { projectedPointsRef } = useCalibrations();
 
-    const prevGeometryRef = useRef();
-    const prevTextureRef = useRef();
-
     const texture = useMemo(() => {
         if (!image) return null;
         return image?.texture;
@@ -45,22 +43,6 @@ export const ImageCanvas = memo(({ image, size }) => {
         if (!image) return;
         return projectedPointsRef.current[image.src].indexToPositionMap;
     }, [image]);
-
-    useEffect(() => {
-        const prevGeometry = prevGeometryRef.current;
-        if (prevGeometry && prevGeometry !== geometry) {
-            prevGeometry.dispose();
-        }
-        prevGeometryRef.current = geometry;
-    }, [geometry]);
-
-    useEffect(() => {
-        const prevTexture = prevTextureRef.current;
-        if (prevTexture && prevTexture !== texture) {
-            prevTexture.dispose();
-        }
-        prevTextureRef.current = texture;
-    }, [texture]);
 
     const shaderMaterial = useMemo(
         () =>
@@ -105,16 +87,14 @@ export const ImageCanvas = memo(({ image, size }) => {
                         texture={texture}
                         scale={[image.width * scale, image.height * scale, 1]}
                     />
-                </>
-            )}
-            {geometry && (
-                <group scale={[scale, scale, 1]}>
-                    <points
+                    <ImageScene
+                        image={image}
                         geometry={geometry}
                         material={shaderMaterial}
                         visible={arePointsVisible}
+                        scale={scale}
                     />
-                </group>
+                </>
             )}
         </Canvas>
     );

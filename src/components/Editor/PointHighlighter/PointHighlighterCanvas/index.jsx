@@ -8,6 +8,7 @@ import { useImagePointHighlighter, useSubscribeFunction } from "hooks";
 
 import { ImageCameraControls } from "components/Editor/CameraImages/ImageCameraControls";
 import { HighlightedPointGeometryUpdater } from "../HighlightedPointGeometryUpdater";
+import { ImageScene } from "../../CameraImages/ImageScene";
 
 import { PointHighlighterShader } from "shaders";
 
@@ -15,34 +16,10 @@ export const PointHighlighterCanvas = memo(({ image, positions }) => {
     const { settings } = useSettings();
     const { projectedPointsRef } = useCalibrations();
 
-    const prevGeometryRef = useRef();
-    const prevTextureRef = useRef();
+    const scale = useMemo(() => [image?.width, image?.height, 1], [image?.width, image?.height]);
 
-    const texture = useMemo(() => {
-        if (!image) return null;
-        return image?.texture;
-    }, [image]);
-
-    const geometry = useMemo(() => {
-        if (!image) return null;
-        return projectedPointsRef.current[image.src]?.geometry;
-    }, [image]);
-
-    useEffect(() => {
-        const prevGeometry = prevGeometryRef.current;
-        if (prevGeometry && prevGeometry !== geometry) {
-            prevGeometry.dispose();
-        }
-        prevGeometryRef.current = geometry;
-    }, [geometry]);
-
-    useEffect(() => {
-        const prevTexture = prevTextureRef.current;
-        if (prevTexture && prevTexture !== texture) {
-            prevTexture.dispose();
-        }
-        prevTextureRef.current = texture;
-    }, [texture]);
+    const imageRef = useRef(null);
+    const geometryRef = useRef(null);
 
     const shaderMaterial = useMemo(() => {
         return PointHighlighterShader({
@@ -76,9 +53,15 @@ export const PointHighlighterCanvas = memo(({ image, positions }) => {
         positions,
     });
 
+    useEffect(() => {
+        if (!image) return;
+        imageRef.current = image;
+        geometryRef.current = projectedPointsRef.current[image.src]?.geometry;
+    }, [image]);
+
     return (
         <Canvas orthographic className="chessboard">
-            {texture && (
+            {imageRef.current?.texture && (
                 <>
                     <HighlightedPointGeometryUpdater image={image} />
                     <ImageCameraControls
@@ -87,13 +70,13 @@ export const PointHighlighterCanvas = memo(({ image, positions }) => {
                         normXY={normXY}
                         fixedZoomLevel={settings.editorSettings.highlighter.highlighterZoom}
                     />
-                    <Image texture={texture} scale={[image.width, image.height, 1]} />
+                    <Image texture={imageRef.current?.texture} scale={scale} />
+                    <ImageScene
+                        image={image}
+                        geometry={geometryRef.current}
+                        material={shaderMaterial}
+                    />
                 </>
-            )}
-            {geometry && (
-                <group scale={[1, 1, 1]}>
-                    <points geometry={geometry} material={shaderMaterial} />
-                </group>
             )}
         </Canvas>
     );

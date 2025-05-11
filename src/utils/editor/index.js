@@ -48,6 +48,7 @@ export {
     drawFrustumMesh,
     drawWireframe,
     drawAxesHelper,
+    disposeMesh,
 } from "./geometry/general";
 export {
     handleIntensityAttribute,

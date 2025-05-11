@@ -4,8 +4,10 @@ export const invalidateHighlighterPointsSize = ({ imageData, sizeData }) => {
     const { geometry } = imageData;
     const { defaultSize } = sizeData;
 
-    const sizeArray = geometry.attributes.size_highlighter.array;
+    const sizeArray = geometry?.attributes?.size_highlighter?.array;
     const newSize = convertFloatToUint(defaultSize);
+
+    if (!sizeArray) return;
 
     for (let i = 0; i < sizeArray.length; i++) {
         sizeArray[i] = newSize;

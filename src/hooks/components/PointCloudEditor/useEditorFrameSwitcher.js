@@ -25,7 +25,6 @@ export const useEditorFrameSwitcher = (onFrameChanged) => {
         if (previousFrameRef.current && scene.children.includes(previousFrameRef.current)) {
             scene.remove(previousFrameRef.current);
             previousFrameRef.current.geometry?.dispose();
-            previousFrameRef.current.material?.dispose();
         }
 
         if (newPointCloud) {

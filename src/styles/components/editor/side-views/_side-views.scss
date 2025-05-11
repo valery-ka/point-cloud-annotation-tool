@@ -1,25 +1,16 @@
-.side-views-container {
+#side-views-canvas-container {
     position: relative;
     width: 400px;
-    display: flex;
-    flex-direction: column;
+    height: 100%;
     z-index: 1001;
     border-right: 1px solid var(--border-color);
     background-color: var(--primary-theme-color);
-    padding: 5px;
+    display: flex;
+    flex-direction: row;
 }
 
-.top-view {
-    position: relative;
-    flex: 1;
-}
-
-.left-view {
-    position: relative;
-    flex: 1;
-}
-
-.front-view {
-    position: relative;
-    flex: 1;
+#side-views-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
 }

@@ -117,13 +117,10 @@ export const useEditorHelpers = () => {
         setCameraColor(selectedCamera);
     }, [selectedCamera]);
 
+    const HIDDEN_POS = 1e6;
+
     useEffect(() => {
         if (!calibrations || !scene || isEmpty(loadedImages)) return;
-
-        Object.values(cameraMeshes.current).forEach((mesh) => scene.remove(mesh));
-        cameraMeshes.current = {};
-
-        if (!showCameraPositions) return;
 
         const cameraDimensions = {};
 
@@ -142,15 +139,27 @@ export const useEditorHelpers = () => {
             }
         });
 
-        Object.entries(calibrations).forEach(([selectedCamera, calibration]) => {
+        Object.entries(calibrations).forEach(([camera, calibration]) => {
             const { extrinsic, intrinsic } = calibration;
-            if (!intrinsic || !extrinsic) return null;
+            if (!intrinsic || !extrinsic) return;
 
-            const { fy } = getIntrinsicParameters(intrinsic);
-            const { position, rotation } = getCameraWorldPosition(extrinsic);
-            const dimensions = cameraDimensions[selectedCamera];
+            const dimensions = cameraDimensions[camera];
             if (!dimensions) return;
 
+            const existing = cameraMeshes.current[camera];
+            if (existing) {
+                if (showCameraPositions) {
+                    const { position, rotation } = getCameraWorldPosition(extrinsic);
+                    existing.position.copy(position);
+                    existing.quaternion.copy(rotation);
+                    existing.visible = true;
+                } else {
+                    existing.visible = false;
+                }
+                return;
+            }
+
+            const { fy } = getIntrinsicParameters(intrinsic);
             const { width, height } = dimensions;
             const aspect = width / height;
             const fovYRad = 2 * Math.atan(height / (2 * fy));
@@ -162,19 +171,27 @@ export const useEditorHelpers = () => {
             wireframe.layers.set(LAYERS.SECONDARY);
 
             frustumMesh.add(wireframe);
+
+            const { position, rotation } = getCameraWorldPosition(extrinsic);
             frustumMesh.position.copy(position);
             frustumMesh.quaternion.copy(rotation);
+            frustumMesh.userData.camera = camera;
 
-            frustumMesh.userData.selectedCamera = selectedCamera;
+            if (!showCameraPositions) {
+                frustumMesh.visible = false;
+                frustumMesh.position.set(HIDDEN_POS, HIDDEN_POS, HIDDEN_POS);
+            }
 
             scene.add(frustumMesh);
-            cameraMeshes.current[selectedCamera] = frustumMesh;
+            cameraMeshes.current[camera] = frustumMesh;
         });
 
         setCameraColor(selectedCamera);
 
         return () => {
-            Object.values(cameraMeshes.current).forEach((obj) => scene.remove(obj));
+            Object.values(cameraMeshes.current).forEach((obj) => {
+                obj.visible = false;
+            });
         };
     }, [showCameraPositions, calibrations, loadedImages, scene]);
 

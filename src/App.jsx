@@ -11,7 +11,7 @@ import {
     EditorContextMenu,
     CameraImages,
     PointHighlighter,
-    SideViews,
+    // SideViews,
 } from "components";
 
 import { useServerLogs } from "hooks";
@@ -24,7 +24,7 @@ export const App = () => {
             <LoadingOverlay />
             <FileNavigator />
             <div className="tool-3d-scene">
-                <SideViews />
+                {/* <SideViews /> */}
                 <div className="tool-3d-container">
                     <EditorContextMenu />
                     <canvas id="canvasSelection" className="tool-3d-canvas-selection"></canvas>
