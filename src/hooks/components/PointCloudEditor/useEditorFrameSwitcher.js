@@ -12,7 +12,7 @@ export const useEditorFrameSwitcher = (onFrameChanged) => {
     const { pcdFiles } = useFileManager();
     const { activeFrameIndex, arePointCloudsLoading } = useFrames();
     const { pointCloudRefs, setHasFilterSelectionPoint } = useEditor();
-    const { gl, scene } = useThree();
+    const { gl, camera, scene } = useThree();
 
     const previousFrameRef = useRef(null);
 
@@ -29,6 +29,10 @@ export const useEditorFrameSwitcher = (onFrameChanged) => {
 
         if (newPointCloud) {
             scene.add(newPointCloud);
+
+            scene.updateMatrixWorld(true);
+            gl.render(scene, camera);
+
             previousFrameRef.current = newPointCloud;
 
             const hasFilterSelectionPoint = newPointCloud.geometry.attributes.position.array.some(

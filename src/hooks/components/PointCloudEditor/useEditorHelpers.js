@@ -21,7 +21,7 @@ import {
 } from "utils/editor";
 import { getIntrinsicParameters, getCameraWorldPosition } from "utils/calibrations";
 
-import { LAYERS } from "constants";
+import { LAYERS, HIDDEN_POINT } from "constants";
 
 export const useEditorHelpers = () => {
     const { scene } = useThree();
@@ -117,8 +117,6 @@ export const useEditorHelpers = () => {
         setCameraColor(selectedCamera);
     }, [selectedCamera]);
 
-    const HIDDEN_POS = 1e6;
-
     useEffect(() => {
         if (!calibrations || !scene || isEmpty(loadedImages)) return;
 
@@ -154,7 +152,7 @@ export const useEditorHelpers = () => {
                     existing.position.copy(position);
                 } else {
                     existing.visible = false;
-                    existing.position.set(HIDDEN_POS, HIDDEN_POS, HIDDEN_POS);
+                    existing.position.set(HIDDEN_POINT, HIDDEN_POINT, HIDDEN_POINT);
                 }
                 return;
             }
@@ -181,7 +179,7 @@ export const useEditorHelpers = () => {
 
             if (!showCameraPositions) {
                 frustumMesh.visible = false;
-                frustumMesh.position.set(HIDDEN_POS, HIDDEN_POS, HIDDEN_POS);
+                frustumMesh.position.set(HIDDEN_POINT, HIDDEN_POINT, HIDDEN_POINT);
             }
 
             scene.add(frustumMesh);

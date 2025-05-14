@@ -49,8 +49,6 @@ export const rebuildGeometry = (geom) => {
     return geometry;
 };
 
-const BOX_MATERIAL = new LineBasicMaterial({ color: 0x555555 });
-
 export const drawGlobalBox = (positions, scene, boundingBoxRef, isBoxActive) => {
     if (!positions) return;
     if (!isBoxActive) {
