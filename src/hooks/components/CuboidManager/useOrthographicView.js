@@ -1,13 +1,12 @@
 import { useEffect, useRef, useCallback } from "react";
 import { useThree, useFrame } from "@react-three/fiber";
-import { OrthographicCamera, WebGLRenderer } from "three";
+import { OrthographicCamera, WebGLRenderer, Quaternion, Euler } from "three";
 
 export const useOrthographicView = () => {
     const { scene } = useThree();
 
     const canvasRef = useRef(null);
     const rendererRef = useRef(null);
-
     const viewsRef = useRef([]);
 
     const setupCamera = () => {
@@ -17,43 +16,37 @@ export const useOrthographicView = () => {
         return camera;
     };
 
+    const getOrientationQuaternion = (euler) => {
+        const orientation = new Quaternion();
+        orientation.setFromEuler(euler);
+        return orientation;
+    };
+
     useEffect(() => {
         viewsRef.current = [
             {
                 name: "top",
                 camera: setupCamera(),
                 scaleOrder: ["x", "y", "z"],
-                computeOrientation: (cam) => {
-                    cam.up.set(0, 1, 0);
-                    cam.rotation.set(0, 0, 0);
-                    cam.rotateZ(-Math.PI / 2);
-                },
+                getOrientation: () => getOrientationQuaternion(new Euler(0, 0, -Math.PI / 2)),
             },
             {
                 name: "left",
                 camera: setupCamera(),
                 scaleOrder: ["z", "x", "y"],
-                computeOrientation: (cam) => {
-                    cam.up.set(0, 0, 1);
-                    cam.rotation.set(0, 0, 0);
-                    cam.rotateX(Math.PI / 2);
-                },
+                getOrientation: () => getOrientationQuaternion(new Euler(Math.PI / 2, 0, 0)),
             },
             {
                 name: "front",
                 camera: setupCamera(),
                 scaleOrder: ["y", "z", "x"],
-                computeOrientation: (cam) => {
-                    cam.up.set(0, 1, 0);
-                    cam.rotation.set(0, 0, 0);
-                    cam.rotateX(Math.PI / 2);
-                    cam.rotateY(-Math.PI / 2);
-                },
+                getOrientation: () =>
+                    getOrientationQuaternion(new Euler(Math.PI / 2, -Math.PI / 2, 0)),
             },
         ];
     }, []);
 
-    const updateCamera = useCallback((camera, mesh, scaleOrder, computeOrientation) => {
+    const updateCamera = useCallback((camera, mesh, scaleOrder, getOrientation) => {
         if (!camera || !mesh) return;
 
         const aspect = 1;
@@ -80,7 +73,8 @@ export const useOrthographicView = () => {
         camera.far = camDepth / 2;
 
         camera.position.copy(mesh.position);
-        computeOrientation(camera);
+
+        camera.quaternion.copy(mesh.quaternion).multiply(getOrientation());
 
         camera.updateProjectionMatrix();
         camera.updateMatrixWorld(true);
@@ -88,8 +82,8 @@ export const useOrthographicView = () => {
 
     const updateAllCameras = useCallback(
         (mesh) => {
-            viewsRef.current.forEach(({ camera, scaleOrder, computeOrientation }) => {
-                updateCamera(camera, mesh, scaleOrder, computeOrientation);
+            viewsRef.current.forEach(({ camera, scaleOrder, getOrientation }) => {
+                updateCamera(camera, mesh, scaleOrder, getOrientation);
             });
         },
         [updateCamera],
@@ -132,9 +126,9 @@ export const useOrthographicView = () => {
 
     return {
         updateAllCameras,
-        addView: (name, scaleOrder, computeOrientation) => {
+        addView: (name, scaleOrder, getOrientation) => {
             const camera = setupCamera();
-            viewsRef.current.push({ name, camera, scaleOrder, computeOrientation });
+            viewsRef.current.push({ name, camera, scaleOrder, getOrientation });
         },
         removeView: (name) => {
             viewsRef.current = viewsRef.current.filter((view) => view.name !== name);

@@ -50,7 +50,7 @@ export const ImageScene = ({ image, geometry, material, visible = true, scale = 
         if (pointsRef.current) {
             pointsRef.current.visible = visible;
         }
-    }, [visible]);
+    }, [image, visible]);
 
     return null;
 };

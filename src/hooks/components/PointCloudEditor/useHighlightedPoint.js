@@ -41,10 +41,13 @@ export const useHighlightedPoint = () => {
     const mouseDownPositionRef = useRef({ x: 0, y: 0 });
 
     useEffect(() => {
-        if (!highlightedPoint) {
-            gl.domElement.classList.remove("pointer-cursor");
-        } else {
+        isIntersectingMap.current.set("highlight", Boolean(highlightedPoint));
+
+        const hasAnyIntersection = [...isIntersectingMap.current.values()].some(Boolean);
+        if (hasAnyIntersection) {
             gl.domElement.classList.add("pointer-cursor");
+        } else {
+            gl.domElement.classList.remove("pointer-cursor");
         }
     }, [highlightedPoint]);
 
@@ -162,11 +165,11 @@ export const useHighlightedPoint = () => {
 
     const onClick = useCallback(
         (event) => {
-            if (
-                isDraggingRef.current === true ||
-                [...isIntersectingMap.current.values()].some(Boolean)
-            )
-                return;
+            const hasOtherIntersections = [...isIntersectingMap.current].some(
+                ([key, value]) => key !== "highlight" && value,
+            );
+
+            if (isDraggingRef.current === true || hasOtherIntersections) return;
 
             if (highlightedPoint && selectedTool === DEFAULT_TOOL && !event.ctrlKey) {
                 const index = highlightedPoint.label

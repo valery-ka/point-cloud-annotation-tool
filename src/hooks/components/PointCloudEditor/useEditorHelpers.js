@@ -149,12 +149,12 @@ export const useEditorHelpers = () => {
             const existing = cameraMeshes.current[camera];
             if (existing) {
                 if (showCameraPositions) {
-                    const { position, rotation } = getCameraWorldPosition(extrinsic);
-                    existing.position.copy(position);
-                    existing.quaternion.copy(rotation);
+                    const { position } = existing.userData;
                     existing.visible = true;
+                    existing.position.copy(position);
                 } else {
                     existing.visible = false;
+                    existing.position.set(HIDDEN_POS, HIDDEN_POS, HIDDEN_POS);
                 }
                 return;
             }
@@ -175,7 +175,9 @@ export const useEditorHelpers = () => {
             const { position, rotation } = getCameraWorldPosition(extrinsic);
             frustumMesh.position.copy(position);
             frustumMesh.quaternion.copy(rotation);
+
             frustumMesh.userData.camera = camera;
+            frustumMesh.userData.position = position;
 
             if (!showCameraPositions) {
                 frustumMesh.visible = false;
@@ -187,12 +189,6 @@ export const useEditorHelpers = () => {
         });
 
         setCameraColor(selectedCamera);
-
-        return () => {
-            Object.values(cameraMeshes.current).forEach((obj) => {
-                obj.visible = false;
-            });
-        };
     }, [showCameraPositions, calibrations, loadedImages, scene]);
 
     return updateGlobalBox;
