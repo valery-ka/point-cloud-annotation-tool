@@ -24,7 +24,12 @@ const leftButton = "leftButton";
 const mouseMove = "mouseMove";
 const mousePressed = "mousePressed";
 
-var isDragging = false;
+const pan = "pan";
+const rotate = "rotate";
+const idle = "idle";
+
+var isPanning = false;
+var isRotating = false;
 var shiftIsPressed = false;
 
 var isKeyPressed = {};
@@ -587,24 +592,34 @@ class CameraControls extends Controls {
     // event callbacks - update the object state
     //
 
-    _handleMouseDownRotate(event) {
-        if (!isDragging) {
-            this._rotateStart.set(event.clientX, event.clientY);
-
-            isDragging = true;
+    _handleMouseDownPan(event) {
+        if (!isPanning) {
+            this._setNavigationMode(pan, event);
         }
     }
 
-    _handleMouseDownPan(event) {
-        if (!isDragging) {
-            this._panStart.set(event.clientX, event.clientY);
+    _handleMouseDownRotate(event) {
+        if (!isRotating) {
+            this._setNavigationMode(rotate, event);
+        }
+    }
 
-            isDragging = true;
+    _handleMouseMovePan(event) {
+        if (isPanning) {
+            this._panEnd.set(event.clientX, event.clientY);
+
+            this._panDelta.subVectors(this._panEnd, this._panStart).multiplyScalar(this.panSpeed);
+
+            this._pan(this._panDelta.x, this._panDelta.y);
+
+            this._panStart.copy(this._panEnd);
+
+            this.update();
         }
     }
 
     _handleMouseMoveRotate(event) {
-        if (isDragging) {
+        if (isRotating) {
             this._rotateEnd.set(event.clientX, event.clientY);
 
             this._rotateDelta
@@ -623,17 +638,18 @@ class CameraControls extends Controls {
         }
     }
 
-    _handleMouseMovePan(event) {
-        if (isDragging) {
-            this._panEnd.set(event.clientX, event.clientY);
-
-            this._panDelta.subVectors(this._panEnd, this._panStart).multiplyScalar(this.panSpeed);
-
-            this._pan(this._panDelta.x, this._panDelta.y);
-
-            this._panStart.copy(this._panEnd);
-
-            this.update();
+    _setNavigationMode(mode = idle, event) {
+        if (mode === pan) {
+            this._panStart.set(event.clientX, event.clientY);
+            isPanning = true;
+            isRotating = false;
+        } else if (mode === rotate) {
+            this._rotateStart.set(event.clientX, event.clientY);
+            isRotating = true;
+            isPanning = false;
+        } else {
+            isRotating = false;
+            isPanning = false;
         }
     }
 
@@ -661,37 +677,29 @@ class CameraControls extends Controls {
         if (this._isButtonsInverted.call(this, rightButton, mouseMove, event)) {
             if (event.shiftKey) {
                 if (!shiftIsPressed) {
-                    this._panStart.set(event.clientX, event.clientY);
+                    this._setNavigationMode(pan, event);
                 }
-
                 shiftIsPressed = true;
-
                 this._handleMouseMovePan(event);
             } else {
                 if (shiftIsPressed) {
-                    this._rotateStart.set(event.clientX, event.clientY);
+                    this._setNavigationMode(rotate, event);
                 }
-
                 shiftIsPressed = false;
-
                 this._handleMouseMoveRotate(event);
             }
         } else if (this._isButtonsInverted.call(this, leftButton, mouseMove, event)) {
             if (event.shiftKey) {
                 if (!shiftIsPressed) {
-                    this._rotateStart.set(event.clientX, event.clientY);
+                    this._setNavigationMode(rotate, event);
                 }
-
                 shiftIsPressed = true;
-
                 this._handleMouseMoveRotate(event);
             } else {
                 if (shiftIsPressed) {
-                    this._panStart.set(event.clientX, event.clientY);
+                    this._setNavigationMode(pan, event);
                 }
-
                 shiftIsPressed = false;
-
                 this._handleMouseMovePan(event);
             }
         }
@@ -807,7 +815,7 @@ function onMouseMove(event) {
 function onMouseUp() {
     if (this.enabled === false) return;
 
-    isDragging = false;
+    this._setNavigationMode(idle);
 
     if (isNonZeroVector(this._rotateStart) || isNonZeroVector(this._panStart)) {
         this.dispatchEvent(_endEvent);
@@ -835,7 +843,7 @@ function onMouseWheel(event) {
 
     this._handleMouseWheel(this._customWheelEvent(event));
 
-    if (!isDragging) {
+    if (!isPanning || !isRotating) {
         this.dispatchEvent(_endEvent);
     }
 }
@@ -845,7 +853,7 @@ function onMouseLeave(event) {
 
     this.state = _STATE.NONE;
 
-    isDragging = false;
+    this._setNavigationMode(idle);
 
     if (isNonZeroVector(this._rotateStart) || isNonZeroVector(this._panStart)) {
         this.dispatchEvent(_endEvent);
