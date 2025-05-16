@@ -44,6 +44,10 @@ export const DEFAULT_BRUSH_SIZE = 40;
 // camera
 export const MIN_IMAGE_HEIGHT = 250;
 
+// side views
+export const SIDE_VIEWS_GAP = 2;
+export const INITIAL_SIDE_VIEWS_ZOOM = 0.8;
+
 // save
 export const SAVE_FRAME_REQUEST_TIME = 500;
 export const UNDO_REDO_STACK_DEPTH = 10;

@@ -22,15 +22,18 @@ export const useTransformControls = ({
     const transformControlsRef = useRef(null);
     const isDraggingRef = useRef(false);
 
-    const onDraggingChanged = useCallback((event) => {
-        isDraggingRef.current = event.value;
-        if (controlsRef.current) {
-            controlsRef.current.enabled = !event.value;
-        }
-        if (!isDraggingRef.current) {
-            onTransformFinished();
-        }
-    }, []);
+    const onDraggingChanged = useCallback(
+        (event) => {
+            isDraggingRef.current = event.value;
+            if (controlsRef.current) {
+                controlsRef.current.enabled = !event.value;
+            }
+            if (!isDraggingRef.current) {
+                onTransformFinished();
+            }
+        },
+        [onTransformFinished],
+    );
 
     const onTransformChange = useCallback(() => {
         if (!isDraggingRef.current || !selectedCuboidRef.current) return;

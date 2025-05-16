@@ -11,6 +11,7 @@ import {
     ModerationProvider,
     ImagesProvider,
     CalibrationsProvider,
+    SideViewsProvider,
 } from "contexts";
 
 const DataProviders = ({ children }) => (
@@ -28,7 +29,9 @@ const DataProviders = ({ children }) => (
 const PointCloudProvider = ({ children }) => (
     <EditorProvider>
         <ToolsProvider>
-            <HoveredPointProvider>{children}</HoveredPointProvider>
+            <HoveredPointProvider>
+                <SideViewsProvider>{children}</SideViewsProvider>
+            </HoveredPointProvider>
         </ToolsProvider>
     </EditorProvider>
 );

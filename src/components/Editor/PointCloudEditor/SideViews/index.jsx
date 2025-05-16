@@ -1,11 +1,21 @@
 import { useEffect, useRef, useState } from "react";
+import { debounce } from "lodash";
 
-const GAP = 2;
-const VIEW_NAMES = ["top", "left", "front"]; // для теста пока так
+import { useSideViews } from "contexts";
+
+import { SIDE_VIEWS_GAP } from "constants";
+
+import { SideViewSVG } from "./SideViewSVG";
 
 export const SideViews = () => {
+    const { selectedCuboidRef, sideViews } = useSideViews();
+
     const containerRef = useRef(null);
     const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
+
+    const VIEW_NAMES = sideViews.map((view) => view.name);
+    const viewCount = VIEW_NAMES.length;
+    const viewHeight = (containerSize.height - SIDE_VIEWS_GAP * (viewCount - 1)) / viewCount;
 
     useEffect(() => {
         const container = containerRef.current;
@@ -23,31 +33,27 @@ export const SideViews = () => {
         return () => resizeObserver.disconnect();
     }, []);
 
-    const viewCount = VIEW_NAMES.length;
-    const viewHeight = (containerSize.height - GAP * (viewCount - 1)) / viewCount;
-
     return (
-        <div id="side-views-canvas-container" ref={containerRef}>
+        <div id="side-views-canvas-container" ref={containerRef} style={{ position: "relative" }}>
             <canvas id="side-views-canvas" />
+            <div className="side-views-container">
+                {VIEW_NAMES.map((name, idx) => {
+                    const y = idx * (viewHeight + SIDE_VIEWS_GAP);
+                    const view = sideViews.find((v) => v.name === name);
 
-            {VIEW_NAMES.map((name, idx) => {
-                const y = idx * (viewHeight + GAP);
-                return (
-                    <svg
-                        key={name}
-                        width={containerSize.width}
-                        height={viewHeight}
-                        style={{
-                            position: "absolute",
-                            left: 0,
-                            top: y,
-                            pointerEvents: "none",
-                        }}
-                    >
-                        <text x="10" y="20" fill="white" fontSize="14">{`${name}`}</text>
-                    </svg>
-                );
-            })}
+                    return (
+                        <SideViewSVG
+                            key={name}
+                            name={name}
+                            y={y}
+                            width={containerSize.width}
+                            height={viewHeight}
+                            mesh={selectedCuboidRef.current}
+                            camera={view?.camera}
+                        />
+                    );
+                })}
+            </div>
         </div>
     );
 };

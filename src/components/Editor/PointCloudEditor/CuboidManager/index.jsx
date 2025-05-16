@@ -2,15 +2,16 @@ import { useThree } from "@react-three/fiber";
 
 import { memo, useState, useEffect, useRef, useCallback } from "react";
 
+import { useSideViews } from "contexts";
 import { useTransformControls, useRaycastClickSelect, useOrthographicView } from "hooks";
 
 import { addCuboid, removeCuboid } from "utils/cuboids";
 
 export const CuboidManager = memo(() => {
     const { scene } = useThree();
+    const { selectedCuboidRef } = useSideViews();
 
     const cubeRefs = useRef({});
-    const selectedCuboidRef = useRef(null);
     const [cuboids, setCuboids] = useState([
         {
             id: "0",

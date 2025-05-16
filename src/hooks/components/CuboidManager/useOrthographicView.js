@@ -2,20 +2,22 @@ import { useEffect, useRef, useCallback } from "react";
 import { useThree, useFrame } from "@react-three/fiber";
 import { OrthographicCamera, WebGLRenderer, Quaternion, Euler } from "three";
 
-const GAP = 2;
-const INITIAL_ZOOM = 0.8;
+import { useSideViews } from "contexts";
+
+import { getCuboidHandlesPositions } from "utils/cuboids";
+import { SIDE_VIEWS_GAP, INITIAL_SIDE_VIEWS_ZOOM } from "constants";
 
 export const useOrthographicView = ({ selectedCuboidRef }) => {
     const { size, scene } = useThree();
 
+    const { sideViews, setSideViews, setHandlePositions } = useSideViews();
+
     const canvasRef = useRef(null);
     const rendererRef = useRef(null);
-    const viewsRef = useRef([]);
     const aspectRef = useRef(null);
 
     const setupCamera = useCallback(() => {
-        const aspect = 1;
-        const camera = new OrthographicCamera(-3 * aspect, 3 * aspect, 3, -3, -3, 3);
+        const camera = new OrthographicCamera();
         return camera;
     }, []);
 
@@ -26,7 +28,7 @@ export const useOrthographicView = ({ selectedCuboidRef }) => {
     }, []);
 
     useEffect(() => {
-        viewsRef.current = [
+        const sideViewsList = [
             {
                 name: "top",
                 camera: setupCamera(),
@@ -47,53 +49,71 @@ export const useOrthographicView = ({ selectedCuboidRef }) => {
                     getOrientationQuaternion(new Euler(Math.PI / 2, -Math.PI / 2, 0)),
             },
         ];
+
+        setSideViews(sideViewsList);
     }, []);
 
     useEffect(() => {
         updateAllCameras(selectedCuboidRef.current);
     }, [size]);
 
-    const updateCamera = useCallback((camera, mesh, scaleOrder, getOrientation) => {
-        if (!camera || !mesh) return;
+    const updateCamera = useCallback(
+        (camera, mesh, scaleOrder, getOrientation) => {
+            if (!camera || !mesh) return;
 
-        const aspect = aspectRef.current;
-        const cameraDepth = 0;
+            const aspect = aspectRef.current;
+            const cameraDepth = 0;
 
-        const scale = mesh.scale;
-        const [w, h, d] = scaleOrder.map((axis) => scale[axis] + cameraDepth);
+            const scale = mesh.scale;
+            const [w, h, d] = scaleOrder.map((axis) => scale[axis] + cameraDepth);
 
-        let camWidth = w;
-        let camHeight = h;
-        let camDepth = d;
+            let camWidth = w;
+            let camHeight = h;
+            let camDepth = d;
 
-        if (camWidth / camHeight > aspect) {
-            camHeight = camWidth / aspect;
-        } else {
-            camWidth = camHeight * aspect;
-        }
+            if (camWidth / camHeight > aspect) {
+                camHeight = camWidth / aspect;
+            } else {
+                camWidth = camHeight * aspect;
+            }
 
-        camera.left = -camWidth / 2;
-        camera.right = camWidth / 2;
-        camera.top = camHeight / 2;
-        camera.bottom = -camHeight / 2;
-        camera.near = -camDepth / 2;
-        camera.far = camDepth / 2;
+            camera.left = -camWidth / 2;
+            camera.right = camWidth / 2;
+            camera.top = camHeight / 2;
+            camera.bottom = -camHeight / 2;
+            camera.near = -camDepth / 2;
+            camera.far = camDepth / 2;
 
-        camera.position.copy(mesh.position);
+            camera.position.copy(mesh.position);
 
-        camera.quaternion.copy(mesh.quaternion).multiply(getOrientation());
+            camera.quaternion.copy(mesh.quaternion).multiply(getOrientation());
 
-        camera.zoom = INITIAL_ZOOM / aspect;
+            camera.zoom = INITIAL_SIDE_VIEWS_ZOOM / aspect;
 
-        camera.updateProjectionMatrix();
-        camera.updateMatrixWorld(true);
-    }, []);
+            camera.updateProjectionMatrix();
+            camera.updateMatrixWorld(true);
+        },
+        [sideViews],
+    );
 
     const updateAllCameras = useCallback(
         (mesh) => {
-            viewsRef.current.forEach(({ camera, scaleOrder, getOrientation }) => {
+            sideViews.forEach(({ camera, scaleOrder, getOrientation }) => {
                 updateCamera(camera, mesh, scaleOrder, getOrientation);
             });
+            updateHandlePositions(mesh);
+        },
+        [updateCamera],
+    );
+
+    const updateHandlePositions = useCallback(
+        (mesh) => {
+            if (!mesh) return;
+            const newPositions = {};
+            sideViews.forEach(({ name, scaleOrder }) => {
+                newPositions[name] = getCuboidHandlesPositions(mesh, scaleOrder);
+            });
+            setHandlePositions(newPositions);
         },
         [updateCamera],
     );
@@ -122,13 +142,13 @@ export const useOrthographicView = ({ selectedCuboidRef }) => {
         rendererRef.current.setSize(width, height);
         rendererRef.current.setScissorTest(true);
 
-        const viewCount = viewsRef.current.length;
-        const viewHeight = (height - GAP * (viewCount - 1)) / viewCount;
+        const viewCount = sideViews.length;
+        const viewHeight = (height - SIDE_VIEWS_GAP * (viewCount - 1)) / viewCount;
 
         aspectRef.current = width / viewHeight;
 
-        viewsRef.current.forEach((view, idx) => {
-            const y = (viewCount - 1 - idx) * (viewHeight + GAP);
+        sideViews.forEach((view, idx) => {
+            const y = (viewCount - 1 - idx) * (viewHeight + SIDE_VIEWS_GAP);
             rendererRef.current.setViewport(0, y, width, viewHeight);
             rendererRef.current.setScissor(0, y, width, viewHeight);
             rendererRef.current.render(scene, view.camera);
@@ -139,10 +159,10 @@ export const useOrthographicView = ({ selectedCuboidRef }) => {
         updateAllCameras,
         addView: (name, scaleOrder, getOrientation) => {
             const camera = setupCamera();
-            viewsRef.current.push({ name, camera, scaleOrder, getOrientation });
+            setSideViews((prev) => [...prev, { name, camera, scaleOrder, getOrientation }]);
         },
         removeView: (name) => {
-            viewsRef.current = viewsRef.current.filter((view) => view.name !== name);
+            setSideViews((prev) => prev.filter((view) => view.name !== name));
         },
     };
 };

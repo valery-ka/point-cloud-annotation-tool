@@ -11,3 +11,5 @@ export {
     addCuboid,
     removeCuboid,
 } from "./geometry";
+
+export { getCuboidHandlesPositions, projectToScreen } from "./sideViews";
