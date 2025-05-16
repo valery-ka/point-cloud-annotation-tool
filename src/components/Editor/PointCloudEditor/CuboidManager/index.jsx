@@ -28,29 +28,32 @@ export const CuboidManager = memo(() => {
         },
     ]);
 
-    const { updateAllCameras: updateAllSideViewCameras } = useOrthographicView();
+    const { updateAllCameras: updateAllSideViewCameras } = useOrthographicView({
+        selectedCuboidRef,
+    });
 
     const onTransformFinished = useCallback(() => {
-        const mesh = cubeRefs.current[selectedCuboidRef.current];
-        updateAllSideViewCameras(mesh);
-    }, []);
+        updateAllSideViewCameras(selectedCuboidRef.current);
+    }, [updateAllSideViewCameras]);
 
     const { transformControlsRef } = useTransformControls({
-        cubeRefs,
         selectedCuboidRef,
         onTransformFinished,
         updateAllSideViewCameras,
     });
 
-    const onCuboidSelect = useCallback((id) => {
-        const mesh = cubeRefs.current[id];
-        selectedCuboidRef.current = id;
+    const onCuboidSelect = useCallback(
+        (id) => {
+            const mesh = cubeRefs.current[id];
+            selectedCuboidRef.current = mesh;
 
-        transformControlsRef.current.detach();
-        transformControlsRef.current.attach(mesh);
+            transformControlsRef.current.detach();
+            transformControlsRef.current.attach(selectedCuboidRef.current);
 
-        updateAllSideViewCameras(mesh);
-    }, []);
+            updateAllSideViewCameras(selectedCuboidRef.current);
+        },
+        [updateAllSideViewCameras],
+    );
 
     useRaycastClickSelect({
         getMeshMap: () => cubeRefs.current,

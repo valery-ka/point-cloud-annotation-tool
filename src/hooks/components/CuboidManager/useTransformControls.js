@@ -9,7 +9,6 @@ import { isEmpty } from "lodash";
 import { TransformControls } from "utils/cuboids";
 
 export const useTransformControls = ({
-    cubeRefs,
     selectedCuboidRef,
     onTransformFinished,
     updateAllSideViewCameras,
@@ -34,13 +33,13 @@ export const useTransformControls = ({
     }, []);
 
     const onTransformChange = useCallback(() => {
-        if (!isDraggingRef.current || !cubeRefs.current[selectedCuboidRef.current]) return;
+        if (!isDraggingRef.current || !selectedCuboidRef.current) return;
 
-        const cube = cubeRefs.current[selectedCuboidRef.current];
-        const position = cube.position;
-        const scale = cube.scale;
+        const cuboid = selectedCuboidRef.current;
+        const position = cuboid.position;
+        const scale = cuboid.scale;
 
-        updateAllSideViewCameras(cube);
+        updateAllSideViewCameras(cuboid);
 
         if (isEmpty(pcdFiles)) {
             // console.log("no points");
@@ -54,7 +53,7 @@ export const useTransformControls = ({
         const positions = activeFrame.geometry.attributes.position.array;
 
         const matrix = new Matrix4();
-        matrix.compose(position, cube.quaternion, scale);
+        matrix.compose(position, cuboid.quaternion, scale);
 
         const inverseMatrix = new Matrix4().copy(matrix).invert();
         const halfSize = new Vector3(0.5, 0.5, 0.5);
@@ -79,7 +78,7 @@ export const useTransformControls = ({
         // console.log("---------------------------");
         // console.log("Points inside box", insidePoints);
         // console.log("---------------------------");
-    }, [pcdFiles, activeFrameIndex]);
+    }, [pcdFiles, activeFrameIndex, updateAllSideViewCameras]);
 
     useEffect(() => {
         const transformControls = new TransformControls(camera, gl.domElement);
@@ -104,7 +103,7 @@ export const useTransformControls = ({
             if (e.key === "x") {
                 transform.detach();
             } else if (e.key === "w") {
-                const object = cubeRefs.current[selectedCuboidRef.current];
+                const object = selectedCuboidRef.current;
                 if (object) transform.attach(object);
             } else if (e.key === "a") {
                 transform.setMode("translate");

@@ -2,25 +2,28 @@ import { useEffect, useRef, useCallback } from "react";
 import { useThree, useFrame } from "@react-three/fiber";
 import { OrthographicCamera, WebGLRenderer, Quaternion, Euler } from "three";
 
-export const useOrthographicView = () => {
-    const { scene } = useThree();
+const GAP = 2;
+const INITIAL_ZOOM = 0.8;
+
+export const useOrthographicView = ({ selectedCuboidRef }) => {
+    const { size, scene } = useThree();
 
     const canvasRef = useRef(null);
     const rendererRef = useRef(null);
     const viewsRef = useRef([]);
+    const aspectRef = useRef(null);
 
-    const setupCamera = () => {
+    const setupCamera = useCallback(() => {
         const aspect = 1;
         const camera = new OrthographicCamera(-3 * aspect, 3 * aspect, 3, -3, -3, 3);
-        camera.zoom = 0.75;
         return camera;
-    };
+    }, []);
 
-    const getOrientationQuaternion = (euler) => {
+    const getOrientationQuaternion = useCallback((euler) => {
         const orientation = new Quaternion();
         orientation.setFromEuler(euler);
         return orientation;
-    };
+    }, []);
 
     useEffect(() => {
         viewsRef.current = [
@@ -46,10 +49,14 @@ export const useOrthographicView = () => {
         ];
     }, []);
 
+    useEffect(() => {
+        updateAllCameras(selectedCuboidRef.current);
+    }, [size]);
+
     const updateCamera = useCallback((camera, mesh, scaleOrder, getOrientation) => {
         if (!camera || !mesh) return;
 
-        const aspect = 1;
+        const aspect = aspectRef.current;
         const cameraDepth = 0;
 
         const scale = mesh.scale;
@@ -75,6 +82,8 @@ export const useOrthographicView = () => {
         camera.position.copy(mesh.position);
 
         camera.quaternion.copy(mesh.quaternion).multiply(getOrientation());
+
+        camera.zoom = INITIAL_ZOOM / aspect;
 
         camera.updateProjectionMatrix();
         camera.updateMatrixWorld(true);
@@ -108,13 +117,15 @@ export const useOrthographicView = () => {
         if (!rendererRef.current || !canvasRef.current) return;
 
         const width = canvasRef.current.clientWidth;
-        const height = canvasRef.current.clientHeight;
+        const height = size.height;
+
         rendererRef.current.setSize(width, height);
         rendererRef.current.setScissorTest(true);
 
-        const GAP = 5;
         const viewCount = viewsRef.current.length;
         const viewHeight = (height - GAP * (viewCount - 1)) / viewCount;
+
+        aspectRef.current = width / viewHeight;
 
         viewsRef.current.forEach((view, idx) => {
             const y = (viewCount - 1 - idx) * (viewHeight + GAP);
