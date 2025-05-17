@@ -22,6 +22,16 @@ export const hexToRgb = (hex) => {
     return [r, g, b];
 };
 
+export const rgbToHex = (color) => {
+    const r = Math.round(color.r * 255);
+    const g = Math.round(color.g * 255);
+    const b = Math.round(color.b * 255);
+
+    const toHex = (n) => n.toString(16).padStart(2, "0");
+
+    return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+};
+
 export const getDefaultPointColor = (index, frameIntensity, brightnessFactor, intensityFactor) => {
     const intensity = frameIntensity?.[index] ?? 0;
     const adjustedIntensity = intensity * intensityFactor;

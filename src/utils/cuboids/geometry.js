@@ -97,7 +97,7 @@ export const addCuboid = (scene, cuboid) => {
     const arrow = createArrowGeometry(color);
 
     cube.mesh.layers.set(LAYERS.SECONDARY);
-    // edges.mesh.layers.set(LAYERS.SECONDARY);;
+    edges.mesh.layers.set(LAYERS.SECONDARY);
     arrow.mesh.layers.set(LAYERS.SECONDARY);
 
     cube.mesh.add(edges.mesh);

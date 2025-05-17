@@ -12,4 +12,10 @@ export {
     removeCuboid,
 } from "./geometry";
 
-export { getCuboidHandlesPositions, projectToScreen } from "./sideViews";
+export {
+    getCuboidHandlesPositions,
+    projectToScreen,
+    getCornerCursor,
+    getEdgeStyles,
+    isHovered,
+} from "./sideViews";

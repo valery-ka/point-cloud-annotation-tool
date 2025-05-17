@@ -19,3 +19,19 @@
     width: 100%;
     height: 100%;
 }
+
+.side-view-svg.hovered {
+    box-shadow: 0 0 5px var(--text-color) inset;
+}
+
+.svg-line {
+    display: none;
+
+    &.hovered {
+        display: block;
+        stroke: var(--text-color);
+        stroke-dasharray: 3, 3;
+        stroke-width: 1px;
+        pointer-events: none;
+    }
+}

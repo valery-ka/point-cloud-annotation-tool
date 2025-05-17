@@ -23,6 +23,7 @@ export {
     getColorArray,
     invalidateCloudColor,
     hexToRgb,
+    rgbToHex,
     changeClassOfSelection,
     getDefaultPointColor,
     updatePointCloudColors,
