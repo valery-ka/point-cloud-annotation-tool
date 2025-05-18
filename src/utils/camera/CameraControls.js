@@ -674,6 +674,8 @@ class CameraControls extends Controls {
     }
 
     _navigationTransform(event) {
+        if (this.enabled === false) return;
+
         if (this._isButtonsInverted.call(this, rightButton, mouseMove, event)) {
             if (event.shiftKey) {
                 if (!shiftIsPressed) {
@@ -828,6 +830,8 @@ function onMouseUp() {
 }
 
 function onMouseWheel(event) {
+    if (this.enabled === false) return;
+
     if (event.ctrlKey === true) {
         event.preventDefault();
         event.stopPropagation();
@@ -875,6 +879,8 @@ function isInputFocused() {
 }
 
 function handleKeyDown(event) {
+    if (this.enabled === false) return;
+
     const stopPanning = isInputFocused();
 
     const isNavigationButton = Object.values(this.keys).includes(event.which);

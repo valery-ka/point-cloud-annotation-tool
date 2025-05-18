@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 
 import { useSideViews } from "contexts";
+import { useSideViewsControls } from "hooks";
 
 import { rgbToHex } from "utils/editor";
 import { projectToScreen, getCornerCursor, getEdgeStyles, isHovered } from "utils/cuboids";
@@ -15,6 +16,8 @@ export const SideViewSVG = ({ name, y, width, height, mesh, camera }) => {
 
     const [hoveredHandler, setHoveredHandler] = useState(null);
     const [hoveredView, setHoveredView] = useState(null);
+
+    useSideViewsControls({ camera, mesh, hoveredView, hoveredHandler, name });
 
     const project = useCallback(
         (pos3d) => projectToScreen(pos3d, camera, width, height),

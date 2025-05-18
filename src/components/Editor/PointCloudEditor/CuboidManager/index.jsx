@@ -9,7 +9,7 @@ import { addCuboid, removeCuboid } from "utils/cuboids";
 
 export const CuboidManager = memo(() => {
     const { scene } = useThree();
-    const { selectedCuboidRef } = useSideViews();
+    const { selectedCuboidRef, sideViewsCamerasNeedUpdate } = useSideViews();
 
     const cubeRefs = useRef({});
     const [cuboids, setCuboids] = useState([
@@ -29,32 +29,28 @@ export const CuboidManager = memo(() => {
         },
     ]);
 
-    const { updateAllCameras: updateAllSideViewCameras } = useOrthographicView({
+    useOrthographicView({
         selectedCuboidRef,
     });
 
     const onTransformFinished = useCallback(() => {
-        updateAllSideViewCameras(selectedCuboidRef.current);
-    }, [updateAllSideViewCameras]);
+        sideViewsCamerasNeedUpdate.current = true;
+    }, []);
 
     const { transformControlsRef } = useTransformControls({
         selectedCuboidRef,
         onTransformFinished,
-        updateAllSideViewCameras,
     });
 
-    const onCuboidSelect = useCallback(
-        (id) => {
-            const mesh = cubeRefs.current[id];
-            selectedCuboidRef.current = mesh;
+    const onCuboidSelect = useCallback((id) => {
+        const mesh = cubeRefs.current[id];
+        selectedCuboidRef.current = mesh;
 
-            transformControlsRef.current.detach();
-            transformControlsRef.current.attach(selectedCuboidRef.current);
+        transformControlsRef.current.detach();
+        transformControlsRef.current.attach(selectedCuboidRef.current);
 
-            updateAllSideViewCameras(selectedCuboidRef.current);
-        },
-        [updateAllSideViewCameras],
-    );
+        sideViewsCamerasNeedUpdate.current = true;
+    }, []);
 
     useRaycastClickSelect({
         getMeshMap: () => cubeRefs.current,

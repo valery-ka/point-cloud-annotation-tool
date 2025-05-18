@@ -3,21 +3,18 @@ import { useThree } from "@react-three/fiber";
 
 import { useCallback, useEffect, useRef } from "react";
 
-import { useEditor, useFrames, useFileManager } from "contexts";
+import { useEditor, useFrames, useFileManager, useSideViews } from "contexts";
 
 import { isEmpty } from "lodash";
 import { TransformControls } from "utils/cuboids";
 
-export const useTransformControls = ({
-    selectedCuboidRef,
-    onTransformFinished,
-    updateAllSideViewCameras,
-}) => {
+export const useTransformControls = ({ selectedCuboidRef, onTransformFinished }) => {
     const { gl, camera, scene } = useThree();
 
     const { pcdFiles } = useFileManager();
     const { pointCloudRefs, controlsRef } = useEditor();
     const { activeFrameIndex } = useFrames();
+    const { sideViewsCamerasNeedUpdate } = useSideViews();
 
     const transformControlsRef = useRef(null);
     const isDraggingRef = useRef(false);
@@ -42,7 +39,7 @@ export const useTransformControls = ({
         const position = cuboid.position;
         const scale = cuboid.scale;
 
-        updateAllSideViewCameras(cuboid);
+        sideViewsCamerasNeedUpdate.current = true;
 
         if (isEmpty(pcdFiles)) {
             // console.log("no points");
@@ -81,7 +78,7 @@ export const useTransformControls = ({
         // console.log("---------------------------");
         // console.log("Points inside box", insidePoints);
         // console.log("---------------------------");
-    }, [pcdFiles, activeFrameIndex, updateAllSideViewCameras]);
+    }, [pcdFiles, activeFrameIndex]);
 
     useEffect(() => {
         const transformControls = new TransformControls(camera, gl.domElement);

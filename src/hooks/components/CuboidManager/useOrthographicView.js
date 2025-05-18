@@ -10,14 +10,17 @@ import { SIDE_VIEWS_GAP, INITIAL_SIDE_VIEWS_ZOOM } from "constants";
 export const useOrthographicView = ({ selectedCuboidRef }) => {
     const { size, scene } = useThree();
 
-    const { sideViews, setSideViews, setHandlePositions } = useSideViews();
+    const { sideViews, setSideViews, setHandlePositions, sideViewsCamerasNeedUpdate } =
+        useSideViews();
 
     const canvasRef = useRef(null);
     const rendererRef = useRef(null);
     const aspectRef = useRef(null);
 
-    const setupCamera = useCallback(() => {
+    const setupCamera = useCallback((name) => {
         const camera = new OrthographicCamera();
+        camera.name = name;
+        camera.zoom = INITIAL_SIDE_VIEWS_ZOOM;
         return camera;
     }, []);
 
@@ -31,19 +34,19 @@ export const useOrthographicView = ({ selectedCuboidRef }) => {
         const sideViewsList = [
             {
                 name: "top",
-                camera: setupCamera(),
+                camera: setupCamera("top"),
                 scaleOrder: ["x", "y", "z"],
                 getOrientation: () => getOrientationQuaternion(new Euler(0, 0, -Math.PI / 2)),
             },
             {
                 name: "left",
-                camera: setupCamera(),
+                camera: setupCamera("left"),
                 scaleOrder: ["z", "x", "y"],
                 getOrientation: () => getOrientationQuaternion(new Euler(Math.PI / 2, 0, 0)),
             },
             {
                 name: "front",
-                camera: setupCamera(),
+                camera: setupCamera("front"),
                 scaleOrder: ["y", "z", "x"],
                 getOrientation: () =>
                     getOrientationQuaternion(new Euler(Math.PI / 2, -Math.PI / 2, 0)),
@@ -54,7 +57,7 @@ export const useOrthographicView = ({ selectedCuboidRef }) => {
     }, []);
 
     useEffect(() => {
-        updateAllCameras(selectedCuboidRef.current);
+        sideViewsCamerasNeedUpdate.current = true;
     }, [size]);
 
     const updateCamera = useCallback(
@@ -87,8 +90,6 @@ export const useOrthographicView = ({ selectedCuboidRef }) => {
             camera.position.copy(mesh.position);
 
             camera.quaternion.copy(mesh.quaternion).multiply(getOrientation());
-
-            camera.zoom = INITIAL_SIDE_VIEWS_ZOOM / aspect;
 
             camera.updateProjectionMatrix();
             camera.updateMatrixWorld(true);
@@ -134,6 +135,13 @@ export const useOrthographicView = ({ selectedCuboidRef }) => {
     }, [scene]);
 
     useFrame(() => {
+        if (sideViewsCamerasNeedUpdate.current) {
+            updateAllCameras(selectedCuboidRef.current);
+            sideViewsCamerasNeedUpdate.current = false;
+        }
+    });
+
+    useFrame(() => {
         if (!rendererRef.current || !canvasRef.current) return;
 
         const width = canvasRef.current.clientWidth;
@@ -156,7 +164,6 @@ export const useOrthographicView = ({ selectedCuboidRef }) => {
     });
 
     return {
-        updateAllCameras,
         addView: (name, scaleOrder, getOrientation) => {
             const camera = setupCamera();
             setSideViews((prev) => [...prev, { name, camera, scaleOrder, getOrientation }]);

@@ -4,6 +4,8 @@ const SideViewsContext = createContext();
 
 export const SideViewsProvider = ({ children }) => {
     const selectedCuboidRef = useRef(null);
+    const sideViewsCamerasNeedUpdate = useRef(true);
+
     const [sideViews, setSideViews] = useState([]);
     const [handlePositions, setHandlePositions] = useState({});
 
@@ -11,6 +13,7 @@ export const SideViewsProvider = ({ children }) => {
         <SideViewsContext.Provider
             value={{
                 selectedCuboidRef,
+                sideViewsCamerasNeedUpdate,
                 sideViews,
                 setSideViews,
                 handlePositions,
