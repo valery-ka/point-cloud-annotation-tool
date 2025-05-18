@@ -6,7 +6,7 @@ import { useSideViews, useEditor } from "contexts";
 const SENSITIVITY = 0.0025;
 
 const MIN_ZOOM = 0.5;
-const MAX_ZOOM = 1;
+const MAX_ZOOM = 1.5;
 const ZOOM_STEP = 0.05;
 
 const translate = "translate";
@@ -15,7 +15,7 @@ const rotate = "rotate";
 
 export const useSideViewsControls = ({ camera, mesh, hoveredView, hoveredHandler, name }) => {
     const { sideViewsCamerasNeedUpdate } = useSideViews();
-    const { controlsRef } = useEditor();
+    const { cameraControlsRef, transformControlsRef } = useEditor();
 
     const isDraggingRef = useRef(false);
     const transformModeRef = useRef(null);
@@ -50,11 +50,43 @@ export const useSideViewsControls = ({ camera, mesh, hoveredView, hoveredHandler
         [mesh, name],
     );
 
+    const handleRotate = useCallback(
+        (movementX) => {
+            if (!mesh) return;
+
+            const dx = movementX * SENSITIVITY;
+
+            switch (name) {
+                case "top": {
+                    const axis = new Vector3(0, 0, 1);
+                    mesh.rotateOnAxis(axis, -dx);
+                    break;
+                }
+
+                case "left": {
+                    const axis = new Vector3(0, 1, 0);
+                    mesh.rotateOnAxis(axis, dx);
+                    break;
+                }
+
+                case "front": {
+                    const axis = new Vector3(1, 0, 0);
+                    mesh.rotateOnAxis(axis, dx);
+                    break;
+                }
+
+                default:
+                    return;
+            }
+        },
+        [mesh, name],
+    );
+
     const handleMouseDown = useCallback(
         (e) => {
             if (e.button !== 0 || !hoveredView) return;
 
-            controlsRef.current.enabled = false;
+            cameraControlsRef.current.enabled = false;
 
             const type = hoveredHandler?.type;
 
@@ -62,8 +94,10 @@ export const useSideViewsControls = ({ camera, mesh, hoveredView, hoveredHandler
                 isDraggingRef.current = true;
                 transformModeRef.current = translate;
             } else if (type === "edge" || type === "corner") {
+                isDraggingRef.current = true;
                 transformModeRef.current = scale;
             } else if (type === "rotation") {
+                isDraggingRef.current = true;
                 transformModeRef.current = rotate;
             }
         },
@@ -74,20 +108,25 @@ export const useSideViewsControls = ({ camera, mesh, hoveredView, hoveredHandler
         (e) => {
             if (!isDraggingRef.current || !mesh) return;
 
+            const { movementX, movementY } = e;
+
             if (transformModeRef.current === translate) {
-                handleTranslate(e.movementX, e.movementY);
-                sideViewsCamerasNeedUpdate.current = true;
+                handleTranslate(movementX, movementY);
+            } else if (transformModeRef.current === rotate) {
+                handleRotate(movementX);
             }
+
+            sideViewsCamerasNeedUpdate.current = true;
+            transformControlsRef.current.dispatchEvent({ type: "change" });
         },
-        [mesh, handleTranslate],
+        [mesh, handleTranslate, handleRotate],
     );
 
     const handleMouseUp = useCallback(() => {
         isDraggingRef.current = false;
         transformModeRef.current = null;
         sideViewsCamerasNeedUpdate.current = true;
-        controlsRef.current.enabled = true;
-        console.log(controlsRef.current.enabled);
+        cameraControlsRef.current.enabled = true;
     }, []);
 
     const handleMouseWheel = useCallback(

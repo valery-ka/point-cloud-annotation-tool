@@ -15,24 +15,24 @@ export const useCameraControls = (requestPixelProjectionsUpdate) => {
     const { camera, gl } = useThree();
 
     const { settings } = useSettings();
-    const { controlsRef, setPixelProjections } = useEditor();
+    const { cameraControlsRef, setPixelProjections } = useEditor();
     const { subscribe, unsubscribe } = useEvent();
     const { selectedTool, isDrawing } = useTools();
     const { setHighlightedPoint } = useHoveredPoint();
 
     // setup camera and camera controls
     useEffect(() => {
-        if (!controlsRef.current) {
+        if (!cameraControlsRef.current) {
             const { navigation } = settings.editorSettings;
 
             camera.position.set(-DISTANCE_TO_CENTER, 0, DISTANCE_TO_CENTER);
             camera.up.set(0, 0, 1);
 
-            controlsRef.current = new CameraControls(camera, gl.domElement);
-            controlsRef.current.zoomSpeed = navigation.zoomSpeed;
-            controlsRef.current.keyPanSpeed = navigation.keyPanSpeed;
-            controlsRef.current.minDistance = 0.5;
-            controlsRef.current.maxDistance = 500;
+            cameraControlsRef.current = new CameraControls(camera, gl.domElement);
+            cameraControlsRef.current.zoomSpeed = navigation.zoomSpeed;
+            cameraControlsRef.current.keyPanSpeed = navigation.keyPanSpeed;
+            cameraControlsRef.current.minDistance = 0.5;
+            cameraControlsRef.current.maxDistance = 500;
         }
 
         const onMouseDown = () => {
@@ -72,27 +72,27 @@ export const useCameraControls = (requestPixelProjectionsUpdate) => {
     }, []);
 
     useEffect(() => {
-        controlsRef.current.addEventListener("end", onEnd);
-        controlsRef.current.addEventListener("change", onChange);
-        controlsRef.current.addEventListener("start", onStart);
+        cameraControlsRef.current.addEventListener("end", onEnd);
+        cameraControlsRef.current.addEventListener("change", onChange);
+        cameraControlsRef.current.addEventListener("start", onStart);
 
         return () => {
-            controlsRef.current.removeEventListener("end", onEnd);
-            controlsRef.current.removeEventListener("change", onChange);
-            controlsRef.current.removeEventListener("start", onStart);
+            cameraControlsRef.current.removeEventListener("end", onEnd);
+            cameraControlsRef.current.removeEventListener("change", onChange);
+            cameraControlsRef.current.removeEventListener("start", onStart);
         };
     }, []);
 
     const handleNavigationChange = useCallback((data) => {
         const value = data.value;
         const setting = data.settingKey;
-        controlsRef.current[setting] = value;
+        cameraControlsRef.current[setting] = value;
     }, []);
 
     useSubscribeFunction("navigationChange", handleNavigationChange, []);
 
     // setup camera presets for camera commands (i.g. top view, origin view)
-    useChangeTarget(controlsRef, tweenGroup, () => {
+    useChangeTarget(cameraControlsRef, tweenGroup, () => {
         onEnd();
     });
 
@@ -100,7 +100,7 @@ export const useCameraControls = (requestPixelProjectionsUpdate) => {
         camera.layers.set(LAYERS.SECONDARY);
         camera.layers.enable(LAYERS.MAIN);
 
-        const cameraViews = createCameraViews(camera, controlsRef.current, tweenGroup, () => {
+        const cameraViews = createCameraViews(camera, cameraControlsRef.current, tweenGroup, () => {
             onEnd();
         });
 
@@ -125,12 +125,13 @@ export const useCameraControls = (requestPixelProjectionsUpdate) => {
 
     // setup controls behaviour for each selection tool when it's active
     useEffect(() => {
-        if (controlsRef.current) {
+        if (cameraControlsRef.current) {
             const config = getToolsConfig(selectedTool, isDrawing);
-            controlsRef.current.enabledButtons.leftButton = config.enabledButtons.leftButton;
-            controlsRef.current.enabledButtons.rightButton = config.enabledButtons.rightButton;
-            controlsRef.current.enableZoom = config.enableZoom;
-            controlsRef.current.enabledKeys = config.enabledKeys;
+            cameraControlsRef.current.enabledButtons.leftButton = config.enabledButtons.leftButton;
+            cameraControlsRef.current.enabledButtons.rightButton =
+                config.enabledButtons.rightButton;
+            cameraControlsRef.current.enableZoom = config.enableZoom;
+            cameraControlsRef.current.enabledKeys = config.enabledKeys;
         }
     }, [selectedTool, isDrawing]);
 

@@ -7,7 +7,7 @@ import { useBindHotkey } from "hooks";
 
 import { switchView, getPointPosition, getTargetPosition } from "utils/camera";
 
-export const useChangeTarget = (controlsRef, tweenGroup, requestPixelProjectionsUpdate) => {
+export const useChangeTarget = (cameraControlsRef, tweenGroup, requestPixelProjectionsUpdate) => {
     const { camera, gl } = useThree();
 
     const { settings } = useSettings();
@@ -33,7 +33,7 @@ export const useChangeTarget = (controlsRef, tweenGroup, requestPixelProjections
             targetPos,
             targetTarget,
             camera,
-            controlsRef.current,
+            cameraControlsRef.current,
             tweenGroup,
             requestPixelProjectionsUpdate,
         );

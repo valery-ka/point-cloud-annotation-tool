@@ -7,11 +7,16 @@ import { useSideViews } from "contexts";
 import { getCuboidHandlesPositions } from "utils/cuboids";
 import { SIDE_VIEWS_GAP, INITIAL_SIDE_VIEWS_ZOOM } from "constants";
 
-export const useOrthographicView = ({ selectedCuboidRef }) => {
+export const useOrthographicView = () => {
     const { size, scene } = useThree();
 
-    const { sideViews, setSideViews, setHandlePositions, sideViewsCamerasNeedUpdate } =
-        useSideViews();
+    const {
+        sideViews,
+        setSideViews,
+        selectedCuboidRef,
+        setHandlePositions,
+        sideViewsCamerasNeedUpdate,
+    } = useSideViews();
 
     const canvasRef = useRef(null);
     const rendererRef = useRef(null);
@@ -55,10 +60,6 @@ export const useOrthographicView = ({ selectedCuboidRef }) => {
 
         setSideViews(sideViewsList);
     }, []);
-
-    useEffect(() => {
-        sideViewsCamerasNeedUpdate.current = true;
-    }, [size]);
 
     const updateCamera = useCallback(
         (camera, mesh, scaleOrder, getOrientation) => {
@@ -133,6 +134,10 @@ export const useOrthographicView = ({ selectedCuboidRef }) => {
             renderer.dispose();
         };
     }, [scene]);
+
+    useEffect(() => {
+        sideViewsCamerasNeedUpdate.current = true;
+    }, [size]);
 
     useFrame(() => {
         if (sideViewsCamerasNeedUpdate.current) {

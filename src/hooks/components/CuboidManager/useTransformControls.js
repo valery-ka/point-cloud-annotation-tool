@@ -1,39 +1,30 @@
 import { Vector3, Matrix4 } from "three";
 import { useThree } from "@react-three/fiber";
 
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect } from "react";
 
 import { useEditor, useFrames, useFileManager, useSideViews } from "contexts";
 
 import { isEmpty } from "lodash";
 import { TransformControls } from "utils/cuboids";
 
-export const useTransformControls = ({ selectedCuboidRef, onTransformFinished }) => {
+export const useTransformControls = () => {
     const { gl, camera, scene } = useThree();
 
     const { pcdFiles } = useFileManager();
-    const { pointCloudRefs, controlsRef } = useEditor();
+    const { pointCloudRefs, cameraControlsRef, transformControlsRef } = useEditor();
     const { activeFrameIndex } = useFrames();
-    const { sideViewsCamerasNeedUpdate } = useSideViews();
+    const { selectedCuboidRef, sideViewsCamerasNeedUpdate } = useSideViews();
 
-    const transformControlsRef = useRef(null);
-    const isDraggingRef = useRef(false);
-
-    const onDraggingChanged = useCallback(
-        (event) => {
-            isDraggingRef.current = event.value;
-            if (controlsRef.current) {
-                controlsRef.current.enabled = !event.value;
-            }
-            if (!isDraggingRef.current) {
-                onTransformFinished();
-            }
-        },
-        [onTransformFinished],
-    );
+    const onDraggingChanged = useCallback((event) => {
+        if (cameraControlsRef.current) {
+            cameraControlsRef.current.enabled = !event.value;
+        }
+        sideViewsCamerasNeedUpdate.current = true;
+    }, []);
 
     const onTransformChange = useCallback(() => {
-        if (!isDraggingRef.current || !selectedCuboidRef.current) return;
+        if (!selectedCuboidRef.current) return;
 
         const cuboid = selectedCuboidRef.current;
         const position = cuboid.position;

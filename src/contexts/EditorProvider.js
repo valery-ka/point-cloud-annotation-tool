@@ -22,7 +22,8 @@ export const EditorProvider = ({ children }) => {
     const undoStackRef = useRef({});
     const redoStackRef = useRef({});
 
-    const controlsRef = useRef(null);
+    const cameraControlsRef = useRef(null);
+    const transformControlsRef = useRef(null);
 
     const isIntersectingMap = useRef(new Map());
 
@@ -44,7 +45,8 @@ export const EditorProvider = ({ children }) => {
                 setHasFilterSelectionPoint,
                 pendingSaveState,
                 setPendingSaveState,
-                controlsRef,
+                cameraControlsRef,
+                transformControlsRef,
                 isIntersectingMap,
             }}
         >

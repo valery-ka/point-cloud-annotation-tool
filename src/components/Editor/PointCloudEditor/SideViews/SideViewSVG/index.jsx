@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, Fragment } from "react";
 
 import { useSideViews } from "contexts";
 import { useSideViewsControls } from "hooks";
@@ -32,7 +32,7 @@ export const SideViewSVG = ({ name, y, width, height, mesh, camera }) => {
             const cursor = getCornerCursor(index, projectedCorners);
 
             return (
-                <>
+                <Fragment key={`corner-${index}`}>
                     <circle
                         key={`corner-${index}`}
                         cx={pos2d.x}
@@ -64,7 +64,7 @@ export const SideViewSVG = ({ name, y, width, height, mesh, camera }) => {
                             />
                         </>
                     )}
-                </>
+                </Fragment>
             );
         },
         [project, corners, hoveredHandler],
@@ -79,7 +79,7 @@ export const SideViewSVG = ({ name, y, width, height, mesh, camera }) => {
             const { picker, line } = getEdgeStyles(isVertical, pos2d, width, height, PICKER_WIDTH);
 
             return (
-                <>
+                <Fragment key={`edge-${index}`}>
                     <rect
                         key={`edge-picker-${index}`}
                         {...picker}
@@ -93,7 +93,7 @@ export const SideViewSVG = ({ name, y, width, height, mesh, camera }) => {
                         className={`svg-line ${hoveredHandler?.index === index ? "hovered" : ""}`}
                         {...line}
                     />
-                </>
+                </Fragment>
             );
         },
         [project, hoveredHandler, corners],

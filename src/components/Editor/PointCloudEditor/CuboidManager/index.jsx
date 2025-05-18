@@ -2,13 +2,15 @@ import { useThree } from "@react-three/fiber";
 
 import { memo, useState, useEffect, useRef, useCallback } from "react";
 
-import { useSideViews } from "contexts";
+import { useSideViews, useEditor } from "contexts";
 import { useTransformControls, useRaycastClickSelect, useOrthographicView } from "hooks";
 
 import { addCuboid, removeCuboid } from "utils/cuboids";
 
 export const CuboidManager = memo(() => {
     const { scene } = useThree();
+
+    const { transformControlsRef } = useEditor();
     const { selectedCuboidRef, sideViewsCamerasNeedUpdate } = useSideViews();
 
     const cubeRefs = useRef({});
@@ -29,18 +31,8 @@ export const CuboidManager = memo(() => {
         },
     ]);
 
-    useOrthographicView({
-        selectedCuboidRef,
-    });
-
-    const onTransformFinished = useCallback(() => {
-        sideViewsCamerasNeedUpdate.current = true;
-    }, []);
-
-    const { transformControlsRef } = useTransformControls({
-        selectedCuboidRef,
-        onTransformFinished,
-    });
+    useOrthographicView();
+    useTransformControls();
 
     const onCuboidSelect = useCallback((id) => {
         const mesh = cubeRefs.current[id];
