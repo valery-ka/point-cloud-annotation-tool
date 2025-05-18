@@ -17,5 +17,10 @@ export {
     projectToScreen,
     getCornerCursor,
     getEdgeStyles,
+    getEdgeDirection,
+    getCornerDirection,
     isHovered,
+    scalingConfigs,
+    translateConfigs,
+    rotateConfigs,
 } from "./sideViews";

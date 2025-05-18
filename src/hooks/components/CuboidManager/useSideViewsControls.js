@@ -1,9 +1,13 @@
-import { Vector3 } from "three";
 import { useEffect, useRef, useCallback } from "react";
 
 import { useSideViews, useEditor } from "contexts";
+import { scalingConfigs, translateConfigs, rotateConfigs } from "utils/cuboids";
 
-const SENSITIVITY = 0.0025;
+const TRANSLATE_SENSITIVITY = 0.0025;
+const ROTATE_SENSITIVITY = 0.005;
+const SCALE_SENSITIVITY = 0.01;
+
+const MIN_SCALE = 0.1;
 
 const MIN_ZOOM = 0.5;
 const MAX_ZOOM = 1.5;
@@ -17,6 +21,7 @@ export const useSideViewsControls = ({ camera, mesh, hoveredView, hoveredHandler
     const { sideViewsCamerasNeedUpdate } = useSideViews();
     const { cameraControlsRef, transformControlsRef } = useEditor();
 
+    const scaleHandlerRef = useRef(null);
     const isDraggingRef = useRef(false);
     const transformModeRef = useRef(null);
 
@@ -24,27 +29,16 @@ export const useSideViewsControls = ({ camera, mesh, hoveredView, hoveredHandler
         (movementX, movementY) => {
             if (!mesh) return;
 
-            const dx = movementX * SENSITIVITY;
-            const dy = movementY * SENSITIVITY;
+            const dx = movementX * TRANSLATE_SENSITIVITY;
+            const dy = movementY * TRANSLATE_SENSITIVITY;
 
-            const localMove = new Vector3();
+            const config = translateConfigs[name];
+            if (!config) return;
 
-            switch (name) {
-                case "top":
-                    localMove.set(-dy, -dx, 0);
-                    break;
-                case "left":
-                    localMove.set(dx, 0, -dy);
-                    break;
-                case "front":
-                    localMove.set(0, -dx, -dy);
-                    break;
-                default:
-                    return;
-            }
-
+            const localMove = config(dx, dy);
             const worldTarget = mesh.localToWorld(localMove.clone());
             const worldMove = worldTarget.sub(mesh.position);
+
             mesh.position.add(worldMove);
         },
         [mesh, name],
@@ -54,30 +48,51 @@ export const useSideViewsControls = ({ camera, mesh, hoveredView, hoveredHandler
         (movementX) => {
             if (!mesh) return;
 
-            const dx = movementX * SENSITIVITY;
+            const dx = movementX * ROTATE_SENSITIVITY;
 
-            switch (name) {
-                case "top": {
-                    const axis = new Vector3(0, 0, 1);
-                    mesh.rotateOnAxis(axis, -dx);
-                    break;
+            const config = rotateConfigs[name];
+            if (!config) return;
+
+            const { axis, direction } = config;
+            mesh.rotateOnAxis(axis, dx * direction);
+        },
+        [mesh, name],
+    );
+
+    const handleScale = useCallback(
+        (movementX, movementY) => {
+            if (!mesh) return;
+
+            const dx = movementX * SCALE_SENSITIVITY;
+            const dy = movementY * SCALE_SENSITIVITY;
+
+            const scale = mesh.scale.clone();
+            const position = mesh.position.clone();
+
+            const config = scalingConfigs(dx, dy)[name]?.[scaleHandlerRef.current];
+            if (!config) return;
+
+            const configs = Array.isArray(config) ? config : [config];
+
+            configs.forEach(({ axis, delta, scaleKey, posAdd }) => {
+                let newScaleVal = scale[scaleKey] + delta;
+                if (newScaleVal < MIN_SCALE) newScaleVal = MIN_SCALE;
+
+                const scaleChange = newScaleVal - scale[scaleKey];
+                scale[scaleKey] = newScaleVal;
+
+                const positionOffset = axis.clone().multiplyScalar(scaleChange / 2);
+                positionOffset.applyQuaternion(mesh.quaternion);
+
+                if (posAdd) {
+                    position.add(positionOffset);
+                } else {
+                    position.sub(positionOffset);
                 }
+            });
 
-                case "left": {
-                    const axis = new Vector3(0, 1, 0);
-                    mesh.rotateOnAxis(axis, dx);
-                    break;
-                }
-
-                case "front": {
-                    const axis = new Vector3(1, 0, 0);
-                    mesh.rotateOnAxis(axis, dx);
-                    break;
-                }
-
-                default:
-                    return;
-            }
+            mesh.scale.copy(scale);
+            mesh.position.copy(position);
         },
         [mesh, name],
     );
@@ -95,6 +110,7 @@ export const useSideViewsControls = ({ camera, mesh, hoveredView, hoveredHandler
                 transformModeRef.current = translate;
             } else if (type === "edge" || type === "corner") {
                 isDraggingRef.current = true;
+                scaleHandlerRef.current = hoveredHandler?.direction;
                 transformModeRef.current = scale;
             } else if (type === "rotation") {
                 isDraggingRef.current = true;
@@ -114,12 +130,14 @@ export const useSideViewsControls = ({ camera, mesh, hoveredView, hoveredHandler
                 handleTranslate(movementX, movementY);
             } else if (transformModeRef.current === rotate) {
                 handleRotate(movementX);
+            } else if (transformModeRef.current === scale) {
+                handleScale(movementX, movementY);
             }
 
             sideViewsCamerasNeedUpdate.current = true;
             transformControlsRef.current.dispatchEvent({ type: "change" });
         },
-        [mesh, handleTranslate, handleRotate],
+        [mesh, handleTranslate, handleRotate, handleScale],
     );
 
     const handleMouseUp = useCallback(() => {

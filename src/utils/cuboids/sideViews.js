@@ -87,3 +87,131 @@ export const getEdgeStyles = (isVertical, pos2d, width, height, pickerWidth) => 
 
 export const isHovered = (hoveredHandler, type, index = null) =>
     hoveredHandler?.type === type && hoveredHandler?.index === index;
+
+export const getEdgeDirection = (pos2d, isVertical, corners2d) => {
+    const center = corners2d.reduce(
+        (acc, p) => {
+            acc.x += p.x;
+            acc.y += p.y;
+            return acc;
+        },
+        { x: 0, y: 0 },
+    );
+    center.x /= corners2d.length;
+    center.y /= corners2d.length;
+
+    if (isVertical) {
+        return pos2d.x > center.x ? "right" : "left";
+    } else {
+        return pos2d.y > center.y ? "bottom" : "top";
+    }
+};
+
+export function getCornerDirection(index, corners, project) {
+    const projectedCorners = corners.map(project);
+    const pos2d = projectedCorners[index];
+
+    const center = projectedCorners.reduce(
+        (acc, p) => {
+            acc.x += p.x;
+            acc.y += p.y;
+            return acc;
+        },
+        { x: 0, y: 0 },
+    );
+    center.x /= projectedCorners.length;
+    center.y /= projectedCorners.length;
+
+    const horizontal = pos2d.x < center.x ? "left" : "right";
+    const vertical = pos2d.y < center.y ? "top" : "bottom";
+
+    return `${vertical}-${horizontal}`;
+}
+
+export const translateConfigs = {
+    top: (dx, dy) => new Vector3(-dy, -dx, 0),
+    left: (dx, dy) => new Vector3(dx, 0, -dy),
+    front: (dx, dy) => new Vector3(0, -dx, -dy),
+};
+
+export const rotateConfigs = {
+    top: { axis: new Vector3(0, 0, 1), direction: -1 },
+    left: { axis: new Vector3(0, 1, 0), direction: 1 },
+    front: { axis: new Vector3(1, 0, 0), direction: 1 },
+};
+
+export const scalingConfigs = (dx, dy) => {
+    const top = {
+        top: { axis: new Vector3(-1, 0, 0), delta: -dy, scaleKey: "x", posAdd: false },
+        right: { axis: new Vector3(0, 1, 0), delta: dx, scaleKey: "y", posAdd: false },
+        bottom: { axis: new Vector3(-1, 0, 0), delta: dy, scaleKey: "x", posAdd: true },
+        left: { axis: new Vector3(0, 1, 0), delta: -dx, scaleKey: "y", posAdd: true },
+
+        "top-right": [
+            { axis: new Vector3(-1, 0, 0), delta: -dy, scaleKey: "x", posAdd: false },
+            { axis: new Vector3(0, 1, 0), delta: dx, scaleKey: "y", posAdd: false },
+        ],
+        "top-left": [
+            { axis: new Vector3(-1, 0, 0), delta: -dy, scaleKey: "x", posAdd: false },
+            { axis: new Vector3(0, 1, 0), delta: -dx, scaleKey: "y", posAdd: true },
+        ],
+        "bottom-right": [
+            { axis: new Vector3(-1, 0, 0), delta: dy, scaleKey: "x", posAdd: true },
+            { axis: new Vector3(0, 1, 0), delta: dx, scaleKey: "y", posAdd: false },
+        ],
+        "bottom-left": [
+            { axis: new Vector3(-1, 0, 0), delta: dy, scaleKey: "x", posAdd: true },
+            { axis: new Vector3(0, 1, 0), delta: -dx, scaleKey: "y", posAdd: true },
+        ],
+    };
+
+    const left = {
+        top: { axis: new Vector3(0, 0, -1), delta: -dy, scaleKey: "z", posAdd: false },
+        bottom: { axis: new Vector3(0, 0, -1), delta: dy, scaleKey: "z", posAdd: true },
+        right: { axis: new Vector3(-1, 0, 0), delta: dx, scaleKey: "x", posAdd: false },
+        left: { axis: new Vector3(-1, 0, 0), delta: -dx, scaleKey: "x", posAdd: true },
+
+        "top-right": [
+            { axis: new Vector3(0, 0, -1), delta: -dy, scaleKey: "z", posAdd: false },
+            { axis: new Vector3(-1, 0, 0), delta: dx, scaleKey: "x", posAdd: false },
+        ],
+        "top-left": [
+            { axis: new Vector3(0, 0, -1), delta: -dy, scaleKey: "z", posAdd: false },
+            { axis: new Vector3(-1, 0, 0), delta: -dx, scaleKey: "x", posAdd: true },
+        ],
+        "bottom-right": [
+            { axis: new Vector3(0, 0, -1), delta: dy, scaleKey: "z", posAdd: true },
+            { axis: new Vector3(-1, 0, 0), delta: dx, scaleKey: "x", posAdd: false },
+        ],
+        "bottom-left": [
+            { axis: new Vector3(0, 0, -1), delta: dy, scaleKey: "z", posAdd: true },
+            { axis: new Vector3(-1, 0, 0), delta: -dx, scaleKey: "x", posAdd: true },
+        ],
+    };
+
+    const front = {
+        top: { axis: new Vector3(0, 0, -1), delta: -dy, scaleKey: "z", posAdd: false },
+        bottom: { axis: new Vector3(0, 0, -1), delta: dy, scaleKey: "z", posAdd: true },
+        right: { axis: new Vector3(0, -1, 0), delta: dx, scaleKey: "y", posAdd: true },
+        left: { axis: new Vector3(0, -1, 0), delta: -dx, scaleKey: "y", posAdd: false },
+
+        "top-right": [
+            { axis: new Vector3(0, 0, -1), delta: -dy, scaleKey: "z", posAdd: false },
+            { axis: new Vector3(0, -1, 0), delta: dx, scaleKey: "y", posAdd: true },
+        ],
+        "top-left": [
+            { axis: new Vector3(0, 0, -1), delta: -dy, scaleKey: "z", posAdd: false },
+            { axis: new Vector3(0, -1, 0), delta: -dx, scaleKey: "y", posAdd: false },
+        ],
+        "bottom-right": [
+            { axis: new Vector3(0, 0, -1), delta: dy, scaleKey: "z", posAdd: true },
+            { axis: new Vector3(0, -1, 0), delta: dx, scaleKey: "y", posAdd: true },
+        ],
+        "bottom-left": [
+            { axis: new Vector3(0, 0, -1), delta: dy, scaleKey: "z", posAdd: true },
+            { axis: new Vector3(0, -1, 0), delta: -dx, scaleKey: "y", posAdd: false },
+        ],
+    };
+
+    return { top, left, front };
+};

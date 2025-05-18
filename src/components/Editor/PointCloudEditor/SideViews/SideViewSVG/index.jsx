@@ -4,7 +4,14 @@ import { useSideViews } from "contexts";
 import { useSideViewsControls } from "hooks";
 
 import { rgbToHex } from "utils/editor";
-import { projectToScreen, getCornerCursor, getEdgeStyles, isHovered } from "utils/cuboids";
+import {
+    projectToScreen,
+    getCornerCursor,
+    getEdgeStyles,
+    getEdgeDirection,
+    getCornerDirection,
+    isHovered,
+} from "utils/cuboids";
 
 const PICKER_COLOR = "#ffffff";
 const PICKER_WIDTH = 30;
@@ -28,6 +35,7 @@ export const SideViewSVG = ({ name, y, width, height, mesh, camera }) => {
         (pos3d, index) => {
             const pos2d = project(pos3d);
 
+            const direction = getCornerDirection(index, corners, project);
             const projectedCorners = corners.map(project);
             const cursor = getCornerCursor(index, projectedCorners);
 
@@ -41,7 +49,7 @@ export const SideViewSVG = ({ name, y, width, height, mesh, camera }) => {
                         fill={PICKER_COLOR}
                         fillOpacity={PICKER_OPACITY}
                         style={{ cursor }}
-                        onMouseEnter={() => setHoveredHandler({ type: "corner", index })}
+                        onMouseEnter={() => setHoveredHandler({ type: "corner", index, direction })}
                         onMouseLeave={() => setHoveredHandler(null)}
                     />
                     {isHovered(hoveredHandler, "corner", index) && (
@@ -75,8 +83,12 @@ export const SideViewSVG = ({ name, y, width, height, mesh, camera }) => {
             const pos2d = project(pos3d);
             const prev = project(corners[index]);
             const next = project(corners[(index + 1) % corners.length]);
+
             const isVertical = Math.abs(next.y - prev.y) > Math.abs(next.x - prev.x);
             const { picker, line } = getEdgeStyles(isVertical, pos2d, width, height, PICKER_WIDTH);
+
+            const corners2d = corners.map(project);
+            const direction = getEdgeDirection(pos2d, isVertical, corners2d);
 
             return (
                 <Fragment key={`edge-${index}`}>
@@ -85,7 +97,7 @@ export const SideViewSVG = ({ name, y, width, height, mesh, camera }) => {
                         {...picker}
                         fill={PICKER_COLOR}
                         fillOpacity={PICKER_OPACITY}
-                        onMouseEnter={() => setHoveredHandler({ type: "edge", index })}
+                        onMouseEnter={() => setHoveredHandler({ type: "edge", index, direction })}
                         onMouseLeave={() => setHoveredHandler(null)}
                     />
                     <line
