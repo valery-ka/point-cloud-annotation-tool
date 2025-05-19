@@ -362,7 +362,6 @@ class TransformControls extends Object3D {
             }
         } else if (mode === "scale") {
             const SENSITIVITY = 1.0;
-
             const MIN_DIMENSION_SIZE = 0.1;
 
             const MIN_SCALE = new Vector3(
@@ -372,73 +371,34 @@ class TransformControls extends Object3D {
             );
 
             const deltaWorld = new Vector3().copy(this.pointEnd).sub(this.pointStart);
-
-            const localAxis = new Vector3();
-            if (axis.includes("posX") || axis.includes("negX")) {
-                localAxis.set(1, 0, 0);
-            } else if (axis.includes("posY") || axis.includes("negY")) {
-                localAxis.set(0, 1, 0);
-            } else if (axis.includes("posZ") || axis.includes("negZ")) {
-                localAxis.set(0, 0, 1);
-            }
-
-            const worldAxis = localAxis.clone().applyQuaternion(object.quaternion).normalize();
-
-            const projectedDelta = worldAxis.dot(deltaWorld);
-
-            const scaleDelta = projectedDelta * SENSITIVITY;
-
             const newScale = object.scale.clone();
-
-            if (axis.includes("posX")) {
-                newScale.x = Math.max(this._scaleStart.x + scaleDelta, MIN_SCALE.x);
-            } else if (axis.includes("negX")) {
-                newScale.x = Math.max(this._scaleStart.x - scaleDelta, MIN_SCALE.x);
-            }
-
-            if (axis.includes("posY")) {
-                newScale.y = Math.max(this._scaleStart.y + scaleDelta, MIN_SCALE.y);
-            } else if (axis.includes("negY")) {
-                newScale.y = Math.max(this._scaleStart.y - scaleDelta, MIN_SCALE.y);
-            }
-
-            if (axis.includes("posZ")) {
-                newScale.z = Math.max(this._scaleStart.z + scaleDelta, MIN_SCALE.z);
-            } else if (axis.includes("negZ")) {
-                newScale.z = Math.max(this._scaleStart.z - scaleDelta, MIN_SCALE.z);
-            }
-
             const scaleOffset = new Vector3();
 
-            if (axis.includes("posX")) {
-                scaleOffset.add(
-                    worldAxis.clone().multiplyScalar((newScale.x - this._scaleStart.x) * 0.5),
-                );
-            } else if (axis.includes("negX")) {
-                scaleOffset.add(
-                    worldAxis.clone().multiplyScalar(-(newScale.x - this._scaleStart.x) * 0.5),
-                );
-            }
+            const directions = [
+                { key: "posX", axis: new Vector3(1, 0, 0), sign: +1 },
+                { key: "negX", axis: new Vector3(1, 0, 0), sign: -1 },
+                { key: "posY", axis: new Vector3(0, 1, 0), sign: +1 },
+                { key: "negY", axis: new Vector3(0, 1, 0), sign: -1 },
+                { key: "posZ", axis: new Vector3(0, 0, 1), sign: +1 },
+                { key: "negZ", axis: new Vector3(0, 0, 1), sign: -1 },
+            ];
 
-            if (axis.includes("posY")) {
-                scaleOffset.add(
-                    worldAxis.clone().multiplyScalar((newScale.y - this._scaleStart.y) * 0.5),
-                );
-            } else if (axis.includes("negY")) {
-                scaleOffset.add(
-                    worldAxis.clone().multiplyScalar(-(newScale.y - this._scaleStart.y) * 0.5),
-                );
-            }
+            directions.forEach(({ key, axis: localAxis, sign }) => {
+                if (!axis.includes(key)) return;
 
-            if (axis.includes("posZ")) {
-                scaleOffset.add(
-                    worldAxis.clone().multiplyScalar((newScale.z - this._scaleStart.z) * 0.5),
-                );
-            } else if (axis.includes("negZ")) {
-                scaleOffset.add(
-                    worldAxis.clone().multiplyScalar(-(newScale.z - this._scaleStart.z) * 0.5),
-                );
-            }
+                const worldAxis = localAxis.clone().applyQuaternion(object.quaternion).normalize();
+                const projectedDelta = worldAxis.dot(deltaWorld);
+                const scaleDelta = projectedDelta * SENSITIVITY * sign;
+
+                const component = localAxis.x ? "x" : localAxis.y ? "y" : "z";
+
+                const initialScale = this._scaleStart[component];
+                const updated = Math.max(initialScale + scaleDelta, MIN_SCALE[component]);
+                newScale[component] = updated;
+
+                const delta = updated - initialScale;
+                scaleOffset.add(worldAxis.clone().multiplyScalar(delta * 0.5 * sign));
+            });
 
             object.scale.copy(newScale);
             object.position.copy(this._positionStart).add(scaleOffset);
@@ -786,7 +746,7 @@ class TransformControlsGizmo extends Object3D {
 
         // Line geometry
         const LINE_CYLINDER_RADIUS = 0.004;
-        const LINE_CYLINDER_HEIGHT = 0.5;
+        const LINE_CYLINDER_HEIGHT = 0.4;
         const LINE_CYLINDER_SEGMENTS = 3;
         const LINE_CYLINDER_POSITION_OFFSET = 0.25;
 
@@ -799,10 +759,10 @@ class TransformControlsGizmo extends Object3D {
         lineGeometryMain.translate(0, LINE_CYLINDER_POSITION_OFFSET, 0);
 
         // Scale handles
-        const SCALE_HANDLE_WIDTH = 0.06;
+        const SCALE_HANDLE_WIDTH = 0.05;
         const SCALE_HANDLE_HEIGHT = SCALE_HANDLE_WIDTH;
         const SCALE_HANDLE_DEPTH = SCALE_HANDLE_WIDTH;
-        const SCALE_HANDLE_POSITION_OFFSET = 0.04;
+        const SCALE_HANDLE_POSITION_OFFSET = 0.05;
 
         const scaleHandleGeometry = new BoxGeometry(
             SCALE_HANDLE_WIDTH,
@@ -1198,62 +1158,149 @@ class TransformControlsGizmo extends Object3D {
 
         const gizmoScale = {
             posX: [
-                [createScaleGizmo(scaleHandleGeometry, matRed), [0.5, 0, 0], [0, 0, -Math.PI / 2]],
                 [createScaleGizmo(lineGeometryMain, matRed), [0, 0, 0], [0, 0, -Math.PI / 2]],
+                [createScaleGizmo(scaleHandleGeometry, matRed), [0.4, 0, 0], [0, 0, -Math.PI / 2]],
             ],
             posY: [
-                [createScaleGizmo(scaleHandleGeometry, matGreen), [0, 0.5, 0]],
                 [createScaleGizmo(lineGeometryMain, matGreen)],
+                [createScaleGizmo(scaleHandleGeometry, matGreen), [0, 0.4, 0]],
             ],
             posZ: [
-                [createScaleGizmo(scaleHandleGeometry, matBlue), [0, 0, 0.5], [Math.PI / 2, 0, 0]],
                 [createScaleGizmo(lineGeometryMain, matBlue), [0, 0, 0], [Math.PI / 2, 0, 0]],
+                [createScaleGizmo(scaleHandleGeometry, matBlue), [0, 0, 0.4], [Math.PI / 2, 0, 0]],
             ],
             negX: [
                 [createScaleGizmo(lineGeometryMain, matRed), [0, 0, 0], [0, 0, Math.PI / 2]],
-                [createScaleGizmo(scaleHandleGeometry, matRed), [-0.5, 0, 0], [0, 0, Math.PI / 2]],
+                [createScaleGizmo(scaleHandleGeometry, matRed), [-0.4, 0, 0], [0, 0, Math.PI / 2]],
             ],
             negY: [
                 [createScaleGizmo(lineGeometryMain, matGreen), [0, 0, 0], [0, 0, Math.PI]],
-                [createScaleGizmo(scaleHandleGeometry, matGreen), [0, -0.5, 0], [0, 0, Math.PI]],
+                [createScaleGizmo(scaleHandleGeometry, matGreen), [0, -0.4, 0], [0, 0, Math.PI]],
             ],
             negZ: [
                 [createScaleGizmo(lineGeometryMain, matBlue), [0, 0, 0], [-Math.PI / 2, 0, 0]],
                 [
                     createScaleGizmo(scaleHandleGeometry, matBlue),
-                    [0, 0, -0.5],
+                    [0, 0, -0.4],
                     [-Math.PI / 2, 0, 0],
                 ],
             ],
-            // XY: [
-            //     [
-            //         new Mesh(
-            //             new BoxGeometry(GIZMO_PLANE_SIZE, GIZMO_PLANE_SIZE, GIZMO_PLANE_THICKNESS),
-            //             matYellow.clone(),
-            //         ),
-            //         [GIZMO_PLANE_OFFSET, GIZMO_PLANE_OFFSET, 0],
-            //     ],
-            // ],
-            // YZ: [
-            //     [
-            //         new Mesh(
-            //             new BoxGeometry(GIZMO_PLANE_SIZE, GIZMO_PLANE_SIZE, GIZMO_PLANE_THICKNESS),
-            //             matCyan.clone(),
-            //         ),
-            //         [0, GIZMO_PLANE_OFFSET, GIZMO_PLANE_OFFSET],
-            //         [0, Math.PI / 2, 0],
-            //     ],
-            // ],
-            // XZ: [
-            //     [
-            //         new Mesh(
-            //             new BoxGeometry(GIZMO_PLANE_SIZE, GIZMO_PLANE_SIZE, GIZMO_PLANE_THICKNESS),
-            //             matMagenta.clone(),
-            //         ),
-            //         [GIZMO_PLANE_OFFSET, 0, GIZMO_PLANE_OFFSET],
-            //         [-Math.PI / 2, 0, 0],
-            //     ],
-            // ],
+            posXposY: [
+                [
+                    new Mesh(
+                        new BoxGeometry(GIZMO_PLANE_SIZE, GIZMO_PLANE_SIZE, GIZMO_PLANE_THICKNESS),
+                        matYellow.clone(),
+                    ),
+                    [GIZMO_PLANE_OFFSET, GIZMO_PLANE_OFFSET, 0],
+                ],
+            ],
+            posYposZ: [
+                [
+                    new Mesh(
+                        new BoxGeometry(GIZMO_PLANE_SIZE, GIZMO_PLANE_SIZE, GIZMO_PLANE_THICKNESS),
+                        matCyan.clone(),
+                    ),
+                    [0, GIZMO_PLANE_OFFSET, GIZMO_PLANE_OFFSET],
+                    [0, Math.PI / 2, 0],
+                ],
+            ],
+            posXposZ: [
+                [
+                    new Mesh(
+                        new BoxGeometry(GIZMO_PLANE_SIZE, GIZMO_PLANE_SIZE, GIZMO_PLANE_THICKNESS),
+                        matMagenta.clone(),
+                    ),
+                    [GIZMO_PLANE_OFFSET, 0, GIZMO_PLANE_OFFSET],
+                    [-Math.PI / 2, 0, 0],
+                ],
+            ],
+            posXnegY: [
+                [
+                    new Mesh(
+                        new BoxGeometry(GIZMO_PLANE_SIZE, GIZMO_PLANE_SIZE, GIZMO_PLANE_THICKNESS),
+                        matYellow.clone(),
+                    ),
+                    [GIZMO_PLANE_OFFSET, -GIZMO_PLANE_OFFSET, 0],
+                ],
+            ],
+            negXposY: [
+                [
+                    new Mesh(
+                        new BoxGeometry(GIZMO_PLANE_SIZE, GIZMO_PLANE_SIZE, GIZMO_PLANE_THICKNESS),
+                        matYellow.clone(),
+                    ),
+                    [-GIZMO_PLANE_OFFSET, GIZMO_PLANE_OFFSET, 0],
+                ],
+            ],
+            negXnegY: [
+                [
+                    new Mesh(
+                        new BoxGeometry(GIZMO_PLANE_SIZE, GIZMO_PLANE_SIZE, GIZMO_PLANE_THICKNESS),
+                        matYellow.clone(),
+                    ),
+                    [-GIZMO_PLANE_OFFSET, -GIZMO_PLANE_OFFSET, 0],
+                ],
+            ],
+            posYnegZ: [
+                [
+                    new Mesh(
+                        new BoxGeometry(GIZMO_PLANE_SIZE, GIZMO_PLANE_SIZE, GIZMO_PLANE_THICKNESS),
+                        matCyan.clone(),
+                    ),
+                    [0, GIZMO_PLANE_OFFSET, -GIZMO_PLANE_OFFSET],
+                    [0, Math.PI / 2, 0],
+                ],
+            ],
+            negYposZ: [
+                [
+                    new Mesh(
+                        new BoxGeometry(GIZMO_PLANE_SIZE, GIZMO_PLANE_SIZE, GIZMO_PLANE_THICKNESS),
+                        matCyan.clone(),
+                    ),
+                    [0, -GIZMO_PLANE_OFFSET, GIZMO_PLANE_OFFSET],
+                    [0, Math.PI / 2, 0],
+                ],
+            ],
+            negYnegZ: [
+                [
+                    new Mesh(
+                        new BoxGeometry(GIZMO_PLANE_SIZE, GIZMO_PLANE_SIZE, GIZMO_PLANE_THICKNESS),
+                        matCyan.clone(),
+                    ),
+                    [0, -GIZMO_PLANE_OFFSET, -GIZMO_PLANE_OFFSET],
+                    [0, Math.PI / 2, 0],
+                ],
+            ],
+            posXnegZ: [
+                [
+                    new Mesh(
+                        new BoxGeometry(GIZMO_PLANE_SIZE, GIZMO_PLANE_SIZE, GIZMO_PLANE_THICKNESS),
+                        matMagenta.clone(),
+                    ),
+                    [GIZMO_PLANE_OFFSET, 0, -GIZMO_PLANE_OFFSET],
+                    [-Math.PI / 2, 0, 0],
+                ],
+            ],
+            negXposZ: [
+                [
+                    new Mesh(
+                        new BoxGeometry(GIZMO_PLANE_SIZE, GIZMO_PLANE_SIZE, GIZMO_PLANE_THICKNESS),
+                        matMagenta.clone(),
+                    ),
+                    [-GIZMO_PLANE_OFFSET, 0, GIZMO_PLANE_OFFSET],
+                    [-Math.PI / 2, 0, 0],
+                ],
+            ],
+            negXnegZ: [
+                [
+                    new Mesh(
+                        new BoxGeometry(GIZMO_PLANE_SIZE, GIZMO_PLANE_SIZE, GIZMO_PLANE_THICKNESS),
+                        matMagenta.clone(),
+                    ),
+                    [-GIZMO_PLANE_OFFSET, 0, -GIZMO_PLANE_OFFSET],
+                    [-Math.PI / 2, 0, 0],
+                ],
+            ],
         };
 
         const pickerScale = {
@@ -1343,6 +1390,170 @@ class TransformControlsGizmo extends Object3D {
                         matInvisible,
                     ),
                     [0, 0, -PICKER_CYLINDER_OFFSET],
+                    [-Math.PI / 2, 0, 0],
+                ],
+            ],
+            posXposY: [
+                [
+                    new Mesh(
+                        new BoxGeometry(
+                            PICKER_PLANE_SIZE,
+                            PICKER_PLANE_SIZE,
+                            PICKER_PLANE_THICKNESS,
+                        ),
+                        matInvisible,
+                    ),
+                    [GIZMO_PLANE_OFFSET, GIZMO_PLANE_OFFSET, 0],
+                ],
+            ],
+            posYposZ: [
+                [
+                    new Mesh(
+                        new BoxGeometry(
+                            PICKER_PLANE_SIZE,
+                            PICKER_PLANE_SIZE,
+                            PICKER_PLANE_THICKNESS,
+                        ),
+                        matInvisible,
+                    ),
+                    [0, GIZMO_PLANE_OFFSET, GIZMO_PLANE_OFFSET],
+                    [0, Math.PI / 2, 0],
+                ],
+            ],
+            posXposZ: [
+                [
+                    new Mesh(
+                        new BoxGeometry(
+                            PICKER_PLANE_SIZE,
+                            PICKER_PLANE_SIZE,
+                            PICKER_PLANE_THICKNESS,
+                        ),
+                        matInvisible,
+                    ),
+                    [GIZMO_PLANE_OFFSET, 0, GIZMO_PLANE_OFFSET],
+                    [-Math.PI / 2, 0, 0],
+                ],
+            ],
+            posXnegY: [
+                [
+                    new Mesh(
+                        new BoxGeometry(
+                            PICKER_PLANE_SIZE,
+                            PICKER_PLANE_SIZE,
+                            PICKER_PLANE_THICKNESS,
+                        ),
+                        matInvisible,
+                    ),
+                    [GIZMO_PLANE_OFFSET, -GIZMO_PLANE_OFFSET, 0],
+                ],
+            ],
+            negXposY: [
+                [
+                    new Mesh(
+                        new BoxGeometry(
+                            PICKER_PLANE_SIZE,
+                            PICKER_PLANE_SIZE,
+                            PICKER_PLANE_THICKNESS,
+                        ),
+                        matInvisible,
+                    ),
+                    [-GIZMO_PLANE_OFFSET, GIZMO_PLANE_OFFSET, 0],
+                ],
+            ],
+            negXnegY: [
+                [
+                    new Mesh(
+                        new BoxGeometry(
+                            PICKER_PLANE_SIZE,
+                            PICKER_PLANE_SIZE,
+                            PICKER_PLANE_THICKNESS,
+                        ),
+                        matInvisible,
+                    ),
+                    [-GIZMO_PLANE_OFFSET, -GIZMO_PLANE_OFFSET, 0],
+                ],
+            ],
+            posYnegZ: [
+                [
+                    new Mesh(
+                        new BoxGeometry(
+                            PICKER_PLANE_SIZE,
+                            PICKER_PLANE_SIZE,
+                            PICKER_PLANE_THICKNESS,
+                        ),
+                        matInvisible,
+                    ),
+                    [0, GIZMO_PLANE_OFFSET, -GIZMO_PLANE_OFFSET],
+                    [0, Math.PI / 2, 0],
+                ],
+            ],
+            negYposZ: [
+                [
+                    new Mesh(
+                        new BoxGeometry(
+                            PICKER_PLANE_SIZE,
+                            PICKER_PLANE_SIZE,
+                            PICKER_PLANE_THICKNESS,
+                        ),
+                        matInvisible,
+                    ),
+                    [0, -GIZMO_PLANE_OFFSET, GIZMO_PLANE_OFFSET],
+                    [0, Math.PI / 2, 0],
+                ],
+            ],
+            negYnegZ: [
+                [
+                    new Mesh(
+                        new BoxGeometry(
+                            PICKER_PLANE_SIZE,
+                            PICKER_PLANE_SIZE,
+                            PICKER_PLANE_THICKNESS,
+                        ),
+                        matInvisible,
+                    ),
+                    [0, -GIZMO_PLANE_OFFSET, -GIZMO_PLANE_OFFSET],
+                    [0, Math.PI / 2, 0],
+                ],
+            ],
+            posXnegZ: [
+                [
+                    new Mesh(
+                        new BoxGeometry(
+                            PICKER_PLANE_SIZE,
+                            PICKER_PLANE_SIZE,
+                            PICKER_PLANE_THICKNESS,
+                        ),
+                        matInvisible,
+                    ),
+                    [GIZMO_PLANE_OFFSET, 0, -GIZMO_PLANE_OFFSET],
+                    [-Math.PI / 2, 0, 0],
+                ],
+            ],
+            negXposZ: [
+                [
+                    new Mesh(
+                        new BoxGeometry(
+                            PICKER_PLANE_SIZE,
+                            PICKER_PLANE_SIZE,
+                            PICKER_PLANE_THICKNESS,
+                        ),
+                        matInvisible,
+                    ),
+                    [-GIZMO_PLANE_OFFSET, 0, GIZMO_PLANE_OFFSET],
+                    [-Math.PI / 2, 0, 0],
+                ],
+            ],
+            negXnegZ: [
+                [
+                    new Mesh(
+                        new BoxGeometry(
+                            PICKER_PLANE_SIZE,
+                            PICKER_PLANE_SIZE,
+                            PICKER_PLANE_THICKNESS,
+                        ),
+                        matInvisible,
+                    ),
+                    [-GIZMO_PLANE_OFFSET, 0, -GIZMO_PLANE_OFFSET],
                     [-Math.PI / 2, 0, 0],
                 ],
             ],
@@ -1668,6 +1879,87 @@ class TransformControlsGizmo extends Object3D {
                         const xSign = xDot < AXIS_INVERT_THRESHOLD ? -1 : 1;
                         const zSign = zDot < AXIS_INVERT_THRESHOLD ? -1 : 1;
                         handle.scale.set(xSign, 1, zSign).multiplyScalar(scaleFactor);
+                    }
+                }
+            } else if (this.mode === "scale") {
+                const AXIS_HIDE_THRESHOLD = 0.99;
+                const PLANE_SHOW_THRESHOLD = 0.2;
+
+                const xDot = _alignVector.copy(_unitX).applyQuaternion(quaternion).dot(this.eye);
+                const yDot = _alignVector.copy(_unitY).applyQuaternion(quaternion).dot(this.eye);
+                const zDot = _alignVector.copy(_unitZ).applyQuaternion(quaternion).dot(this.eye);
+
+                const scaleFactor = (factor * this.size) / 4;
+
+                if (handle.name === "X" || handle.name === "posX" || handle.name === "negX") {
+                    if (Math.abs(xDot) > AXIS_HIDE_THRESHOLD) {
+                        handle.scale.set(1e-10, 1e-10, 1e-10);
+                        handle.visible = false;
+                    } else {
+                        handle.scale.set(1, 1, 1).multiplyScalar(scaleFactor);
+                    }
+                }
+
+                if (handle.name === "Y" || handle.name === "posY" || handle.name === "negY") {
+                    if (Math.abs(yDot) > AXIS_HIDE_THRESHOLD) {
+                        handle.scale.set(1e-10, 1e-10, 1e-10);
+                        handle.visible = false;
+                    } else {
+                        handle.scale.set(1, 1, 1).multiplyScalar(scaleFactor);
+                    }
+                }
+
+                if (handle.name === "Z" || handle.name === "posZ" || handle.name === "negZ") {
+                    if (Math.abs(zDot) > AXIS_HIDE_THRESHOLD) {
+                        handle.scale.set(1e-10, 1e-10, 1e-10);
+                        handle.visible = false;
+                    } else {
+                        handle.scale.set(1, 1, 1).multiplyScalar(scaleFactor);
+                    }
+                }
+
+                if (
+                    handle.name === "XY" ||
+                    handle.name === "posXposY" ||
+                    handle.name === "posXnegY" ||
+                    handle.name === "negXposY" ||
+                    handle.name === "negXnegY"
+                ) {
+                    if (Math.abs(zDot) < PLANE_SHOW_THRESHOLD) {
+                        handle.scale.set(1e-10, 1e-10, 1e-10);
+                        handle.visible = false;
+                    } else {
+                        handle.scale.set(1, 1, 1).multiplyScalar(scaleFactor);
+                    }
+                }
+
+                if (
+                    handle.name === "YZ" ||
+                    handle.name === "posYposZ" ||
+                    handle.name === "posYnegZ" ||
+                    handle.name === "negYposZ" ||
+                    handle.name === "negYnegZ"
+                ) {
+                    if (Math.abs(xDot) < PLANE_SHOW_THRESHOLD) {
+                        handle.scale.set(1e-10, 1e-10, 1e-10);
+                        handle.visible = false;
+                    } else {
+                        handle.scale.set(1, 1, 1).multiplyScalar(scaleFactor);
+                    }
+                }
+
+                if (
+                    handle.name === "XZ" ||
+                    handle.name === "posXposZ" ||
+                    handle.name === "posXnegZ" ||
+                    handle.name === "negXposZ" ||
+                    handle.name === "negXnegZ"
+                ) {
+                    if (Math.abs(yDot) < PLANE_SHOW_THRESHOLD) {
+                        handle.scale.set(1e-10, 1e-10, 1e-10);
+                        handle.visible = false;
+                    } else {
+                        handle.scale.set(1, 1, 1).multiplyScalar(scaleFactor);
                     }
                 }
             } else if (this.mode === "rotate") {

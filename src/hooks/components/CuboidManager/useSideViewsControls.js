@@ -3,9 +3,9 @@ import { useEffect, useRef, useCallback } from "react";
 import { useSideViews, useEditor } from "contexts";
 import { scalingConfigs, translateConfigs, rotateConfigs } from "utils/cuboids";
 
-const TRANSLATE_SENSITIVITY = 0.0025;
+const TRANSLATE_SENSITIVITY = 0.0075;
 const ROTATE_SENSITIVITY = 0.005;
-const SCALE_SENSITIVITY = 0.01;
+const SCALE_SENSITIVITY = 0.015;
 
 const MIN_SCALE = 0.1;
 

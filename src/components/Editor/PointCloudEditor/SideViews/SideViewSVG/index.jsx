@@ -116,6 +116,7 @@ export const SideViewSVG = ({ name, y, width, height, mesh, camera }) => {
 
         const projected = corners.map(project);
         const centerX = (projected[0].x + projected[2].x) / 2;
+        const handlerHeight = height / 2;
 
         return (
             <>
@@ -124,7 +125,7 @@ export const SideViewSVG = ({ name, y, width, height, mesh, camera }) => {
                     x={centerX - PICKER_WIDTH / 2}
                     y={0}
                     width={PICKER_WIDTH}
-                    height={height}
+                    height={handlerHeight}
                     fill={PICKER_COLOR}
                     fillOpacity={PICKER_OPACITY}
                     style={{ cursor: "col-resize" }}
@@ -138,7 +139,7 @@ export const SideViewSVG = ({ name, y, width, height, mesh, camera }) => {
                     x1={centerX}
                     y1={0}
                     x2={centerX}
-                    y2={height}
+                    y2={handlerHeight}
                 />
             </>
         );
