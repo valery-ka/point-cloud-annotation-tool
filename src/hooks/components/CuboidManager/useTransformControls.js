@@ -3,7 +3,7 @@ import { useThree } from "@react-three/fiber";
 
 import { useCallback, useEffect } from "react";
 
-import { useEditor, useFrames, useFileManager, useSideViews } from "contexts";
+import { useEditor, useFrames, useFileManager, useObjects } from "contexts";
 
 import { isEmpty } from "lodash";
 import { TransformControls } from "utils/cuboids";
@@ -14,7 +14,7 @@ export const useTransformControls = () => {
     const { pcdFiles } = useFileManager();
     const { pointCloudRefs, cameraControlsRef, transformControlsRef } = useEditor();
     const { activeFrameIndex } = useFrames();
-    const { selectedCuboidRef, sideViewsCamerasNeedUpdate } = useSideViews();
+    const { selectedCuboidRef, sideViewsCamerasNeedUpdate } = useObjects();
 
     const onDraggingChanged = useCallback((event) => {
         if (cameraControlsRef.current) {

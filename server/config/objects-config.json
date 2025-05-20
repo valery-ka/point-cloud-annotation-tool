@@ -1,12 +1,52 @@
-{
-    "car": {
-        "title": "Легковое авто",
-        "description": "Легковые автомобили",
-        "dimensions": {
-            "height": 1.7,
-            "length": 4.5,
-            "width": 2.0
+[
+    {
+        "vehicle": {
+            "title": "Легковое авто",
+            "description": "Легковые автомобили",
+            "dimensions": {
+                "height": 1.7,
+                "length": 4.5,
+                "width": 2.0
+            },
+            "color": "#fcc203"
         },
-        "color": "#fcc203"
+        "parent_truck": {
+            "title": "Грузовик",
+            "description": "Тягачи, обычные грузовики и малые грузовики.",
+            "abstract": true
+        },
+        "semitruck": {
+            "title": "Тягач фуры",
+            "description": "Тягачи, даже без прицепов.",
+            "parent": "parent_truck",
+            "dimensions": {
+                "height": 3.8,
+                "length": 6.0,
+                "width": 2.6
+            },
+            "color": "#e703fc"
+        },
+        "truck": {
+            "title": "Обычный грузовик",
+            "description": "Грузовик с несъемным кузовом.",
+            "parent": "parent_truck",
+            "dimensions": {
+                "height": 2.85,
+                "length": 8.0,
+                "width": 2.75
+            },
+            "color": "#03fc6f"
+        },
+        "pickup": {
+            "title": "«Газель» / микроавтобус / пикап",
+            "description": "Легкие коммерческие автомобили",
+            "parent": "parent_truck",
+            "dimensions": {
+                "height": 2.85,
+                "length": 6.0,
+                "width": 2.55
+            },
+            "color": "#00ffea"
+        }
     }
-}
+]

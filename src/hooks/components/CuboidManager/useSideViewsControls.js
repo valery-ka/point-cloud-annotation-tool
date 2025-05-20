@@ -1,6 +1,6 @@
 import { useEffect, useRef, useCallback } from "react";
 
-import { useSideViews, useEditor } from "contexts";
+import { useObjects, useEditor } from "contexts";
 import { scalingConfigs, translateConfigs, rotateConfigs } from "utils/cuboids";
 
 const TRANSLATE_SENSITIVITY = 0.0075;
@@ -18,7 +18,7 @@ const scale = "scale";
 const rotate = "rotate";
 
 export const useSideViewsControls = ({ camera, mesh, hoveredView, hoveredHandler, name }) => {
-    const { sideViewsCamerasNeedUpdate } = useSideViews();
+    const { sideViewsCamerasNeedUpdate } = useObjects();
     const { cameraControlsRef, transformControlsRef } = useEditor();
 
     const scaleHandlerRef = useRef(null);

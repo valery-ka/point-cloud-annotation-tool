@@ -15,7 +15,7 @@ export const useCameraControls = (requestPixelProjectionsUpdate) => {
     const { camera, gl } = useThree();
 
     const { settings } = useSettings();
-    const { cameraControlsRef, setPixelProjections } = useEditor();
+    const { cameraRef, cameraControlsRef, setPixelProjections } = useEditor();
     const { subscribe, unsubscribe } = useEvent();
     const { selectedTool, isDrawing } = useTools();
     const { setHighlightedPoint } = useHoveredPoint();
@@ -99,6 +99,7 @@ export const useCameraControls = (requestPixelProjectionsUpdate) => {
     useEffect(() => {
         camera.layers.set(LAYERS.SECONDARY);
         camera.layers.enable(LAYERS.MAIN);
+        cameraRef.current = camera;
 
         const cameraViews = createCameraViews(camera, cameraControlsRef.current, tweenGroup, () => {
             onEnd();

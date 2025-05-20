@@ -1,16 +1,17 @@
 import { createContext, useContext, useRef, useState } from "react";
 
-const SideViewsContext = createContext();
+const ObjectsContext = createContext();
 
-export const SideViewsProvider = ({ children }) => {
+export const ObjectsProvider = ({ children }) => {
+    const [cuboids, setCuboids] = useState([]);
     const selectedCuboidRef = useRef(null);
-    const sideViewsCamerasNeedUpdate = useRef(true);
 
     const [sideViews, setSideViews] = useState([]);
     const [handlePositions, setHandlePositions] = useState({});
+    const sideViewsCamerasNeedUpdate = useRef(true);
 
     return (
-        <SideViewsContext.Provider
+        <ObjectsContext.Provider
             value={{
                 selectedCuboidRef,
                 sideViewsCamerasNeedUpdate,
@@ -18,11 +19,13 @@ export const SideViewsProvider = ({ children }) => {
                 setSideViews,
                 handlePositions,
                 setHandlePositions,
+                cuboids,
+                setCuboids,
             }}
         >
             {children}
-        </SideViewsContext.Provider>
+        </ObjectsContext.Provider>
     );
 };
 
-export const useSideViews = () => useContext(SideViewsContext);
+export const useObjects = () => useContext(ObjectsContext);

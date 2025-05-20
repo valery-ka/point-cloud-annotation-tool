@@ -133,21 +133,28 @@ export const ModerationMenu = ({
                                 className="editor-context-menu-item"
                                 onClick={() => handleContextMenuClick(issue)}
                             >
-                                <div className="editor-context-menu-item-color">{index + 1}</div>
+                                <div className="editor-context-menu-item-key">{index + 1}</div>
                                 <div className="editor-context-menu-item-title">{issue.title}</div>
-                                <div
-                                    className="editor-context-menu-item-info"
-                                    data-tooltip-id={`tooltip-${issue.value}`}
-                                    data-tooltip-html={issue?.moderatorHint}
-                                >
-                                    <FontAwesomeIcon icon={faQuestionCircle} className="icon" />
-                                </div>
-                                <Tooltip
-                                    id={`tooltip-${issue.value}`}
-                                    place="bottom"
-                                    effect="solid"
-                                    delayShow={300}
-                                />
+                                {issue?.moderatorHint && (
+                                    <>
+                                        <div
+                                            className="editor-context-menu-item-info"
+                                            data-tooltip-id={`tooltip-${issue.value}`}
+                                            data-tooltip-html={issue?.moderatorHint}
+                                        >
+                                            <FontAwesomeIcon
+                                                icon={faQuestionCircle}
+                                                className="icon"
+                                            />
+                                        </div>
+                                        <Tooltip
+                                            id={`tooltip-${issue.value}`}
+                                            place="bottom"
+                                            effect="solid"
+                                            delayShow={300}
+                                        />
+                                    </>
+                                )}
                             </div>
                         </div>
                     ))

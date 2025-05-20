@@ -1,6 +1,6 @@
 import { useState, useCallback, Fragment } from "react";
 
-import { useSideViews } from "contexts";
+import { useObjects } from "contexts";
 import { useSideViewsControls } from "hooks";
 
 import { rgbToHex } from "utils/editor";
@@ -18,7 +18,7 @@ const PICKER_WIDTH = 30;
 const PICKER_OPACITY = 0;
 
 export const SideViewSVG = ({ name, y, width, height, mesh, camera }) => {
-    const { selectedCuboidRef, handlePositions } = useSideViews();
+    const { selectedCuboidRef, handlePositions } = useObjects();
     const { corners = [], edges = [] } = handlePositions?.[name] ?? {};
 
     const [hoveredHandler, setHoveredHandler] = useState(null);
