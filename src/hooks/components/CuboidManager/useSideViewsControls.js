@@ -1,9 +1,9 @@
 import { useEffect, useRef, useCallback } from "react";
 
-import { useObjects, useEditor } from "contexts";
+import { useCuboids, useEditor } from "contexts";
 import { scalingConfigs, translateConfigs, rotateConfigs } from "utils/cuboids";
 
-const TRANSLATE_SENSITIVITY = 0.0075;
+const TRANSLATE_SENSITIVITY = 0.005;
 const ROTATE_SENSITIVITY = 0.005;
 const SCALE_SENSITIVITY = 0.015;
 
@@ -18,11 +18,10 @@ const scale = "scale";
 const rotate = "rotate";
 
 export const useSideViewsControls = ({ camera, mesh, hoveredView, hoveredHandler, name }) => {
-    const { sideViewsCamerasNeedUpdate } = useObjects();
+    const { sideViewsCamerasNeedUpdate, isCuboidTransformingRef } = useCuboids();
     const { cameraControlsRef, transformControlsRef } = useEditor();
 
     const scaleHandlerRef = useRef(null);
-    const isDraggingRef = useRef(false);
     const transformModeRef = useRef(null);
 
     const handleTranslate = useCallback(
@@ -106,23 +105,22 @@ export const useSideViewsControls = ({ camera, mesh, hoveredView, hoveredHandler
             const type = hoveredHandler?.type;
 
             if (!hoveredHandler) {
-                isDraggingRef.current = true;
                 transformModeRef.current = translate;
             } else if (type === "edge" || type === "corner") {
-                isDraggingRef.current = true;
                 scaleHandlerRef.current = hoveredHandler?.direction;
                 transformModeRef.current = scale;
             } else if (type === "rotation") {
-                isDraggingRef.current = true;
                 transformModeRef.current = rotate;
             }
+
+            isCuboidTransformingRef.current = true;
         },
         [hoveredView, hoveredHandler],
     );
 
     const handleMouseMove = useCallback(
         (e) => {
-            if (!isDraggingRef.current || !mesh) return;
+            if (!isCuboidTransformingRef.current || !mesh) return;
 
             const { movementX, movementY } = e;
 
@@ -141,10 +139,13 @@ export const useSideViewsControls = ({ camera, mesh, hoveredView, hoveredHandler
     );
 
     const handleMouseUp = useCallback(() => {
-        isDraggingRef.current = false;
         transformModeRef.current = null;
         sideViewsCamerasNeedUpdate.current = true;
         cameraControlsRef.current.enabled = true;
+
+        if (isCuboidTransformingRef.current) {
+            transformControlsRef.current.dispatchEvent({ type: "dragging-changed" });
+        }
     }, []);
 
     const handleMouseWheel = useCallback(

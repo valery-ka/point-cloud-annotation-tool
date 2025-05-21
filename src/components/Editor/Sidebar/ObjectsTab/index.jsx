@@ -2,11 +2,12 @@ import React, { useEffect, useState, useCallback, memo } from "react";
 import { useTranslation } from "react-i18next";
 import { faEye, faEyeSlash, faPlus } from "@fortawesome/free-solid-svg-icons";
 
-import { useEditor, useConfig, useEvent, useSettings, useTools } from "contexts";
+import { useEditor, useConfig, useEvent, useSettings, useTools, useCuboids } from "contexts";
 import { useSubscribeFunction, useBindHotkey } from "hooks";
 
 import { SidebarIcon } from "../SidebarIcon";
 import { ClassItem } from "./ClassItem";
+import { CuboidItem } from "./CuboidItem";
 
 import * as APP_CONSTANTS from "constants";
 
@@ -18,6 +19,7 @@ export const ObjectsTab = memo(({ title }) => {
     const { nonHiddenClasses } = useConfig();
     const { subscribe, unsubscribe } = useEvent();
     const { classesVisibilityRef, selectedClassIndex, setSelectedClassIndex } = useEditor();
+    const { cuboids, selectedCuboid, setSelectedCuboid } = useCuboids();
     const { setSelectedTool } = useTools();
     const { settings } = useSettings();
     const { hotkeys } = settings;
@@ -27,6 +29,10 @@ export const ObjectsTab = memo(({ title }) => {
 
     const handleIsClassVisible = useCallback((cls) => {
         return classesVisibilityRef.current[cls]?.visible;
+    }, []);
+
+    const handleIsObjectVisible = useCallback((obj) => {
+        return true;
     }, []);
 
     const getHideShowToggleState = useCallback(() => {
@@ -44,6 +50,7 @@ export const ObjectsTab = memo(({ title }) => {
 
     const unselectObject = useCallback(() => {
         setSelectedClassIndex(null);
+        setSelectedCuboid(null);
         setSelectedTool(DEFAULT_TOOL);
     }, []);
 
@@ -53,7 +60,10 @@ export const ObjectsTab = memo(({ title }) => {
         const subscriptions = nonHiddenClasses.map((cls, index) => {
             const originalIndex = cls.originalIndex;
             const actionName = `selectClass${originalIndex}`;
-            const callback = () => setSelectedClassIndex(index);
+            const callback = () => {
+                setSelectedCuboid(null);
+                setSelectedClassIndex(index);
+            };
             subscribe(actionName, callback);
             return { actionName, callback };
         });
@@ -64,6 +74,31 @@ export const ObjectsTab = memo(({ title }) => {
             });
         };
     }, [subscribe, unsubscribe, nonHiddenClasses]);
+
+    useEffect(() => {
+        const subscriptions = cuboids.map((obj, index) => {
+            const id = obj.id;
+            const actionName = `selectObject${id}`;
+            const callback = () => {
+                setSelectedClassIndex(null);
+                setSelectedCuboid(obj);
+            };
+            subscribe(actionName, callback);
+            return { actionName, callback };
+        });
+
+        return () => {
+            subscriptions.forEach(({ actionName, callback }) => {
+                unsubscribe(actionName, callback);
+            });
+        };
+    }, [subscribe, unsubscribe, cuboids]);
+
+    useEffect(() => {
+        if (selectedCuboid) {
+            setSelectedClassIndex(null);
+        }
+    }, [selectedCuboid]);
 
     return (
         <div className="sidebar-tab-panel">
@@ -104,6 +139,19 @@ export const ObjectsTab = memo(({ title }) => {
                             isVisible={handleIsClassVisible(cls.originalIndex)}
                         />
                     ))}
+                </div>
+                <div className="cuboids-list">
+                    {cuboids.length &&
+                        cuboids.map((obj, idx) => (
+                            <CuboidItem
+                                key={idx}
+                                obj={obj}
+                                index={idx}
+                                action={`selectObject${obj.id}`}
+                                isSelected={selectedCuboid?.id === obj?.id}
+                                isVisible={handleIsObjectVisible(obj?.id)}
+                            />
+                        ))}
                 </div>
             </div>
         </div>

@@ -10,6 +10,7 @@ import {
     DoubleSide,
     Mesh,
     LineSegments,
+    Euler,
 } from "three";
 
 import { LAYERS } from "constants";
@@ -89,6 +90,14 @@ export const createArrowGeometry = (color) => {
     };
 };
 
+export const extractPsrFromObject = (object3D) => {
+    return {
+        position: [object3D.position.x, object3D.position.y, object3D.position.z],
+        scale: [object3D.scale.x, object3D.scale.y, object3D.scale.z],
+        rotation: new Euler().setFromQuaternion(object3D.quaternion).toArray(),
+    };
+};
+
 export const addCuboid = (scene, cuboid) => {
     const { color, position, scale, rotation } = cuboid;
 
@@ -102,6 +111,8 @@ export const addCuboid = (scene, cuboid) => {
 
     cube.mesh.add(edges.mesh);
     cube.mesh.add(arrow.mesh);
+
+    cube.mesh.name = cuboid.id;
 
     scene.add(cube.mesh);
 

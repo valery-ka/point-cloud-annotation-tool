@@ -1,18 +1,24 @@
 import { createContext, useContext, useRef, useState } from "react";
 
-const ObjectsContext = createContext();
+const CuboidsContext = createContext();
 
-export const ObjectsProvider = ({ children }) => {
+export const CuboidsProvider = ({ children }) => {
     const [cuboids, setCuboids] = useState([]);
+    const cuboidsRef = useRef({});
+
+    const [selectedCuboid, setSelectedCuboid] = useState(null);
     const selectedCuboidRef = useRef(null);
 
     const [sideViews, setSideViews] = useState([]);
     const [handlePositions, setHandlePositions] = useState({});
+
+    const isCuboidTransformingRef = useRef(false);
     const sideViewsCamerasNeedUpdate = useRef(true);
 
     return (
-        <ObjectsContext.Provider
+        <CuboidsContext.Provider
             value={{
+                cuboidsRef,
                 selectedCuboidRef,
                 sideViewsCamerasNeedUpdate,
                 sideViews,
@@ -21,11 +27,14 @@ export const ObjectsProvider = ({ children }) => {
                 setHandlePositions,
                 cuboids,
                 setCuboids,
+                selectedCuboid,
+                setSelectedCuboid,
+                isCuboidTransformingRef,
             }}
         >
             {children}
-        </ObjectsContext.Provider>
+        </CuboidsContext.Provider>
     );
 };
 
-export const useObjects = () => useContext(ObjectsContext);
+export const useCuboids = () => useContext(CuboidsContext);

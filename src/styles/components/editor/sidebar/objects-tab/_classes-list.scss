@@ -2,6 +2,15 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
+    padding-bottom: 8px;
+    margin-bottom: 8px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.cuboids-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
 .classes-item {
@@ -50,4 +59,5 @@
 .classes-label {
     user-select: none;
     opacity: 0.8;
+    text-transform: capitalize;
 }

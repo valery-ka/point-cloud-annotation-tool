@@ -10,6 +10,7 @@ export {
     createArrowGeometry,
     addCuboid,
     removeCuboid,
+    extractPsrFromObject,
 } from "./geometry";
 
 export {

@@ -3,7 +3,7 @@ import { Tooltip } from "react-tooltip";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faQuestionCircle, faCaretRight } from "@fortawesome/free-solid-svg-icons";
 
-import { useConfig, useObjects } from "contexts";
+import { useConfig, useCuboids } from "contexts";
 import { useMousetrapPause } from "hooks";
 
 import { getChildObjects, getChildTypes, formatObjectData } from "utils/shared";
@@ -19,7 +19,7 @@ export const ObjectsMenu = ({
 }) => {
     const { config } = useConfig();
     const { objects } = config;
-    const { setCuboids } = useObjects();
+    const { setCuboids } = useCuboids();
 
     const objectList = useMemo(() => {
         if (!objects) return [];
@@ -39,6 +39,7 @@ export const ObjectsMenu = ({
     const addObject = useCallback(
         (object) => {
             const color = object.color;
+            const type = object.type;
             const clickedPosition = pointIndex.current.position;
             const dimensions = object.dimensions;
             const scale = [dimensions.length, dimensions.width, dimensions.height];
@@ -47,7 +48,7 @@ export const ObjectsMenu = ({
                 clickedPosition[1],
                 clickedPosition[2] + scale[2] / 2,
             ];
-            const rotation = [0, 0, 0];
+            const rotation = [0, 0, 0]; // клонировать предыдущее...?
 
             setCuboids((prevCuboids = []) => {
                 const maxId = prevCuboids.reduce((max, obj) => {
@@ -59,6 +60,7 @@ export const ObjectsMenu = ({
 
                 const newObject = {
                     id: newId,
+                    type: type,
                     position,
                     scale,
                     rotation,

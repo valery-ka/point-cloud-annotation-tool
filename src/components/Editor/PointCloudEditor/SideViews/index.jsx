@@ -1,14 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { debounce } from "lodash";
 
-import { useObjects } from "contexts";
+import { useCuboids } from "contexts";
 
 import { SIDE_VIEWS_GAP } from "constants";
 
 import { SideViewSVG } from "./SideViewSVG";
 
 export const SideViews = () => {
-    const { selectedCuboidRef, sideViews } = useObjects();
+    const { selectedCuboidRef, sideViews } = useCuboids();
 
     const containerRef = useRef(null);
     const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });

@@ -2,7 +2,7 @@ import { useEffect, useRef, useCallback } from "react";
 import { useThree, useFrame } from "@react-three/fiber";
 import { OrthographicCamera, WebGLRenderer, Quaternion, Euler } from "three";
 
-import { useObjects } from "contexts";
+import { useCuboids } from "contexts";
 
 import { getCuboidHandlesPositions } from "utils/cuboids";
 import { SIDE_VIEWS_GAP, INITIAL_SIDE_VIEWS_ZOOM } from "constants";
@@ -16,7 +16,7 @@ export const useOrthographicView = () => {
         selectedCuboidRef,
         setHandlePositions,
         sideViewsCamerasNeedUpdate,
-    } = useObjects();
+    } = useCuboids();
 
     const canvasRef = useRef(null);
     const rendererRef = useRef(null);

@@ -10,4 +10,4 @@ export { ToolsProvider, useTools } from "./ToolsProvider";
 export { ModerationProvider, useModeration } from "./ModerationProvider";
 export { ImagesProvider, useImages } from "./ImagesProvider";
 export { CalibrationsProvider, useCalibrations } from "./CalibrationsProvider";
-export { ObjectsProvider, useObjects } from "./ObjectsProvider";
+export { CuboidsProvider, useCuboids } from "./CuboidsProvider";

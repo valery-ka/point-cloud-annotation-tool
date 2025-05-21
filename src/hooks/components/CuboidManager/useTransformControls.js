@@ -3,10 +3,10 @@ import { useThree } from "@react-three/fiber";
 
 import { useCallback, useEffect } from "react";
 
-import { useEditor, useFrames, useFileManager, useObjects } from "contexts";
+import { useEditor, useFrames, useFileManager, useCuboids } from "contexts";
 
 import { isEmpty } from "lodash";
-import { TransformControls } from "utils/cuboids";
+import { TransformControls, extractPsrFromObject } from "utils/cuboids";
 
 export const useTransformControls = () => {
     const { gl, camera, scene } = useThree();
@@ -14,21 +14,35 @@ export const useTransformControls = () => {
     const { pcdFiles } = useFileManager();
     const { pointCloudRefs, cameraControlsRef, transformControlsRef } = useEditor();
     const { activeFrameIndex } = useFrames();
-    const { selectedCuboidRef, sideViewsCamerasNeedUpdate } = useObjects();
+    const {
+        selectedCuboidRef,
+        sideViewsCamerasNeedUpdate,
+        isCuboidTransformingRef,
+        setCuboids,
+        setSelectedCuboid,
+    } = useCuboids();
 
     const onDraggingChanged = useCallback((event) => {
+        isCuboidTransformingRef.current = event.value;
+
         if (cameraControlsRef.current) {
             cameraControlsRef.current.enabled = !event.value;
         }
+
+        if (!event.value) {
+            onTransformFinished();
+        }
+
         sideViewsCamerasNeedUpdate.current = true;
     }, []);
 
     const onTransformChange = useCallback(() => {
-        if (!selectedCuboidRef.current) return;
+        if (!selectedCuboidRef.current || !isCuboidTransformingRef.current) return;
+
+        isCuboidTransformingRef.current = true;
 
         const cuboid = selectedCuboidRef.current;
-        const position = cuboid.position;
-        const scale = cuboid.scale;
+        const { position, scale, rotation } = extractPsrFromObject(cuboid);
 
         sideViewsCamerasNeedUpdate.current = true;
 
@@ -44,7 +58,10 @@ export const useTransformControls = () => {
         const positions = activeFrame.geometry.attributes.position.array;
 
         const matrix = new Matrix4();
-        matrix.compose(position, cuboid.quaternion, scale);
+        const positionVec = new Vector3().fromArray(position);
+        const scaleVec = new Vector3().fromArray(scale);
+
+        matrix.compose(positionVec, cuboid.quaternion, scaleVec);
 
         const inverseMatrix = new Matrix4().copy(matrix).invert();
         const halfSize = new Vector3(0.5, 0.5, 0.5);
@@ -66,10 +83,30 @@ export const useTransformControls = () => {
             }
         }
 
+        setSelectedCuboid((prevCuboid) => ({
+            ...prevCuboid,
+            ...{ position, scale, rotation },
+        }));
+
         // console.log("---------------------------");
         // console.log("Points inside box", insidePoints);
         // console.log("---------------------------");
     }, [pcdFiles, activeFrameIndex]);
+
+    const onTransformFinished = useCallback(() => {
+        const object = selectedCuboidRef.current;
+        if (!object) return;
+
+        const psr = extractPsrFromObject(object);
+
+        setCuboids((prevCuboids) =>
+            prevCuboids.map((cuboid) =>
+                cuboid.id === object.name ? { ...cuboid, ...psr } : cuboid,
+            ),
+        );
+
+        console.log("finish transform");
+    }, []);
 
     useEffect(() => {
         const transformControls = new TransformControls(camera, gl.domElement);
@@ -78,13 +115,10 @@ export const useTransformControls = () => {
         transformControlsRef.current = transformControls;
         scene.add(transformControls);
 
-        transformControls.addEventListener("dragging-changed", onDraggingChanged);
-
         return () => {
-            transformControls.removeEventListener("dragging-changed", onDraggingChanged);
             scene.remove(transformControls);
         };
-    }, [camera, gl.domElement, scene, onDraggingChanged]);
+    }, [camera, gl.domElement, scene]);
 
     useEffect(() => {
         const handleKeyDown = (e) => {
@@ -108,13 +142,15 @@ export const useTransformControls = () => {
         const transform = transformControlsRef.current;
         document.addEventListener("keydown", handleKeyDown);
         transform?.addEventListener("change", onTransformChange);
+        transform?.addEventListener("dragging-changed", onDraggingChanged);
 
         return () => {
             document.removeEventListener("keydown", handleKeyDown);
             transform?.removeEventListener("change", onTransformChange);
+            transform?.removeEventListener("dragging-changed", onDraggingChanged);
             transform?.detach();
         };
-    }, [onTransformChange]);
+    }, [onTransformChange, onDraggingChanged]);
 
     return {
         transformControlsRef,

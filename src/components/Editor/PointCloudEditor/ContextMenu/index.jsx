@@ -94,7 +94,7 @@ export const EditorContextMenu = () => {
                 }
             }
         },
-        [highlightedPoint],
+        [highlightedPoint, selectedTool],
     );
 
     const handleObjectsMenuOpen = useCallback(
@@ -105,7 +105,7 @@ export const EditorContextMenu = () => {
             const container = document.querySelector(CONTEXT_MENU_CONTAINER);
 
             if (container && container.contains(event.target)) {
-                const { left, top } = container.getBoundingClientRect();
+                const { left, top, width, height } = container.getBoundingClientRect();
                 const clientX = event.clientX - left;
                 const clientY = event.clientY - top;
 
@@ -120,8 +120,8 @@ export const EditorContextMenu = () => {
                     };
                 } else {
                     const mouse = new Vector2();
-                    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-                    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+                    mouse.x = ((event.clientX - left) / width) * 2 - 1;
+                    mouse.y = -((event.clientY - top) / height) * 2 + 1;
 
                     raycasterRef.current.setFromCamera(mouse, cameraRef.current);
 
@@ -138,7 +138,7 @@ export const EditorContextMenu = () => {
                 setIsObjectsMenuOpened(true);
             }
         },
-        [highlightedPoint],
+        [highlightedPoint, selectedTool],
     );
 
     const handleMouseDown = useCallback(

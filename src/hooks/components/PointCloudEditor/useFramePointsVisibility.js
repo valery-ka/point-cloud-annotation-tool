@@ -173,5 +173,20 @@ export const useFramePointsVisibility = (updateGlobalBox) => {
 
     useSubscribeFunction("filterClass", updateClassesVisibility, []);
 
+    const updateObjectsVisibility = useCallback(
+        (data) => {
+            if (data) {
+                const action = data.action;
+                const classIndex = data.index;
+
+                console.log(data);
+            }
+            filterFramePoints();
+        },
+        [filterFramePoints],
+    );
+
+    useSubscribeFunction("filterObject", updateObjectsVisibility, []);
+
     return { filterFramePoints, filterSelectedPoints };
 };

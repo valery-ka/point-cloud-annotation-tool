@@ -11,7 +11,7 @@ import {
     ModerationProvider,
     ImagesProvider,
     CalibrationsProvider,
-    ObjectsProvider,
+    CuboidsProvider,
 } from "contexts";
 
 const DataProviders = ({ children }) => (
@@ -30,7 +30,7 @@ const PointCloudProvider = ({ children }) => (
     <EditorProvider>
         <ToolsProvider>
             <HoveredPointProvider>
-                <ObjectsProvider>{children}</ObjectsProvider>
+                <CuboidsProvider>{children}</CuboidsProvider>
             </HoveredPointProvider>
         </ToolsProvider>
     </EditorProvider>

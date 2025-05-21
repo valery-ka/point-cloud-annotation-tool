@@ -9,6 +9,7 @@ import {
     useConfig,
     useTools,
     useSettings,
+    useCuboids,
 } from "contexts";
 
 import { findNearestPoints } from "utils/editor";
@@ -29,6 +30,7 @@ export const useHighlightedPoint = () => {
         setSelectedClassIndex,
         isIntersectingMap,
     } = useEditor();
+    const { setSelectedCuboid } = useCuboids();
     const { selectedTool } = useTools();
     const { highlightedPoint, setHighlightedPoint } = useHoveredPoint();
     const { settings } = useSettings();
@@ -179,6 +181,7 @@ export const useHighlightedPoint = () => {
                     : null;
 
                 const validIndex = index === -1 ? null : index;
+                setSelectedCuboid(null);
                 setSelectedClassIndex(validIndex);
             }
         },
