@@ -8,6 +8,10 @@
     display: flex;
     flex-direction: row;
     user-select: none;
+
+    &.hidden {
+        display: none;
+    }
 }
 
 #side-views-canvas {

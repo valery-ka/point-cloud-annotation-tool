@@ -141,7 +141,7 @@ export const ObjectsTab = memo(({ title }) => {
                     ))}
                 </div>
                 <div className="cuboids-list">
-                    {cuboids.length &&
+                    {cuboids.length > 0 &&
                         cuboids.map((obj, idx) => (
                             <CuboidItem
                                 key={idx}

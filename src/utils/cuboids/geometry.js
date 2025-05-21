@@ -113,6 +113,7 @@ export const addCuboid = (scene, cuboid) => {
     cube.mesh.add(arrow.mesh);
 
     cube.mesh.name = cuboid.id;
+    cube.mesh.userData.color = color;
 
     scene.add(cube.mesh);
 

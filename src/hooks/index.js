@@ -50,3 +50,4 @@ export { useImageCanvasMouseEvents } from "./components/CameraImages/useImageCan
 export { useOrthographicView } from "./components/CuboidManager/useOrthographicView";
 export { useTransformControls } from "./components/CuboidManager/useTransformControls";
 export { useSideViewsControls } from "./components/CuboidManager/useSideViewsControls";
+export { useCuboidManager } from "./components/CuboidManager/useCuboidManager";

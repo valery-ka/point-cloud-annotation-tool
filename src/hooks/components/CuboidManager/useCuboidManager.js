@@ -7,7 +7,7 @@ import { useTransformControls, useRaycastClickSelect, useOrthographicView } from
 
 import { addCuboid, removeCuboid } from "utils/cuboids";
 
-export const CuboidManager = memo(() => {
+export const useCuboidManager = () => {
     const { scene } = useThree();
 
     const { transformControlsRef } = useEditor();
@@ -27,12 +27,9 @@ export const CuboidManager = memo(() => {
         (id) => {
             const mesh = cuboidsRef.current[id];
             selectedCuboidRef.current = mesh;
-
             transformControlsRef.current.detach();
-
-            sideViewsCamerasNeedUpdate.current = true;
-
             setSelectedCuboid(cuboids[id]);
+            sideViewsCamerasNeedUpdate.current = true;
         },
         [cuboids],
     );
@@ -40,8 +37,13 @@ export const CuboidManager = memo(() => {
     useEffect(() => {
         const id = selectedCuboid?.id;
         const cuboid = cuboids.findIndex((obj) => obj.id === id);
-        onCuboidSelect(cuboid);
-    }, [selectedCuboid]);
+        if (cuboid !== -1) {
+            onCuboidSelect(cuboid);
+        } else {
+            transformControlsRef.current.detach();
+            selectedCuboidRef.current = null;
+        }
+    }, [selectedCuboid?.id]);
 
     useRaycastClickSelect({
         getMeshMap: () => cuboidsRef.current,
@@ -72,4 +74,4 @@ export const CuboidManager = memo(() => {
             }
         });
     }, [cuboids, scene]);
-});
+};

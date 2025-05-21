@@ -34,7 +34,7 @@ export const SideViews = () => {
     }, []);
 
     return (
-        <div id="side-views-canvas-container" ref={containerRef} style={{ position: "relative" }}>
+        <div id="side-views-canvas-container" ref={containerRef}>
             <canvas id="side-views-canvas" />
             <div className="side-views-container">
                 {VIEW_NAMES.map((name, idx) => {

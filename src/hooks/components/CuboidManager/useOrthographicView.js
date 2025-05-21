@@ -13,12 +13,14 @@ export const useOrthographicView = () => {
     const {
         sideViews,
         setSideViews,
+        selectedCuboid,
         selectedCuboidRef,
         setHandlePositions,
         sideViewsCamerasNeedUpdate,
     } = useCuboids();
 
     const canvasRef = useRef(null);
+    const containerRef = useRef(null);
     const rendererRef = useRef(null);
     const aspectRef = useRef(null);
 
@@ -122,11 +124,23 @@ export const useOrthographicView = () => {
 
     useEffect(() => {
         const canvas = document.getElementById("side-views-canvas");
-        if (!canvas || !scene) return;
+        const container = document.getElementById("side-views-canvas-container");
+
+        if (!canvas || !scene || !container) return;
 
         canvasRef.current = canvas;
+        containerRef.current = container;
 
-        const renderer = new WebGLRenderer({ canvas, alpha: true });
+        const width = `${container.clientWidth}px`;
+        canvas.style.width = width;
+
+        const renderer = new WebGLRenderer({
+            canvas,
+            alpha: true,
+            width: container.clientWidth,
+            height: size.height,
+        });
+
         renderer.setPixelRatio(window.devicePixelRatio);
         rendererRef.current = renderer;
 
@@ -134,6 +148,18 @@ export const useOrthographicView = () => {
             renderer.dispose();
         };
     }, [scene]);
+
+    useEffect(() => {
+        if (!canvasRef.current) return;
+
+        if (selectedCuboid) {
+            canvasRef.current.style.display = "block";
+            containerRef.current.style.display = "";
+        } else {
+            canvasRef.current.style.display = "none";
+            containerRef.current.style.display = "none";
+        }
+    }, [selectedCuboid]);
 
     useEffect(() => {
         sideViewsCamerasNeedUpdate.current = true;
@@ -149,10 +175,13 @@ export const useOrthographicView = () => {
     useFrame(() => {
         if (!rendererRef.current || !canvasRef.current) return;
 
-        const width = canvasRef.current.clientWidth;
+        const width = containerRef.current.clientWidth;
         const height = size.height;
 
-        rendererRef.current.setSize(width, height);
+        if (width !== rendererRef.current.width || height !== rendererRef.current.height) {
+            rendererRef.current.setSize(width, height);
+        }
+
         rendererRef.current.setScissorTest(true);
 
         const viewCount = sideViews.length;
