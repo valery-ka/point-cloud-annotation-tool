@@ -11,6 +11,7 @@ export {
     addCuboid,
     removeCuboid,
     extractPsrFromObject,
+    getPointsInsideCuboid,
 } from "./geometry";
 
 export {

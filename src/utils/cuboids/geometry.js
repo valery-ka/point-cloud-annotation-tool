@@ -11,6 +11,7 @@ import {
     Mesh,
     LineSegments,
     Euler,
+    Matrix4,
 } from "three";
 
 import { LAYERS } from "constants";
@@ -127,4 +128,31 @@ export const removeCuboid = (scene, cuboid) => {
     cube.cleanup();
     edges.cleanup();
     arrow.cleanup();
+};
+
+export const getPointsInsideCuboid = (positions, position, quaternion, scale) => {
+    const positionVector = new Vector3().fromArray(position);
+    const scaleVector = new Vector3().fromArray(scale);
+    const matrix = new Matrix4().compose(positionVector, quaternion, scaleVector);
+    const inverseMatrix = new Matrix4().copy(matrix).invert();
+
+    const halfSize = new Vector3(0.5, 0.5, 0.5);
+    const point = new Vector3();
+    const localPoint = new Vector3();
+    const insidePoints = [];
+
+    for (let i = 0; i < positions.length; i += 3) {
+        point.set(positions[i], positions[i + 1], positions[i + 2]);
+        localPoint.copy(point).applyMatrix4(inverseMatrix);
+
+        if (
+            Math.abs(localPoint.x) <= halfSize.x &&
+            Math.abs(localPoint.y) <= halfSize.y &&
+            Math.abs(localPoint.z) <= halfSize.z
+        ) {
+            insidePoints.push(i / 3);
+        }
+    }
+
+    return insidePoints;
 };

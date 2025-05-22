@@ -6,6 +6,8 @@ import { useEvent } from "contexts";
 
 import { SidebarIcon } from "../../SidebarIcon";
 
+import { TABS } from "constants";
+
 // const COMPONENT_NAME = "CuboidItem.";
 const COMPONENT_NAME = "";
 
@@ -16,6 +18,8 @@ export const CuboidItem = memo(({ obj, index, action, isSelected, isVisible }) =
     const selectCuboid = useCallback(() => {
         if (action) {
             publish(action);
+            publish("switchCameraToPoint", obj.position);
+            publish("setActiveTab", TABS.OBJECT_CARD);
         }
     }, [action, publish]);
 

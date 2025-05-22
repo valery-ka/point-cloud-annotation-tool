@@ -1,3 +1,12 @@
+// sidebar tabs
+export const TABS = {
+    OBJECTS: 0,
+    SETTINGS: 1,
+    MODERATION: 2,
+    HOTKEYS: 3,
+    OBJECT_CARD: 4,
+};
+
 // camera
 export const DISTANCE_TO_CENTER = 15;
 export const TWEEN_DURATION = 200;

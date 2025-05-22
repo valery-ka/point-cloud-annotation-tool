@@ -1,26 +1,17 @@
-import { Vector3, Matrix4 } from "three";
 import { useThree } from "@react-three/fiber";
 
 import { useCallback, useEffect } from "react";
 
-import { useEditor, useFrames, useFileManager, useCuboids } from "contexts";
+import { useEditor, useCuboids } from "contexts";
 
-import { isEmpty } from "lodash";
 import { TransformControls, extractPsrFromObject } from "utils/cuboids";
 
-export const useTransformControls = () => {
+export const useTransformControls = ({ selectPointsByCuboid }) => {
     const { gl, camera, scene } = useThree();
 
-    const { pcdFiles } = useFileManager();
-    const { pointCloudRefs, cameraControlsRef, transformControlsRef } = useEditor();
-    const { activeFrameIndex } = useFrames();
-    const {
-        selectedCuboidRef,
-        sideViewsCamerasNeedUpdate,
-        isCuboidTransformingRef,
-        setCuboids,
-        setSelectedCuboid,
-    } = useCuboids();
+    const { cameraControlsRef, transformControlsRef } = useEditor();
+    const { selectedCuboidRef, sideViewsCamerasNeedUpdate, isCuboidTransformingRef, setCuboids } =
+        useCuboids();
 
     const onDraggingChanged = useCallback((event) => {
         isCuboidTransformingRef.current = event.value;
@@ -37,61 +28,9 @@ export const useTransformControls = () => {
     }, []);
 
     const onTransformChange = useCallback(() => {
-        if (!selectedCuboidRef.current || !isCuboidTransformingRef.current) return;
-
-        isCuboidTransformingRef.current = true;
-
-        const cuboid = selectedCuboidRef.current;
-        const { position, scale, rotation } = extractPsrFromObject(cuboid);
-
-        sideViewsCamerasNeedUpdate.current = true;
-
-        if (isEmpty(pcdFiles)) {
-            // console.log("no points");
-            return;
-        }
-
-        const activeFrameFilePath = pcdFiles[activeFrameIndex];
-        const activeFrame = pointCloudRefs.current[activeFrameFilePath];
-        if (!activeFrame) return;
-
-        const positions = activeFrame.geometry.attributes.position.array;
-
-        const matrix = new Matrix4();
-        const positionVec = new Vector3().fromArray(position);
-        const scaleVec = new Vector3().fromArray(scale);
-
-        matrix.compose(positionVec, cuboid.quaternion, scaleVec);
-
-        const inverseMatrix = new Matrix4().copy(matrix).invert();
-        const halfSize = new Vector3(0.5, 0.5, 0.5);
-        const point = new Vector3();
-        const localPoint = new Vector3();
-
-        const insidePoints = [];
-
-        for (let i = 0; i < positions.length; i += 3) {
-            point.set(positions[i], positions[i + 1], positions[i + 2]);
-            localPoint.copy(point).applyMatrix4(inverseMatrix);
-
-            if (
-                Math.abs(localPoint.x) <= halfSize.x &&
-                Math.abs(localPoint.y) <= halfSize.y &&
-                Math.abs(localPoint.z) <= halfSize.z
-            ) {
-                insidePoints.push(i / 3);
-            }
-        }
-
-        setSelectedCuboid((prevCuboid) => ({
-            ...prevCuboid,
-            ...{ position, scale, rotation },
-        }));
-
-        // console.log("---------------------------");
-        // console.log("Points inside box", insidePoints);
-        // console.log("---------------------------");
-    }, [pcdFiles, activeFrameIndex]);
+        if (!isCuboidTransformingRef.current) return;
+        selectPointsByCuboid();
+    }, [selectPointsByCuboid]);
 
     const onTransformFinished = useCallback(() => {
         const object = selectedCuboidRef.current;

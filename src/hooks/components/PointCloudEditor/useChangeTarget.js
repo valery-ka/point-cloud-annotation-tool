@@ -55,10 +55,10 @@ export const useChangeTarget = (cameraControlsRef, tweenGroup, requestPixelProje
     }, []);
 
     useEffect(() => {
-        subscribe("switchCameraToIssue", (position) => changeTarget(null, position));
+        subscribe("switchCameraToPoint", (position) => changeTarget(null, position));
 
         return () => {
-            unsubscribe("switchCameraToIssue", (position) => changeTarget(null, position));
+            unsubscribe("switchCameraToPoint", (position) => changeTarget(null, position));
         };
     }, [subscribe, unsubscribe]);
 };

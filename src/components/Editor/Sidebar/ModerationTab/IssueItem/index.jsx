@@ -20,16 +20,16 @@ export const IssueItem = memo(({ issue, index, orderNumber }) => {
         return issue.resolved || isIssuesHidden || issue.checked;
     }, [issue, isIssuesHidden]);
 
-    const switchCameraToIssue = useCallback(() => {
+    const switchCameraToPoint = useCallback(() => {
         if (issue.resolved || isIssuesHidden || issue.checked) return;
-        publish("switchCameraToIssue", issue.position);
+        publish("switchCameraToPoint", issue.position);
     }, [publish, isIssueActive]);
 
     return (
         <div
             className={`issue-item ${isIssueActive ? "resolved" : ""}`}
             key={index}
-            onClick={() => switchCameraToIssue(issue)}
+            onClick={() => switchCameraToPoint(issue)}
         >
             <div className="issue">{orderNumber}</div>
             <div className="issue-text-container">

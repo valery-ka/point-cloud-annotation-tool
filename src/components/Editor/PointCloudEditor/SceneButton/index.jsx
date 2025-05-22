@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 
 import { useEvent, useConfig } from "contexts";
 
-const MODERATION_TAB_INDEX = 2;
+import { TABS } from "constants";
 
 export const SceneButton = ({ index, position, buttonIndex, resolved, checked, workerHint }) => {
     const { t } = useTranslation();
@@ -38,7 +38,7 @@ export const SceneButton = ({ index, position, buttonIndex, resolved, checked, w
     }, []);
 
     const setActiveTab = useCallback(() => {
-        publish("setActiveTab", MODERATION_TAB_INDEX);
+        publish("setActiveTab", TABS.MODERATION);
     }, [publish]);
 
     const resolveIssue = useCallback(() => {

@@ -17,6 +17,7 @@ import { ObjectsTab } from "./ObjectsTab";
 import { SettingsTab } from "./SettingsTab";
 import { ModerationTab } from "./ModerationTab";
 import { HotkeysTab } from "./HotkeysTab";
+import { ObjectCardTab } from "./ObjectCardTab";
 
 // const COMPONENT_NAME = "Sidebar.";
 const COMPONENT_NAME = "";
@@ -35,14 +36,24 @@ export const Sidebar = memo(() => {
     }, []);
 
     useSubscribeFunction("toggleSidebar", toggleSidebar, []);
-    useSubscribeFunction("setActiveTab", (data) => setActiveTab(data), []);
+
+    const setTab = useCallback((data) => {
+        if (typeof data === "object" && data.index !== undefined) {
+            setActiveTab(data.index);
+        } else {
+            setActiveTab(data);
+        }
+    }, []);
+
+    useSubscribeFunction("setActiveTab", (data) => setTab(data), []);
 
     if (!pcdFiles.length || arePointCloudsLoading) return null;
 
-    const createTab = (icon, title, Component) => ({
+    const createTab = (icon, title, Component, hasTabButton = true) => ({
         icon,
         title: t(`${COMPONENT_NAME}${title}`),
         component: <Component title={t(`${COMPONENT_NAME}${title}`)} />,
+        hasTabButton,
     });
 
     const tabs = [
@@ -50,6 +61,7 @@ export const Sidebar = memo(() => {
         createTab(faCog, "settingsTab", SettingsTab),
         createTab(faCommentAlt, "moderationTab", ModerationTab),
         createTab(faKeyboard, "hotkeysTab", HotkeysTab),
+        createTab(faList, "ObjectCardTab", ObjectCardTab, false),
     ];
 
     // do not umount component when it's hidden
@@ -59,26 +71,29 @@ export const Sidebar = memo(() => {
             <div className={`sidebar ${sidebarVisible ? "active" : ""}`}>
                 <div className="sidebar-tabs">
                     <div className="sidebar-tabs-left-buttons-group">
-                        {tabs.map((tab, index) => (
-                            <RenderSidebarTabsButton
-                                key={index}
-                                className={`sidebar-tab ${index === activeTab ? "active" : ""}`}
-                                title={tab.title}
-                                icon={tab.icon}
-                                onClick={() => setActiveTab(index)}
-                            />
-                        ))}
+                        {tabs.map(
+                            ({ title, icon, hasTabButton }, index) =>
+                                hasTabButton && (
+                                    <RenderSidebarTabsButton
+                                        key={index}
+                                        className={`sidebar-tab ${index === activeTab ? "active" : ""}`}
+                                        title={title}
+                                        icon={icon}
+                                        onClick={() => setActiveTab(index)}
+                                    />
+                                ),
+                        )}
                     </div>
                 </div>
 
-                {tabs.map((tab, index) => (
+                {tabs.map(({ component }, index) => (
                     <div
                         key={index}
                         className={`sidebar-tab-panel-containter ${
                             index === activeTab ? "active" : ""
                         }`}
                     >
-                        {tab.component}
+                        {component}
                     </div>
                 ))}
             </div>
