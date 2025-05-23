@@ -44,16 +44,21 @@ export const useSideViewsControls = ({ camera, mesh, hoveredView, hoveredHandler
     );
 
     const handleRotate = useCallback(
-        (movementX) => {
+        (movementX, movementY, isHandler = false) => {
             if (!mesh) return;
 
             const dx = movementX * ROTATE_SENSITIVITY;
+            const dy = movementY * ROTATE_SENSITIVITY;
 
             const config = rotateConfigs[name];
             if (!config) return;
 
             const { axis, direction } = config;
+
             mesh.rotateOnAxis(axis, dx * direction);
+            if (!isHandler) {
+                mesh.rotateOnAxis(axis, dy * direction);
+            }
         },
         [mesh, name],
     );
@@ -122,12 +127,16 @@ export const useSideViewsControls = ({ camera, mesh, hoveredView, hoveredHandler
         (e) => {
             if (!isCuboidTransformingRef.current || !mesh) return;
 
-            const { movementX, movementY } = e;
+            const { movementX, movementY, shiftKey } = e;
 
             if (transformModeRef.current === translate) {
-                handleTranslate(movementX, movementY);
+                if (shiftKey) {
+                    handleRotate(movementX, movementY);
+                } else {
+                    handleTranslate(movementX, movementY);
+                }
             } else if (transformModeRef.current === rotate) {
-                handleRotate(movementX);
+                handleRotate(movementX, movementY, true);
             } else if (transformModeRef.current === scale) {
                 handleScale(movementX, movementY);
             }

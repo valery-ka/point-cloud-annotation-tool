@@ -63,10 +63,8 @@ export const useRaycastClickSelect = ({ getMeshMap, onSelect, groupKey }) => {
                 const isSame = intersects.some((i) => i.object === downIntersectRef.current);
 
                 if (isSame) {
-                    const key = Object.entries(getMeshMap()).find(
-                        ([_, obj]) => obj === downIntersectRef.current,
-                    )?.[0];
-                    if (key) onSelect(key);
+                    const id = downIntersectRef.current.name;
+                    if (id) onSelect(id);
                 }
             }
 

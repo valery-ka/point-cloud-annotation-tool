@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-export const ObjectCardInfoBlock = ({ title, data, buttons, decimals = 2, unit = "" }) => {
+export const ObjectCardInfoBlock = ({ title, action, data, buttons, decimals = 2, unit = "" }) => {
     const formatValue = (value) => {
         if (typeof value !== "number") return value;
         return `${value.toFixed(decimals)}${unit ? `${unit}` : ""}`;
@@ -19,8 +19,18 @@ export const ObjectCardInfoBlock = ({ title, data, buttons, decimals = 2, unit =
                                 <button
                                     key={buttonKey}
                                     className="object-card-info-block-value-button"
-                                    onClick={() => buttonConfig.callback({ index, buttonKey })}
-                                    onMouseDown={(e) => e.preventDefault()}
+                                    onMouseDown={(e) => {
+                                        e.preventDefault();
+                                        if (buttonConfig.continuous) {
+                                            buttonConfig.callback({ action, index });
+                                        }
+                                    }}
+                                    onMouseUp={(e) => {
+                                        e.preventDefault();
+                                        if (!buttonConfig.continuous) {
+                                            buttonConfig.callback({ action, index });
+                                        }
+                                    }}
                                 >
                                     <FontAwesomeIcon icon={buttonConfig.icon} />
                                 </button>

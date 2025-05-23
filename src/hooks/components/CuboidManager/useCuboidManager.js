@@ -5,7 +5,12 @@ import { useEffect, useCallback } from "react";
 import { useCuboids, useEditor, useFileManager, useFrames, useEvent } from "contexts";
 import { useTransformControls, useRaycastClickSelect, useOrthographicView } from "hooks";
 
-import { addCuboid, extractPsrFromObject, getPointsInsideCuboid } from "utils/cuboids";
+import {
+    addCuboid,
+    removeCuboid,
+    extractPsrFromObject,
+    getPointsInsideCuboid,
+} from "utils/cuboids";
 
 import { TABS } from "constants";
 
@@ -53,12 +58,12 @@ export const useCuboidManager = () => {
 
     const onCuboidSelect = useCallback(
         (id) => {
-            const cuboid = cuboidsRef.current[id];
+            const cuboid = cuboidsRef.current[id].cube.mesh;
             selectedCuboidRef.current = cuboid;
             transformControlsRef.current.detach();
             sideViewsCamerasNeedUpdate.current = true;
 
-            const cuboidData = cuboids[id];
+            const cuboidData = cuboids.find((cube) => cube.id === id);
             const { position, scale, rotation } = extractPsrFromObject(cuboid);
 
             const activeFrameFilePath = pcdFiles[activeFrameIndex];
@@ -85,33 +90,31 @@ export const useCuboidManager = () => {
         [cuboids, pcdFiles, activeFrameIndex],
     );
 
-    const unselectCuboid = useCallback(() => {
-        transformControlsRef.current.detach();
-        selectedCuboidRef.current = null;
-    }, []);
-
     useEffect(() => {
         const id = selectedCuboid?.id;
-        const cuboid = cuboids.findIndex((obj) => obj.id === id);
-        cuboid !== -1 ? onCuboidSelect(cuboid) : unselectCuboid();
+        if (id) onCuboidSelect(id);
     }, [selectedCuboid?.id]);
 
     useRaycastClickSelect({
-        getMeshMap: () => cuboidsRef.current,
+        getMeshMap: () => {
+            const meshMap = {};
+            for (const id in cuboidsRef.current) {
+                meshMap[id] = cuboidsRef.current[id].cube.mesh;
+            }
+            return meshMap;
+        },
         onSelect: onCuboidSelect,
         groupKey: "cuboid",
     });
 
     useEffect(() => {
-        if (!cuboids) return;
-
         const currentIds = new Set(Object.keys(cuboidsRef.current));
         const newIds = new Set(cuboids.map((c) => c.id));
 
         cuboids.forEach((cuboid) => {
             if (!cuboidsRef.current[cuboid.id]) {
-                const { cube } = addCuboid(scene, cuboid);
-                cuboidsRef.current[cuboid.id] = cube.mesh;
+                const cuboidObject = addCuboid(scene, cuboid);
+                cuboidsRef.current[cuboid.id] = cuboidObject;
                 selectedCuboidRef.current = cuboid.id;
                 onCuboidSelect(selectedCuboidRef.current);
             }
@@ -119,8 +122,8 @@ export const useCuboidManager = () => {
 
         currentIds.forEach((id) => {
             if (!newIds.has(id)) {
-                const mesh = cuboidsRef.current[id];
-                scene.remove(mesh);
+                const cuboidObject = cuboidsRef.current[id];
+                removeCuboid(scene, cuboidObject);
                 delete cuboidsRef.current[id];
             }
         });

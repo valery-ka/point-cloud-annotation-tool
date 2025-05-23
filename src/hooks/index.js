@@ -12,6 +12,7 @@ export { useButtonState } from "./shared/useButtonState";
 export { useUpdateHotkeys } from "./shared/useUpdateHotkeys";
 export { useMousetrapPause } from "./shared/useMousetrapPause";
 export { useSettingsStorage } from "./shared/useSettingsStorage";
+export { useContinuousAction } from "./shared/useContinuousAction";
 export { useClickOutsideBlur } from "./shared/useClickOutsideBlur";
 export { useSubscribeFunction } from "./shared/useSubscribeFunction";
 export { useGlobalEventListeners } from "./shared/useGlobalEventListeners";

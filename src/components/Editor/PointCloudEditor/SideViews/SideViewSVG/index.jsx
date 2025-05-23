@@ -3,7 +3,6 @@ import { useState, useCallback, Fragment } from "react";
 import { useCuboids } from "contexts";
 import { useSideViewsControls } from "hooks";
 
-import { rgbToHex } from "utils/editor";
 import {
     projectToScreen,
     getCornerCursor,
@@ -168,7 +167,7 @@ export const SideViewSVG = ({ name, y, width, height, mesh, camera }) => {
         const projectedCorners = corners.map(project);
         if (projectedCorners.some((p) => isNaN(p.x) || isNaN(p.y))) return null;
 
-        const color = selectedCuboidRef.current.userData.color;
+        const color = selectedCuboidRef.current?.userData?.color;
 
         return edges.map((_, index) => {
             const start = projectedCorners[index];

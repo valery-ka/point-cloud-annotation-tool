@@ -1,12 +1,19 @@
-import { memo, useEffect, useState, useCallback } from "react";
-import { faClose, faTrash, faPlus, faMinus, faEdit } from "@fortawesome/free-solid-svg-icons";
+import { memo, useEffect, useCallback, useRef } from "react";
+import { faClose, faTrash, faPlus, faMinus, faRefresh } from "@fortawesome/free-solid-svg-icons";
 
-import { useEvent, useCuboids } from "contexts";
+import { useEvent, useCuboids, useConfig, useEditor } from "contexts";
+import { useSubscribeFunction, useContinuousAction } from "hooks";
 
 import { SidebarIcon } from "../SidebarIcon";
 import { ObjectCardInfoBlock } from "./ObjectCardInfoBlock";
 
 import { TABS } from "constants";
+import {
+    POSITION_HANDLERS,
+    SCALE_HANDLERS,
+    ROTATION_HANDLERS,
+    RESET_HANDLERS,
+} from "./handlersConfig";
 
 // const COMPONENT_NAME = "ObjectCardTab.";
 const COMPONENT_NAME = "";
@@ -14,33 +21,131 @@ const OBJECTS_TAB_INDEX = 0;
 
 export const ObjectCardTab = memo(() => {
     const { publish } = useEvent();
-    const { selectedCuboid, selectedCuboidRef } = useCuboids();
+    const { transformControlsRef } = useEditor();
+    const {
+        setCuboids,
+        selectedCuboid,
+        setSelectedCuboid,
+        selectedCuboidRef,
+        isCuboidTransformingRef,
+    } = useCuboids();
+    const { config } = useConfig();
+    const { objects } = config;
+    const { startContinuousAction } = useContinuousAction({ delay: 100 });
 
-    const [isTextInputActive, setIsTextInputActive] = useState({ textInputActiveFields: {} });
+    const pointsInsideCuboidRef = useRef(0);
 
     useEffect(() => {
-        selectedCuboid ? openObjectCard() : closeObjectCard();
+        selectedCuboid
+            ? publish("setActiveTab", TABS.OBJECT_CARD)
+            : publish("setActiveTab", OBJECTS_TAB_INDEX);
     }, [selectedCuboid?.id]);
 
-    const openObjectCard = useCallback(() => {
-        publish("setActiveTab", TABS.OBJECT_CARD);
-    }, [publish]);
+    useEffect(() => {
+        if (selectedCuboid?.insidePoints) {
+            pointsInsideCuboidRef.current = selectedCuboid.insidePoints.length;
+        }
+    }, [selectedCuboid?.insidePoints]);
 
-    const closeObjectCard = useCallback(() => {
-        publish("setActiveTab", OBJECTS_TAB_INDEX);
-    }, [publish]);
-
-    const plusScale = useCallback((data) => {
-        console.log("plus");
+    const updateCuboidState = useCallback(() => {
+        isCuboidTransformingRef.current = true;
+        transformControlsRef.current.dispatchEvent({ type: "change" });
     }, []);
 
-    const minusScale = useCallback((data) => {
-        console.log("minus");
+    const removeCuboid = useCallback((data) => {
+        const cuboidId = data.index;
+        setCuboids((prevCuboids) => prevCuboids.filter((cuboid) => cuboid.id !== cuboidId));
+        setSelectedCuboid(null);
     }, []);
 
-    const editData = useCallback((data) => {
-        console.log("editing");
-    }, []);
+    useSubscribeFunction("removeCuboid", removeCuboid, []);
+
+    const handleAction = useCallback(
+        (type, op) => (data) => {
+            startContinuousAction(() => {
+                const cuboid = selectedCuboidRef.current;
+                const handlerMap = {
+                    position: POSITION_HANDLERS,
+                    scale: SCALE_HANDLERS,
+                    rotation: ROTATION_HANDLERS,
+                };
+                handlerMap[type][op](cuboid, data.index);
+                updateCuboidState();
+            });
+        },
+        [],
+    );
+
+    const resetUnit = useCallback(
+        (data) => {
+            const { action, index } = data;
+            const cuboid = selectedCuboidRef.current;
+            const label = selectedCuboid.type;
+            const unit = objects[0][label];
+            RESET_HANDLERS[action]?.(cuboid, index, unit);
+            updateCuboidState();
+        },
+        [objects, selectedCuboid],
+    );
+
+    const getButtons = useCallback(
+        (type) => ({
+            plus: {
+                icon: faPlus,
+                callback: handleAction(type, "plus"),
+                continuous: true,
+            },
+            minus: {
+                icon: faMinus,
+                callback: handleAction(type, "minus"),
+                continuous: true,
+            },
+            reset: {
+                icon: faRefresh,
+                callback: resetUnit,
+                continuous: false,
+            },
+        }),
+        [resetUnit],
+    );
+
+    const getData = useCallback(
+        (type) => {
+            if (!selectedCuboid) return {};
+
+            const valueMap = {
+                points: {
+                    "Точек внутри бокса": pointsInsideCuboidRef.current,
+                    "Покрашенных точек": 0,
+                },
+                position: {
+                    "Позиция X": selectedCuboid.position[0],
+                    "Позиция Y": selectedCuboid.position[1],
+                    "Позиция Z": selectedCuboid.position[2] - selectedCuboid.scale[2] / 2,
+                },
+                scale: {
+                    Длина: selectedCuboid.scale[0],
+                    Ширина: selectedCuboid.scale[1],
+                    Высота: selectedCuboid.scale[2],
+                },
+                rotation: {
+                    Крен: selectedCuboid.rotation[0] * (180 / Math.PI),
+                    Тангаж: selectedCuboid.rotation[1] * (180 / Math.PI),
+                    Рыскание: selectedCuboid.rotation[2] * (180 / Math.PI),
+                },
+            };
+
+            return valueMap[type] || {};
+        },
+        [selectedCuboid],
+    );
+
+    const infoBlocksConfig = [
+        { title: "Точки", type: "points", decimals: 0 },
+        { title: "Позиция коробки", type: "position", action: "position", unit: " m" },
+        { title: "Размеры коробки", type: "scale", action: "scale", unit: " m" },
+        { title: "Вращение коробки", type: "rotation", action: "rotation", unit: "°" },
+    ];
 
     return (
         <div className="sidebar-tab-panel">
@@ -52,13 +157,16 @@ export const ObjectCardTab = memo(() => {
                         size="20px"
                         title="Удалить кубоид со всех кадров"
                         icon={faTrash}
+                        action={"removeCuboid"}
+                        type={"removeCuboid"}
+                        index={selectedCuboid?.id}
                     />
                     <SidebarIcon
                         className="icon-style"
                         size="20px"
                         title="Закрыть карточку"
                         icon={faClose}
-                        type={"setActiveTab"}
+                        type="setActiveTab"
                         index={OBJECTS_TAB_INDEX}
                     />
                 </div>
@@ -75,52 +183,17 @@ export const ObjectCardTab = memo(() => {
                         </div>
                     </div>
                     <div className="object-card-info-block-container">
-                        <ObjectCardInfoBlock
-                            title="Точки"
-                            data={{
-                                "Точек внутри бокса": selectedCuboid?.insidePoints?.length,
-                                "Покрашенных точек": 0,
-                            }}
-                            decimals={0}
-                        />
-                        <ObjectCardInfoBlock
-                            title="Позиция коробки"
-                            data={{
-                                "Позиция X": selectedCuboid?.position[0],
-                                "Позиция Y": selectedCuboid?.position[1],
-                                "Позиция Z": selectedCuboid?.position[2],
-                            }}
-                            buttons={{
-                                edit: { icon: faEdit, callback: editData },
-                            }}
-                            unit=" m"
-                        />
-                        <ObjectCardInfoBlock
-                            title="Размеры коробки"
-                            data={{
-                                Длина: selectedCuboid?.scale[0],
-                                Ширина: selectedCuboid?.scale[1],
-                                Высота: selectedCuboid?.scale[2],
-                            }}
-                            buttons={{
-                                plus: { icon: faPlus, callback: plusScale },
-                                minus: { icon: faMinus, callback: minusScale },
-                                edit: { icon: faEdit, callback: editData },
-                            }}
-                            unit=" m"
-                        />
-                        <ObjectCardInfoBlock
-                            title="Вращение коробки"
-                            data={{
-                                Крен: selectedCuboid?.rotation[0] * (180 / Math.PI),
-                                Тангаж: selectedCuboid?.rotation[1] * (180 / Math.PI),
-                                Рыскание: selectedCuboid?.rotation[2] * (180 / Math.PI),
-                            }}
-                            buttons={{
-                                edit: { icon: faEdit, callback: editData },
-                            }}
-                            unit="°"
-                        />
+                        {infoBlocksConfig.map(({ title, type, action, unit, decimals }) => (
+                            <ObjectCardInfoBlock
+                                key={type}
+                                title={title}
+                                action={action}
+                                data={getData(type)}
+                                buttons={action ? getButtons(action) : undefined}
+                                unit={unit}
+                                decimals={decimals}
+                            />
+                        ))}
                     </div>
                 </div>
             </div>

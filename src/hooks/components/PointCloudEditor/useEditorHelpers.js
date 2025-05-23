@@ -137,7 +137,7 @@ export const useEditorHelpers = () => {
             }
         });
 
-        Object.entries(calibrations).forEach(([camera, calibration]) => {
+        Object.entries(calibrations).forEach(([camera, calibration], index) => {
             const { extrinsic, intrinsic } = calibration;
             if (!intrinsic || !extrinsic) return;
 
@@ -174,7 +174,7 @@ export const useEditorHelpers = () => {
             frustumMesh.position.copy(position);
             frustumMesh.quaternion.copy(rotation);
 
-            frustumMesh.userData.camera = camera;
+            frustumMesh.name = camera;
             frustumMesh.userData.position = position;
 
             if (!showCameraPositions) {
