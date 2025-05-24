@@ -1,4 +1,4 @@
-import { useState, useCallback, Fragment } from "react";
+import { useState, useCallback, useEffect, Fragment } from "react";
 
 import { useCuboids } from "contexts";
 import { useSideViewsControls } from "hooks";
@@ -17,7 +17,7 @@ const PICKER_WIDTH = 30;
 const PICKER_OPACITY = 0;
 
 export const SideViewSVG = ({ name, y, width, height, mesh, camera }) => {
-    const { selectedCuboidRef, handlePositions } = useCuboids();
+    const { selectedCuboidGeometryRef, handlePositions } = useCuboids();
     const { corners = [], edges = [] } = handlePositions?.[name] ?? {};
 
     const [hoveredHandler, setHoveredHandler] = useState(null);
@@ -167,7 +167,7 @@ export const SideViewSVG = ({ name, y, width, height, mesh, camera }) => {
         const projectedCorners = corners.map(project);
         if (projectedCorners.some((p) => isNaN(p.x) || isNaN(p.y))) return null;
 
-        const color = selectedCuboidRef.current?.userData?.color;
+        const color = selectedCuboidGeometryRef.current?.userData?.color;
 
         return edges.map((_, index) => {
             const start = projectedCorners[index];
@@ -186,7 +186,14 @@ export const SideViewSVG = ({ name, y, width, height, mesh, camera }) => {
                 />
             );
         });
-    }, [corners, edges, selectedCuboidRef]);
+    }, [corners, edges, selectedCuboidGeometryRef]);
+
+    useEffect(() => {
+        if (!mesh) {
+            setHoveredView(null);
+            setHoveredHandler(null);
+        }
+    }, [mesh]);
 
     if (!mesh || !camera || width <= 0 || height <= 0) return null;
 

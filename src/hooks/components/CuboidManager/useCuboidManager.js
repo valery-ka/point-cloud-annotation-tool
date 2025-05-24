@@ -1,4 +1,4 @@
-import { useThree } from "@react-three/fiber";
+import { useThree, useFrame } from "@react-three/fiber";
 
 import { useEffect, useCallback } from "react";
 
@@ -20,93 +20,61 @@ export const useCuboidManager = () => {
     const { pcdFiles } = useFileManager();
     const { activeFrameIndex } = useFrames();
     const { publish } = useEvent();
-    const { pointCloudRefs, transformControlsRef } = useEditor();
+    const { pointCloudRefs, cameraControlsRef, transformControlsRef } = useEditor();
     const {
         cuboids,
-        cuboidsRef,
+        cuboidsGeometriesRef,
         selectedCuboid,
-        selectedCuboidRef,
-        sideViewsCamerasNeedUpdate,
+        selectedCuboidGeometryRef,
+        selectedCuboidInfoRef,
+        sideViewsCamerasNeedUpdateRef,
+        setCuboids,
         setSelectedCuboid,
     } = useCuboids();
 
     useOrthographicView();
 
-    const selectPointsByCuboid = useCallback(() => {
-        const cuboid = selectedCuboidRef.current;
+    const updateCuboidsState = useCallback(() => {
+        const geometry = selectedCuboidGeometryRef.current;
+        if (!geometry) return;
 
-        if (!cuboid) return;
+        const psr = extractPsrFromObject(geometry);
 
-        const { position, scale, rotation } = extractPsrFromObject(cuboid);
+        setCuboids((prevCuboids) =>
+            prevCuboids.map((cuboid) =>
+                cuboid.id === geometry.name ? { ...cuboid, ...psr } : cuboid,
+            ),
+        );
 
-        sideViewsCamerasNeedUpdate.current = true;
+        sideViewsCamerasNeedUpdateRef.current = true;
+    }, []);
 
-        const activeFrameFilePath = pcdFiles[activeFrameIndex];
-        const activeFrame = pointCloudRefs.current[activeFrameFilePath];
-        if (!activeFrame) return;
-
-        const positions = activeFrame.geometry.attributes.position.array;
-
-        const insidePoints = getPointsInsideCuboid(positions, position, cuboid.quaternion, scale);
-
-        setSelectedCuboid((prevCuboid) => ({
-            ...prevCuboid,
-            ...{ position, scale, rotation, insidePoints },
-        }));
-    }, [pcdFiles, activeFrameIndex]);
-
-    useTransformControls({ selectPointsByCuboid });
+    useTransformControls({ updateCuboidsState });
 
     const onCuboidSelect = useCallback(
         (id) => {
-            const cuboid = cuboidsRef.current[id].cube.mesh;
-            selectedCuboidRef.current = cuboid;
+            const geometry = cuboidsGeometriesRef.current[id].cube.mesh;
+            selectedCuboidGeometryRef.current = geometry;
             transformControlsRef.current.detach();
-            sideViewsCamerasNeedUpdate.current = true;
-
-            const cuboidData = cuboids.find((cube) => cube.id === id);
-            const { position, scale, rotation } = extractPsrFromObject(cuboid);
-
-            const activeFrameFilePath = pcdFiles[activeFrameIndex];
-            const activeFrame = pointCloudRefs.current[activeFrameFilePath];
-            const insidePoints = activeFrame
-                ? getPointsInsideCuboid(
-                      activeFrame.geometry.attributes.position.array,
-                      position,
-                      cuboid.quaternion,
-                      scale,
-                  )
-                : [];
-
-            setSelectedCuboid({
-                ...cuboidData,
-                position,
-                scale,
-                rotation,
-                insidePoints,
-            });
-
+            cameraControlsRef.current.enabled = true;
+            sideViewsCamerasNeedUpdateRef.current = true;
+            setSelectedCuboid(cuboids.find((cube) => cube.id === id));
             publish("setActiveTab", TABS.OBJECT_CARD);
         },
-        [cuboids, pcdFiles, activeFrameIndex],
+        [cuboids],
     );
 
     const unselectCuboid = useCallback(() => {
-        console.log(
-            "implement unselecting logic как-то блять чтоб не сломалось нахуй господи помогите",
-        );
+        transformControlsRef.current.detach();
+        selectedCuboidGeometryRef.current = null;
+        cameraControlsRef.current.enabled = true;
     }, []);
-
-    useEffect(() => {
-        const id = selectedCuboid?.id;
-        id ? onCuboidSelect(id) : unselectCuboid();
-    }, [selectedCuboid?.id]);
 
     useRaycastClickSelect({
         getMeshMap: () => {
             const meshMap = {};
-            for (const id in cuboidsRef.current) {
-                meshMap[id] = cuboidsRef.current[id].cube.mesh;
+            for (const id in cuboidsGeometriesRef.current) {
+                meshMap[id] = cuboidsGeometriesRef.current[id].cube.mesh;
             }
             return meshMap;
         },
@@ -115,24 +83,64 @@ export const useCuboidManager = () => {
     });
 
     useEffect(() => {
-        const currentIds = new Set(Object.keys(cuboidsRef.current));
+        const id = selectedCuboid?.id;
+        id ? onCuboidSelect(id) : unselectCuboid();
+    }, [selectedCuboid?.id]);
+
+    useEffect(() => {
+        const currentIds = new Set(Object.keys(cuboidsGeometriesRef.current));
         const newIds = new Set(cuboids.map((c) => c.id));
 
         cuboids.forEach((cuboid) => {
-            if (!cuboidsRef.current[cuboid.id]) {
+            if (!cuboidsGeometriesRef.current[cuboid.id]) {
                 const cuboidObject = addCuboid(scene, cuboid);
-                cuboidsRef.current[cuboid.id] = cuboidObject;
-                selectedCuboidRef.current = cuboid.id;
-                onCuboidSelect(selectedCuboidRef.current);
+                cuboidsGeometriesRef.current[cuboid.id] = cuboidObject;
+                selectedCuboidGeometryRef.current = cuboid.id;
+                onCuboidSelect(selectedCuboidGeometryRef.current);
             }
         });
 
         currentIds.forEach((id) => {
             if (!newIds.has(id)) {
-                const cuboidObject = cuboidsRef.current[id];
+                const cuboidObject = cuboidsGeometriesRef.current[id];
                 removeCuboid(scene, cuboidObject);
-                delete cuboidsRef.current[id];
+                delete cuboidsGeometriesRef.current[id];
             }
         });
     }, [cuboids, scene]);
+
+    // update info card
+    useFrame(() => {
+        const geometry = selectedCuboidGeometryRef.current;
+        if (!geometry) return;
+
+        const { position, scale, rotation, quaternion } = geometry;
+        const newPosition = [position.x, position.y, position.z];
+        const newScale = [scale.x, scale.y, scale.z];
+        const newRotation = [rotation.x, rotation.y, rotation.z];
+
+        const info = selectedCuboidInfoRef.current;
+
+        const positionChanged = !newPosition.every((v, i) => v === info.position[i]);
+        const scaleChanged = !newScale.every((v, i) => v === info.scale[i]);
+        const rotationChanged = !newRotation.every((v, i) => v === info.rotation[i]);
+
+        if (positionChanged || scaleChanged || rotationChanged) {
+            info.position = newPosition;
+            info.scale = newScale;
+            info.rotation = newRotation;
+
+            const activeFrameFilePath = pcdFiles[activeFrameIndex];
+            const activeFrame = pointCloudRefs.current[activeFrameFilePath];
+            if (!activeFrame) return;
+
+            const positions = activeFrame.geometry.attributes.position.array;
+
+            const insidePoints = getPointsInsideCuboid(positions, position, quaternion, scale);
+            const insidePointsCount = insidePoints.length;
+            if (insidePointsCount !== info.insidePointsCount) {
+                info.insidePointsCount = insidePointsCount;
+            }
+        }
+    });
 };

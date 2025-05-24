@@ -2,6 +2,7 @@ import { Plane, Vector2, Vector3, Raycaster } from "three";
 import { useEffect, useState, useRef, useCallback } from "react";
 
 import { useHoveredPoint, useTools, useConfig, useEditor } from "contexts";
+import { useSubscribeFunction } from "hooks";
 
 import { ModerationMenu } from "./ModerationMenu";
 import { ObjectsMenu } from "./ObjectsMenu";
@@ -17,8 +18,7 @@ export const EditorContextMenu = () => {
     const { selectedTool } = useTools();
     const { isModerationJob } = useConfig();
 
-    const objectsMenuRef = useRef(null);
-    const moderationMenuRef = useRef(null);
+    const menuRefs = useRef({});
 
     const [isTextInputOpened, setIsTextInputOpened] = useState(false);
     const [isSubMenuOpened, setIsSubMenuOpened] = useState(false);
@@ -39,14 +39,15 @@ export const EditorContextMenu = () => {
         setContextMenuPosition(CONTEXT_MENU_RESET_POSITION);
     }, []);
 
-    const updateMenuPosition = useCallback((x, y, menuRef) => {
+    const updateMenuPosition = useCallback((x, y, menuKey) => {
         const container = document.querySelector(CONTEXT_MENU_CONTAINER);
         const padding = 10;
 
-        if (!container || !menuRef.current) return;
+        const menuEl = menuRefs.current[menuKey];
+        if (!container || !menuEl) return;
 
         const containerRect = container.getBoundingClientRect();
-        const { offsetWidth, offsetHeight } = menuRef.current;
+        const { offsetWidth, offsetHeight } = menuEl;
 
         const maxX = containerRect.width - offsetWidth - padding;
         const maxY = containerRect.height - offsetHeight - padding;
@@ -63,7 +64,7 @@ export const EditorContextMenu = () => {
         const { x, y } = contextMenuPosition;
         if (isTextInputOpened) {
             requestAnimationFrame(() => {
-                updateMenuPosition(x, y, moderationMenuRef);
+                updateMenuPosition(x, y, "moderation");
             });
         }
     }, [isTextInputOpened]);
@@ -82,7 +83,7 @@ export const EditorContextMenu = () => {
                     const clientY = event.clientY - top;
 
                     requestAnimationFrame(() => {
-                        updateMenuPosition(clientX, clientY, moderationMenuRef);
+                        updateMenuPosition(clientX, clientY, "moderation");
                     });
 
                     pointIndexRef.current = {
@@ -98,7 +99,7 @@ export const EditorContextMenu = () => {
     );
 
     const handleObjectsMenuOpen = useCallback(
-        (event) => {
+        (event, cuboid) => {
             if (selectedTool !== "handPointer") return;
             setIsModerationMenuOpened(false);
 
@@ -110,8 +111,14 @@ export const EditorContextMenu = () => {
                 const clientY = event.clientY - top;
 
                 requestAnimationFrame(() => {
-                    updateMenuPosition(clientX, clientY, objectsMenuRef);
+                    updateMenuPosition(clientX, clientY, "objects");
                 });
+
+                setIsObjectsMenuOpened(true);
+
+                if (cuboid) {
+                    console.log("editing label");
+                }
 
                 if (highlightedPoint) {
                     pointIndexRef.current = {
@@ -134,12 +141,22 @@ export const EditorContextMenu = () => {
                         position: [intersection.x, intersection.y, intersection.z],
                     };
                 }
-
-                setIsObjectsMenuOpened(true);
             }
         },
         [highlightedPoint, selectedTool],
     );
+
+    const editCuboidLabel = useCallback(
+        (data) => {
+            if (data) {
+                const { event, cuboid } = data;
+                handleObjectsMenuOpen(event, cuboid);
+            }
+        },
+        [handleObjectsMenuOpen],
+    );
+
+    useSubscribeFunction("editCuboidLabel", editCuboidLabel, []);
 
     const handleMouseDown = useCallback(
         (event) => {
@@ -152,13 +169,14 @@ export const EditorContextMenu = () => {
                     handleModerationMenuOpen(event);
                 } else if (OPEN_OBJECTS_MENU(event)) {
                     handleObjectsMenuOpen(event);
-                } else if (
-                    objectsMenuRef.current &&
-                    !objectsMenuRef.current.contains(event.target) &&
-                    moderationMenuRef.current &&
-                    !moderationMenuRef.current.contains(event.target)
-                ) {
-                    resetContextMenu();
+                } else {
+                    const clickedInsideMenu = Object.values(menuRefs.current).some(
+                        (menuEl) => menuEl && menuEl.contains(event.target),
+                    );
+
+                    if (!clickedInsideMenu) {
+                        resetContextMenu();
+                    }
                 }
             }
         },
@@ -187,7 +205,7 @@ export const EditorContextMenu = () => {
     return (
         <>
             <ObjectsMenu
-                menuRef={objectsMenuRef}
+                menuRef={(el) => (menuRefs.current["objects"] = el)}
                 isOpened={isObjectsMenuOpened}
                 resetContextMenu={resetContextMenu}
                 contextMenuPosition={contextMenuPosition}
@@ -196,7 +214,7 @@ export const EditorContextMenu = () => {
                 setIsSubMenuOpened={setIsSubMenuOpened}
             />
             <ModerationMenu
-                menuRef={moderationMenuRef}
+                menuRef={(el) => (menuRefs.current["moderation"] = el)}
                 isOpened={isModerationMenuOpened}
                 resetContextMenu={resetContextMenu}
                 contextMenuPosition={contextMenuPosition}

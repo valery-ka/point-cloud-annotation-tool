@@ -131,9 +131,7 @@ export const removeCuboid = (scene, cuboid) => {
 };
 
 export const getPointsInsideCuboid = (positions, position, quaternion, scale) => {
-    const positionVector = new Vector3().fromArray(position);
-    const scaleVector = new Vector3().fromArray(scale);
-    const matrix = new Matrix4().compose(positionVector, quaternion, scaleVector);
+    const matrix = new Matrix4().compose(position, quaternion, scale);
     const inverseMatrix = new Matrix4().copy(matrix).invert();
 
     const halfSize = new Vector3(0.5, 0.5, 0.5);

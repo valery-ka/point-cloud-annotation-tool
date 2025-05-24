@@ -11,8 +11,8 @@
 }
 
 .scene-button {
-    width: 40px;
-    height: 40px;
+    min-width: 40px;
+    min-height: 40px;
     background-color: var(--primary-theme-color);
     color: var(--text-color);
     border: 1px solid var(--border-color);
@@ -24,6 +24,7 @@
     top: 50%;
     transform: translate(-50%, -50%);
     opacity: 0.75;
+    padding: 0 10px;
 
     &:hover {
         opacity: 1;

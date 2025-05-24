@@ -10,7 +10,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 import { useEvent, useCuboids, useConfig, useEditor } from "contexts";
-import { useSubscribeFunction, useContinuousAction } from "hooks";
+import { useSubscribeFunction, useContinuousAction, useForceUpdate } from "hooks";
 
 import { SidebarIcon } from "../SidebarIcon";
 import { ObjectCardInfoBlock } from "./ObjectCardInfoBlock";
@@ -35,11 +35,13 @@ export const ObjectCardTab = memo(() => {
         setCuboids,
         selectedCuboid,
         setSelectedCuboid,
-        selectedCuboidRef,
+        selectedCuboidGeometryRef,
         isCuboidTransformingRef,
+        selectedCuboidInfoRef,
     } = useCuboids();
     const { config } = useConfig();
     const { objects } = config;
+
     const { startContinuousAction } = useContinuousAction({ delay: 100 });
 
     const pointsInsideCuboidRef = useRef(0);
@@ -125,7 +127,7 @@ export const ObjectCardTab = memo(() => {
     const handleAction = useCallback(
         (type, op) => (data) => {
             startContinuousAction(() => {
-                const cuboid = selectedCuboidRef.current;
+                const cuboid = selectedCuboidGeometryRef.current;
                 const handlerMap = {
                     position: POSITION_HANDLERS,
                     scale: SCALE_HANDLERS,
@@ -141,7 +143,7 @@ export const ObjectCardTab = memo(() => {
     const resetUnit = useCallback(
         (data) => {
             const { action, index } = data;
-            const cuboid = selectedCuboidRef.current;
+            const cuboid = selectedCuboidGeometryRef.current;
             const label = selectedCuboid.type;
             const unit = objects[0][label];
             RESET_HANDLERS[action]?.(cuboid, index, unit);
@@ -171,36 +173,34 @@ export const ObjectCardTab = memo(() => {
         [resetUnit],
     );
 
-    const getData = useCallback(
-        (type) => {
-            if (!selectedCuboid) return {};
+    const getData = useCallback((type) => {
+        const info = selectedCuboidInfoRef.current;
+        if (!info) return {};
 
-            const valueMap = {
-                points: {
-                    "Точек внутри бокса": pointsInsideCuboidRef.current,
-                    "Покрашенных точек": 0,
-                },
-                position: {
-                    "Позиция X": selectedCuboid.position[0],
-                    "Позиция Y": selectedCuboid.position[1],
-                    "Позиция Z": selectedCuboid.position[2] - selectedCuboid.scale[2] / 2,
-                },
-                scale: {
-                    Длина: selectedCuboid.scale[0],
-                    Ширина: selectedCuboid.scale[1],
-                    Высота: selectedCuboid.scale[2],
-                },
-                rotation: {
-                    Крен: selectedCuboid.rotation[0] * (180 / Math.PI),
-                    Тангаж: selectedCuboid.rotation[1] * (180 / Math.PI),
-                    Рыскание: selectedCuboid.rotation[2] * (180 / Math.PI),
-                },
-            };
+        const valueMap = {
+            points: {
+                "Точек внутри бокса": info.insidePointsCount,
+                "Покрашенных точек": 0,
+            },
+            position: {
+                "Позиция X": info.position[0],
+                "Позиция Y": info.position[1],
+                "Позиция Z": info.position[2] - info.scale[2] / 2,
+            },
+            scale: {
+                Длина: info.scale[0],
+                Ширина: info.scale[1],
+                Высота: info.scale[2],
+            },
+            rotation: {
+                Крен: info.rotation[0] * (180 / Math.PI),
+                Тангаж: info.rotation[1] * (180 / Math.PI),
+                Рыскание: info.rotation[2] * (180 / Math.PI),
+            },
+        };
 
-            return valueMap[type] || {};
-        },
-        [selectedCuboid],
-    );
+        return valueMap[type] || {};
+    }, []);
 
     const infoBlocksConfig = [
         { title: "Точки", type: "points", decimals: 0 },

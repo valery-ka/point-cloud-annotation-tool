@@ -14,9 +14,9 @@ export const useOrthographicView = () => {
         sideViews,
         setSideViews,
         selectedCuboid,
-        selectedCuboidRef,
+        selectedCuboidGeometryRef,
         setHandlePositions,
-        sideViewsCamerasNeedUpdate,
+        sideViewsCamerasNeedUpdateRef,
     } = useCuboids();
 
     const canvasRef = useRef(null);
@@ -150,30 +150,22 @@ export const useOrthographicView = () => {
     }, [scene]);
 
     useEffect(() => {
-        if (!canvasRef.current) return;
-
-        if (selectedCuboid) {
-            canvasRef.current.style.display = "block";
-            containerRef.current.style.display = "";
-        } else {
-            canvasRef.current.style.display = "none";
-            containerRef.current.style.display = "none";
-        }
-    }, [selectedCuboid]);
-
-    useEffect(() => {
-        sideViewsCamerasNeedUpdate.current = true;
+        sideViewsCamerasNeedUpdateRef.current = true;
     }, [size]);
 
     useFrame(() => {
-        if (sideViewsCamerasNeedUpdate.current) {
-            updateAllCameras(selectedCuboidRef.current);
-            sideViewsCamerasNeedUpdate.current = false;
+        if (sideViewsCamerasNeedUpdateRef.current) {
+            updateAllCameras(selectedCuboidGeometryRef.current);
+            sideViewsCamerasNeedUpdateRef.current = false;
         }
     });
 
     useFrame(() => {
         if (!rendererRef.current || !canvasRef.current) return;
+        const visible = selectedCuboid && selectedCuboidGeometryRef.current;
+
+        canvasRef.current.style.display = visible ? "block" : "none";
+        containerRef.current.style.display = visible ? "" : "none";
 
         const width = containerRef.current.clientWidth;
         const height = size.height;

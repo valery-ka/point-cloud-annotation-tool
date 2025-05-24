@@ -18,7 +18,7 @@ const scale = "scale";
 const rotate = "rotate";
 
 export const useSideViewsControls = ({ camera, mesh, hoveredView, hoveredHandler, name }) => {
-    const { sideViewsCamerasNeedUpdate, isCuboidTransformingRef } = useCuboids();
+    const { sideViewsCamerasNeedUpdateRef, isCuboidTransformingRef } = useCuboids();
     const { cameraControlsRef, transformControlsRef } = useEditor();
 
     const scaleHandlerRef = useRef(null);
@@ -101,31 +101,31 @@ export const useSideViewsControls = ({ camera, mesh, hoveredView, hoveredHandler
         [mesh, name],
     );
 
-    const handleMouseDown = useCallback(
-        (e) => {
-            if (e.button !== 0 || !hoveredView) return;
+    const handleMouseDown = useCallback(() => {
+        if (!hoveredView) return;
 
-            cameraControlsRef.current.enabled = false;
+        cameraControlsRef.current.enabled = false;
 
-            const type = hoveredHandler?.type;
+        const type = hoveredHandler?.type;
 
-            if (!hoveredHandler) {
-                transformModeRef.current = translate;
-            } else if (type === "edge" || type === "corner") {
-                scaleHandlerRef.current = hoveredHandler?.direction;
-                transformModeRef.current = scale;
-            } else if (type === "rotation") {
-                transformModeRef.current = rotate;
-            }
+        if (!hoveredHandler) {
+            transformModeRef.current = translate;
+        } else if (type === "edge" || type === "corner") {
+            scaleHandlerRef.current = hoveredHandler?.direction;
+            transformModeRef.current = scale;
+        } else if (type === "rotation") {
+            transformModeRef.current = rotate;
+        }
 
-            isCuboidTransformingRef.current = true;
-        },
-        [hoveredView, hoveredHandler],
-    );
+        isCuboidTransformingRef.current = true;
+    }, [hoveredView, hoveredHandler]);
 
     const handleMouseMove = useCallback(
         (e) => {
-            if (!isCuboidTransformingRef.current || !mesh) return;
+            if (!isCuboidTransformingRef.current || !mesh) {
+                cameraControlsRef.current.enabled = true;
+                return;
+            }
 
             const { movementX, movementY, shiftKey } = e;
 
@@ -148,7 +148,7 @@ export const useSideViewsControls = ({ camera, mesh, hoveredView, hoveredHandler
 
     const handleMouseUp = useCallback(() => {
         transformModeRef.current = null;
-        sideViewsCamerasNeedUpdate.current = true;
+        sideViewsCamerasNeedUpdateRef.current = true;
         cameraControlsRef.current.enabled = true;
 
         if (isCuboidTransformingRef.current) {
@@ -166,7 +166,7 @@ export const useSideViewsControls = ({ camera, mesh, hoveredView, hoveredHandler
                 camera.zoom = Math.max(MIN_ZOOM, camera.zoom - ZOOM_STEP);
             }
 
-            sideViewsCamerasNeedUpdate.current = true;
+            sideViewsCamerasNeedUpdateRef.current = true;
         },
         [camera, hoveredView],
     );

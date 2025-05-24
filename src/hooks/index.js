@@ -8,6 +8,7 @@ export { useTimeSinceMount } from "./dev/useTimeSinceMount";
 export { useTheme } from "./shared/useTheme";
 export { useLanguage } from "./shared/useLanguage";
 export { useBindHotkey } from "./shared/useBindHotkey";
+export { useForceUpdate } from "./shared/useForceUpdate";
 export { useButtonState } from "./shared/useButtonState";
 export { useUpdateHotkeys } from "./shared/useUpdateHotkeys";
 export { useMousetrapPause } from "./shared/useMousetrapPause";

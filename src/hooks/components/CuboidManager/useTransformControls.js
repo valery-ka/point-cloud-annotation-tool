@@ -4,47 +4,27 @@ import { useCallback, useEffect } from "react";
 
 import { useEditor, useCuboids } from "contexts";
 
-import { TransformControls, extractPsrFromObject } from "utils/cuboids";
+import { TransformControls } from "utils/cuboids";
 
-export const useTransformControls = ({ selectPointsByCuboid }) => {
+export const useTransformControls = ({ updateCuboidsState }) => {
     const { gl, camera, scene } = useThree();
 
     const { cameraControlsRef, transformControlsRef } = useEditor();
-    const { selectedCuboidRef, sideViewsCamerasNeedUpdate, isCuboidTransformingRef, setCuboids } =
+    const { selectedCuboidGeometryRef, sideViewsCamerasNeedUpdateRef, isCuboidTransformingRef } =
         useCuboids();
+
+    const onTransformChange = useCallback(() => {
+        sideViewsCamerasNeedUpdateRef.current = true;
+    }, []);
+
+    const onTransformFinished = useCallback(() => {
+        updateCuboidsState();
+    }, [updateCuboidsState]);
 
     const onDraggingChanged = useCallback((event) => {
         isCuboidTransformingRef.current = event.value;
-
-        if (cameraControlsRef.current) {
-            cameraControlsRef.current.enabled = !event.value;
-        }
-
-        if (!event.value) {
-            onTransformFinished();
-        }
-
-        sideViewsCamerasNeedUpdate.current = true;
-    }, []);
-
-    const onTransformChange = useCallback(() => {
-        if (!isCuboidTransformingRef.current) return;
-        selectPointsByCuboid();
-    }, [selectPointsByCuboid]);
-
-    const onTransformFinished = useCallback(() => {
-        const object = selectedCuboidRef.current;
-        if (!object) return;
-
-        const psr = extractPsrFromObject(object);
-
-        setCuboids((prevCuboids) =>
-            prevCuboids.map((cuboid) =>
-                cuboid.id === object.name ? { ...cuboid, ...psr } : cuboid,
-            ),
-        );
-
-        console.log("finish transform");
+        cameraControlsRef.current.enabled = !event.value;
+        if (!event.value) onTransformFinished();
     }, []);
 
     useEffect(() => {
@@ -67,7 +47,7 @@ export const useTransformControls = ({ selectPointsByCuboid }) => {
             if (e.key === "x") {
                 transform.detach();
             } else if (e.key === "w") {
-                const object = selectedCuboidRef.current;
+                const object = selectedCuboidGeometryRef.current;
                 if (object) transform.attach(object);
             } else if (e.key === "a") {
                 transform.setMode("translate");
@@ -90,8 +70,4 @@ export const useTransformControls = ({ selectPointsByCuboid }) => {
             transform?.detach();
         };
     }, [onTransformChange, onDraggingChanged]);
-
-    return {
-        transformControlsRef,
-    };
 };

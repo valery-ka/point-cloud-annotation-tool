@@ -5,9 +5,7 @@ import { useTranslation } from "react-i18next";
 
 import { useEvent, useConfig } from "contexts";
 
-import { TABS } from "constants";
-
-export const SceneButton = ({ index, position, buttonIndex, resolved, checked, workerHint }) => {
+export const SceneButton = ({ index, position, text, resolved, checked, hint, hover, onClick }) => {
     const { t } = useTranslation();
 
     const { gl } = useThree();
@@ -37,10 +35,6 @@ export const SceneButton = ({ index, position, buttonIndex, resolved, checked, w
         domElement.dispatchEvent(new WheelEvent("wheel", event));
     }, []);
 
-    const setActiveTab = useCallback(() => {
-        publish("setActiveTab", TABS.MODERATION);
-    }, [publish]);
-
     const resolveIssue = useCallback(() => {
         publish("resolveIssue", { index });
         setShowHint(false);
@@ -68,16 +62,16 @@ export const SceneButton = ({ index, position, buttonIndex, resolved, checked, w
             >
                 <button
                     className="scene-button"
-                    onClick={() => setActiveTab()}
+                    onClick={(e) => onClick(e)}
                     onMouseDown={(e) => e.preventDefault()}
                     style={{ pointerEvents: isMouseDown ? "none" : "auto" }}
                 >
-                    {buttonIndex}
+                    {text}
                 </button>
 
-                {showHint && (
+                {hover && showHint && (
                     <div className="issue-hover">
-                        <div className="issue-hover-text">{workerHint}</div>
+                        <div className="issue-hover-text">{hint}</div>
                         {isModerationJob ? (
                             <div className="issue-hover-buttons">
                                 <button
