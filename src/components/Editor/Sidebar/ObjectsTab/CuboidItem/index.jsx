@@ -15,10 +15,19 @@ export const CuboidItem = memo(({ obj, index, action, isSelected, isVisible }) =
     const { publish } = useEvent();
     const { t } = useTranslation();
 
+    const getTargetPosition = useCallback((obj) => {
+        const position = obj.position;
+        const scale = obj.scale;
+        const target = [position[0], position[1], position[2] - scale[2] / 2];
+        return target;
+    }, []);
+
     const selectCuboid = useCallback(() => {
         if (action) {
+            const target = getTargetPosition(obj);
+
             publish(action);
-            publish("switchCameraToPoint", obj.position);
+            publish("switchCameraToPoint", target);
             publish("setActiveTab", TABS.OBJECT_CARD);
         }
     }, [action, publish]);

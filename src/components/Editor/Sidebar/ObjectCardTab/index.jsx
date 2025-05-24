@@ -1,5 +1,13 @@
-import { memo, useEffect, useCallback, useRef } from "react";
-import { faClose, faTrash, faPlus, faMinus, faRefresh } from "@fortawesome/free-solid-svg-icons";
+import { memo, useEffect, useCallback, useRef, useMemo } from "react";
+import {
+    faClose,
+    faTrash,
+    faPlus,
+    faMinus,
+    faRefresh,
+    faAngleDoubleLeft,
+    faAngleDoubleRight,
+} from "@fortawesome/free-solid-svg-icons";
 
 import { useEvent, useCuboids, useConfig, useEditor } from "contexts";
 import { useSubscribeFunction, useContinuousAction } from "hooks";
@@ -23,6 +31,7 @@ export const ObjectCardTab = memo(() => {
     const { publish } = useEvent();
     const { transformControlsRef } = useEditor();
     const {
+        cuboids,
         setCuboids,
         selectedCuboid,
         setSelectedCuboid,
@@ -34,6 +43,20 @@ export const ObjectCardTab = memo(() => {
     const { startContinuousAction } = useContinuousAction({ delay: 100 });
 
     const pointsInsideCuboidRef = useRef(0);
+
+    const { isPrevButtonActive, isNextButtonActive } = useMemo(() => {
+        if (!selectedCuboid?.id || cuboids.length === 0) {
+            return { isPrevButtonActive: false, isNextButtonActive: false };
+        }
+
+        const sorted = [...cuboids].sort((a, b) => Number(a.id) - Number(b.id));
+        const index = sorted.findIndex((c) => c.id === selectedCuboid.id);
+
+        return {
+            isPrevButtonActive: index > 0,
+            isNextButtonActive: index >= 0 && index < sorted.length - 1,
+        };
+    }, [selectedCuboid?.id, cuboids]);
 
     useEffect(() => {
         selectedCuboid
@@ -47,6 +70,13 @@ export const ObjectCardTab = memo(() => {
         }
     }, [selectedCuboid?.insidePoints]);
 
+    const getTargetPosition = useCallback((obj) => {
+        const position = obj.position;
+        const scale = obj.scale;
+        const target = [position[0], position[1], position[2] - scale[2] / 2];
+        return target;
+    }, []);
+
     const updateCuboidState = useCallback(() => {
         isCuboidTransformingRef.current = true;
         transformControlsRef.current.dispatchEvent({ type: "change" });
@@ -59,6 +89,38 @@ export const ObjectCardTab = memo(() => {
     }, []);
 
     useSubscribeFunction("removeCuboid", removeCuboid, []);
+
+    const prevCuboid = useCallback(() => {
+        if (!selectedCuboid?.id) return;
+
+        const sorted = [...cuboids].sort((a, b) => Number(a.id) - Number(b.id));
+        const index = sorted.findIndex((c) => c.id === selectedCuboid.id);
+
+        if (index > 0) {
+            const prevCuboid = sorted[index - 1];
+            const target = getTargetPosition(prevCuboid);
+            publish("switchCameraToPoint", target);
+            setSelectedCuboid(prevCuboid);
+        }
+    }, [selectedCuboid?.id, cuboids]);
+
+    useSubscribeFunction("prevCuboid", prevCuboid, []);
+
+    const nextCuboid = useCallback(() => {
+        if (!selectedCuboid?.id) return;
+
+        const sorted = [...cuboids].sort((a, b) => Number(a.id) - Number(b.id));
+        const index = sorted.findIndex((c) => c.id === selectedCuboid.id);
+
+        if (index !== -1 && index < sorted.length - 1) {
+            const nextCuboid = sorted[index + 1];
+            const target = getTargetPosition(nextCuboid);
+            publish("switchCameraToPoint", target);
+            setSelectedCuboid(nextCuboid);
+        }
+    }, [selectedCuboid?.id, cuboids]);
+
+    useSubscribeFunction("nextCuboid", nextCuboid, []);
 
     const handleAction = useCallback(
         (type, op) => (data) => {
@@ -152,6 +214,20 @@ export const ObjectCardTab = memo(() => {
             <div className="tab-header-container">
                 <h2 className="tab-header">ID: {selectedCuboid?.id}</h2>
                 <div className="tab-header-buttons">
+                    <SidebarIcon
+                        className={`icon-style ${isPrevButtonActive ? "" : "disabled"}`}
+                        size="20px"
+                        title={"Предыдущий объект"}
+                        icon={faAngleDoubleLeft}
+                        action={"prevCuboid"}
+                    />
+                    <SidebarIcon
+                        className={`icon-style ${isNextButtonActive ? "" : "disabled"}`}
+                        size="20px"
+                        title={"Следующий объект"}
+                        icon={faAngleDoubleRight}
+                        action={"nextCuboid"}
+                    />
                     <SidebarIcon
                         className="icon-style"
                         size="20px"

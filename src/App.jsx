@@ -24,7 +24,6 @@ export const App = () => {
             <LoadingOverlay />
             <FileNavigator />
             <div className="tool-3d-scene">
-                <SideViews />
                 <div className="tool-3d-container">
                     <EditorContextMenu />
                     <canvas id="canvasSelection" className="tool-3d-canvas-selection"></canvas>
@@ -37,6 +36,7 @@ export const App = () => {
                     <CameraImages />
                     <PointHighlighter />
                 </div>
+                <SideViews />
                 <Sidebar />
             </div>
             <FrameSwitcher />

@@ -33,9 +33,10 @@ export const useCuboidManager = () => {
     useOrthographicView();
 
     const selectPointsByCuboid = useCallback(() => {
-        if (!selectedCuboidRef.current) return;
-
         const cuboid = selectedCuboidRef.current;
+
+        if (!cuboid) return;
+
         const { position, scale, rotation } = extractPsrFromObject(cuboid);
 
         sideViewsCamerasNeedUpdate.current = true;
@@ -90,9 +91,15 @@ export const useCuboidManager = () => {
         [cuboids, pcdFiles, activeFrameIndex],
     );
 
+    const unselectCuboid = useCallback(() => {
+        console.log(
+            "implement unselecting logic как-то блять чтоб не сломалось нахуй господи помогите",
+        );
+    }, []);
+
     useEffect(() => {
         const id = selectedCuboid?.id;
-        if (id) onCuboidSelect(id);
+        id ? onCuboidSelect(id) : unselectCuboid();
     }, [selectedCuboid?.id]);
 
     useRaycastClickSelect({

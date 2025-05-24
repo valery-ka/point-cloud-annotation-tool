@@ -141,7 +141,6 @@ export const useSideViewsControls = ({ camera, mesh, hoveredView, hoveredHandler
                 handleScale(movementX, movementY);
             }
 
-            sideViewsCamerasNeedUpdate.current = true;
             transformControlsRef.current.dispatchEvent({ type: "change" });
         },
         [mesh, handleTranslate, handleRotate, handleScale],
