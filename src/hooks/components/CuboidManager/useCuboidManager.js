@@ -4,6 +4,7 @@ import { useEffect, useCallback } from "react";
 
 import { useCuboids, useEditor, useFileManager, useFrames, useEvent } from "contexts";
 import { useTransformControls, useRaycastClickSelect, useOrthographicView } from "hooks";
+import { useHoveredCuboid } from "./useHoveredCuboid";
 
 import { getPointsInsideCuboid } from "utils/cuboids";
 
@@ -45,6 +46,16 @@ export const useCuboidManager = () => {
         selectedCuboidGeometryRef.current = null;
         cameraControlsRef.current.enabled = true;
     }, []);
+
+    useHoveredCuboid({
+        meshMap: () => {
+            const meshMap = {};
+            for (const id in cuboidsGeometriesRef.current) {
+                meshMap[id] = cuboidsGeometriesRef.current[id].cube.mesh;
+            }
+            return meshMap;
+        },
+    });
 
     useRaycastClickSelect({
         getMeshMap: () => {

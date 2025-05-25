@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 
 import { useEvent, useConfig } from "contexts";
 
-export const SceneButton = ({ index, position, text, resolved, checked, hint, hover, onClick }) => {
+export const SceneButton = ({ index, position, text, hidden, hint, hover, onClick }) => {
     const { t } = useTranslation();
 
     const { gl } = useThree();
@@ -50,7 +50,7 @@ export const SceneButton = ({ index, position, text, resolved, checked, hint, ho
         setShowHint(false);
     }, [publish]);
 
-    if (resolved || checked) return;
+    if (hidden) return;
 
     return (
         <Html position={position} zIndexRange={[10, 10]}>

@@ -6,7 +6,7 @@ import { SceneButton } from "../SceneButton";
 
 export const CuboidsLabels = () => {
     const { publish } = useEvent();
-    const { cuboidsGeometriesRef } = useCuboids();
+    const { cuboidsGeometriesRef, hoveredCuboid } = useCuboids();
 
     const getPosition = useCallback((mesh) => {
         const position = mesh.position;
@@ -18,6 +18,13 @@ export const CuboidsLabels = () => {
         const label = mesh.userData.label;
         return label;
     }, []);
+
+    const getIsHidden = useCallback(
+        (mesh) => {
+            return mesh.name === hoveredCuboid;
+        },
+        [hoveredCuboid],
+    );
 
     const openContextMenu = useCallback(
         (event, mesh) => {
@@ -42,6 +49,7 @@ export const CuboidsLabels = () => {
                         index={index}
                         text={getLabel(mesh)}
                         position={getPosition(mesh)}
+                        hidden={!getIsHidden(mesh)}
                         onClick={(e) => openContextMenu(e, mesh)}
                     />
                 );

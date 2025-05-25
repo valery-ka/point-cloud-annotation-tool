@@ -26,8 +26,7 @@ export const ModerationComments = () => {
                             index={index}
                             text={acc.length + 1}
                             position={issue.position}
-                            resolved={issue.resolved}
-                            checked={issue.checked}
+                            hidden={issue.resolved || issue.checked}
                             hint={issue.workerHint}
                             hover={true}
                             onClick={setActiveTab}

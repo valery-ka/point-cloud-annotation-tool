@@ -1,4 +1,4 @@
-import { createContext, useContext, useRef, useState, useEffect } from "react";
+import { createContext, useContext, useRef, useState } from "react";
 
 const CuboidsContext = createContext();
 
@@ -17,6 +17,7 @@ export const CuboidsProvider = ({ children }) => {
 
     const [cuboids, setCuboids] = useState([]);
     const [selectedCuboid, setSelectedCuboid] = useState(null);
+    const [hoveredCuboid, setHoveredCuboid] = useState(null);
 
     const [sideViews, setSideViews] = useState([]);
     const [handlePositions, setHandlePositions] = useState({});
@@ -40,6 +41,8 @@ export const CuboidsProvider = ({ children }) => {
                 selectedCuboid,
                 setSelectedCuboid,
                 isCuboidTransformingRef,
+                hoveredCuboid,
+                setHoveredCuboid,
             }}
         >
             {children}
