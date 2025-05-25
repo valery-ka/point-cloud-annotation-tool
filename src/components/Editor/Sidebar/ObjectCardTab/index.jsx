@@ -97,7 +97,6 @@ export const ObjectCardTab = memo(() => {
             const prevCuboid = sorted[index - 1];
             const target = getCuboidMeshPositionById(cuboidsGeometriesRef, prevCuboid.id);
             publish("switchCameraToPoint", target);
-            console.log(prevCuboid);
             setSelectedCuboid(prevCuboid);
         }
     }, [selectedCuboid?.id, cuboids]);

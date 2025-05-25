@@ -17,7 +17,7 @@ export const ModerationMenu = ({
     isOpened,
     resetContextMenu,
     contextMenuPosition,
-    pointIndex,
+    clickedInfoRef,
     isTextInputOpened,
     setIsTextInputOpened,
 }) => {
@@ -60,14 +60,14 @@ export const ModerationMenu = ({
                 return;
             }
 
-            const point = pointIndex.current.index;
-            const position = pointIndex.current.position;
+            const point = clickedInfoRef.current.index;
+            const position = clickedInfoRef.current.position;
 
             setIssues((prevIssues) => {
                 const newIssue = {
                     type: "point",
                     frame: activeFrameIndex,
-                    pointIndex: point,
+                    clickedInfoRef: point,
                     position: position,
                     issue: issue.value,
                     workerHint: issue.workerHint,

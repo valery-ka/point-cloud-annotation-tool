@@ -24,14 +24,15 @@ export const EditorContextMenu = () => {
     const [isSubMenuOpened, setIsSubMenuOpened] = useState(false);
     const [contextMenuPosition, setContextMenuPosition] = useState(CONTEXT_MENU_RESET_POSITION);
 
-    const pointIndexRef = useRef(null);
+    const clickedInfoRef = useRef(null);
+
     const [isModerationMenuOpened, setIsModerationMenuOpened] = useState(false);
     const [isObjectsMenuOpened, setIsObjectsMenuOpened] = useState(false);
 
     const raycasterRef = useRef(new Raycaster());
 
     const resetContextMenu = useCallback(() => {
-        pointIndexRef.current = null;
+        clickedInfoRef.current = null;
         setIsSubMenuOpened(false);
         setIsTextInputOpened(false);
         setIsModerationMenuOpened(false);
@@ -86,7 +87,7 @@ export const EditorContextMenu = () => {
                         updateMenuPosition(clientX, clientY, "moderation");
                     });
 
-                    pointIndexRef.current = {
+                    clickedInfoRef.current = {
                         index: highlightedPoint?.index,
                         position: [highlightedPoint?.x, highlightedPoint?.y, highlightedPoint?.z],
                     };
@@ -99,7 +100,7 @@ export const EditorContextMenu = () => {
     );
 
     const handleObjectsMenuOpen = useCallback(
-        (event, cuboid) => {
+        (event) => {
             if (selectedTool !== "handPointer") return;
             setIsModerationMenuOpened(false);
 
@@ -116,12 +117,8 @@ export const EditorContextMenu = () => {
 
                 setIsObjectsMenuOpened(true);
 
-                if (cuboid) {
-                    console.log("editing label");
-                }
-
                 if (highlightedPoint) {
-                    pointIndexRef.current = {
+                    clickedInfoRef.current = {
                         index: highlightedPoint.index,
                         position: [highlightedPoint.x, highlightedPoint.y, highlightedPoint.z],
                     };
@@ -136,7 +133,7 @@ export const EditorContextMenu = () => {
                     const intersection = new Vector3();
                     raycasterRef.current.ray.intersectPlane(planeZ, intersection);
 
-                    pointIndexRef.current = {
+                    clickedInfoRef.current = {
                         index: null,
                         position: [intersection.x, intersection.y, intersection.z],
                     };
@@ -150,10 +147,26 @@ export const EditorContextMenu = () => {
         (data) => {
             if (data) {
                 const { event, cuboid } = data;
-                handleObjectsMenuOpen(event, cuboid);
+                setIsModerationMenuOpened(false);
+
+                const container = document.querySelector(CONTEXT_MENU_CONTAINER);
+
+                if (container && container.contains(event.target)) {
+                    const { left, top } = container.getBoundingClientRect();
+                    const clientX = event.clientX - left;
+                    const clientY = event.clientY - top;
+
+                    requestAnimationFrame(() => {
+                        updateMenuPosition(clientX, clientY, "objects");
+                    });
+
+                    setIsObjectsMenuOpened(true);
+
+                    clickedInfoRef.current = cuboid;
+                }
             }
         },
-        [handleObjectsMenuOpen],
+        [selectedTool],
     );
 
     useSubscribeFunction("editCuboidLabel", editCuboidLabel, []);
@@ -209,7 +222,7 @@ export const EditorContextMenu = () => {
                 isOpened={isObjectsMenuOpened}
                 resetContextMenu={resetContextMenu}
                 contextMenuPosition={contextMenuPosition}
-                pointIndex={pointIndexRef}
+                clickedInfoRef={clickedInfoRef}
                 isSubMenuOpened={isSubMenuOpened}
                 setIsSubMenuOpened={setIsSubMenuOpened}
             />
@@ -218,7 +231,7 @@ export const EditorContextMenu = () => {
                 isOpened={isModerationMenuOpened}
                 resetContextMenu={resetContextMenu}
                 contextMenuPosition={contextMenuPosition}
-                pointIndex={pointIndexRef}
+                clickedInfoRef={clickedInfoRef}
                 isTextInputOpened={isTextInputOpened}
                 setIsTextInputOpened={setIsTextInputOpened}
             />

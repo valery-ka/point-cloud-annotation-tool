@@ -1,16 +1,19 @@
-import { createContext, useContext, useRef, useState } from "react";
+import { createContext, useContext, useRef, useState, useEffect } from "react";
 
 const CuboidsContext = createContext();
+
+const DEFAULT_INFO_CARD = {
+    position: [0, 0, 0],
+    scale: [0, 0, 0],
+    rotation: [0, 0, 0],
+    insidePointsCount: 0,
+    selected: false,
+};
 
 export const CuboidsProvider = ({ children }) => {
     const cuboidsGeometriesRef = useRef({});
     const selectedCuboidGeometryRef = useRef(null);
-    const selectedCuboidInfoRef = useRef({
-        position: [0, 0, 0],
-        scale: [0, 0, 0],
-        rotation: [0, 0, 0],
-        insidePointsCount: 0,
-    });
+    const selectedCuboidInfoRef = useRef(DEFAULT_INFO_CARD);
 
     const [cuboids, setCuboids] = useState([]);
     const [selectedCuboid, setSelectedCuboid] = useState(null);

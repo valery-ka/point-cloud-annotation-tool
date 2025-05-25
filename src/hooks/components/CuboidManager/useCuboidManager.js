@@ -66,7 +66,10 @@ export const useCuboidManager = () => {
     // update info card
     useFrame(() => {
         const geometry = selectedCuboidGeometryRef.current;
-        if (!geometry) return;
+        if (!geometry) {
+            selectedCuboidInfoRef.current.selected = false;
+            return;
+        }
 
         const { position, scale, rotation, quaternion } = geometry;
         const newPosition = [position.x, position.y, position.z];
@@ -83,6 +86,7 @@ export const useCuboidManager = () => {
             info.position = newPosition;
             info.scale = newScale;
             info.rotation = newRotation;
+            info.selected = true;
 
             const activeFrameFilePath = pcdFiles[activeFrameIndex];
             const activeFrame = pointCloudRefs.current[activeFrameFilePath];

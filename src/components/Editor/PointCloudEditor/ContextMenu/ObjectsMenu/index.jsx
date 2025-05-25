@@ -6,21 +6,22 @@ import { faQuestionCircle, faCaretRight } from "@fortawesome/free-solid-svg-icon
 import { useConfig, useCuboids, useEditor } from "contexts";
 import { useMousetrapPause } from "hooks";
 
-import { addCuboid } from "utils/cuboids";
-import { getChildObjects, getChildTypes, formatObjectData } from "utils/shared";
+import { addCuboid, updateCuboid } from "utils/cuboids";
+import { getChildObjects, getChildTypes, formatObjectData, getNextId } from "utils/shared";
 
 export const ObjectsMenu = ({
     menuRef,
     isOpened,
     resetContextMenu,
     contextMenuPosition,
-    pointIndex,
+    clickedInfoRef,
     isSubMenuOpened,
     setIsSubMenuOpened,
 }) => {
     const { config } = useConfig();
     const { objects } = config;
-    const { cuboidsGeometriesRef, setCuboids, setSelectedCuboid } = useCuboids();
+    const { cuboidsGeometriesRef, setCuboids, setSelectedCuboid, selectedCuboidInfoRef } =
+        useCuboids();
     const { sceneRef } = useEditor();
 
     const objectList = useMemo(() => {
@@ -45,44 +46,53 @@ export const ObjectsMenu = ({
         setSelectedCuboid(toSelect);
     }, []);
 
-    const addObject = useCallback(
-        (object) => {
-            const color = object.color;
-            const label = object.type;
-            const clickedPosition = pointIndex.current.position;
-            const dimensions = object.dimensions;
-            const scale = [dimensions.length, dimensions.width, dimensions.height];
-            const position = [
-                clickedPosition[0],
-                clickedPosition[1],
-                clickedPosition[2] + scale[2] / 2,
-            ];
-            const rotation = [0, 0, 0]; // клонировать предыдущее...?
+    const addNewObject = useCallback(
+        (object, position) => {
+            const { color, type: label, dimensions } = object;
+            const { selected, scale, position: selPos, rotation } = selectedCuboidInfoRef.current;
 
-            setCuboids((prevCuboids = []) => {
-                const maxId = prevCuboids.reduce((max, obj) => {
-                    const idNum = parseInt(obj.id, 10);
-                    return isNaN(idNum) ? max : Math.max(max, idNum);
-                }, -1);
+            const defaultScale = [dimensions.length, dimensions.width, dimensions.height];
+            const newPosition = selected
+                ? [position[0], position[1], selPos[2] - (scale[2] - defaultScale[2]) / 2]
+                : [position[0], position[1], position[2] + defaultScale[2] / 2];
 
-                const newId = String(maxId + 1);
-
-                const cuboid = { id: newId, label, color, position, scale, rotation };
-
-                addCuboidOnScene(cuboid);
-
-                const newObject = {
+            setCuboids((prev = []) => {
+                const newId = String(getNextId(prev));
+                const cuboid = {
                     id: newId,
-                    label: label,
+                    label,
                     color,
+                    position: newPosition,
+                    scale: defaultScale,
+                    rotation: selected ? rotation : [0, 0, 0],
                 };
-
-                return [...prevCuboids, newObject];
+                addCuboidOnScene(cuboid);
+                return [...prev, { id: newId, label, color }];
             });
+        },
+        [addCuboidOnScene],
+    );
 
+    const updateExistingObject = useCallback(
+        (id, object) => {
+            const { type: label, color } = object;
+
+            updateCuboid(id, label, color, cuboidsGeometriesRef);
+            setCuboids((prev) =>
+                prev.map((cuboid) => (cuboid.id === id ? { ...cuboid, label, color } : cuboid)),
+            );
+            setSelectedCuboid({ id, label, color });
+        },
+        [cuboidsGeometriesRef],
+    );
+
+    const handleObjectAction = useCallback(
+        (object) => {
+            const { position, id } = clickedInfoRef.current;
+            position ? addNewObject(object, position) : updateExistingObject(id, object);
             resetContextMenu();
         },
-        [resetContextMenu, pointIndex],
+        [addNewObject, updateExistingObject, resetContextMenu],
     );
 
     const handleOpenSubMenu = useCallback(
@@ -104,12 +114,12 @@ export const ObjectsMenu = ({
     const handleContextMenuClick = useCallback(
         (e, object) => {
             if (!object.children) {
-                addObject(object);
+                handleObjectAction(object);
             } else {
                 handleOpenSubMenu(object);
             }
         },
-        [addObject, handleOpenSubMenu],
+        [handleObjectAction, handleOpenSubMenu],
     );
 
     const handleKeyDown = useCallback(
@@ -129,13 +139,20 @@ export const ObjectsMenu = ({
                 if (!object) return;
 
                 if (!object.children || isSubMenuOpened.isOpen) {
-                    addObject(object);
+                    handleObjectAction(object);
                 } else {
                     handleOpenSubMenu(object);
                 }
             }
         },
-        [isOpened, objectList, isSubMenuOpened, addObject, handleOpenSubMenu, handleBackToParent],
+        [
+            isOpened,
+            objectList,
+            isSubMenuOpened,
+            handleObjectAction,
+            handleOpenSubMenu,
+            handleBackToParent,
+        ],
     );
 
     useEffect(() => {

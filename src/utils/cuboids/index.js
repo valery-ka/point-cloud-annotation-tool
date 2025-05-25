@@ -9,6 +9,7 @@ export {
     createEdgesGeometry,
     createArrowGeometry,
     addCuboid,
+    updateCuboid,
     removeCuboid,
     extractPsrFromObject,
     getPointsInsideCuboid,

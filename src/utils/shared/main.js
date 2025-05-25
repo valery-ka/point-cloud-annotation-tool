@@ -50,3 +50,11 @@ export const getChildObjects = (parentType, objects) => {
 
     return children;
 };
+
+export const getNextId = (cuboids) => {
+    const maxId = cuboids.reduce((max, obj) => {
+        const idNum = parseInt(obj.id, 10);
+        return isNaN(idNum) ? max : Math.max(max, idNum);
+    }, -1);
+    return maxId + 1;
+};
