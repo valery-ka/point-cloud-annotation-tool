@@ -1,4 +1,4 @@
-import { memo, useEffect, useCallback, useRef, useMemo } from "react";
+import { memo, useEffect, useCallback, useMemo } from "react";
 import {
     faClose,
     faTrash,
@@ -10,11 +10,12 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 import { useEvent, useCuboids, useConfig, useEditor } from "contexts";
-import { useSubscribeFunction, useContinuousAction, useForceUpdate } from "hooks";
+import { useSubscribeFunction, useContinuousAction } from "hooks";
 
 import { SidebarIcon } from "../SidebarIcon";
 import { ObjectCardInfoBlock } from "./ObjectCardInfoBlock";
 
+import { getCuboidMeshPositionById, removeCuboid } from "utils/cuboids";
 import { TABS } from "constants";
 import {
     POSITION_HANDLERS,
@@ -29,7 +30,7 @@ const OBJECTS_TAB_INDEX = 0;
 
 export const ObjectCardTab = memo(() => {
     const { publish } = useEvent();
-    const { transformControlsRef } = useEditor();
+    const { sceneRef, transformControlsRef } = useEditor();
     const {
         cuboids,
         setCuboids,
@@ -38,13 +39,12 @@ export const ObjectCardTab = memo(() => {
         selectedCuboidGeometryRef,
         isCuboidTransformingRef,
         selectedCuboidInfoRef,
+        cuboidsGeometriesRef,
     } = useCuboids();
     const { config } = useConfig();
     const { objects } = config;
 
     const { startContinuousAction } = useContinuousAction({ delay: 100 });
-
-    const pointsInsideCuboidRef = useRef(0);
 
     const { isPrevButtonActive, isNextButtonActive } = useMemo(() => {
         if (!selectedCuboid?.id || cuboids.length === 0) {
@@ -66,31 +66,26 @@ export const ObjectCardTab = memo(() => {
             : publish("setActiveTab", OBJECTS_TAB_INDEX);
     }, [selectedCuboid?.id]);
 
-    useEffect(() => {
-        if (selectedCuboid?.insidePoints) {
-            pointsInsideCuboidRef.current = selectedCuboid.insidePoints.length;
-        }
-    }, [selectedCuboid?.insidePoints]);
-
-    const getTargetPosition = useCallback((obj) => {
-        const position = obj.position;
-        const scale = obj.scale;
-        const target = [position[0], position[1], position[2] - scale[2] / 2];
-        return target;
-    }, []);
-
     const updateCuboidState = useCallback(() => {
         isCuboidTransformingRef.current = true;
         transformControlsRef.current.dispatchEvent({ type: "change" });
     }, []);
 
-    const removeCuboid = useCallback((data) => {
+    const removeObject = useCallback((data) => {
         const cuboidId = data.index;
+
+        for (const geometry of Object.values(cuboidsGeometriesRef.current)) {
+            if (geometry?.cube?.mesh?.name === cuboidId) {
+                removeCuboid(sceneRef.current, geometry);
+                delete cuboidsGeometriesRef.current[cuboidId];
+            }
+        }
+
         setCuboids((prevCuboids) => prevCuboids.filter((cuboid) => cuboid.id !== cuboidId));
         setSelectedCuboid(null);
     }, []);
 
-    useSubscribeFunction("removeCuboid", removeCuboid, []);
+    useSubscribeFunction("removeObject", removeObject, []);
 
     const prevCuboid = useCallback(() => {
         if (!selectedCuboid?.id) return;
@@ -100,8 +95,9 @@ export const ObjectCardTab = memo(() => {
 
         if (index > 0) {
             const prevCuboid = sorted[index - 1];
-            const target = getTargetPosition(prevCuboid);
+            const target = getCuboidMeshPositionById(cuboidsGeometriesRef, prevCuboid.id);
             publish("switchCameraToPoint", target);
+            console.log(prevCuboid);
             setSelectedCuboid(prevCuboid);
         }
     }, [selectedCuboid?.id, cuboids]);
@@ -116,7 +112,7 @@ export const ObjectCardTab = memo(() => {
 
         if (index !== -1 && index < sorted.length - 1) {
             const nextCuboid = sorted[index + 1];
-            const target = getTargetPosition(nextCuboid);
+            const target = getCuboidMeshPositionById(cuboidsGeometriesRef, nextCuboid.id);
             publish("switchCameraToPoint", target);
             setSelectedCuboid(nextCuboid);
         }
@@ -144,7 +140,7 @@ export const ObjectCardTab = memo(() => {
         (data) => {
             const { action, index } = data;
             const cuboid = selectedCuboidGeometryRef.current;
-            const label = selectedCuboid.type;
+            const label = selectedCuboid.label;
             const unit = objects[0][label];
             RESET_HANDLERS[action]?.(cuboid, index, unit);
             updateCuboidState();
@@ -233,8 +229,8 @@ export const ObjectCardTab = memo(() => {
                         size="20px"
                         title="Удалить кубоид со всех кадров"
                         icon={faTrash}
-                        action={"removeCuboid"}
-                        type={"removeCuboid"}
+                        action={"removeObject"}
+                        type={"removeObject"}
                         index={selectedCuboid?.id}
                     />
                     <SidebarIcon
@@ -255,7 +251,7 @@ export const ObjectCardTab = memo(() => {
                             style={{ backgroundColor: selectedCuboid?.color }}
                         ></div>
                         <div className="object-label-button">
-                            <h3 className="classes-label">{selectedCuboid?.type}</h3>
+                            <h3 className="classes-label">{selectedCuboid?.label}</h3>
                         </div>
                     </div>
                     <div className="object-card-info-block-container">

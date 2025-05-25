@@ -22,6 +22,7 @@ export const EditorProvider = ({ children }) => {
     const undoStackRef = useRef({});
     const redoStackRef = useRef({});
 
+    const sceneRef = useRef(null);
     const cameraRef = useRef(null);
     const cameraControlsRef = useRef(null);
     const transformControlsRef = useRef(null);
@@ -50,6 +51,7 @@ export const EditorProvider = ({ children }) => {
                 cameraControlsRef,
                 transformControlsRef,
                 isIntersectingMap,
+                sceneRef,
             }}
         >
             {children}

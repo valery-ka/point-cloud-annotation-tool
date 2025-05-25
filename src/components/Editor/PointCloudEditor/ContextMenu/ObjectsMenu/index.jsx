@@ -3,9 +3,10 @@ import { Tooltip } from "react-tooltip";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faQuestionCircle, faCaretRight } from "@fortawesome/free-solid-svg-icons";
 
-import { useConfig, useCuboids } from "contexts";
+import { useConfig, useCuboids, useEditor } from "contexts";
 import { useMousetrapPause } from "hooks";
 
+import { addCuboid } from "utils/cuboids";
 import { getChildObjects, getChildTypes, formatObjectData } from "utils/shared";
 
 export const ObjectsMenu = ({
@@ -19,7 +20,8 @@ export const ObjectsMenu = ({
 }) => {
     const { config } = useConfig();
     const { objects } = config;
-    const { setCuboids } = useCuboids();
+    const { cuboidsGeometriesRef, setCuboids, setSelectedCuboid } = useCuboids();
+    const { sceneRef } = useEditor();
 
     const objectList = useMemo(() => {
         if (!objects) return [];
@@ -36,10 +38,17 @@ export const ObjectsMenu = ({
         return result;
     }, [objects]);
 
+    const addCuboidOnScene = useCallback((cuboid) => {
+        const toSelect = { id: cuboid.id, label: cuboid.label, color: cuboid.color };
+        const cuboidGeometry = addCuboid(sceneRef.current, cuboid);
+        cuboidsGeometriesRef.current[cuboid.id] = cuboidGeometry;
+        setSelectedCuboid(toSelect);
+    }, []);
+
     const addObject = useCallback(
         (object) => {
             const color = object.color;
-            const type = object.type;
+            const label = object.type;
             const clickedPosition = pointIndex.current.position;
             const dimensions = object.dimensions;
             const scale = [dimensions.length, dimensions.width, dimensions.height];
@@ -58,12 +67,13 @@ export const ObjectsMenu = ({
 
                 const newId = String(maxId + 1);
 
+                const cuboid = { id: newId, label, color, position, scale, rotation };
+
+                addCuboidOnScene(cuboid);
+
                 const newObject = {
                     id: newId,
-                    type: type,
-                    position,
-                    scale,
-                    rotation,
+                    label: label,
                     color,
                 };
 

@@ -28,11 +28,15 @@ export const useEditorHelpers = () => {
     const { settings } = useSettings();
 
     const { pcdFiles } = useFileManager();
-    const { pointCloudRefs } = useEditor();
+    const { sceneRef, pointCloudRefs } = useEditor();
     const { activeFrameIndex, arePointCloudsLoading } = useFrames();
 
     const { loadedImages, selectedCamera, setSelectedCamera } = useImages();
     const { calibrations } = useCalibrations();
+
+    useEffect(() => {
+        sceneRef.current = scene;
+    }, [scene]);
 
     // Axes
     useEffect(() => {

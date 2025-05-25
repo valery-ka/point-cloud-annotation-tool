@@ -6,7 +6,7 @@ import { useEditor, useCuboids } from "contexts";
 
 import { TransformControls } from "utils/cuboids";
 
-export const useTransformControls = ({ updateCuboidsState }) => {
+export const useTransformControls = () => {
     const { gl, camera, scene } = useThree();
 
     const { cameraControlsRef, transformControlsRef } = useEditor();
@@ -18,8 +18,8 @@ export const useTransformControls = ({ updateCuboidsState }) => {
     }, []);
 
     const onTransformFinished = useCallback(() => {
-        updateCuboidsState();
-    }, [updateCuboidsState]);
+        sideViewsCamerasNeedUpdateRef.current = true;
+    }, []);
 
     const onDraggingChanged = useCallback((event) => {
         isCuboidTransformingRef.current = event.value;

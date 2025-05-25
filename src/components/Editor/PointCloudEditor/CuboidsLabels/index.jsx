@@ -6,34 +6,46 @@ import { SceneButton } from "../SceneButton";
 
 export const CuboidsLabels = () => {
     const { publish } = useEvent();
+    const { cuboidsGeometriesRef } = useCuboids();
 
-    const { cuboids } = useCuboids();
+    const getPosition = useCallback((mesh) => {
+        const position = mesh.position;
+        const scale = mesh.scale;
+        return [position.x, position.y, position.z + scale.z / 2];
+    }, []);
 
-    const getPosition = useCallback((cuboid) => {
-        const position = cuboid.position;
-        const scale = cuboid.scale;
-
-        return [position[0], position[1], position[2] + scale[2] / 2];
+    const getLabel = useCallback((mesh) => {
+        const label = mesh.userData.label;
+        return label;
     }, []);
 
     const openContextMenu = useCallback(
-        (event, cuboid) => {
-            publish("editCuboidLabel", { event: event, cuboid: cuboid });
+        (event, mesh) => {
+            publish("editCuboidLabel", {
+                event: event,
+                cuboid: {
+                    id: mesh.name,
+                    label: mesh.userData.label,
+                },
+            });
         },
         [publish],
     );
 
     return (
         <>
-            {cuboids.map((cuboid, index) => (
-                <SceneButton
-                    key={cuboid.id || index}
-                    index={index}
-                    text={cuboid.type}
-                    position={getPosition(cuboid)}
-                    onClick={(e) => openContextMenu(e, cuboid)}
-                />
-            ))}
+            {Object.values(cuboidsGeometriesRef.current).map((geometry, index) => {
+                const mesh = geometry.cube.mesh;
+                return (
+                    <SceneButton
+                        key={mesh.name || index}
+                        index={index}
+                        text={getLabel(mesh)}
+                        position={getPosition(mesh)}
+                        onClick={(e) => openContextMenu(e, mesh)}
+                    />
+                );
+            })}
         </>
     );
 };

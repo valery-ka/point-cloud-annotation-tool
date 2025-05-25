@@ -1,22 +1,15 @@
-import { useThree, useFrame } from "@react-three/fiber";
+import { useFrame } from "@react-three/fiber";
 
 import { useEffect, useCallback } from "react";
 
 import { useCuboids, useEditor, useFileManager, useFrames, useEvent } from "contexts";
 import { useTransformControls, useRaycastClickSelect, useOrthographicView } from "hooks";
 
-import {
-    addCuboid,
-    removeCuboid,
-    extractPsrFromObject,
-    getPointsInsideCuboid,
-} from "utils/cuboids";
+import { getPointsInsideCuboid } from "utils/cuboids";
 
 import { TABS } from "constants";
 
 export const useCuboidManager = () => {
-    const { scene } = useThree();
-
     const { pcdFiles } = useFileManager();
     const { activeFrameIndex } = useFrames();
     const { publish } = useEvent();
@@ -28,28 +21,11 @@ export const useCuboidManager = () => {
         selectedCuboidGeometryRef,
         selectedCuboidInfoRef,
         sideViewsCamerasNeedUpdateRef,
-        setCuboids,
         setSelectedCuboid,
     } = useCuboids();
 
     useOrthographicView();
-
-    const updateCuboidsState = useCallback(() => {
-        const geometry = selectedCuboidGeometryRef.current;
-        if (!geometry) return;
-
-        const psr = extractPsrFromObject(geometry);
-
-        setCuboids((prevCuboids) =>
-            prevCuboids.map((cuboid) =>
-                cuboid.id === geometry.name ? { ...cuboid, ...psr } : cuboid,
-            ),
-        );
-
-        sideViewsCamerasNeedUpdateRef.current = true;
-    }, []);
-
-    useTransformControls({ updateCuboidsState });
+    useTransformControls();
 
     const onCuboidSelect = useCallback(
         (id) => {
@@ -86,28 +62,6 @@ export const useCuboidManager = () => {
         const id = selectedCuboid?.id;
         id ? onCuboidSelect(id) : unselectCuboid();
     }, [selectedCuboid?.id]);
-
-    useEffect(() => {
-        const currentIds = new Set(Object.keys(cuboidsGeometriesRef.current));
-        const newIds = new Set(cuboids.map((c) => c.id));
-
-        cuboids.forEach((cuboid) => {
-            if (!cuboidsGeometriesRef.current[cuboid.id]) {
-                const cuboidObject = addCuboid(scene, cuboid);
-                cuboidsGeometriesRef.current[cuboid.id] = cuboidObject;
-                selectedCuboidGeometryRef.current = cuboid.id;
-                onCuboidSelect(selectedCuboidGeometryRef.current);
-            }
-        });
-
-        currentIds.forEach((id) => {
-            if (!newIds.has(id)) {
-                const cuboidObject = cuboidsGeometriesRef.current[id];
-                removeCuboid(scene, cuboidObject);
-                delete cuboidsGeometriesRef.current[id];
-            }
-        });
-    }, [cuboids, scene]);
 
     // update info card
     useFrame(() => {

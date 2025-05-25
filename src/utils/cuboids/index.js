@@ -12,6 +12,7 @@ export {
     removeCuboid,
     extractPsrFromObject,
     getPointsInsideCuboid,
+    getCuboidMeshPositionById,
 } from "./geometry";
 
 export {

@@ -2,31 +2,26 @@ import React, { useCallback, memo } from "react";
 import { useTranslation } from "react-i18next";
 import { faEyeSlash, faBullseye, faEye, faBan } from "@fortawesome/free-solid-svg-icons";
 
-import { useEvent } from "contexts";
+import { useEvent, useCuboids } from "contexts";
 
 import { SidebarIcon } from "../../SidebarIcon";
 
+import { getCuboidMeshPositionById } from "utils/cuboids";
 import { TABS } from "constants";
 
 // const COMPONENT_NAME = "CuboidItem.";
 const COMPONENT_NAME = "";
 
 export const CuboidItem = memo(({ obj, index, action, isSelected, isVisible }) => {
-    const { publish } = useEvent();
     const { t } = useTranslation();
 
-    const getTargetPosition = useCallback((obj) => {
-        const position = obj.position;
-        const scale = obj.scale;
-        const target = [position[0], position[1], position[2] - scale[2] / 2];
-        return target;
-    }, []);
+    const { publish } = useEvent();
+    const { cuboidsGeometriesRef } = useCuboids();
 
     const selectCuboid = useCallback(() => {
         if (action) {
-            const target = getTargetPosition(obj);
-
             publish(action);
+            const target = getCuboidMeshPositionById(cuboidsGeometriesRef, obj.id);
             publish("switchCameraToPoint", target);
             publish("setActiveTab", TABS.OBJECT_CARD);
         }
@@ -39,7 +34,7 @@ export const CuboidItem = memo(({ obj, index, action, isSelected, isVisible }) =
         >
             <div className="color-box" style={{ backgroundColor: obj.color }}></div>
             <div className="classes-label-container">
-                <h3 className="classes-label">{obj.type}</h3>
+                <h3 className="classes-label">{obj.label}</h3>
             </div>
             <SidebarIcon
                 className="icon-style"

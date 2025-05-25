@@ -100,7 +100,7 @@ export const extractPsrFromObject = (object3D) => {
 };
 
 export const addCuboid = (scene, cuboid) => {
-    const { color, position, scale, rotation } = cuboid;
+    const { label, color, position, scale, rotation } = cuboid;
 
     const cube = createCubeGeometry(color, position, scale, rotation);
     const edges = createEdgesGeometry(cube.mesh.geometry, color);
@@ -115,6 +115,7 @@ export const addCuboid = (scene, cuboid) => {
 
     cube.mesh.name = cuboid.id;
     cube.mesh.userData.color = color;
+    cube.mesh.userData.label = label;
 
     scene.add(cube.mesh);
 
@@ -153,4 +154,14 @@ export const getPointsInsideCuboid = (positions, position, quaternion, scale) =>
     }
 
     return insidePoints;
+};
+
+export const getCuboidMeshPositionById = (cuboidsGeometriesRef, id) => {
+    for (const geometry of Object.values(cuboidsGeometriesRef.current)) {
+        if (geometry?.cube?.mesh?.name === id) {
+            const position = geometry.cube.mesh.position;
+            const scale = geometry.cube.mesh.scale;
+            return [position.x, position.y, position.z - scale.z / 2];
+        }
+    }
 };
