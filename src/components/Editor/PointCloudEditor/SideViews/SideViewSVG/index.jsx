@@ -17,7 +17,7 @@ const PICKER_WIDTH = 30;
 const PICKER_OPACITY = 0;
 
 export const SideViewSVG = ({ name, y, width, height, mesh, camera }) => {
-    const { selectedCuboidGeometryRef, handlePositions } = useCuboids();
+    const { selectedCuboidGeometryRef, selectedCuboid, handlePositions } = useCuboids();
     const { corners = [], edges = [] } = handlePositions?.[name] ?? {};
 
     const [hoveredHandler, setHoveredHandler] = useState(null);
@@ -189,11 +189,11 @@ export const SideViewSVG = ({ name, y, width, height, mesh, camera }) => {
     }, [corners, edges, selectedCuboidGeometryRef]);
 
     useEffect(() => {
-        if (!mesh) {
+        if (!selectedCuboid) {
             setHoveredView(null);
             setHoveredHandler(null);
         }
-    }, [mesh]);
+    }, [selectedCuboid]);
 
     if (!mesh || !camera || width <= 0 || height <= 0) return null;
 

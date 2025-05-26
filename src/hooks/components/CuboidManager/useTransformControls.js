@@ -3,6 +3,7 @@ import { useThree } from "@react-three/fiber";
 import { useCallback, useEffect } from "react";
 
 import { useEditor, useCuboids } from "contexts";
+import { useCuboidsTransformations } from "./useCuboidsTransformations";
 
 import { TransformControls } from "utils/cuboids";
 
@@ -13,19 +14,24 @@ export const useTransformControls = () => {
     const { selectedCuboidGeometryRef, sideViewsCamerasNeedUpdateRef, isCuboidTransformingRef } =
         useCuboids();
 
+    const { saveCurrentPSR } = useCuboidsTransformations();
+
     const onTransformChange = useCallback(() => {
         sideViewsCamerasNeedUpdateRef.current = true;
     }, []);
 
     const onTransformFinished = useCallback(() => {
-        sideViewsCamerasNeedUpdateRef.current = true;
-    }, []);
+        saveCurrentPSR();
+    }, [saveCurrentPSR]);
 
-    const onDraggingChanged = useCallback((event) => {
-        isCuboidTransformingRef.current = event.value;
-        cameraControlsRef.current.enabled = !event.value;
-        if (!event.value) onTransformFinished();
-    }, []);
+    const onDraggingChanged = useCallback(
+        (event) => {
+            isCuboidTransformingRef.current = event.value;
+            cameraControlsRef.current.enabled = !event.value;
+            if (!event.value) onTransformFinished();
+        },
+        [onTransformFinished],
+    );
 
     useEffect(() => {
         const transformControls = new TransformControls(camera, gl.domElement);

@@ -74,6 +74,28 @@ export const useCuboidManager = () => {
         id ? onCuboidSelect(id) : unselectCuboid();
     }, [selectedCuboid?.id]);
 
+    useEffect(() => {
+        const geometries = cuboidsGeometriesRef.current;
+
+        Object.values(geometries).forEach((entry) => {
+            const cube = entry.cube?.mesh;
+            if (!cube) return;
+
+            const psrByFrame = cube.userData.psrByFrame;
+            if (!psrByFrame) return;
+
+            const frameData = psrByFrame[activeFrameIndex];
+
+            if (frameData) {
+                cube.position.copy(frameData.position);
+                cube.scale.copy(frameData.scale);
+                cube.rotation.copy(frameData.rotation);
+            }
+        });
+
+        sideViewsCamerasNeedUpdateRef.current = true;
+    }, [activeFrameIndex]);
+
     // update info card
     useFrame(() => {
         const geometry = selectedCuboidGeometryRef.current;

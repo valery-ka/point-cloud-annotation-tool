@@ -25,6 +25,8 @@ export const CuboidsProvider = ({ children }) => {
     const isCuboidTransformingRef = useRef(false);
     const sideViewsCamerasNeedUpdateRef = useRef(true);
 
+    const cuboidsSolutionRef = useRef({});
+
     return (
         <CuboidsContext.Provider
             value={{
@@ -43,6 +45,7 @@ export const CuboidsProvider = ({ children }) => {
                 isCuboidTransformingRef,
                 hoveredCuboid,
                 setHoveredCuboid,
+                cuboidsSolutionRef,
             }}
         >
             {children}
