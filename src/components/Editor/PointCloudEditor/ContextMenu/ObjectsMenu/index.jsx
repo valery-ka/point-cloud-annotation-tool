@@ -3,10 +3,10 @@ import { Tooltip } from "react-tooltip";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faQuestionCircle, faCaretRight } from "@fortawesome/free-solid-svg-icons";
 
-import { useConfig, useCuboids, useEditor } from "contexts";
+import { useConfig, useCuboids, useEditor, useFileManager } from "contexts";
 import { useMousetrapPause } from "hooks";
 
-import { addCuboid, updateCuboid } from "utils/cuboids";
+import { addCuboid, updateCuboid, writePSRToSolution } from "utils/cuboids";
 import { getChildObjects, getChildTypes, formatObjectData, getNextId } from "utils/shared";
 
 export const ObjectsMenu = ({
@@ -18,10 +18,16 @@ export const ObjectsMenu = ({
     isSubMenuOpened,
     setIsSubMenuOpened,
 }) => {
+    const { pcdFiles } = useFileManager();
     const { config } = useConfig();
     const { objects } = config;
-    const { cuboidsGeometriesRef, setCuboids, setSelectedCuboid, selectedCuboidInfoRef } =
-        useCuboids();
+    const {
+        cuboidsSolutionRef,
+        cuboidsGeometriesRef,
+        setCuboids,
+        setSelectedCuboid,
+        selectedCuboidInfoRef,
+    } = useCuboids();
     const { sceneRef } = useEditor();
 
     const objectList = useMemo(() => {
@@ -39,12 +45,29 @@ export const ObjectsMenu = ({
         return result;
     }, [objects]);
 
-    const addCuboidOnScene = useCallback((cuboid) => {
-        const toSelect = { id: cuboid.id, label: cuboid.label, color: cuboid.color };
-        const cuboidGeometry = addCuboid(sceneRef.current, cuboid);
-        cuboidsGeometriesRef.current[cuboid.id] = cuboidGeometry;
-        setSelectedCuboid(toSelect);
-    }, []);
+    const initializeCuboidPSRForAllFrames = useCallback(
+        (mesh) => {
+            const allFrames = pcdFiles.map((_, i) => i);
+            writePSRToSolution({
+                mesh,
+                frameIndices: allFrames,
+                cuboidsSolutionRef,
+            });
+        },
+        [pcdFiles],
+    );
+
+    const addCuboidOnScene = useCallback(
+        (cuboid) => {
+            const toSelect = { id: cuboid.id, label: cuboid.label, color: cuboid.color };
+            const cuboidGeometry = addCuboid(sceneRef.current, cuboid);
+            cuboidsGeometriesRef.current[cuboid.id] = cuboidGeometry;
+
+            initializeCuboidPSRForAllFrames(cuboidGeometry.cube.mesh);
+            setSelectedCuboid(toSelect);
+        },
+        [initializeCuboidPSRForAllFrames],
+    );
 
     const addNewObject = useCallback(
         (object, position) => {

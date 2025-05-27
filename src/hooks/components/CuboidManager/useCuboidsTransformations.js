@@ -1,6 +1,8 @@
 import { useEffect, useCallback } from "react";
 import { useCuboids, useFrames } from "contexts";
 
+import { writePSRToSolution } from "utils/cuboids";
+
 export const useCuboidsTransformations = () => {
     const { activeFrameIndex } = useFrames();
     const { cuboidsSolutionRef, cuboidsGeometriesRef, sideViewsCamerasNeedUpdateRef } =
@@ -9,52 +11,19 @@ export const useCuboidsTransformations = () => {
     const saveCurrentPSR = useCallback(() => {
         const geometries = cuboidsGeometriesRef.current;
 
-        const solutionForFrame = [];
+        cuboidsSolutionRef.current[activeFrameIndex] = [];
 
         Object.values(geometries).forEach((entry) => {
             const cube = entry.cube?.mesh;
             if (!cube) return;
 
-            const position = cube.position.clone();
-            const scale = cube.scale.clone();
-            const rotation = cube.rotation.clone();
-
-            if (!cube.userData.psrByFrame) {
-                cube.userData.psrByFrame = {};
-            }
-
-            cube.userData.psrByFrame[activeFrameIndex] = {
-                position,
-                scale,
-                rotation,
-            };
-
-            solutionForFrame.push({
-                id: cube.name,
-                type: cube.userData.label,
-                psr: {
-                    position: {
-                        x: position.x,
-                        y: position.y,
-                        z: position.z,
-                    },
-                    rotation: {
-                        x: rotation.x,
-                        y: rotation.y,
-                        z: rotation.z,
-                    },
-                    scale: {
-                        x: scale.x,
-                        y: scale.y,
-                        z: scale.z,
-                    },
-                },
+            writePSRToSolution({
+                mesh: cube,
+                frameIndices: [activeFrameIndex],
+                cuboidsSolutionRef,
+                manual: true,
             });
         });
-
-        cuboidsSolutionRef.current[activeFrameIndex] = solutionForFrame;
-
-        console.log(cuboidsSolutionRef.current);
 
         sideViewsCamerasNeedUpdateRef.current = true;
     }, [activeFrameIndex]);

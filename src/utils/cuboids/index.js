@@ -28,3 +28,5 @@ export {
     translateConfigs,
     rotateConfigs,
 } from "./sideViews";
+
+export { writePSRToSolution, interpolateBetweenFrames } from "./interpolation";

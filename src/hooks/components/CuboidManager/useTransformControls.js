@@ -2,17 +2,23 @@ import { useThree } from "@react-three/fiber";
 
 import { useCallback, useEffect } from "react";
 
-import { useEditor, useCuboids } from "contexts";
+import { useEditor, useCuboids, useFileManager } from "contexts";
 import { useCuboidsTransformations } from "./useCuboidsTransformations";
 
-import { TransformControls } from "utils/cuboids";
+import { TransformControls, interpolateBetweenFrames } from "utils/cuboids";
 
 export const useTransformControls = () => {
     const { gl, camera, scene } = useThree();
 
+    const { pcdFiles } = useFileManager();
     const { cameraControlsRef, transformControlsRef } = useEditor();
-    const { selectedCuboidGeometryRef, sideViewsCamerasNeedUpdateRef, isCuboidTransformingRef } =
-        useCuboids();
+    const {
+        cuboidsGeometriesRef,
+        cuboidsSolutionRef,
+        selectedCuboidGeometryRef,
+        sideViewsCamerasNeedUpdateRef,
+        isCuboidTransformingRef,
+    } = useCuboids();
 
     const { saveCurrentPSR } = useCuboidsTransformations();
 
@@ -21,8 +27,17 @@ export const useTransformControls = () => {
     }, []);
 
     const onTransformFinished = useCallback(() => {
+        const selectedCuboid = selectedCuboidGeometryRef.current;
+        if (!selectedCuboid?.name) return;
+
         saveCurrentPSR();
-    }, [saveCurrentPSR]);
+        interpolateBetweenFrames({
+            cuboidsGeometriesRef,
+            cuboidsSolutionRef,
+            totalFrames: pcdFiles.length,
+            selectedId: selectedCuboid.name,
+        });
+    }, [pcdFiles, saveCurrentPSR]);
 
     const onDraggingChanged = useCallback(
         (event) => {
