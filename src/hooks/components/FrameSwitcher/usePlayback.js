@@ -2,7 +2,9 @@ import { useState, useRef, useEffect, useCallback } from "react";
 
 import { useFileManager, useFrames } from "contexts";
 
-export const usePlayback = (playbackConfig) => {
+import { playbackConfig } from "components/Editor/FrameSwitcher/playbackConfig";
+
+export const usePlayback = () => {
     const { pcdFiles } = useFileManager();
     const { isPlaying, setIsPlaying, setActiveFrameIndex } = useFrames();
 

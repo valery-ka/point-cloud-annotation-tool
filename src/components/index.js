@@ -1,6 +1,4 @@
-export { EditorTopLeftControls } from "./Editor/Controls/EditorTopLeftControls";
-export { EditorSideLeftControls } from "./Editor/Controls/EditorSideLeftControls";
-export { EditorTopRightControls } from "./Editor/Controls/EditorTopRightControls";
+export { EditorControls } from "./Editor/EditorControls";
 export { PointCloudEditor } from "./Editor/PointCloudEditor";
 export { CameraImages } from "./Editor/CameraImages";
 export { PointHighlighter } from "./Editor/PointHighlighter";

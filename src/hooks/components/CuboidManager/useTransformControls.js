@@ -7,7 +7,7 @@ import { useCuboidsTransformations } from "./useCuboidsTransformations";
 
 import { TransformControls, interpolateBetweenFrames } from "utils/cuboids";
 
-export const useTransformControls = () => {
+export const useTransformControls = ({ findkeyFrameIndices }) => {
     const { gl, camera, scene } = useThree();
 
     const { pcdFiles } = useFileManager();
@@ -37,6 +37,8 @@ export const useTransformControls = () => {
             totalFrames: pcdFiles.length,
             selectedId: selectedCuboid.name,
         });
+        findkeyFrameIndices();
+        console.log("finish");
     }, [pcdFiles, saveCurrentPSR]);
 
     const onDraggingChanged = useCallback(

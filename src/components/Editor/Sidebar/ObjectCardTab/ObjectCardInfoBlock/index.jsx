@@ -14,7 +14,7 @@ export const ObjectCardInfoBlock = ({ title, action, data, buttons, decimals = 2
                 {buttons && (
                     <button
                         className="object-card-info-block-value-button"
-                        onClick={() => {
+                        onMouseUp={() => {
                             Object.keys(data).forEach((_, index) => {
                                 buttons.reset?.callback({ action, index });
                             });

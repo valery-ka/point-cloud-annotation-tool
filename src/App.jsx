@@ -1,9 +1,7 @@
 import { Canvas } from "@react-three/fiber";
 import {
     PointCloudEditor,
-    EditorSideLeftControls,
-    EditorTopLeftControls,
-    EditorTopRightControls,
+    EditorControls,
     FileNavigator,
     FrameSwitcher,
     Sidebar,
@@ -30,9 +28,7 @@ export const App = () => {
                     <Canvas>
                         <PointCloudEditor />
                     </Canvas>
-                    <EditorTopLeftControls />
-                    <EditorSideLeftControls />
-                    <EditorTopRightControls />
+                    <EditorControls />
                     <CameraImages />
                     <PointHighlighter />
                 </div>

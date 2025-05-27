@@ -1,4 +1,4 @@
-import React, { memo, useRef } from "react";
+import { memo, useRef } from "react";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMinus, faExpandAlt, faCompressAlt, faCamera } from "@fortawesome/free-solid-svg-icons";
@@ -9,7 +9,7 @@ import { useImageResize, useImageLoader, useImageSelector, useFetchCalibrations 
 
 import { TopLoader, ContextMenu } from "components";
 import { ImageCanvas } from "./ImageCanvas";
-import { RenderEditorButton } from "../Controls/RenderEditorButton";
+import { RenderEditorButton } from "../EditorControls/RenderEditorButton";
 
 export const CameraImages = memo(() => {
     const { t } = useTranslation();

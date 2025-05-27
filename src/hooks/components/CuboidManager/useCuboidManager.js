@@ -23,10 +23,30 @@ export const useCuboidManager = () => {
         selectedCuboidInfoRef,
         sideViewsCamerasNeedUpdateRef,
         setSelectedCuboid,
+        setKeyFramesIndices,
+        cuboidsSolutionRef,
     } = useCuboids();
 
+    const findkeyFrameIndices = useCallback(() => {
+        if (selectedCuboidGeometryRef.current) {
+            const id = selectedCuboidGeometryRef.current.name;
+            const indices = [];
+
+            for (const [frameIndex, frameSolution] of Object.entries(cuboidsSolutionRef.current)) {
+                for (const cuboid of Object.values(frameSolution)) {
+                    if (cuboid.id === id && cuboid.manual) {
+                        indices.push(Number(frameIndex));
+                        break;
+                    }
+                }
+            }
+
+            setKeyFramesIndices(indices);
+        }
+    }, []);
+
     useOrthographicView();
-    useTransformControls();
+    useTransformControls({ findkeyFrameIndices });
 
     const onCuboidSelect = useCallback(
         (id) => {
@@ -36,6 +56,7 @@ export const useCuboidManager = () => {
             cameraControlsRef.current.enabled = true;
             sideViewsCamerasNeedUpdateRef.current = true;
             setSelectedCuboid(cuboids.find((cube) => cube.id === id));
+            findkeyFrameIndices();
             publish("setActiveTab", TABS.OBJECT_CARD);
         },
         [cuboids],
@@ -45,6 +66,7 @@ export const useCuboidManager = () => {
         transformControlsRef.current.detach();
         selectedCuboidGeometryRef.current = null;
         cameraControlsRef.current.enabled = true;
+        setKeyFramesIndices([]);
     }, []);
 
     useHoveredCuboid({
