@@ -1,22 +1,27 @@
+import { Vector3, Quaternion, Euler } from "three";
+
 export const interpolatePSR = (start, end, t) => {
-    const lerp = (a, b) => a + (b - a) * t;
+    const startPos = new Vector3(start.position.x, start.position.y, start.position.z);
+    const endPos = new Vector3(end.position.x, end.position.y, end.position.z);
+    const interpolatedPos = new Vector3().copy(startPos).lerp(endPos, t);
+
+    const startScale = new Vector3(start.scale.x, start.scale.y, start.scale.z);
+    const endScale = new Vector3(end.scale.x, end.scale.y, end.scale.z);
+    const interpolatedScale = new Vector3().copy(startScale).lerp(endScale, t);
+
+    const startQuat = new Quaternion().setFromEuler(
+        new Euler(start.rotation.x, start.rotation.y, start.rotation.z),
+    );
+    const endQuat = new Quaternion().setFromEuler(
+        new Euler(end.rotation.x, end.rotation.y, end.rotation.z),
+    );
+    const interpolatedQuat = new Quaternion().slerpQuaternions(startQuat, endQuat, t);
+    const interpolatedEuler = new Euler().setFromQuaternion(interpolatedQuat);
 
     return {
-        position: {
-            x: lerp(start.position.x, end.position.x),
-            y: lerp(start.position.y, end.position.y),
-            z: lerp(start.position.z, end.position.z),
-        },
-        rotation: {
-            x: lerp(start.rotation.x, end.rotation.x),
-            y: lerp(start.rotation.y, end.rotation.y),
-            z: lerp(start.rotation.z, end.rotation.z),
-        },
-        scale: {
-            x: lerp(start.scale.x, end.scale.x),
-            y: lerp(start.scale.y, end.scale.y),
-            z: lerp(start.scale.z, end.scale.z),
-        },
+        position: interpolatedPos,
+        rotation: interpolatedEuler,
+        scale: interpolatedScale,
     };
 };
 

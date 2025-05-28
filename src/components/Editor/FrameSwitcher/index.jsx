@@ -1,7 +1,7 @@
 import React, { memo } from "react";
 
 import { useFileManager } from "contexts";
-import { useEventSubscriptions, useFrameSwitcher, usePlayback } from "hooks";
+import { useEventSubscriptions, useFrameSwitcher, usePlayback, useStartStopPlayback } from "hooks";
 
 import { FrameSwitcherControls } from "./FrameSwitcherControls";
 import { FrameSwitcherLane } from "./FrameSwitcherLane";
@@ -16,6 +16,7 @@ export const FrameSwitcher = memo(() => {
         handlePlay,
         handlePlayCycle,
         handlePlaySpeed,
+        startPlayback,
         stopPlayback,
     } = usePlayback();
 
@@ -35,6 +36,8 @@ export const FrameSwitcher = memo(() => {
         handlePlayCycle,
         handlePlaySpeed,
     );
+
+    useStartStopPlayback({ playSpeed, isPlaying, startPlayback, stopPlayback });
 
     return pcdFiles.length < 2 ? null : (
         <div className="frame-switcher">

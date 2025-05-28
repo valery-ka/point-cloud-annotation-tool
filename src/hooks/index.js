@@ -17,6 +17,7 @@ export { useSettingsStorage } from "./shared/useSettingsStorage";
 export { useContinuousAction } from "./shared/useContinuousAction";
 export { useClickOutsideBlur } from "./shared/useClickOutsideBlur";
 export { useSubscribeFunction } from "./shared/useSubscribeFunction";
+export { useDebouncedCallback } from "./shared/useDebouncedCallback";
 export { useGlobalEventListeners } from "./shared/useGlobalEventListeners";
 export { useCustomClassesSettings } from "./shared/useCustomClassesSettings";
 
@@ -40,6 +41,7 @@ export { useUpdatePixelProjections } from "./components/PointCloudEditor/useUpda
 
 export { usePlayback } from "./components/FrameSwitcher/usePlayback";
 export { useFrameSwitcher } from "./components/FrameSwitcher/useFrameSwitcher";
+export { useStartStopPlayback } from "./components/FrameSwitcher/useStartStopPlayback";
 export { useEventSubscriptions } from "./components/FrameSwitcher/useEventSubscriptions";
 export { useFrameLaneMouseEvents } from "./components/FrameSwitcher/useFrameLaneMouseEvents";
 

@@ -3,9 +3,11 @@ import { useThree } from "@react-three/fiber";
 import { useCallback, useEffect } from "react";
 
 import { useEditor, useCuboids, useFrames } from "contexts";
-import { useCuboidInterpolation } from "hooks";
+import { useCuboidInterpolation, useDebouncedCallback } from "hooks";
 
 import { TransformControls } from "utils/cuboids";
+
+const REQUEST_INTERPOLATE_PSR_TIME = 50;
 
 export const useTransformControls = () => {
     const { gl, camera, scene } = useThree();
@@ -17,15 +19,19 @@ export const useTransformControls = () => {
 
     const { saveCurrentPSR, interpolatePSR, findFrameMarkers } = useCuboidInterpolation();
 
+    const debouncedInterpolatePSR = useDebouncedCallback(() => {
+        saveCurrentPSR({ activeFrameIndex: activeFrameIndex });
+        findFrameMarkers();
+        interpolatePSR();
+        console.log("onTransformFinished");
+    }, REQUEST_INTERPOLATE_PSR_TIME);
+
     const onTransformChange = useCallback(() => {
         sideViewsCamerasNeedUpdateRef.current = true;
     }, []);
 
     const onTransformFinished = useCallback(() => {
-        saveCurrentPSR({ activeFrameIndex: activeFrameIndex });
-        interpolatePSR();
-        findFrameMarkers();
-        console.log("onTransformFinished");
+        debouncedInterpolatePSR();
     }, [activeFrameIndex, interpolatePSR]);
 
     const onDraggingChanged = useCallback(

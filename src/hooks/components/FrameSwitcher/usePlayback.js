@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useCallback } from "react";
 
 import { useFileManager, useFrames } from "contexts";
 
@@ -67,14 +67,6 @@ export const usePlayback = () => {
         setPlaySpeed((prevSpeed) => playbackConfig.getNextSpeed(prevSpeed));
     }, [playbackConfig]);
 
-    useEffect(() => {
-        if (isPlaying) {
-            startPlayback();
-        } else {
-            stopPlayback();
-        }
-    }, [playSpeed, isPlaying, startPlayback, stopPlayback]);
-
     return {
         isPlaying,
         isPlayCycle,
@@ -82,6 +74,7 @@ export const usePlayback = () => {
         handlePlay,
         handlePlayCycle,
         handlePlaySpeed,
+        startPlayback,
         stopPlayback,
     };
 };

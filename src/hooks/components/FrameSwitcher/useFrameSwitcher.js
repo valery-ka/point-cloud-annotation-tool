@@ -9,22 +9,22 @@ export const useFrameSwitcher = (stopPlayback) => {
     const handleGoToFirstFrame = useCallback(() => {
         stopPlayback();
         setActiveFrameIndex(0);
-    }, [setActiveFrameIndex, stopPlayback]);
+    }, []);
 
     const handleGoToPreviousFrame = useCallback(() => {
         stopPlayback();
         setActiveFrameIndex((prevIndex) => Math.max(0, prevIndex - 1));
-    }, [setActiveFrameIndex, stopPlayback]);
+    }, []);
 
     const handleGoToNextFrame = useCallback(() => {
         stopPlayback();
         setActiveFrameIndex((prevIndex) => Math.min(pcdFiles.length - 1, prevIndex + 1));
-    }, [setActiveFrameIndex, stopPlayback, pcdFiles]);
+    }, [pcdFiles]);
 
     const handleGoToLastFrame = useCallback(() => {
         stopPlayback();
         setActiveFrameIndex(pcdFiles.length - 1);
-    }, [setActiveFrameIndex, stopPlayback, pcdFiles]);
+    }, [pcdFiles]);
 
     return {
         handleGoToFirstFrame,

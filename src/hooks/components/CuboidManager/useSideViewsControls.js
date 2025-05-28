@@ -1,7 +1,7 @@
 import { useEffect, useRef, useCallback } from "react";
 
 import { useCuboids, useEditor } from "contexts";
-import { useMousetrapPause } from "hooks";
+import { useMousetrapPause, useFrameSwitcher, usePlayback } from "hooks";
 
 import {
     scalingConfigs,
@@ -10,9 +10,11 @@ import {
     applyKeyTransformToMesh,
 } from "utils/cuboids";
 
+import { Box3, Vector3 } from "three";
+
 const TRANSLATE_SENSITIVITY = 0.005;
 const ROTATE_SENSITIVITY = 0.005;
-const SCALE_SENSITIVITY = 0.015;
+const SCALE_SENSITIVITY = 0.001;
 
 const MIN_SCALE = 0.1;
 
@@ -27,6 +29,9 @@ const rotate = "rotate";
 export const useSideViewsControls = ({ camera, mesh, hoveredView, hoveredHandler, name }) => {
     const { sideViewsCamerasNeedUpdateRef, isCuboidTransformingRef } = useCuboids();
     const { cameraControlsRef, transformControlsRef } = useEditor();
+
+    const { stopPlayback } = usePlayback();
+    const { handleGoToPreviousFrame, handleGoToNextFrame } = useFrameSwitcher(stopPlayback);
 
     const scaleHandlerRef = useRef(null);
     const transformModeRef = useRef(null);
@@ -74,8 +79,13 @@ export const useSideViewsControls = ({ camera, mesh, hoveredView, hoveredHandler
         (movementX, movementY) => {
             if (!mesh) return;
 
-            const dx = movementX * SCALE_SENSITIVITY;
-            const dy = movementY * SCALE_SENSITIVITY;
+            const objectSize = new Box3().setFromObject(mesh).getSize(new Vector3()).length();
+            const zoomFactor = camera.zoom;
+
+            const sensitivity = (SCALE_SENSITIVITY * objectSize) / zoomFactor;
+
+            const dx = movementX * sensitivity;
+            const dy = movementY * sensitivity;
 
             const scale = mesh.scale.clone();
             const position = mesh.position.clone();
@@ -198,11 +208,18 @@ export const useSideViewsControls = ({ camera, mesh, hoveredView, hoveredHandler
                 configRotate,
             });
 
+            const frameShortcuts = {
+                1: handleGoToPreviousFrame,
+                2: handleGoToNextFrame,
+            };
+            frameShortcuts[e.key]?.();
+
             if (didTransform) {
+                transformControlsRef.current.dispatchEvent({ type: "change" });
                 transformControlsRef.current.dispatchEvent({ type: "dragging-changed" });
             }
         },
-        [hoveredView, mesh, name],
+        [hoveredView, mesh, name, handleGoToPreviousFrame, handleGoToNextFrame],
     );
 
     useEffect(() => {

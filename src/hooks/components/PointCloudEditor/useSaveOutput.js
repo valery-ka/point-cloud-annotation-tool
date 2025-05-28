@@ -1,18 +1,13 @@
 import { useEffect, useRef, useCallback, useMemo, useState } from "react";
-import { debounce } from "lodash";
 
 import { useFileManager, useEditor, useFrames, useSettings } from "contexts";
-import { useSubscribeFunction } from "hooks";
+import { useSubscribeFunction, useDebouncedCallback } from "hooks";
 
 import { SaveOutputWorker } from "workers";
 import { saveLabels, formatPointLabels } from "utils/editor";
 import * as APP_CONSTANTS from "constants";
 
 const { UNDO_REDO_STACK_DEPTH, SAVE_FRAME_REQUEST_TIME } = APP_CONSTANTS;
-
-const debouncedSaveFrame = debounce((run) => {
-    run();
-}, SAVE_FRAME_REQUEST_TIME);
 
 export const useSaveOutput = (updateUndoRedoState) => {
     const { pcdFiles, folderName } = useFileManager();
@@ -74,6 +69,10 @@ export const useSaveOutput = (updateUndoRedoState) => {
         [updateUndoRedoState],
     );
 
+    const debouncedSaveFrame = useDebouncedCallback((controllerInstance) => {
+        saveFrame(controllerInstance);
+    }, SAVE_FRAME_REQUEST_TIME);
+
     const requestSaveFrame = useCallback(
         ({ updateStack = true, isAutoSave = false }) => {
             if (!pcdFiles.length) return;
@@ -111,9 +110,7 @@ export const useSaveOutput = (updateUndoRedoState) => {
 
             setPendingSaveState(true);
 
-            debouncedSaveFrame(() => {
-                saveFrame(newController);
-            });
+            debouncedSaveFrame(newController);
         },
         [saveFrame, pcdFiles, activeFrameIndex],
     );
