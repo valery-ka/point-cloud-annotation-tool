@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect, Fragment } from "react";
 
 import { useCuboids } from "contexts";
-import { useSideViewsControls } from "hooks";
+import { useSideViewsControls, useDelayedHover } from "hooks";
 
 import {
     projectToScreen,
@@ -22,6 +22,11 @@ export const SideViewSVG = ({ name, y, width, height, mesh, camera }) => {
 
     const [hoveredHandler, setHoveredHandler] = useState(null);
     const [hoveredView, setHoveredView] = useState(null);
+
+    const { handleMouseEnter, handleMouseLeave } = useDelayedHover({
+        setState: setHoveredView,
+        delay: 50,
+    });
 
     useSideViewsControls({ camera, mesh, hoveredView, hoveredHandler, name });
 
@@ -208,8 +213,8 @@ export const SideViewSVG = ({ name, y, width, height, mesh, camera }) => {
                 top: y,
                 cursor: "move",
             }}
-            onMouseEnter={() => setHoveredView(name)}
-            onMouseLeave={() => setHoveredView(null)}
+            onMouseEnter={() => handleMouseEnter(name)}
+            onMouseLeave={() => handleMouseLeave(null)}
         >
             <text x="10" y="20" fill={PICKER_COLOR} fontSize="14">
                 {name}

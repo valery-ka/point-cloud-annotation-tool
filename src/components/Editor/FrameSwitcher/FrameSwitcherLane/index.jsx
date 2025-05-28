@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faDiamond } from "@fortawesome/free-solid-svg-icons";
+import { faDiamond, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 
 import { useFileManager, useFrames, useCuboids } from "contexts";
 import { useFrameLaneMouseEvents, useClickOutsideBlur } from "hooks";
@@ -8,7 +8,11 @@ import { useFrameLaneMouseEvents, useClickOutsideBlur } from "hooks";
 export const FrameSwitcherLane = ({ stopPlayback }) => {
     const { pcdFiles } = useFileManager();
     const { activeFrameIndex } = useFrames();
-    const { keyFramesIndices } = useCuboids();
+    const { frameMarkers } = useCuboids();
+
+    const [keyFramesIndices, visibilityIndices] = useMemo(() => {
+        return [frameMarkers[0], frameMarkers[1]];
+    }, [frameMarkers]);
 
     const frameLaneRef = useClickOutsideBlur();
 
@@ -23,7 +27,7 @@ export const FrameSwitcherLane = ({ stopPlayback }) => {
         }, {});
     }, [pcdFiles]);
 
-    const { handleMouseDownLane } = useFrameLaneMouseEvents(frameLaneRef);
+    const { handleMouseDownLane, removeKeyFrame } = useFrameLaneMouseEvents(frameLaneRef);
 
     return (
         <div className="frame-switcher-lane-frames" ref={frameLaneRef}>
@@ -33,9 +37,12 @@ export const FrameSwitcherLane = ({ stopPlayback }) => {
                     className={`frame-switcher-frame-container ${
                         value === activeFrameIndex ? "selected" : ""
                     }`}
-                    onMouseDown={(e) => {
+                    onPointerDown={(e) => {
                         stopPlayback();
                         handleMouseDownLane(e, value);
+                    }}
+                    onPointerUp={(e) => {
+                        removeKeyFrame(e, value);
                     }}
                 >
                     <div
@@ -44,7 +51,11 @@ export const FrameSwitcherLane = ({ stopPlayback }) => {
                         }`}
                     ></div>
                     <div className="frame-switcher-frame-text">
-                        {keyFramesIndices.includes(value) && <FontAwesomeIcon icon={faDiamond} />}
+                        {visibilityIndices?.includes(value) ? (
+                            <FontAwesomeIcon icon={faEyeSlash} />
+                        ) : keyFramesIndices?.includes(value) ? (
+                            <FontAwesomeIcon icon={faDiamond} />
+                        ) : null}
                     </div>
                 </div>
             ))}

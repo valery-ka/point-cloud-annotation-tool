@@ -1,5 +1,8 @@
 import { Vector3 } from "three";
 
+const TRANSLATE_STEP = 0.01;
+const ROTATE_STEP = 1;
+
 export const getCuboidHandlesPositions = (mesh, scaleOrder) => {
     if (!mesh) return [];
 
@@ -214,4 +217,51 @@ export const scalingConfigs = (dx, dy) => {
     };
 
     return { top, left, front };
+};
+
+export const applyKeyTransformToMesh = ({ code, mesh, configTranslate, configRotate }) => {
+    if (!mesh || !configTranslate || !configRotate) return;
+
+    switch (code) {
+        case "KeyW": {
+            const move = configTranslate(0, -TRANSLATE_STEP);
+            const worldTarget = mesh.localToWorld(move.clone());
+            const worldMove = worldTarget.sub(mesh.position);
+            mesh.position.add(worldMove);
+            return true;
+        }
+        case "KeyS": {
+            const move = configTranslate(0, TRANSLATE_STEP);
+            const worldTarget = mesh.localToWorld(move.clone());
+            const worldMove = worldTarget.sub(mesh.position);
+            mesh.position.add(worldMove);
+            return true;
+        }
+        case "KeyA": {
+            const move = configTranslate(-TRANSLATE_STEP, 0);
+            const worldTarget = mesh.localToWorld(move.clone());
+            const worldMove = worldTarget.sub(mesh.position);
+            mesh.position.add(worldMove);
+            return true;
+        }
+        case "KeyD": {
+            const move = configTranslate(TRANSLATE_STEP, 0);
+            const worldTarget = mesh.localToWorld(move.clone());
+            const worldMove = worldTarget.sub(mesh.position);
+            mesh.position.add(worldMove);
+            return true;
+        }
+        case "KeyQ": {
+            const { axis, direction } = configRotate;
+            mesh.rotateOnAxis(axis, -ROTATE_STEP * direction * (Math.PI / 180));
+            return true;
+        }
+        case "KeyE": {
+            const { axis, direction } = configRotate;
+            mesh.rotateOnAxis(axis, ROTATE_STEP * direction * (Math.PI / 180));
+            return true;
+        }
+        default:
+            return false;
+    }
 };

@@ -17,7 +17,7 @@ export const CuboidsProvider = ({ children }) => {
 
     const [cuboids, setCuboids] = useState([]);
     const [selectedCuboid, setSelectedCuboid] = useState(null);
-    const [keyFramesIndices, setKeyFramesIndices] = useState([]);
+    const [frameMarkers, setFrameMarkers] = useState([[], []]); // [0] - keyframes, [1] - visibility
     const [hoveredCuboid, setHoveredCuboid] = useState(null);
 
     const [sideViews, setSideViews] = useState([]);
@@ -47,8 +47,8 @@ export const CuboidsProvider = ({ children }) => {
                 hoveredCuboid,
                 setHoveredCuboid,
                 cuboidsSolutionRef,
-                keyFramesIndices,
-                setKeyFramesIndices,
+                frameMarkers,
+                setFrameMarkers,
             }}
         >
             {children}

@@ -1,7 +1,14 @@
 import { useEffect, useRef, useCallback } from "react";
 
 import { useCuboids, useEditor } from "contexts";
-import { scalingConfigs, translateConfigs, rotateConfigs } from "utils/cuboids";
+import { useMousetrapPause } from "hooks";
+
+import {
+    scalingConfigs,
+    translateConfigs,
+    rotateConfigs,
+    applyKeyTransformToMesh,
+} from "utils/cuboids";
 
 const TRANSLATE_SENSITIVITY = 0.005;
 const ROTATE_SENSITIVITY = 0.005;
@@ -172,16 +179,45 @@ export const useSideViewsControls = ({ camera, mesh, hoveredView, hoveredHandler
     );
 
     useEffect(() => {
+        cameraControlsRef.current.enabledKeys = hoveredView === null;
+    }, [hoveredView]);
+
+    useMousetrapPause(hoveredView);
+
+    const handleKeyDown = useCallback(
+        (e) => {
+            if (!hoveredView || !mesh) return;
+
+            const configTranslate = translateConfigs[name];
+            const configRotate = rotateConfigs[name];
+
+            const didTransform = applyKeyTransformToMesh({
+                code: e.code,
+                mesh,
+                configTranslate,
+                configRotate,
+            });
+
+            if (didTransform) {
+                transformControlsRef.current.dispatchEvent({ type: "dragging-changed" });
+            }
+        },
+        [hoveredView, mesh, name],
+    );
+
+    useEffect(() => {
         document.addEventListener("mousedown", handleMouseDown);
         document.addEventListener("mousemove", handleMouseMove);
         document.addEventListener("mouseup", handleMouseUp);
         document.addEventListener("mousewheel", handleMouseWheel);
+        document.addEventListener("keydown", handleKeyDown);
 
         return () => {
             document.removeEventListener("mousedown", handleMouseDown);
             document.removeEventListener("mousemove", handleMouseMove);
             document.removeEventListener("mouseup", handleMouseUp);
             document.removeEventListener("mousewheel", handleMouseWheel);
+            document.removeEventListener("keydown", handleKeyDown);
         };
-    }, [handleMouseDown, handleMouseMove, handleMouseUp, handleMouseWheel]);
+    }, [handleMouseDown, handleMouseMove, handleMouseUp, handleMouseWheel, handleKeyDown]);
 };

@@ -38,8 +38,13 @@ export const useHoveredCuboid = ({ meshMap }) => {
     const handleMouseMove = useCallback((event) => {
         if (!isEmpty(cuboidsGeometriesRef.current)) {
             const intersects = getIntersects(event);
-            const cuboid = intersects[0]?.object?.name || null;
-            setHoveredCuboid(cuboid);
+            const object = intersects[0]?.object;
+
+            if (object && object.visible) {
+                setHoveredCuboid(object.name);
+            } else {
+                setHoveredCuboid(null);
+            }
         }
     }, []);
 

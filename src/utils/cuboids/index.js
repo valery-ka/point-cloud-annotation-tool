@@ -27,6 +27,11 @@ export {
     scalingConfigs,
     translateConfigs,
     rotateConfigs,
+    applyKeyTransformToMesh,
 } from "./sideViews";
 
-export { writePSRToSolution, interpolateBetweenFrames } from "./interpolation";
+export {
+    writePSRToSolution,
+    interpolateBetweenFrames,
+    computeVisibilityFrameRange,
+} from "./interpolation";

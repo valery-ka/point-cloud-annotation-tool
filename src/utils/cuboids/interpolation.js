@@ -1,5 +1,3 @@
-import { Vector3, Euler } from "three";
-
 export const interpolatePSR = (start, end, t) => {
     const lerp = (a, b) => a + (b - a) * t;
 
@@ -97,15 +95,6 @@ const computeInterpolatedPSR = (prev, next, frame, totalFrames, cuboidsSolutionR
     return null;
 };
 
-const applyInterpolatedPSRToCube = (cube, frame, psr) => {
-    if (!cube.userData.psrByFrame) cube.userData.psrByFrame = {};
-    cube.userData.psrByFrame[frame] = {
-        position: new Vector3(psr.position.x, psr.position.y, psr.position.z),
-        rotation: new Euler(psr.rotation.x, psr.rotation.y, psr.rotation.z),
-        scale: new Vector3(psr.scale.x, psr.scale.y, psr.scale.z),
-    };
-};
-
 export const interpolateBetweenFrames = ({
     cuboidsGeometriesRef,
     cuboidsSolutionRef,
@@ -133,39 +122,71 @@ export const interpolateBetweenFrames = ({
         );
 
         if (interpolatedPSR) {
-            entry.psr = interpolatedPSR;
-            applyInterpolatedPSRToCube(cube, frame, interpolatedPSR);
+            if (!cuboidsSolutionRef.current[frame]) cuboidsSolutionRef.current[frame] = {};
+            if (!cuboidsSolutionRef.current[frame][selectedId]) {
+                cuboidsSolutionRef.current[frame][selectedId] = { id: selectedId };
+            }
+
+            cuboidsSolutionRef.current[frame][selectedId].psr = interpolatedPSR;
         }
     }
 };
 
-export const writePSRToSolution = ({ mesh, frameIndices, cuboidsSolutionRef, manual = false }) => {
+export const computeVisibilityFrameRange = ({
+    activeFrameIndex,
+    id,
+    cuboidsSolutionRef,
+    totalFrames,
+}) => {
+    const solution = cuboidsSolutionRef.current;
+
+    const frameSolution = solution[activeFrameIndex] ?? [];
+    const currentKeyframeEntry = frameSolution.find((e) => e.id === id && e.manual);
+
+    const prevKeyframe = findPrevKeyframe(activeFrameIndex - 1, id, cuboidsSolutionRef);
+    const nextKeyframe = findNextKeyframe(
+        activeFrameIndex + 1,
+        id,
+        totalFrames,
+        cuboidsSolutionRef,
+    );
+
+    if (currentKeyframeEntry) {
+        return { startFrame: activeFrameIndex, endFrame: activeFrameIndex };
+    }
+
+    const startFrame = prevKeyframe ? activeFrameIndex : 0;
+    const endFrame = nextKeyframe ? activeFrameIndex : totalFrames - 1;
+
+    return { startFrame, endFrame };
+};
+
+export const writePSRToSolution = ({
+    mesh,
+    frameIndices,
+    cuboidsSolutionRef,
+    manual = false,
+    visible = undefined,
+}) => {
     const id = mesh.name;
     const type = mesh.userData.label;
     const position = mesh.position.clone();
     const scale = mesh.scale.clone();
     const rotation = mesh.rotation.clone();
 
-    if (!mesh.userData.psrByFrame) {
-        mesh.userData.psrByFrame = {};
-    }
-
     for (const frameIndex of frameIndices) {
-        mesh.userData.psrByFrame[frameIndex] = {
-            position: position.clone(),
-            scale: scale.clone(),
-            rotation: rotation.clone(),
-        };
-
         if (!cuboidsSolutionRef.current[frameIndex]) {
             cuboidsSolutionRef.current[frameIndex] = [];
         }
 
         const existing = cuboidsSolutionRef.current[frameIndex].find((e) => e.id === id);
+        const isVisible = visible !== undefined ? visible : (existing?.visible ?? true);
+
         const data = {
             id,
             type,
             manual,
+            visible: isVisible,
             psr: {
                 position: { x: position.x, y: position.y, z: position.z },
                 rotation: { x: rotation.x, y: rotation.y, z: rotation.z },

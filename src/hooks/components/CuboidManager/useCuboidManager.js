@@ -3,8 +3,14 @@ import { useFrame } from "@react-three/fiber";
 import { useEffect, useCallback } from "react";
 
 import { useCuboids, useEditor, useFileManager, useFrames, useEvent } from "contexts";
-import { useTransformControls, useRaycastClickSelect, useOrthographicView } from "hooks";
-import { useHoveredCuboid } from "./useHoveredCuboid";
+import {
+    useTransformControls,
+    useRaycastClickSelect,
+    useOrthographicView,
+    useHoveredCuboid,
+    useCuboidInterpolation,
+    useCuboidVisibility,
+} from "hooks";
 
 import { getPointsInsideCuboid } from "utils/cuboids";
 
@@ -23,30 +29,14 @@ export const useCuboidManager = () => {
         selectedCuboidInfoRef,
         sideViewsCamerasNeedUpdateRef,
         setSelectedCuboid,
-        setKeyFramesIndices,
-        cuboidsSolutionRef,
+        setFrameMarkers,
     } = useCuboids();
 
-    const findkeyFrameIndices = useCallback(() => {
-        if (selectedCuboidGeometryRef.current) {
-            const id = selectedCuboidGeometryRef.current.name;
-            const indices = [];
-
-            for (const [frameIndex, frameSolution] of Object.entries(cuboidsSolutionRef.current)) {
-                for (const cuboid of Object.values(frameSolution)) {
-                    if (cuboid.id === id && cuboid.manual) {
-                        indices.push(Number(frameIndex));
-                        break;
-                    }
-                }
-            }
-
-            setKeyFramesIndices(indices);
-        }
-    }, []);
+    const { updateCuboidPSR, findFrameMarkers } = useCuboidInterpolation();
 
     useOrthographicView();
-    useTransformControls({ findkeyFrameIndices });
+    useTransformControls();
+    useCuboidVisibility();
 
     const onCuboidSelect = useCallback(
         (id) => {
@@ -56,7 +46,7 @@ export const useCuboidManager = () => {
             cameraControlsRef.current.enabled = true;
             sideViewsCamerasNeedUpdateRef.current = true;
             setSelectedCuboid(cuboids.find((cube) => cube.id === id));
-            findkeyFrameIndices();
+            findFrameMarkers();
             publish("setActiveTab", TABS.OBJECT_CARD);
         },
         [cuboids],
@@ -66,7 +56,7 @@ export const useCuboidManager = () => {
         transformControlsRef.current.detach();
         selectedCuboidGeometryRef.current = null;
         cameraControlsRef.current.enabled = true;
-        setKeyFramesIndices([]);
+        setFrameMarkers([]);
     }, []);
 
     useHoveredCuboid({
@@ -97,26 +87,8 @@ export const useCuboidManager = () => {
     }, [selectedCuboid?.id]);
 
     useEffect(() => {
-        const geometries = cuboidsGeometriesRef.current;
-
-        Object.values(geometries).forEach((entry) => {
-            const cube = entry.cube?.mesh;
-            if (!cube) return;
-
-            const psrByFrame = cube.userData.psrByFrame;
-            if (!psrByFrame) return;
-
-            const frameData = psrByFrame[activeFrameIndex];
-
-            if (frameData) {
-                cube.position.copy(frameData.position);
-                cube.scale.copy(frameData.scale);
-                cube.rotation.copy(frameData.rotation);
-            }
-        });
-
-        sideViewsCamerasNeedUpdateRef.current = true;
-    }, [activeFrameIndex]);
+        updateCuboidPSR();
+    }, [updateCuboidPSR]);
 
     // update info card
     useFrame(() => {

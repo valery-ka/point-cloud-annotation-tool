@@ -59,7 +59,7 @@ export const useRaycastClickSelect = ({ getMeshMap, onSelect, groupKey }) => {
             if (!downIntersectRef.current) return;
 
             if (!isDragRef.current && selectedTool === DEFAULT_TOOL) {
-                const intersects = getIntersects(event);
+                const intersects = getIntersects(event).filter((i) => i.object.visible);
                 const isSame = intersects.some((i) => i.object === downIntersectRef.current);
 
                 if (isSame) {
@@ -81,8 +81,8 @@ export const useRaycastClickSelect = ({ getMeshMap, onSelect, groupKey }) => {
             const distance = Math.sqrt(dx * dx + dy * dy);
             if (distance > DRAG_ACTION_PX) isDragRef.current = true;
 
-            const intersects = getIntersects(event);
-            const isIntersecting = intersects.length > 0;
+            const visibleIntersects = getIntersects(event).filter((i) => i.object.visible);
+            const isIntersecting = visibleIntersects.length > 0;
             isObjectIntersectRef.current = isIntersecting;
             isIntersectingMap.current.set(groupKey, isIntersecting);
 

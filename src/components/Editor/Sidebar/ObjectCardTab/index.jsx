@@ -40,6 +40,7 @@ export const ObjectCardTab = memo(() => {
         isCuboidTransformingRef,
         selectedCuboidInfoRef,
         cuboidsGeometriesRef,
+        cuboidsSolutionRef,
     } = useCuboids();
     const { config } = useConfig();
     const { objects } = config;
@@ -78,6 +79,15 @@ export const ObjectCardTab = memo(() => {
             if (geometry?.cube?.mesh?.name === cuboidId) {
                 removeCuboid(sceneRef.current, geometry);
                 delete cuboidsGeometriesRef.current[cuboidId];
+            }
+        }
+
+        for (const solution of Object.values(cuboidsSolutionRef.current)) {
+            for (let i = 0; i < solution.length; i++) {
+                if (solution[i]?.id === cuboidId) {
+                    solution.splice(i, 1);
+                    i--;
+                }
             }
         }
 

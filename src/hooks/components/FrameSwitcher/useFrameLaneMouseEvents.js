@@ -1,9 +1,14 @@
-import React, { useCallback, useState, useEffect } from "react";
+import { useCallback, useState, useEffect } from "react";
+
 import { useFileManager, useFrames } from "contexts";
+import { useCuboidInterpolation } from "hooks";
 
 export const useFrameLaneMouseEvents = (frameLaneRef) => {
     const { pcdFiles } = useFileManager();
     const { activeFrameIndex, setActiveFrameIndex } = useFrames();
+
+    const { interpolatePSR, updateCuboidPSR, findFrameMarkers, saveCurrentPSR } =
+        useCuboidInterpolation();
 
     const [isDragging, setIsDragging] = useState(false);
     const [laneStartX, setLaneStartX] = useState(0);
@@ -61,6 +66,18 @@ export const useFrameLaneMouseEvents = (frameLaneRef) => {
         }
     }, []);
 
+    const removeKeyFrame = useCallback(
+        (event, frame) => {
+            if (event.button === 2) {
+                saveCurrentPSR({ manual: false, activeFrameIndex: frame });
+                interpolatePSR();
+                findFrameMarkers();
+                updateCuboidPSR();
+            }
+        },
+        [interpolatePSR, updateCuboidPSR],
+    );
+
     useEffect(() => {
         document.addEventListener("mousemove", handleMouseMoveLane);
         document.addEventListener("pointerup", handleMouseUpLane);
@@ -71,5 +88,5 @@ export const useFrameLaneMouseEvents = (frameLaneRef) => {
         };
     }, [handleMouseMoveLane, handleMouseUpLane]);
 
-    return { handleMouseDownLane };
+    return { handleMouseDownLane, removeKeyFrame };
 };

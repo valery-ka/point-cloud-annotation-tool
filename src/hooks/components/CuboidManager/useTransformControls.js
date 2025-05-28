@@ -2,44 +2,31 @@ import { useThree } from "@react-three/fiber";
 
 import { useCallback, useEffect } from "react";
 
-import { useEditor, useCuboids, useFileManager } from "contexts";
-import { useCuboidsTransformations } from "./useCuboidsTransformations";
+import { useEditor, useCuboids, useFrames } from "contexts";
+import { useCuboidInterpolation } from "hooks";
 
-import { TransformControls, interpolateBetweenFrames } from "utils/cuboids";
+import { TransformControls } from "utils/cuboids";
 
-export const useTransformControls = ({ findkeyFrameIndices }) => {
+export const useTransformControls = () => {
     const { gl, camera, scene } = useThree();
 
-    const { pcdFiles } = useFileManager();
+    const { activeFrameIndex } = useFrames();
     const { cameraControlsRef, transformControlsRef } = useEditor();
-    const {
-        cuboidsGeometriesRef,
-        cuboidsSolutionRef,
-        selectedCuboidGeometryRef,
-        sideViewsCamerasNeedUpdateRef,
-        isCuboidTransformingRef,
-    } = useCuboids();
+    const { selectedCuboidGeometryRef, sideViewsCamerasNeedUpdateRef, isCuboidTransformingRef } =
+        useCuboids();
 
-    const { saveCurrentPSR } = useCuboidsTransformations();
+    const { saveCurrentPSR, interpolatePSR, findFrameMarkers } = useCuboidInterpolation();
 
     const onTransformChange = useCallback(() => {
         sideViewsCamerasNeedUpdateRef.current = true;
     }, []);
 
     const onTransformFinished = useCallback(() => {
-        const selectedCuboid = selectedCuboidGeometryRef.current;
-        if (!selectedCuboid?.name) return;
-
-        saveCurrentPSR();
-        interpolateBetweenFrames({
-            cuboidsGeometriesRef,
-            cuboidsSolutionRef,
-            totalFrames: pcdFiles.length,
-            selectedId: selectedCuboid.name,
-        });
-        findkeyFrameIndices();
-        console.log("finish");
-    }, [pcdFiles, saveCurrentPSR]);
+        saveCurrentPSR({ activeFrameIndex: activeFrameIndex });
+        interpolatePSR();
+        findFrameMarkers();
+        console.log("onTransformFinished");
+    }, [activeFrameIndex, interpolatePSR]);
 
     const onDraggingChanged = useCallback(
         (event) => {
@@ -63,31 +50,31 @@ export const useTransformControls = ({ findkeyFrameIndices }) => {
     }, [camera, gl.domElement, scene]);
 
     useEffect(() => {
-        const handleKeyDown = (e) => {
-            const transform = transformControlsRef.current;
-            if (!transform) return;
+        // const handleKeyDown = (e) => {
+        //     const transform = transformControlsRef.current;
+        //     if (!transform) return;
 
-            if (e.key === "x") {
-                transform.detach();
-            } else if (e.key === "w") {
-                const object = selectedCuboidGeometryRef.current;
-                if (object) transform.attach(object);
-            } else if (e.key === "a") {
-                transform.setMode("translate");
-            } else if (e.key === "s") {
-                transform.setMode("scale");
-            } else if (e.key === "d") {
-                transform.setMode("rotate");
-            }
-        };
+        //     if (e.key === "x") {
+        //         transform.detach();
+        //     } else if (e.key === "w") {
+        //         const object = selectedCuboidGeometryRef.current;
+        //         if (object) transform.attach(object);
+        //     } else if (e.key === "a") {
+        //         transform.setMode("translate");
+        //     } else if (e.key === "s") {
+        //         transform.setMode("scale");
+        //     } else if (e.key === "d") {
+        //         transform.setMode("rotate");
+        //     }
+        // };
 
         const transform = transformControlsRef.current;
-        document.addEventListener("keydown", handleKeyDown);
+        // document.addEventListener("keydown", handleKeyDown);
         transform?.addEventListener("change", onTransformChange);
         transform?.addEventListener("dragging-changed", onDraggingChanged);
 
         return () => {
-            document.removeEventListener("keydown", handleKeyDown);
+            // document.removeEventListener("keydown", handleKeyDown);
             transform?.removeEventListener("change", onTransformChange);
             transform?.removeEventListener("dragging-changed", onDraggingChanged);
             transform?.detach();

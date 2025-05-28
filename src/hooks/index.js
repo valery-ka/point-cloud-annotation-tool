@@ -10,6 +10,7 @@ export { useLanguage } from "./shared/useLanguage";
 export { useBindHotkey } from "./shared/useBindHotkey";
 export { useForceUpdate } from "./shared/useForceUpdate";
 export { useButtonState } from "./shared/useButtonState";
+export { useDelayedHover } from "./shared/useDelayedHover";
 export { useUpdateHotkeys } from "./shared/useUpdateHotkeys";
 export { useMousetrapPause } from "./shared/useMousetrapPause";
 export { useSettingsStorage } from "./shared/useSettingsStorage";
@@ -49,7 +50,10 @@ export { useFetchCalibrations } from "./components/CameraImages/useFetchCalibrat
 export { useImagePointHighlighter } from "./components/CameraImages/useImagePointHighlighter";
 export { useImageCanvasMouseEvents } from "./components/CameraImages/useImageCanvasMouseEvents";
 
+export { useCuboidManager } from "./components/CuboidManager/useCuboidManager";
+export { useHoveredCuboid } from "./components/CuboidManager/useHoveredCuboid";
+export { useCuboidVisibility } from "./components/CuboidManager/useCuboidVisibility";
 export { useOrthographicView } from "./components/CuboidManager/useOrthographicView";
 export { useTransformControls } from "./components/CuboidManager/useTransformControls";
 export { useSideViewsControls } from "./components/CuboidManager/useSideViewsControls";
-export { useCuboidManager } from "./components/CuboidManager/useCuboidManager";
+export { useCuboidInterpolation } from "./components/CuboidManager/useCuboidInterpolation";
