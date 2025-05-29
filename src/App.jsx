@@ -10,6 +10,7 @@ import {
     CameraImages,
     PointHighlighter,
     SideViews,
+    BatchView,
 } from "components";
 
 import { useServerLogs } from "hooks";
@@ -20,6 +21,7 @@ export const App = () => {
     return (
         <div className="tool-3d-app">
             <LoadingOverlay />
+            <BatchView />
             <FileNavigator />
             <div className="tool-3d-scene">
                 <div className="tool-3d-container">

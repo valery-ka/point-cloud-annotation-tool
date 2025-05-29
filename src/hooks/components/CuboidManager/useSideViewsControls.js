@@ -18,7 +18,7 @@ const SCALE_SENSITIVITY = 0.001;
 
 const MIN_SCALE = 0.1;
 
-const MIN_ZOOM = 0.5;
+const MIN_ZOOM = 0.1;
 const MAX_ZOOM = 1.5;
 const ZOOM_STEP = 0.05;
 

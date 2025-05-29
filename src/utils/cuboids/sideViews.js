@@ -1,7 +1,50 @@
-import { Vector3 } from "three";
+import { Vector3, OrthographicCamera, Quaternion, Euler } from "three";
 
 const TRANSLATE_STEP = 0.01;
 const ROTATE_STEP = 1;
+
+export const setupCamera = (name) => {
+    const camera = new OrthographicCamera();
+    camera.name = name;
+    camera.zoom = 0.8;
+    return camera;
+};
+
+export const getOrientationQuaternion = (euler) => {
+    const orientation = new Quaternion();
+    orientation.setFromEuler(euler);
+    return orientation;
+};
+
+export const updateCamera = (camera, mesh, scaleOrder, getOrientation, aspect) => {
+    if (!camera || !mesh) return;
+
+    const cameraDepth = 0;
+    const scale = mesh.scale;
+    const [w, h, d] = scaleOrder.map((axis) => scale[axis] + cameraDepth);
+
+    let camWidth = w;
+    let camHeight = h;
+
+    if (camWidth / camHeight > aspect) {
+        camHeight = camWidth / aspect;
+    } else {
+        camWidth = camHeight * aspect;
+    }
+
+    camera.left = -camWidth / 2;
+    camera.right = camWidth / 2;
+    camera.top = camHeight / 2;
+    camera.bottom = -camHeight / 2;
+    camera.near = -d / 2;
+    camera.far = d / 2;
+
+    camera.position.copy(mesh.position);
+    camera.quaternion.copy(mesh.quaternion).multiply(getOrientation());
+
+    camera.updateProjectionMatrix();
+    camera.updateMatrixWorld(true);
+};
 
 export const getCuboidHandlesPositions = (mesh, scaleOrder) => {
     if (!mesh) return [];

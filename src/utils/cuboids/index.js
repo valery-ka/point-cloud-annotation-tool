@@ -28,6 +28,9 @@ export {
     translateConfigs,
     rotateConfigs,
     applyKeyTransformToMesh,
+    setupCamera,
+    getOrientationQuaternion,
+    updateCamera,
 } from "./sideViews";
 
 export {

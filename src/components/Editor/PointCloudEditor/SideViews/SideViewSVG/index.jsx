@@ -16,7 +16,7 @@ const PICKER_COLOR = "#ffffff";
 const PICKER_WIDTH = 30;
 const PICKER_OPACITY = 0;
 
-export const SideViewSVG = ({ name, y, width, height, mesh, camera }) => {
+export const SideViewSVG = ({ name, x, y, width, height, mesh, camera }) => {
     const { selectedCuboidGeometryRef, selectedCuboid, handlePositions } = useCuboids();
     const { corners = [], edges = [] } = handlePositions?.[name] ?? {};
 
@@ -209,7 +209,7 @@ export const SideViewSVG = ({ name, y, width, height, mesh, camera }) => {
             className={`side-view-svg ${hoveredView === name ? "hovered" : ""}`}
             style={{
                 position: "absolute",
-                left: 0,
+                left: x || 0,
                 top: y,
                 cursor: "move",
             }}
