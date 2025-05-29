@@ -220,7 +220,7 @@ export const SideViewSVG = ({ name, y, width, height, mesh, camera }) => {
                 {name}
             </text>
 
-            {renderBoxOutline()}
+            {/* {renderBoxOutline()} */}
             {edges.map(renderEdgesHandlers)}
             {renderRotationHandler()}
             {corners.map(renderCornersHandlers)}
