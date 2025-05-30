@@ -27,7 +27,8 @@ const scale = "scale";
 const rotate = "rotate";
 
 export const useSideViewsControls = ({ camera, mesh, hoveredView, hoveredHandler, name }) => {
-    const { sideViewsCamerasNeedUpdateRef, isCuboidTransformingRef } = useCuboids();
+    const { sideViewsCamerasNeedUpdateRef, isCuboidTransformingRef, sideViewCameraZoomsRef } =
+        useCuboids();
     const { cameraControlsRef, transformControlsRef } = useEditor();
 
     const { stopPlayback } = usePlayback();
@@ -183,6 +184,7 @@ export const useSideViewsControls = ({ camera, mesh, hoveredView, hoveredHandler
                 camera.zoom = Math.max(MIN_ZOOM, camera.zoom - ZOOM_STEP);
             }
 
+            sideViewCameraZoomsRef.current[camera.name] = camera.zoom;
             sideViewsCamerasNeedUpdateRef.current = true;
         },
         [camera, hoveredView],

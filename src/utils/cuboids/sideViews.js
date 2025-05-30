@@ -1,4 +1,4 @@
-import { Vector3, OrthographicCamera, Quaternion, Euler } from "three";
+import { Vector3, OrthographicCamera, Quaternion } from "three";
 
 const TRANSLATE_STEP = 0.01;
 const ROTATE_STEP = 1;
@@ -6,7 +6,6 @@ const ROTATE_STEP = 1;
 export const setupCamera = (name) => {
     const camera = new OrthographicCamera();
     camera.name = name;
-    camera.zoom = 0.8;
     return camera;
 };
 
@@ -16,7 +15,7 @@ export const getOrientationQuaternion = (euler) => {
     return orientation;
 };
 
-export const updateCamera = (camera, mesh, scaleOrder, getOrientation, aspect) => {
+export const updateCamera = (camera, mesh, scaleOrder, getOrientation, aspect, zooms) => {
     if (!camera || !mesh) return;
 
     const cameraDepth = 0;
@@ -38,6 +37,8 @@ export const updateCamera = (camera, mesh, scaleOrder, getOrientation, aspect) =
     camera.bottom = -camHeight / 2;
     camera.near = -d / 2;
     camera.far = d / 2;
+
+    camera.zoom = zooms[camera.name];
 
     camera.position.copy(mesh.position);
     camera.quaternion.copy(mesh.quaternion).multiply(getOrientation());
@@ -174,25 +175,24 @@ export function getCornerDirection(index, corners, project) {
     return `${vertical}-${horizontal}`;
 }
 
-export const translateConfigs = {
+const baseTranslate = {
     top: (dx, dy) => new Vector3(-dy, -dx, 0),
     left: (dx, dy) => new Vector3(dx, 0, -dy),
     front: (dx, dy) => new Vector3(0, -dx, -dy),
 };
 
-export const rotateConfigs = {
+const baseRotate = {
     top: { axis: new Vector3(0, 0, 1), direction: -1 },
     left: { axis: new Vector3(0, 1, 0), direction: 1 },
     front: { axis: new Vector3(1, 0, 0), direction: 1 },
 };
 
-export const scalingConfigs = (dx, dy) => {
-    const top = {
+const baseScalingConfigs = (dx, dy) => ({
+    top: {
         top: { axis: new Vector3(-1, 0, 0), delta: -dy, scaleKey: "x", posAdd: false },
         right: { axis: new Vector3(0, 1, 0), delta: dx, scaleKey: "y", posAdd: false },
         bottom: { axis: new Vector3(-1, 0, 0), delta: dy, scaleKey: "x", posAdd: true },
         left: { axis: new Vector3(0, 1, 0), delta: -dx, scaleKey: "y", posAdd: true },
-
         "top-right": [
             { axis: new Vector3(-1, 0, 0), delta: -dy, scaleKey: "x", posAdd: false },
             { axis: new Vector3(0, 1, 0), delta: dx, scaleKey: "y", posAdd: false },
@@ -209,14 +209,12 @@ export const scalingConfigs = (dx, dy) => {
             { axis: new Vector3(-1, 0, 0), delta: dy, scaleKey: "x", posAdd: true },
             { axis: new Vector3(0, 1, 0), delta: -dx, scaleKey: "y", posAdd: true },
         ],
-    };
-
-    const left = {
+    },
+    left: {
         top: { axis: new Vector3(0, 0, -1), delta: -dy, scaleKey: "z", posAdd: false },
         bottom: { axis: new Vector3(0, 0, -1), delta: dy, scaleKey: "z", posAdd: true },
         right: { axis: new Vector3(-1, 0, 0), delta: dx, scaleKey: "x", posAdd: false },
         left: { axis: new Vector3(-1, 0, 0), delta: -dx, scaleKey: "x", posAdd: true },
-
         "top-right": [
             { axis: new Vector3(0, 0, -1), delta: -dy, scaleKey: "z", posAdd: false },
             { axis: new Vector3(-1, 0, 0), delta: dx, scaleKey: "x", posAdd: false },
@@ -233,14 +231,12 @@ export const scalingConfigs = (dx, dy) => {
             { axis: new Vector3(0, 0, -1), delta: dy, scaleKey: "z", posAdd: true },
             { axis: new Vector3(-1, 0, 0), delta: -dx, scaleKey: "x", posAdd: true },
         ],
-    };
-
-    const front = {
+    },
+    front: {
         top: { axis: new Vector3(0, 0, -1), delta: -dy, scaleKey: "z", posAdd: false },
         bottom: { axis: new Vector3(0, 0, -1), delta: dy, scaleKey: "z", posAdd: true },
         right: { axis: new Vector3(0, -1, 0), delta: dx, scaleKey: "y", posAdd: true },
         left: { axis: new Vector3(0, -1, 0), delta: -dx, scaleKey: "y", posAdd: false },
-
         "top-right": [
             { axis: new Vector3(0, 0, -1), delta: -dy, scaleKey: "z", posAdd: false },
             { axis: new Vector3(0, -1, 0), delta: dx, scaleKey: "y", posAdd: true },
@@ -257,9 +253,27 @@ export const scalingConfigs = (dx, dy) => {
             { axis: new Vector3(0, 0, -1), delta: dy, scaleKey: "z", posAdd: true },
             { axis: new Vector3(0, -1, 0), delta: -dx, scaleKey: "y", posAdd: false },
         ],
-    };
+    },
+});
 
-    return { top, left, front };
+const withBatchAliases = (baseConfig) => {
+    const result = { ...baseConfig };
+    for (const key of Object.keys(baseConfig)) {
+        result[`batch_${key}`] = baseConfig[key];
+    }
+    return result;
+};
+
+export const translateConfigs = withBatchAliases(baseTranslate);
+export const rotateConfigs = withBatchAliases(baseRotate);
+export const scalingConfigs = (dx, dy) => {
+    const base = baseScalingConfigs(dx, dy);
+    return new Proxy(base, {
+        get(target, key) {
+            const k = String(key).replace(/^batch_/, "");
+            return target[k];
+        },
+    });
 };
 
 export const applyKeyTransformToMesh = ({ code, mesh, configTranslate, configRotate }) => {

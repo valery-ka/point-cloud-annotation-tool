@@ -1,4 +1,5 @@
 import { createContext, useContext, useRef, useState } from "react";
+import { INITIAL_SIDE_VIEWS_ZOOM } from "constants";
 
 const CuboidsContext = createContext();
 
@@ -8,6 +9,15 @@ const DEFAULT_INFO_CARD = {
     rotation: [0, 0, 0],
     insidePointsCount: 0,
     selected: false,
+};
+
+const DEFAULT_ZOOM = {
+    top: INITIAL_SIDE_VIEWS_ZOOM,
+    left: INITIAL_SIDE_VIEWS_ZOOM,
+    front: INITIAL_SIDE_VIEWS_ZOOM,
+    batch_top: INITIAL_SIDE_VIEWS_ZOOM,
+    batch_left: INITIAL_SIDE_VIEWS_ZOOM,
+    batch_front: INITIAL_SIDE_VIEWS_ZOOM,
 };
 
 export const CuboidsProvider = ({ children }) => {
@@ -27,6 +37,7 @@ export const CuboidsProvider = ({ children }) => {
     const [batchFrames, setBatchFrames] = useState({});
 
     const isCuboidTransformingRef = useRef(false);
+    const sideViewCameraZoomsRef = useRef(DEFAULT_ZOOM);
     const sideViewsCamerasNeedUpdateRef = useRef(true);
 
     const cuboidsSolutionRef = useRef({});
@@ -56,6 +67,7 @@ export const CuboidsProvider = ({ children }) => {
                 setBatchMode,
                 batchFrames,
                 setBatchFrames,
+                sideViewCameraZoomsRef,
             }}
         >
             {children}

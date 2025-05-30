@@ -24,6 +24,7 @@ export const useOrthographicView = () => {
         setBatchMode,
         batchFrames,
         setBatchFrames,
+        sideViewCameraZoomsRef,
     } = useCuboids();
 
     const aspectRef = useRef(null);
@@ -57,10 +58,11 @@ export const useOrthographicView = () => {
 
     const updateAllCameras = useCallback(
         (mesh) => {
+            const zooms = sideViewCameraZoomsRef.current;
             const viewsToUpdate = batchMode ? Object.values(batchFrames).flat() : sideViews;
 
             viewsToUpdate.forEach(({ camera, scaleOrder, getOrientation }) => {
-                updateCamera(camera, mesh, scaleOrder, getOrientation, aspectRef.current);
+                updateCamera(camera, mesh, scaleOrder, getOrientation, aspectRef.current, zooms);
             });
 
             updateHandlePositions(mesh, viewsToUpdate);
@@ -81,10 +83,14 @@ export const useOrthographicView = () => {
 
         const batchFramesList = {};
         for (let i = 0; i < 10; i++) {
-            batchFramesList[i] = VIEW_CONFIGS.map((config) => ({
-                ...config,
-                camera: setupCamera(config.name),
-            }));
+            batchFramesList[i] = VIEW_CONFIGS.map((config) => {
+                const batchName = `batch_${config.name}`;
+                return {
+                    ...config,
+                    name: batchName,
+                    camera: setupCamera(batchName),
+                };
+            });
         }
         setBatchFrames(batchFramesList);
     }, []);
