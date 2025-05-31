@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 
-import { useFileManager, useEditor, useFrames } from "contexts";
+import { useFileManager, useEditor, useFrames, useCuboids } from "contexts";
 
 import { useThree } from "@react-three/fiber";
 
@@ -9,10 +9,12 @@ import * as APP_CONSTANTS from "constants";
 const { SELECTION } = APP_CONSTANTS.HIDDEN_POSITION;
 
 export const useEditorFrameSwitcher = (onFrameChanged) => {
+    const { gl, camera, scene } = useThree();
+
     const { pcdFiles } = useFileManager();
     const { activeFrameIndex, arePointCloudsLoading } = useFrames();
     const { pointCloudRefs, setHasFilterSelectionPoint } = useEditor();
-    const { gl, camera, scene } = useThree();
+    const { batchMode } = useCuboids();
 
     const previousFrameRef = useRef(null);
 
@@ -42,5 +44,5 @@ export const useEditorFrameSwitcher = (onFrameChanged) => {
         }
 
         onFrameChanged?.();
-    }, [activeFrameIndex, arePointCloudsLoading, pcdFiles]);
+    }, [activeFrameIndex, arePointCloudsLoading, pcdFiles, batchMode]);
 };

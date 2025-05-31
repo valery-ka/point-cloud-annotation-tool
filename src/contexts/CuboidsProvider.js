@@ -34,7 +34,7 @@ export const CuboidsProvider = ({ children }) => {
     const [handlePositions, setHandlePositions] = useState({});
 
     const [batchMode, setBatchMode] = useState(false);
-    const [batchFrames, setBatchFrames] = useState({});
+    const [batchEditorCameras, setBatchEditorCameras] = useState({});
 
     const isCuboidTransformingRef = useRef(false);
     const sideViewCameraZoomsRef = useRef(DEFAULT_ZOOM);
@@ -65,8 +65,8 @@ export const CuboidsProvider = ({ children }) => {
                 setFrameMarkers,
                 batchMode,
                 setBatchMode,
-                batchFrames,
-                setBatchFrames,
+                batchEditorCameras,
+                setBatchEditorCameras,
                 sideViewCameraZoomsRef,
             }}
         >

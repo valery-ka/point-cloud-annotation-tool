@@ -17,7 +17,7 @@ const PICKER_WIDTH = 30;
 const PICKER_OPACITY = 0;
 
 export const SideViewSVG = ({ name, x, y, width, height, mesh, camera }) => {
-    const { selectedCuboidGeometryRef, selectedCuboid, handlePositions, batchMode } = useCuboids();
+    const { selectedCuboid, handlePositions, batchMode } = useCuboids();
     const { corners = [], edges = [] } = handlePositions?.[name] ?? {};
 
     const [hoveredHandler, setHoveredHandler] = useState(null);
@@ -166,38 +166,36 @@ export const SideViewSVG = ({ name, x, y, width, height, mesh, camera }) => {
         );
     }, [project, hoveredHandler, corners, height]);
 
-    const renderBoxOutline = useCallback(() => {
-        if (!corners.length) return null;
+    // const renderBoxOutline = useCallback(() => {
+    //     if (!corners.length) return null;
 
-        const projectedCorners = corners.map(project);
-        if (projectedCorners.some((p) => isNaN(p.x) || isNaN(p.y))) return null;
+    //     const projectedCorners = corners.map(project);
+    //     if (projectedCorners.some((p) => isNaN(p.x) || isNaN(p.y))) return null;
 
-        const color = selectedCuboidGeometryRef.current?.userData?.color;
+    //     const color = mesh.userData.color;
 
-        return edges.map((_, index) => {
-            const start = projectedCorners[index];
-            const end = projectedCorners[(index + 1) % projectedCorners.length];
+    //     return edges.map((_, index) => {
+    //         const start = projectedCorners[index];
+    //         const end = projectedCorners[(index + 1) % projectedCorners.length];
 
-            return (
-                <line
-                    key={`hovered-line-${index}`}
-                    x1={Math.max(0, start.x)}
-                    y1={Math.max(0, start.y)}
-                    x2={Math.max(0, end.x)}
-                    y2={Math.max(0, end.y)}
-                    stroke={color}
-                    strokeWidth={1}
-                    pointerEvents="none"
-                />
-            );
-        });
-    }, [corners, edges, selectedCuboidGeometryRef]);
+    //         return (
+    //             <line
+    //                 key={`hovered-line-${index}`}
+    //                 x1={Math.max(0, start.x)}
+    //                 y1={Math.max(0, start.y)}
+    //                 x2={Math.max(0, end.x)}
+    //                 y2={Math.max(0, end.y)}
+    //                 stroke={color}
+    //                 strokeWidth={1}
+    //                 pointerEvents="none"
+    //             />
+    //         );
+    //     });
+    // }, [corners, edges]);
 
     useEffect(() => {
-        if (!selectedCuboid || batchMode) {
-            setHoveredView(null);
-            setHoveredHandler(null);
-        }
+        setHoveredView(null);
+        setHoveredHandler(null);
     }, [selectedCuboid, batchMode]);
 
     if (!mesh || !camera || width <= 0 || height <= 0) return null;

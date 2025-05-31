@@ -2,8 +2,8 @@ import { useEffect, useRef, useCallback } from "react";
 import { useThree, useFrame } from "@react-three/fiber";
 import { Euler } from "three";
 
-import { useCuboids } from "contexts";
-import { useSideViewsRenderer } from "./useSideViewsRenderer";
+import { useCuboids, useFileManager } from "contexts";
+import { useSideViewsRenderer, useBatchEditor } from "hooks";
 
 import {
     getCuboidHandlesPositions,
@@ -12,18 +12,16 @@ import {
     updateCamera,
 } from "utils/cuboids";
 
-export const useOrthographicView = () => {
+export const useOrthographicView = (handlers) => {
     const { size } = useThree();
+
+    const { pcdFiles } = useFileManager();
     const {
         sideViews,
         setSideViews,
         selectedCuboidGeometryRef,
         setHandlePositions,
         sideViewsCamerasNeedUpdateRef,
-        batchMode,
-        setBatchMode,
-        batchFrames,
-        setBatchFrames,
         sideViewCameraZoomsRef,
     } = useCuboids();
 
@@ -59,15 +57,14 @@ export const useOrthographicView = () => {
     const updateAllCameras = useCallback(
         (mesh) => {
             const zooms = sideViewCameraZoomsRef.current;
-            const viewsToUpdate = batchMode ? Object.values(batchFrames).flat() : sideViews;
 
-            viewsToUpdate.forEach(({ camera, scaleOrder, getOrientation }) => {
+            sideViews.forEach(({ camera, scaleOrder, getOrientation }) => {
                 updateCamera(camera, mesh, scaleOrder, getOrientation, aspectRef.current, zooms);
             });
 
-            updateHandlePositions(mesh, viewsToUpdate);
+            updateHandlePositions(mesh, sideViews);
         },
-        [updateCamera, updateHandlePositions, sideViews, batchFrames, batchMode],
+        [updateCamera, updateHandlePositions, sideViews],
     );
 
     useEffect(() => {
@@ -80,31 +77,7 @@ export const useOrthographicView = () => {
             camera: setupCamera(config.name),
         }));
         setSideViews(sideViewsList);
-
-        const batchFramesList = {};
-        for (let i = 0; i < 10; i++) {
-            batchFramesList[i] = VIEW_CONFIGS.map((config) => {
-                const batchName = `batch_${config.name}`;
-                return {
-                    ...config,
-                    name: batchName,
-                    camera: setupCamera(batchName),
-                };
-            });
-        }
-        setBatchFrames(batchFramesList);
-    }, []);
-
-    useEffect(() => {
-        const handleKeyDown = (e) => {
-            if (e.code === "Tab") {
-                setBatchMode((prev) => !prev);
-            }
-        };
-
-        document.addEventListener("keydown", handleKeyDown);
-        return () => document.removeEventListener("keydown", handleKeyDown);
-    }, []);
+    }, [pcdFiles]);
 
     useFrame(() => {
         if (sideViewsCamerasNeedUpdateRef.current) {
@@ -113,29 +86,6 @@ export const useOrthographicView = () => {
         sideViewsCamerasNeedUpdateRef.current = false;
     });
 
-    useSideViewsRenderer({
-        isBatchMode: false,
-        canvasId: "side-views-canvas",
-        containerId: "side-views-canvas-container",
-        refs: {
-            canvasRef: useRef(null),
-            containerRef: useRef(null),
-            rendererRef: useRef(null),
-        },
-        getViews: () => sideViews,
-        aspectRef,
-    });
-
-    useSideViewsRenderer({
-        isBatchMode: true,
-        canvasId: "batch-view-canvas",
-        containerId: "batch-view-canvas-container",
-        refs: {
-            canvasRef: useRef(null),
-            containerRef: useRef(null),
-            rendererRef: useRef(null),
-        },
-        getViews: () => Object.values(batchFrames),
-        aspectRef,
-    });
+    useSideViewsRenderer({ aspectRef });
+    useBatchEditor({ aspectRef, handlers });
 };

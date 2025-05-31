@@ -27,28 +27,32 @@ export const useFramePointsVisibility = (updateGlobalBox) => {
 
     const { imagePointsAlphaNeedsUpdateRef } = useImages();
 
-    const filterFramePoints = useCallback(() => {
-        const activeFrameFilePath = pcdFiles[activeFrameIndex];
+    const filterFramePoints = useCallback(
+        (frame) => {
+            const frameIndex = frame ?? activeFrameIndex;
+            const activeFrameFilePath = pcdFiles[frameIndex];
 
-        const activeFrameCloud = pointCloudRefs.current[activeFrameFilePath];
-        const activeFrameLabels = pointLabelsRef.current[activeFrameFilePath];
+            const activeFrameCloud = pointCloudRefs.current[activeFrameFilePath];
+            const activeFrameLabels = pointLabelsRef.current[activeFrameFilePath];
 
-        if (activeFrameCloud?.geometry.attributes.original.array) {
-            filterPoints({
-                cloudData: {
-                    cloud: activeFrameCloud,
-                    labels: activeFrameLabels,
-                },
-                filterData: {
-                    visibility: classesVisibilityRef.current,
-                    minZ: minMaxZRef.current[0],
-                    maxZ: minMaxZRef.current[1],
-                },
-            });
-            updateGlobalBox();
-            imagePointsAlphaNeedsUpdateRef.current = true;
-        }
-    }, [pcdFiles, activeFrameIndex]);
+            if (activeFrameCloud?.geometry.attributes.original.array) {
+                filterPoints({
+                    cloudData: {
+                        cloud: activeFrameCloud,
+                        labels: activeFrameLabels,
+                    },
+                    filterData: {
+                        visibility: classesVisibilityRef.current,
+                        minZ: minMaxZRef.current[0],
+                        maxZ: minMaxZRef.current[1],
+                    },
+                });
+                updateGlobalBox();
+                imagePointsAlphaNeedsUpdateRef.current = true;
+            }
+        },
+        [pcdFiles, activeFrameIndex],
+    );
 
     const filterSelectedPoints = useCallback(
         (mode, points) => {

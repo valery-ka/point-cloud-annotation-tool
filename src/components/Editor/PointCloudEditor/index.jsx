@@ -52,7 +52,7 @@ export const PointCloudEditor = () => {
 
     HOOKS.useStats();
 
-    HOOKS.useCuboidManager();
+    HOOKS.useCuboidManager({ handlePointCloudColors, handlePointsSize, filterFramePoints });
 
     return (
         <>

@@ -83,12 +83,13 @@ export const usePaintFramePoints = (updateGlobalBox) => {
     );
 
     const handlePointCloudColors = useCallback(
-        (data) => {
+        (data, frame) => {
             if (data) {
                 const { value, settingKey } = data;
                 pointColorRef.current[settingKey] = value;
             }
-            const activeFrameFilePath = pcdFiles[activeFrameIndex];
+            const frameIndex = frame ?? activeFrameIndex;
+            const activeFrameFilePath = pcdFiles[frameIndex];
 
             const activeFrameCloud = pointCloudRefs.current[activeFrameFilePath];
             const activeFrameLabels = pointLabelsRef.current[activeFrameFilePath];

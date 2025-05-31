@@ -19,7 +19,7 @@ export const ObjectsTab = memo(({ title }) => {
     const { nonHiddenClasses } = useConfig();
     const { subscribe, unsubscribe } = useEvent();
     const { classesVisibilityRef, selectedClassIndex, setSelectedClassIndex } = useEditor();
-    const { cuboids, selectedCuboid, setSelectedCuboid } = useCuboids();
+    const { cuboids, selectedCuboid, setSelectedCuboid, setBatchMode } = useCuboids();
     const { setSelectedTool } = useTools();
     const { settings } = useSettings();
     const { hotkeys } = settings;
@@ -51,6 +51,7 @@ export const ObjectsTab = memo(({ title }) => {
     const unselectObject = useCallback(() => {
         setSelectedClassIndex(null);
         setSelectedCuboid(null);
+        setBatchMode(false);
         setSelectedTool(DEFAULT_TOOL);
     }, []);
 

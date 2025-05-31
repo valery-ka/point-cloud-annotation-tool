@@ -26,33 +26,38 @@ export const useCuboidInterpolation = () => {
         });
     }, [pcdFiles]);
 
-    const updateCuboidPSR = useCallback(() => {
-        const geometries = cuboidsGeometriesRef.current;
-        const frameSolution = cuboidsSolutionRef.current[activeFrameIndex] ?? [];
+    const updateCuboidPSR = useCallback(
+        (frame) => {
+            const geometries = cuboidsGeometriesRef.current;
 
-        const solutionMap = {};
-        for (const cuboid of frameSolution) {
-            solutionMap[cuboid.id] = cuboid;
-        }
+            const frameIndex = frame ?? activeFrameIndex;
+            const frameSolution = cuboidsSolutionRef.current[frameIndex] ?? [];
 
-        Object.entries(geometries).forEach(([id, entry]) => {
-            const cube = entry.cube?.mesh;
-            if (!cube) return;
+            const solutionMap = {};
+            for (const cuboid of frameSolution) {
+                solutionMap[cuboid.id] = cuboid;
+            }
 
-            const cuboidData = solutionMap[id];
-            if (!cuboidData || !cuboidData.psr) return;
+            Object.entries(geometries).forEach(([id, entry]) => {
+                const cube = entry.cube?.mesh;
+                if (!cube) return;
 
-            const { position, rotation, scale } = cuboidData.psr;
+                const cuboidData = solutionMap[id];
+                if (!cuboidData || !cuboidData.psr) return;
 
-            cube.position.set(position.x, position.y, position.z);
-            cube.scale.set(scale.x, scale.y, scale.z);
-            cube.rotation.set(rotation.x, rotation.y, rotation.z);
+                const { position, rotation, scale } = cuboidData.psr;
 
-            cube.visible = cuboidData.visible !== false;
-        });
+                cube.position.set(position.x, position.y, position.z);
+                cube.scale.set(scale.x, scale.y, scale.z);
+                cube.rotation.set(rotation.x, rotation.y, rotation.z);
 
-        sideViewsCamerasNeedUpdateRef.current = true;
-    }, [activeFrameIndex]);
+                cube.visible = cuboidData.visible !== false;
+            });
+
+            sideViewsCamerasNeedUpdateRef.current = true;
+        },
+        [activeFrameIndex],
+    );
 
     const findFrameMarkers = useCallback(() => {
         const selectedCuboid = selectedCuboidGeometryRef.current;

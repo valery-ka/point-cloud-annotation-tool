@@ -32,13 +32,14 @@ export const useFramePointsSize = () => {
     const selectedClassRef = useRef(null);
 
     const handlePointsSize = useCallback(
-        (data, points) => {
+        (data, points, frame) => {
             if (data) {
                 const { value, settingKey } = data;
                 pointSizeRef.current[settingKey].value = value;
             }
 
-            const activeFrameFilePath = pcdFiles[activeFrameIndex];
+            const frameIndex = frame ?? activeFrameIndex;
+            const activeFrameFilePath = pcdFiles[frameIndex];
 
             const activeFrameCloud = pointCloudRefs.current[activeFrameFilePath];
             const activeFrameLabels = pointLabelsRef.current[activeFrameFilePath];

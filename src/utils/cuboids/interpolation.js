@@ -19,9 +19,9 @@ export const interpolatePSR = (start, end, t) => {
     const interpolatedEuler = new Euler().setFromQuaternion(interpolatedQuat);
 
     return {
-        position: interpolatedPos,
-        rotation: interpolatedEuler,
-        scale: interpolatedScale,
+        position: { x: interpolatedPos.x, y: interpolatedPos.y, z: interpolatedPos.z },
+        rotation: { x: interpolatedEuler._x, y: interpolatedEuler._y, z: interpolatedEuler._z },
+        scale: { x: interpolatedScale.x, y: interpolatedScale.y, z: interpolatedScale.z },
     };
 };
 

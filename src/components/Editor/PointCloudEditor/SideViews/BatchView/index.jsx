@@ -8,12 +8,12 @@ import { SIDE_VIEWS_GAP } from "constants";
 import { SideViewSVG } from "../SideViewSVG";
 
 export const BatchView = () => {
-    const { selectedCuboidGeometryRef, batchFrames, batchMode } = useCuboids();
+    const { selectedCuboidGeometryRef, batchEditorCameras, batchMode } = useCuboids();
 
     const containerRef = useRef(null);
     const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
 
-    const frameEntries = Object.entries(batchFrames);
+    const frameEntries = Object.entries(batchEditorCameras);
     const framesCount = frameEntries.length;
     const viewsPerFrame = frameEntries[0]?.[1]?.length || 0;
 
@@ -43,7 +43,7 @@ export const BatchView = () => {
         <div id="batch-view-canvas-container" ref={containerRef}>
             <canvas id="batch-view-canvas" />
             <div className="side-views-container" style={{ position: "absolute", top: 0, left: 0 }}>
-                {frameEntries.map(([frameKey, views], frameIdx) =>
+                {/* {frameEntries.map(([frameKey, views], frameIdx) =>
                     views.map((view, viewIdx) => {
                         const x = frameIdx * (frameWidth + SIDE_VIEWS_GAP);
                         const y = viewIdx * (viewHeight + SIDE_VIEWS_GAP);
@@ -61,7 +61,7 @@ export const BatchView = () => {
                             />
                         );
                     }),
-                )}
+                )} */}
             </div>
         </div>,
         document.getElementById("root"),

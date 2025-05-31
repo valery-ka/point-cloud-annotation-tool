@@ -16,7 +16,7 @@ import { getPointsInsideCuboid } from "utils/cuboids";
 
 import { TABS } from "constants";
 
-export const useCuboidManager = () => {
+export const useCuboidManager = (handlers) => {
     const { pcdFiles } = useFileManager();
     const { activeFrameIndex } = useFrames();
     const { publish } = useEvent();
@@ -34,7 +34,7 @@ export const useCuboidManager = () => {
 
     const { updateCuboidPSR, findFrameMarkers } = useCuboidInterpolation();
 
-    useOrthographicView();
+    useOrthographicView(handlers);
     useTransformControls();
     useCuboidVisibility();
 
