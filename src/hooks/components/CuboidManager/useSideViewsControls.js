@@ -29,6 +29,8 @@ const rotate = "rotate";
 export const useSideViewsControls = ({ camera, mesh, hoveredView, hoveredHandler, name }) => {
     const { sideViewsCamerasNeedUpdateRef, isCuboidTransformingRef, sideViewCameraZoomsRef } =
         useCuboids();
+    const { batchMode, batchViewsCamerasNeedUpdateRef } = useCuboids();
+
     const { cameraControlsRef, transformControlsRef } = useEditor();
 
     const { stopPlayback } = usePlayback();
@@ -36,6 +38,12 @@ export const useSideViewsControls = ({ camera, mesh, hoveredView, hoveredHandler
 
     const scaleHandlerRef = useRef(null);
     const transformModeRef = useRef(null);
+
+    const updateCameras = useCallback(() => {
+        batchMode
+            ? (batchViewsCamerasNeedUpdateRef.current = true)
+            : (sideViewsCamerasNeedUpdateRef.current = true);
+    }, [batchMode]);
 
     const handleTranslate = useCallback(
         (movementX, movementY) => {
@@ -140,7 +148,7 @@ export const useSideViewsControls = ({ camera, mesh, hoveredView, hoveredHandler
 
     const handleMouseMove = useCallback(
         (e) => {
-            if (!isCuboidTransformingRef.current || !mesh) {
+            if (!isCuboidTransformingRef.current) {
                 cameraControlsRef.current.enabled = true;
                 return;
             }
@@ -166,13 +174,13 @@ export const useSideViewsControls = ({ camera, mesh, hoveredView, hoveredHandler
 
     const handleMouseUp = useCallback(() => {
         transformModeRef.current = null;
-        sideViewsCamerasNeedUpdateRef.current = true;
+        updateCameras();
         cameraControlsRef.current.enabled = true;
 
         if (isCuboidTransformingRef.current) {
             transformControlsRef.current.dispatchEvent({ type: "dragging-changed" });
         }
-    }, []);
+    }, [updateCameras]);
 
     const handleMouseWheel = useCallback(
         (e) => {
@@ -185,9 +193,9 @@ export const useSideViewsControls = ({ camera, mesh, hoveredView, hoveredHandler
             }
 
             sideViewCameraZoomsRef.current[camera.name] = camera.zoom;
-            sideViewsCamerasNeedUpdateRef.current = true;
+            updateCameras();
         },
-        [camera, hoveredView],
+        [camera, hoveredView, updateCameras],
     );
 
     useEffect(() => {

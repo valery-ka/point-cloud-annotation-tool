@@ -1,52 +1,49 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 
 import { useCuboids, useFileManager, useEditor } from "contexts";
 
-import { useBatchEditorRenderer, useBatchEditorScene, useBatchModeCameras } from "hooks";
+import {
+    useBatchEditorRenderer,
+    useBatchEditorScene,
+    useBatchModeCameras,
+    useBatchCloudsUpdater,
+} from "hooks";
 
 import { SIDE_VIEWS_GAP } from "constants";
 
-export const useBatchEditor = (config) => {
+export const useBatchEditor = ({ handlers, views }) => {
     const { pcdFiles } = useFileManager();
     const { pointCloudRefs } = useEditor();
-    const {
-        selectedCuboid,
-        selectedCuboidGeometryRef,
-        batchMode,
-        setBatchMode,
-        batchEditorCameras,
-    } = useCuboids();
 
-    const BATCH_VIEWS = Object.values(batchEditorCameras);
+    const { batchMode, setBatchMode, batchEditorCameras } = useCuboids();
+    const { selectedCuboid, selectedCuboidGeometryRef } = useCuboids();
+    const { cuboidsSolutionRef, cuboidsGeometriesRef } = useCuboids();
 
-    useBatchModeCameras();
-    const { batchSceneRef } = useBatchEditorScene(config.handlers);
+    const BATCH_CAMERAS = Object.values(batchEditorCameras);
+
+    const [aspect, setAspect] = useState(null);
+
+    useBatchModeCameras({ aspect, views });
+    useBatchCloudsUpdater({ handlers, cameras: BATCH_CAMERAS });
+    const { batchSceneRef } = useBatchEditorScene({ handlers });
     const { canvasRef, containerRef, rendererRef } = useBatchEditorRenderer();
 
-    useEffect(() => {
-        const { filterFramePoints, handlePointCloudColors, handlePointsSize } = config.handlers;
-
-        for (let frame = 0; frame < BATCH_VIEWS.length; frame++) {
-            filterFramePoints(frame);
-            handlePointCloudColors(null, frame);
-            handlePointsSize(null, null, frame);
-        }
-
-        BATCH_VIEWS?.[0]?.[0].camera.position.set(3, 0, 1);
-    }, [batchMode]);
-
-    useFrame(() => {
+    const updateVisibility = () => {
         if (!rendererRef.current || !canvasRef.current || !batchMode) {
             canvasRef.current.style.display = "none";
             containerRef.current.style.display = "none";
-            return;
+            return false;
         }
 
         const visible = selectedCuboid && selectedCuboidGeometryRef.current;
         canvasRef.current.style.display = visible ? "block" : "none";
         containerRef.current.style.display = visible ? "" : "none";
 
+        return visible;
+    };
+
+    const updateRendererSize = () => {
         const width = containerRef.current.clientWidth;
         const height = containerRef.current.clientHeight;
 
@@ -54,27 +51,61 @@ export const useBatchEditor = (config) => {
             rendererRef.current.setSize(width, height);
         }
 
-        rendererRef.current.setScissorTest(true);
+        return { width, height };
+    };
 
-        const numFrames = BATCH_VIEWS.length;
-        const viewsPerFrame = BATCH_VIEWS[0].length;
+    const calculateViewportDimensions = (width, height) => {
+        const numFrames = BATCH_CAMERAS.length;
+        const viewsPerFrame = BATCH_CAMERAS[0].length;
         const frameWidth = (width - SIDE_VIEWS_GAP * (numFrames - 1)) / numFrames;
         const viewHeight = (height - SIDE_VIEWS_GAP * (viewsPerFrame - 1)) / viewsPerFrame;
 
-        if (frameWidth <= 0 || viewHeight <= 0) return;
-        config.aspectRef.current = frameWidth / viewHeight;
+        if (frameWidth <= 0 || viewHeight <= 0) return null;
 
-        BATCH_VIEWS.forEach((frameViews, frameIdx) => {
-            const filePath = pcdFiles[frameIdx];
-            const cloud = pointCloudRefs.current[filePath];
-            if (!cloud) return;
+        setAspect(frameWidth / viewHeight);
+        return { frameWidth, viewHeight, numFrames, viewsPerFrame };
+    };
 
-            batchSceneRef.current.children
-                .filter((child) => child.userData.isPointCloud)
-                .forEach((cloud) => batchSceneRef.current.remove(cloud));
+    const addCloudToScene = (frameIdx, tempObjects) => {
+        const filePath = pcdFiles[frameIdx];
+        const cloud = pointCloudRefs.current[filePath];
+        if (!cloud) return;
 
-            cloud.userData.isPointCloud = true;
-            batchSceneRef.current.add(cloud);
+        cloud.userData = { isPointCloud: true };
+        batchSceneRef.current.add(cloud);
+        tempObjects.push(cloud);
+    };
+
+    const addCuboidsToScene = (frameIdx, tempObjects) => {
+        const geometries = cuboidsGeometriesRef.current;
+        const solution = cuboidsSolutionRef.current;
+
+        const cuboids = solution[frameIdx] || [];
+        cuboids.forEach((cuboid) => {
+            if (cuboid.id === selectedCuboid?.id || !cuboid.visible) return;
+
+            const originalGeometry = geometries[cuboid.id]?.cube?.mesh;
+            if (!originalGeometry) return;
+
+            const meshClone = originalGeometry.clone();
+            const { position, scale, rotation } = cuboid.psr;
+
+            meshClone.position.set(position.x, position.y, position.z);
+            meshClone.scale.set(scale.x, scale.y, scale.z);
+            meshClone.rotation.set(rotation.x, rotation.y, rotation.z);
+
+            meshClone.userData = { cuboidId: cuboid.id };
+            batchSceneRef.current.add(meshClone);
+            tempObjects.push(meshClone);
+        });
+    };
+
+    const renderBatches = (width, height, frameWidth, viewHeight) => {
+        BATCH_CAMERAS.forEach((frameViews, frameIdx) => {
+            const tempObjects = [];
+
+            addCuboidsToScene(frameIdx, tempObjects);
+            addCloudToScene(frameIdx, tempObjects);
 
             batchSceneRef.current.updateMatrixWorld(true);
 
@@ -86,8 +117,20 @@ export const useBatchEditor = (config) => {
                 rendererRef.current.render(batchSceneRef.current, view.camera);
             });
 
-            batchSceneRef.current.remove(cloud);
+            tempObjects.forEach((obj) => batchSceneRef.current.remove(obj));
         });
+    };
+
+    useFrame(() => {
+        if (!updateVisibility()) return;
+
+        rendererRef.current.setScissorTest(true);
+        const { width, height } = updateRendererSize();
+
+        const dimensions = calculateViewportDimensions(width, height);
+        if (!dimensions) return;
+
+        renderBatches(width, height, dimensions.frameWidth, dimensions.viewHeight);
     });
 
     // temp hook

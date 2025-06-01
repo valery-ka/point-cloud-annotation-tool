@@ -37,17 +37,21 @@ export const useSideViewsRenderer = ({ aspectRef }) => {
         return () => renderer.dispose();
     }, [scene]);
 
-    useFrame(() => {
+    const updateVisibility = () => {
         if (!rendererRef.current || !canvasRef.current || batchMode) {
             canvasRef.current.style.display = "none";
             containerRef.current.style.display = "none";
-            return;
+            return false;
         }
 
         const visible = selectedCuboid && selectedCuboidGeometryRef.current;
         canvasRef.current.style.display = visible ? "block" : "none";
         containerRef.current.style.display = visible ? "" : "none";
 
+        return visible;
+    };
+
+    const updateRendererSize = () => {
         const width = containerRef.current.clientWidth;
         const height = containerRef.current.clientHeight;
 
@@ -55,18 +59,37 @@ export const useSideViewsRenderer = ({ aspectRef }) => {
             rendererRef.current.setSize(width, height);
         }
 
-        rendererRef.current.setScissorTest(true);
+        return { width, height };
+    };
 
+    const calculateViewportDimensions = (height) => {
         const viewCount = sideViews.length;
         const viewHeight = (height - SIDE_VIEWS_GAP * (viewCount - 1)) / viewCount;
-        if (viewHeight <= 0) return;
-        aspectRef.current = width / viewHeight;
 
+        if (viewHeight <= 0) return null;
+
+        aspectRef.current = containerRef.current.clientWidth / viewHeight;
+        return { viewHeight, viewCount };
+    };
+
+    const renderViews = (width, viewHeight, viewCount) => {
         sideViews.forEach((view, idx) => {
             const y = (viewCount - 1 - idx) * (viewHeight + SIDE_VIEWS_GAP);
             rendererRef.current.setViewport(0, y, width, viewHeight);
             rendererRef.current.setScissor(0, y, width, viewHeight);
             rendererRef.current.render(scene, view.camera);
         });
+    };
+
+    useFrame(() => {
+        if (!updateVisibility()) return;
+
+        const { width, height } = updateRendererSize();
+        rendererRef.current.setScissorTest(true);
+
+        const dimensions = calculateViewportDimensions(height);
+        if (!dimensions) return;
+
+        renderViews(width, dimensions.viewHeight, dimensions.viewCount);
     });
 };

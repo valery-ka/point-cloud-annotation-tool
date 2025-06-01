@@ -16,9 +16,16 @@ const PICKER_COLOR = "#ffffff";
 const PICKER_WIDTH = 30;
 const PICKER_OPACITY = 0;
 
-export const SideViewSVG = ({ name, x, y, width, height, mesh, camera }) => {
-    const { selectedCuboid, handlePositions, batchMode } = useCuboids();
-    const { corners = [], edges = [] } = handlePositions?.[name] ?? {};
+export const SideViewSVG = ({ name, x, y, width, height, mesh, camera, outline = false }) => {
+    const { selectedCuboid, handlePositions, batchHandlePositions, batchMode } = useCuboids();
+
+    const frame = mesh?.userData?.frame;
+
+    const currentViewHandles = batchMode
+        ? batchHandlePositions?.[frame]?.[name]
+        : handlePositions?.[name];
+
+    const { corners = [], edges = [] } = currentViewHandles ?? {};
 
     const [hoveredHandler, setHoveredHandler] = useState(null);
     const [hoveredView, setHoveredView] = useState(null);
@@ -166,32 +173,32 @@ export const SideViewSVG = ({ name, x, y, width, height, mesh, camera }) => {
         );
     }, [project, hoveredHandler, corners, height]);
 
-    // const renderBoxOutline = useCallback(() => {
-    //     if (!corners.length) return null;
+    const renderBoxOutline = useCallback(() => {
+        if (!corners.length || !outline) return null;
 
-    //     const projectedCorners = corners.map(project);
-    //     if (projectedCorners.some((p) => isNaN(p.x) || isNaN(p.y))) return null;
+        const projectedCorners = corners.map(project);
+        if (projectedCorners.some((p) => isNaN(p.x) || isNaN(p.y))) return null;
 
-    //     const color = mesh.userData.color;
+        const color = mesh.userData.color;
 
-    //     return edges.map((_, index) => {
-    //         const start = projectedCorners[index];
-    //         const end = projectedCorners[(index + 1) % projectedCorners.length];
+        return edges.map((_, index) => {
+            const start = projectedCorners[index];
+            const end = projectedCorners[(index + 1) % projectedCorners.length];
 
-    //         return (
-    //             <line
-    //                 key={`hovered-line-${index}`}
-    //                 x1={Math.max(0, start.x)}
-    //                 y1={Math.max(0, start.y)}
-    //                 x2={Math.max(0, end.x)}
-    //                 y2={Math.max(0, end.y)}
-    //                 stroke={color}
-    //                 strokeWidth={1}
-    //                 pointerEvents="none"
-    //             />
-    //         );
-    //     });
-    // }, [corners, edges]);
+            return (
+                <line
+                    key={`hovered-line-${index}`}
+                    x1={Math.max(0, start.x)}
+                    y1={Math.max(0, start.y)}
+                    x2={Math.max(0, end.x)}
+                    y2={Math.max(0, end.y)}
+                    stroke={color}
+                    strokeWidth={1}
+                    pointerEvents="none"
+                />
+            );
+        });
+    }, [corners, edges, outline]);
 
     useEffect(() => {
         setHoveredView(null);
@@ -215,10 +222,10 @@ export const SideViewSVG = ({ name, x, y, width, height, mesh, camera }) => {
             onMouseLeave={() => handleMouseLeave(null)}
         >
             <text x="10" y="20" fill={PICKER_COLOR} fontSize="14">
-                {name}
+                {frame ?? name}
             </text>
 
-            {/* {renderBoxOutline()} */}
+            {renderBoxOutline()}
             {edges.map(renderEdgesHandlers)}
             {renderRotationHandler()}
             {corners.map(renderCornersHandlers)}

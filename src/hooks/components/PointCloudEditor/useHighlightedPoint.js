@@ -30,7 +30,7 @@ export const useHighlightedPoint = () => {
         setSelectedClassIndex,
         isIntersectingMap,
     } = useEditor();
-    const { setSelectedCuboid } = useCuboids();
+    const { batchMode, setSelectedCuboid } = useCuboids();
     const { selectedTool } = useTools();
     const { highlightedPoint, setHighlightedPoint } = useHoveredPoint();
     const { settings } = useSettings();
@@ -159,7 +159,7 @@ export const useHighlightedPoint = () => {
 
     useEffect(() => {
         setHighlightedPoint(null);
-    }, [activeFrameIndex]);
+    }, [batchMode, activeFrameIndex]);
 
     const onMouseLeave = useCallback((event) => {
         setHighlightedPoint(null);

@@ -5,7 +5,7 @@ import { useThree } from "@react-three/fiber";
 
 import { useCuboids } from "contexts";
 
-export const useBatchEditorScene = (handlers) => {
+export const useBatchEditorScene = ({ handlers }) => {
     const { scene } = useThree();
     const { batchMode } = useCuboids();
 

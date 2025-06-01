@@ -87,5 +87,5 @@ export const useOrthographicView = (handlers) => {
     });
 
     useSideViewsRenderer({ aspectRef });
-    useBatchEditor({ aspectRef, handlers });
+    useBatchEditor({ handlers, views: VIEW_CONFIGS });
 };

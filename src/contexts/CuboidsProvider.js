@@ -3,6 +3,8 @@ import { INITIAL_SIDE_VIEWS_ZOOM } from "constants";
 
 const CuboidsContext = createContext();
 
+const TEMP_ZOOM = 0.5;
+
 const DEFAULT_INFO_CARD = {
     position: [0, 0, 0],
     scale: [0, 0, 0],
@@ -15,9 +17,9 @@ const DEFAULT_ZOOM = {
     top: INITIAL_SIDE_VIEWS_ZOOM,
     left: INITIAL_SIDE_VIEWS_ZOOM,
     front: INITIAL_SIDE_VIEWS_ZOOM,
-    batch_top: INITIAL_SIDE_VIEWS_ZOOM,
-    batch_left: INITIAL_SIDE_VIEWS_ZOOM,
-    batch_front: INITIAL_SIDE_VIEWS_ZOOM,
+    batch_top: TEMP_ZOOM,
+    batch_left: TEMP_ZOOM,
+    batch_front: TEMP_ZOOM,
 };
 
 export const CuboidsProvider = ({ children }) => {
@@ -33,8 +35,12 @@ export const CuboidsProvider = ({ children }) => {
     const [sideViews, setSideViews] = useState([]);
     const [handlePositions, setHandlePositions] = useState({});
 
+    // все, что с батчем в отдельный хук / контекст мб вынести?...
     const [batchMode, setBatchMode] = useState(false);
     const [batchEditorCameras, setBatchEditorCameras] = useState({});
+    const [batchHandlePositions, setBatchHandlePositions] = useState({});
+    const selectedCuboidBatchGeometriesRef = useRef(null);
+    const batchViewsCamerasNeedUpdateRef = useRef(true);
 
     const isCuboidTransformingRef = useRef(false);
     const sideViewCameraZoomsRef = useRef(DEFAULT_ZOOM);
@@ -68,6 +74,10 @@ export const CuboidsProvider = ({ children }) => {
                 batchEditorCameras,
                 setBatchEditorCameras,
                 sideViewCameraZoomsRef,
+                selectedCuboidBatchGeometriesRef,
+                batchHandlePositions,
+                setBatchHandlePositions,
+                batchViewsCamerasNeedUpdateRef,
             }}
         >
             {children}
