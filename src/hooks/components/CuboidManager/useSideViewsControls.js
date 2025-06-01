@@ -219,11 +219,13 @@ export const useSideViewsControls = ({ camera, mesh, hoveredView, hoveredHandler
                 configRotate,
             });
 
-            const frameShortcuts = {
-                1: handleGoToPreviousFrame,
-                2: handleGoToNextFrame,
-            };
-            frameShortcuts[e.key]?.();
+            if (!batchMode) {
+                const frameShortcuts = {
+                    1: handleGoToPreviousFrame,
+                    2: handleGoToNextFrame,
+                };
+                frameShortcuts[e.key]?.();
+            }
 
             if (didTransform) {
                 batchEditingFrameRef.current = mesh?.userData?.frame;
@@ -231,7 +233,7 @@ export const useSideViewsControls = ({ camera, mesh, hoveredView, hoveredHandler
                 transformControlsRef.current.dispatchEvent({ type: "dragging-changed" });
             }
         },
-        [hoveredView, mesh, name, handleGoToPreviousFrame, handleGoToNextFrame],
+        [hoveredView, mesh, name, handleGoToPreviousFrame, handleGoToNextFrame, batchMode],
     );
 
     useEffect(() => {

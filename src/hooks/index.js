@@ -66,3 +66,4 @@ export { useBatchEditorScene } from "./components/BatchView/useBatchEditorScene"
 export { useBatchModeCameras } from "./components/BatchView/useBatchModeCameras";
 export { useBatchCloudsUpdater } from "./components/BatchView/useBatchCloudsUpdater";
 export { useBatchEditorRenderer } from "./components/BatchView/useBatchEditorRenderer";
+export { useBatchEditorGeometrySelector } from "./components/BatchView/useBatchEditorGeometrySelector";

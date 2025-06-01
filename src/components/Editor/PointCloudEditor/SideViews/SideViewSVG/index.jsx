@@ -16,7 +16,17 @@ const PICKER_COLOR = "#ffffff";
 const PICKER_WIDTH = 30;
 const PICKER_OPACITY = 0;
 
-export const SideViewSVG = ({ name, x, y, width, height, mesh, camera, outline = false }) => {
+export const SideViewSVG = ({
+    name,
+    x,
+    y,
+    width,
+    height,
+    mesh,
+    camera,
+    outline = false,
+    fileName = null,
+}) => {
     const { selectedCuboid, handlePositions, batchHandlePositions, batchMode } = useCuboids();
 
     const frame = mesh?.userData?.frame;
@@ -222,7 +232,7 @@ export const SideViewSVG = ({ name, x, y, width, height, mesh, camera, outline =
             onMouseLeave={() => handleMouseLeave(null)}
         >
             <text x="10" y="20" fill={PICKER_COLOR} fontSize="14">
-                {frame ?? name}
+                {fileName ?? name}
             </text>
 
             {renderBoxOutline()}

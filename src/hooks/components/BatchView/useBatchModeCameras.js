@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useFrame } from "@react-three/fiber";
 
 import { useCuboids } from "contexts";
@@ -6,16 +6,21 @@ import { useCuboids } from "contexts";
 import { setupCamera, updateCamera, getCuboidHandlesPositions } from "utils/cuboids";
 
 export const useBatchModeCameras = ({ aspect, views }) => {
-    const { batchMode, batchEditorCameras, setBatchEditorCameras } = useCuboids();
-    const { selectedCuboid, cuboidsGeometriesRef, cuboidsSolutionRef } = useCuboids();
-    const { sideViewCameraZoomsRef, setBatchHandlePositions } = useCuboids();
-    const { selectedCuboidBatchGeometriesRef, batchViewsCamerasNeedUpdateRef } = useCuboids();
-
-    const [viewsCount, setViewsCount] = useState(5);
+    const {
+        viewsCount,
+        batchMode,
+        batchEditorCameras,
+        setBatchEditorCameras,
+        sideViewCameraZoomsRef,
+        setBatchHandlePositions,
+        selectedCuboidBatchGeometriesRef,
+        batchViewsCamerasNeedUpdateRef,
+        currentFrame,
+    } = useCuboids();
 
     useEffect(() => {
         const batchFramesList = {};
-        for (let i = 0; i < viewsCount; i++) {
+        for (let i = currentFrame[0]; i < currentFrame[1] + 1; i++) {
             batchFramesList[i] = views.map((config) => {
                 const batchName = `batch_${config.name}`;
                 return {
@@ -27,7 +32,7 @@ export const useBatchModeCameras = ({ aspect, views }) => {
             });
         }
         setBatchEditorCameras(batchFramesList);
-    }, [viewsCount]);
+    }, [currentFrame, viewsCount]);
 
     const updateHandlePositions = (frame, mesh, views) => {
         if (!mesh) return;
@@ -70,40 +75,6 @@ export const useBatchModeCameras = ({ aspect, views }) => {
     });
 
     useEffect(() => {
-        if (batchMode && selectedCuboid) {
-            const originalGeometry = cuboidsGeometriesRef.current[selectedCuboid?.id]?.cube?.mesh;
-            if (!originalGeometry) return;
-
-            const cuboids = cuboidsSolutionRef.current;
-            const batchGeometries = {};
-
-            Object.entries(cuboids).forEach(([frameKey, cuboidsArray]) => {
-                const frame = parseInt(frameKey);
-                const cuboid = cuboidsArray.find((c) => c.id === selectedCuboid.id);
-
-                if (cuboid) {
-                    const meshClone = originalGeometry.clone();
-                    const { position, scale, rotation } = cuboid.psr;
-                    meshClone.position.set(position.x, position.y, position.z);
-                    meshClone.scale.set(scale.x, scale.y, scale.z);
-                    meshClone.rotation.set(rotation.x, rotation.y, rotation.z);
-
-                    meshClone.userData = {
-                        ...originalGeometry.userData,
-                        frame: frame,
-                    };
-
-                    batchGeometries[frame] = meshClone;
-                }
-            });
-
-            selectedCuboidBatchGeometriesRef.current = batchGeometries;
-        } else {
-            selectedCuboidBatchGeometriesRef.current = null;
-        }
-    }, [batchEditorCameras, selectedCuboid, batchMode]);
-
-    useEffect(() => {
         batchViewsCamerasNeedUpdateRef.current = true;
-    }, [aspect, batchMode]);
+    }, [aspect, batchMode, currentFrame, batchEditorCameras]);
 };

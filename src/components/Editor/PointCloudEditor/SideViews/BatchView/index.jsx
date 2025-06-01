@@ -1,13 +1,14 @@
 import { createPortal } from "react-dom";
 import { useEffect, useRef, useState } from "react";
 
-import { useCuboids } from "contexts";
+import { useCuboids, useFileManager } from "contexts";
 
 import { SIDE_VIEWS_GAP } from "constants";
 
 import { SideViewSVG } from "../SideViewSVG";
 
 export const BatchView = () => {
+    const { pcdFiles } = useFileManager();
     const { selectedCuboidBatchGeometriesRef, batchEditorCameras, batchMode } = useCuboids();
 
     const containerRef = useRef(null);
@@ -45,11 +46,14 @@ export const BatchView = () => {
             <div className="side-views-container" style={{ position: "absolute", top: 0, left: 0 }}>
                 {frameEntries.map(([frameKey, views], frameIdx) =>
                     views.map((view, viewIdx) => {
-                        const mesh = selectedCuboidBatchGeometriesRef.current?.[frameIdx];
+                        const frame = view.frame;
+                        const mesh = selectedCuboidBatchGeometriesRef.current?.[frame];
                         if (!mesh) return null;
 
                         const x = frameIdx * (frameWidth + SIDE_VIEWS_GAP);
                         const y = viewIdx * (viewHeight + SIDE_VIEWS_GAP);
+
+                        const name = pcdFiles[frame].split("/").pop().replace(".pcd", "");
 
                         return (
                             <SideViewSVG
@@ -62,6 +66,7 @@ export const BatchView = () => {
                                 mesh={mesh}
                                 camera={view.camera}
                                 outline={true}
+                                fileName={name}
                             />
                         );
                     }),

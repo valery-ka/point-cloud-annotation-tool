@@ -37,8 +37,10 @@ export const CuboidsProvider = ({ children }) => {
 
     // все, что с батчем в отдельный хук / контекст мб вынести?...
     const [batchMode, setBatchMode] = useState(false);
+    const [currentFrame, setCurrentFrame] = useState([]);
     const [batchEditorCameras, setBatchEditorCameras] = useState({});
     const [batchHandlePositions, setBatchHandlePositions] = useState({});
+    const [viewsCount, setViewsCount] = useState(10);
     const selectedCuboidBatchGeometriesRef = useRef(null);
     const batchViewsCamerasNeedUpdateRef = useRef(true);
     const batchEditingFrameRef = useRef(null);
@@ -80,6 +82,10 @@ export const CuboidsProvider = ({ children }) => {
                 setBatchHandlePositions,
                 batchViewsCamerasNeedUpdateRef,
                 batchEditingFrameRef,
+                currentFrame,
+                setCurrentFrame,
+                viewsCount,
+                setViewsCount,
             }}
         >
             {children}

@@ -8,6 +8,8 @@ import {
     useBatchEditorScene,
     useBatchModeCameras,
     useBatchCloudsUpdater,
+    useBatchEditorGeometrySelector,
+    useMousetrapPause,
 } from "hooks";
 
 import { SIDE_VIEWS_GAP } from "constants";
@@ -24,6 +26,8 @@ export const useBatchEditor = ({ handlers, views }) => {
 
     const [aspect, setAspect] = useState(null);
 
+    useMousetrapPause(batchMode);
+    useBatchEditorGeometrySelector();
     useBatchModeCameras({ aspect, views });
     useBatchCloudsUpdater({ handlers, cameras: BATCH_CAMERAS });
     const { batchSceneRef } = useBatchEditorScene({ handlers });
@@ -66,8 +70,8 @@ export const useBatchEditor = ({ handlers, views }) => {
         return { frameWidth, viewHeight, numFrames, viewsPerFrame };
     };
 
-    const addCloudToScene = (frameIdx, tempObjects) => {
-        const filePath = pcdFiles[frameIdx];
+    const addCloudToScene = (frame, tempObjects) => {
+        const filePath = pcdFiles[frame];
         const cloud = pointCloudRefs.current[filePath];
         if (!cloud) return;
 
@@ -76,11 +80,11 @@ export const useBatchEditor = ({ handlers, views }) => {
         tempObjects.push(cloud);
     };
 
-    const addCuboidsToScene = (frameIdx, tempObjects) => {
+    const addCuboidsToScene = (frame, tempObjects) => {
         const geometries = cuboidsGeometriesRef.current;
         const solution = cuboidsSolutionRef.current;
 
-        const cuboids = solution[frameIdx] || [];
+        const cuboids = solution[frame] || [];
         cuboids.forEach((cuboid) => {
             if (cuboid.id === selectedCuboid?.id || !cuboid.visible) return;
 
@@ -102,10 +106,11 @@ export const useBatchEditor = ({ handlers, views }) => {
 
     const renderBatches = (width, height, frameWidth, viewHeight) => {
         BATCH_CAMERAS.forEach((frameViews, frameIdx) => {
+            const frame = frameViews[0].frame;
             const tempObjects = [];
 
-            addCuboidsToScene(frameIdx, tempObjects);
-            addCloudToScene(frameIdx, tempObjects);
+            addCuboidsToScene(frame, tempObjects);
+            addCloudToScene(frame, tempObjects);
 
             batchSceneRef.current.updateMatrixWorld(true);
 
@@ -138,6 +143,8 @@ export const useBatchEditor = ({ handlers, views }) => {
         const handleKeyDown = (e) => {
             if (e.code === "Tab") {
                 setBatchMode((prev) => !prev);
+            } else if (e.code === "Escape") {
+                setBatchMode(false);
             }
         };
 
