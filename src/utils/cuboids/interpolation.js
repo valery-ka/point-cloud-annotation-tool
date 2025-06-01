@@ -172,6 +172,7 @@ export const writePSRToSolution = ({
     cuboidsSolutionRef,
     manual = false,
     visible = undefined,
+    preserveManual = false,
 }) => {
     const id = mesh.name;
     const type = mesh.userData.label;
@@ -200,7 +201,10 @@ export const writePSRToSolution = ({
         };
 
         if (existing) {
-            Object.assign(existing, data);
+            Object.assign(existing, {
+                ...data,
+                manual: preserveManual ? existing.manual || manual : manual,
+            });
         } else {
             cuboidsSolutionRef.current[frameIndex].push(data);
         }

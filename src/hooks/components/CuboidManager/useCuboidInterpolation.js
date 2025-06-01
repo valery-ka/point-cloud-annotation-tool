@@ -14,6 +14,13 @@ export const useCuboidInterpolation = () => {
         setFrameMarkers,
     } = useCuboids();
 
+    const {
+        batchViewsCamerasNeedUpdateRef,
+        selectedCuboidBatchGeometriesRef,
+        batchEditingFrameRef,
+        batchMode,
+    } = useCuboids();
+
     const interpolatePSR = useCallback(() => {
         const selectedCuboid = selectedCuboidGeometryRef.current;
         if (!selectedCuboid?.name) return;
@@ -26,8 +33,30 @@ export const useCuboidInterpolation = () => {
         });
     }, [pcdFiles]);
 
+    const interpolatePSRBatch = useCallback(() => {
+        const geometries = selectedCuboidBatchGeometriesRef.current;
+        if (!geometries) return;
+
+        const totalFrames = pcdFiles.length;
+
+        Object.values(geometries).forEach((cube) => {
+            if (!cube?.name) return;
+
+            interpolateBetweenFrames({
+                cuboidsGeometriesRef,
+                cuboidsSolutionRef,
+                totalFrames,
+                selectedId: cube.name,
+            });
+        });
+
+        batchViewsCamerasNeedUpdateRef.current = true;
+    }, [pcdFiles]);
+
     const updateCuboidPSR = useCallback(
         (frame) => {
+            if (batchMode) return;
+
             const geometries = cuboidsGeometriesRef.current;
 
             const frameIndex = frame ?? activeFrameIndex;
@@ -56,31 +85,34 @@ export const useCuboidInterpolation = () => {
 
             sideViewsCamerasNeedUpdateRef.current = true;
         },
-        [activeFrameIndex],
+        [batchMode, activeFrameIndex],
     );
 
-    const findFrameMarkers = useCallback(() => {
-        const selectedCuboid = selectedCuboidGeometryRef.current;
-        if (!selectedCuboid) return;
-
-        const id = selectedCuboid.name;
-        const keyframes = [];
-        const visibility = [];
-
+    const updateCuboidPSRBatch = useCallback(() => {
+        const geometries = selectedCuboidBatchGeometriesRef.current;
         const solution = cuboidsSolutionRef.current;
-        for (const [frameIndexStr, frameSolution] of Object.entries(solution)) {
-            const frameIndex = Number(frameIndexStr);
 
-            for (const cuboid of Object.values(frameSolution)) {
-                if (cuboid.id === id) {
-                    if (cuboid.manual) keyframes.push(frameIndex);
-                    if (cuboid.visible === false) visibility.push(frameIndex);
-                    break;
-                }
-            }
-        }
+        if (!geometries || !solution) return;
 
-        setFrameMarkers([keyframes, visibility]);
+        Object.values(geometries).forEach((cube) => {
+            if (!cube) return;
+
+            const id = cube.name;
+            const frame = cube.userData.frame;
+            const frameSolution = solution[frame];
+            if (!frameSolution) return;
+
+            const data = frameSolution.find((c) => c.id === id);
+            if (!data || !data.psr) return;
+
+            const { position, rotation, scale } = data.psr;
+            cube.position.set(position.x, position.y, position.z);
+            cube.scale.set(scale.x, scale.y, scale.z);
+            cube.rotation.set(rotation.x, rotation.y, rotation.z);
+            cube.visible = data.visible !== false;
+        });
+
+        batchViewsCamerasNeedUpdateRef.current = true;
     }, []);
 
     const saveCurrentPSR = useCallback(({ manual = true, activeFrameIndex }) => {
@@ -108,5 +140,60 @@ export const useCuboidInterpolation = () => {
         sideViewsCamerasNeedUpdateRef.current = true;
     }, []);
 
-    return { interpolatePSR, updateCuboidPSR, findFrameMarkers, saveCurrentPSR };
+    const saveCurrentPSRBatch = useCallback(() => {
+        const geometries = selectedCuboidBatchGeometriesRef.current;
+        const id = selectedCuboidGeometryRef.current.name;
+
+        Object.values(geometries).forEach((cube) => {
+            if (!cube || cube.name !== id) return;
+            const mesh = cube;
+            const frame = cube.userData.frame;
+            const manual = frame === batchEditingFrameRef.current;
+
+            writePSRToSolution({
+                mesh,
+                frameIndices: [frame],
+                cuboidsSolutionRef,
+                manual: manual,
+                preserveManual: true,
+            });
+        });
+
+        batchViewsCamerasNeedUpdateRef.current = true;
+        batchEditingFrameRef.current = null;
+    }, []);
+
+    const findFrameMarkers = useCallback(() => {
+        const selectedCuboid = selectedCuboidGeometryRef.current;
+        if (!selectedCuboid) return;
+
+        const id = selectedCuboid.name;
+        const keyframes = [];
+        const visibility = [];
+
+        const solution = cuboidsSolutionRef.current;
+        for (const [frameIndexStr, frameSolution] of Object.entries(solution)) {
+            const frameIndex = Number(frameIndexStr);
+
+            for (const cuboid of Object.values(frameSolution)) {
+                if (cuboid.id === id) {
+                    if (cuboid.manual) keyframes.push(frameIndex);
+                    if (cuboid.visible === false) visibility.push(frameIndex);
+                    break;
+                }
+            }
+        }
+
+        setFrameMarkers([keyframes, visibility]);
+    }, []);
+
+    return {
+        interpolatePSR,
+        updateCuboidPSR,
+        findFrameMarkers,
+        saveCurrentPSR,
+        saveCurrentPSRBatch,
+        interpolatePSRBatch,
+        updateCuboidPSRBatch,
+    };
 };

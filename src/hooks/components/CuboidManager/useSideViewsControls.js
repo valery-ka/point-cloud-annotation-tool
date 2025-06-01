@@ -29,7 +29,7 @@ const rotate = "rotate";
 export const useSideViewsControls = ({ camera, mesh, hoveredView, hoveredHandler, name }) => {
     const { sideViewsCamerasNeedUpdateRef, isCuboidTransformingRef, sideViewCameraZoomsRef } =
         useCuboids();
-    const { batchMode, batchViewsCamerasNeedUpdateRef } = useCuboids();
+    const { batchMode, batchViewsCamerasNeedUpdateRef, batchEditingFrameRef } = useCuboids();
 
     const { cameraControlsRef, transformControlsRef } = useEditor();
 
@@ -144,11 +144,12 @@ export const useSideViewsControls = ({ camera, mesh, hoveredView, hoveredHandler
         }
 
         isCuboidTransformingRef.current = true;
+        batchEditingFrameRef.current = mesh?.userData?.frame;
     }, [hoveredView, hoveredHandler]);
 
     const handleMouseMove = useCallback(
         (e) => {
-            if (!isCuboidTransformingRef.current) {
+            if (!isCuboidTransformingRef.current || !mesh) {
                 cameraControlsRef.current.enabled = true;
                 return;
             }
@@ -225,6 +226,7 @@ export const useSideViewsControls = ({ camera, mesh, hoveredView, hoveredHandler
             frameShortcuts[e.key]?.();
 
             if (didTransform) {
+                batchEditingFrameRef.current = mesh?.userData?.frame;
                 transformControlsRef.current.dispatchEvent({ type: "change" });
                 transformControlsRef.current.dispatchEvent({ type: "dragging-changed" });
             }

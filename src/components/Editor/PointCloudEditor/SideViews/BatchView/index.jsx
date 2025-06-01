@@ -46,6 +46,7 @@ export const BatchView = () => {
                 {frameEntries.map(([frameKey, views], frameIdx) =>
                     views.map((view, viewIdx) => {
                         const mesh = selectedCuboidBatchGeometriesRef.current?.[frameIdx];
+                        if (!mesh) return null;
 
                         const x = frameIdx * (frameWidth + SIDE_VIEWS_GAP);
                         const y = viewIdx * (viewHeight + SIDE_VIEWS_GAP);

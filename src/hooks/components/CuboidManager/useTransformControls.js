@@ -15,23 +15,34 @@ export const useTransformControls = () => {
     const { activeFrameIndex } = useFrames();
     const { cameraControlsRef, transformControlsRef } = useEditor();
     const { sideViewsCamerasNeedUpdateRef, isCuboidTransformingRef } = useCuboids();
+    const { batchMode, batchViewsCamerasNeedUpdateRef } = useCuboids();
 
     const { saveCurrentPSR, interpolatePSR, findFrameMarkers } = useCuboidInterpolation();
+    const { saveCurrentPSRBatch, interpolatePSRBatch, updateCuboidPSRBatch } =
+        useCuboidInterpolation();
 
-    const debouncedInterpolatePSR = useDebouncedCallback(() => {
+    const debouncedInterpolatePSRSingle = useDebouncedCallback(() => {
         saveCurrentPSR({ activeFrameIndex: activeFrameIndex });
-        findFrameMarkers();
         interpolatePSR();
-        console.log("onTransformFinished");
+        console.log("single finished");
+    }, REQUEST_INTERPOLATE_PSR_TIME);
+
+    const debouncedInterpolatePSRBatch = useDebouncedCallback(() => {
+        saveCurrentPSRBatch();
+        interpolatePSRBatch();
+        updateCuboidPSRBatch();
+        console.log("batch finished");
     }, REQUEST_INTERPOLATE_PSR_TIME);
 
     const onTransformChange = useCallback(() => {
         sideViewsCamerasNeedUpdateRef.current = true;
+        batchViewsCamerasNeedUpdateRef.current = true;
     }, []);
 
     const onTransformFinished = useCallback(() => {
-        debouncedInterpolatePSR();
-    }, [activeFrameIndex, interpolatePSR]);
+        batchMode ? debouncedInterpolatePSRBatch() : debouncedInterpolatePSRSingle();
+        findFrameMarkers();
+    }, [activeFrameIndex, batchMode, interpolatePSR]);
 
     const onDraggingChanged = useCallback(
         (event) => {

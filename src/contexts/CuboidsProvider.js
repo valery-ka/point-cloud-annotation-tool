@@ -41,6 +41,7 @@ export const CuboidsProvider = ({ children }) => {
     const [batchHandlePositions, setBatchHandlePositions] = useState({});
     const selectedCuboidBatchGeometriesRef = useRef(null);
     const batchViewsCamerasNeedUpdateRef = useRef(true);
+    const batchEditingFrameRef = useRef(null);
 
     const isCuboidTransformingRef = useRef(false);
     const sideViewCameraZoomsRef = useRef(DEFAULT_ZOOM);
@@ -78,6 +79,7 @@ export const CuboidsProvider = ({ children }) => {
                 batchHandlePositions,
                 setBatchHandlePositions,
                 batchViewsCamerasNeedUpdateRef,
+                batchEditingFrameRef,
             }}
         >
             {children}
