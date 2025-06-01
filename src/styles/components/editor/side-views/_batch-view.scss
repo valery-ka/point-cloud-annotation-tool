@@ -7,7 +7,7 @@
     z-index: 10000;
     background-color: var(--primary-theme-color);
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     user-select: none;
     pointer-events: auto;
 
@@ -20,4 +20,17 @@
     width: 100%;
     height: 100%;
     display: block;
+}
+
+.batch-canvas-wrapper {
+    position: relative;
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+}
+
+.batch-header-checkboxes-group {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
 }

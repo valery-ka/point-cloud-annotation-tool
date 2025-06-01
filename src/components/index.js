@@ -14,3 +14,4 @@ export { TopLoader } from "./UI/TopLoader";
 export { Dialog } from "./UI/Dialog";
 export { ContextMenu } from "./UI/ContextMenu";
 export { default as ErrorBoundary } from "./UI/ErrorBoundary";
+export { Checkbox } from "./UI/Checkbox";

@@ -41,6 +41,12 @@ export const CuboidsProvider = ({ children }) => {
     const [batchEditorCameras, setBatchEditorCameras] = useState({});
     const [batchHandlePositions, setBatchHandlePositions] = useState({});
     const [viewsCount, setViewsCount] = useState(10);
+    const [activeCameraViews, setActiveCameraViews] = useState({
+        top: true,
+        left: true,
+        front: true,
+    });
+
     const selectedCuboidBatchGeometriesRef = useRef(null);
     const batchViewsCamerasNeedUpdateRef = useRef(true);
     const batchEditingFrameRef = useRef(null);
@@ -86,6 +92,8 @@ export const CuboidsProvider = ({ children }) => {
                 setCurrentFrame,
                 viewsCount,
                 setViewsCount,
+                activeCameraViews,
+                setActiveCameraViews,
             }}
         >
             {children}

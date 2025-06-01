@@ -6,6 +6,7 @@ import { useCuboids, useFileManager } from "contexts";
 import { SIDE_VIEWS_GAP } from "constants";
 
 import { SideViewSVG } from "../SideViewSVG";
+import { BatchHeader } from "../BatchHeader";
 
 export const BatchView = () => {
     const { pcdFiles } = useFileManager();
@@ -42,35 +43,43 @@ export const BatchView = () => {
 
     return createPortal(
         <div id="batch-view-canvas-container" ref={containerRef}>
-            <canvas id="batch-view-canvas" />
-            <div className="side-views-container" style={{ position: "absolute", top: 0, left: 0 }}>
-                {frameEntries.map(([frameKey, views], frameIdx) =>
-                    views.map((view, viewIdx) => {
-                        const frame = view.frame;
-                        const mesh = selectedCuboidBatchGeometriesRef.current?.[frame];
-                        if (!mesh) return null;
+            <div className="batch-header-wrapper">
+                <BatchHeader />
+            </div>
+            <div className="batch-canvas-wrapper">
+                <canvas id="batch-view-canvas" />
+                <div
+                    className="side-views-container"
+                    style={{ position: "absolute", top: 0, left: 0 }}
+                >
+                    {frameEntries.map(([frameKey, views], frameIdx) =>
+                        views.map((view, viewIdx) => {
+                            const frame = view.frame;
+                            const mesh = selectedCuboidBatchGeometriesRef.current?.[frame];
+                            if (!mesh) return null;
 
-                        const x = frameIdx * (frameWidth + SIDE_VIEWS_GAP);
-                        const y = viewIdx * (viewHeight + SIDE_VIEWS_GAP);
+                            const x = frameIdx * (frameWidth + SIDE_VIEWS_GAP);
+                            const y = viewIdx * (viewHeight + SIDE_VIEWS_GAP);
 
-                        const name = pcdFiles[frame].split("/").pop().replace(".pcd", "");
+                            const name = pcdFiles[frame].split("/").pop().replace(".pcd", "");
 
-                        return (
-                            <SideViewSVG
-                                key={`${frameKey}-${view.name}`}
-                                name={view.name}
-                                x={x}
-                                y={y}
-                                width={frameWidth}
-                                height={viewHeight}
-                                mesh={mesh}
-                                camera={view.camera}
-                                outline={true}
-                                fileName={name}
-                            />
-                        );
-                    }),
-                )}
+                            return (
+                                <SideViewSVG
+                                    key={`${frameKey}-${view.name}`}
+                                    name={view.name}
+                                    x={x}
+                                    y={y}
+                                    width={frameWidth}
+                                    height={viewHeight}
+                                    mesh={mesh}
+                                    camera={view.camera}
+                                    outline={true}
+                                    fileName={name}
+                                />
+                            );
+                        }),
+                    )}
+                </div>
             </div>
         </div>,
         document.getElementById("root"),

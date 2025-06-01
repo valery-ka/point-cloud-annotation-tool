@@ -16,12 +16,15 @@ export const useBatchModeCameras = ({ aspect, views }) => {
         selectedCuboidBatchGeometriesRef,
         batchViewsCamerasNeedUpdateRef,
         currentFrame,
+        activeCameraViews,
     } = useCuboids();
 
     useEffect(() => {
         const batchFramesList = {};
         for (let i = currentFrame[0]; i < currentFrame[1] + 1; i++) {
-            batchFramesList[i] = views.map((config) => {
+            const filteredViews = views.filter(({ name }) => activeCameraViews[name]);
+
+            batchFramesList[i] = filteredViews.map((config) => {
                 const batchName = `batch_${config.name}`;
                 return {
                     ...config,
@@ -32,7 +35,7 @@ export const useBatchModeCameras = ({ aspect, views }) => {
             });
         }
         setBatchEditorCameras(batchFramesList);
-    }, [currentFrame, viewsCount]);
+    }, [currentFrame, viewsCount, activeCameraViews]);
 
     const updateHandlePositions = (frame, mesh, views) => {
         if (!mesh) return;
