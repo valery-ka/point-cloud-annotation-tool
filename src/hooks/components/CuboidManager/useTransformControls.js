@@ -23,12 +23,14 @@ export const useTransformControls = () => {
 
     const debouncedInterpolatePSRSingle = useDebouncedCallback(() => {
         saveCurrentPSR({ activeFrameIndex: activeFrameIndex });
+        findFrameMarkers();
         interpolatePSR();
         console.log("single finished");
     }, REQUEST_INTERPOLATE_PSR_TIME);
 
     const debouncedInterpolatePSRBatch = useDebouncedCallback(() => {
         saveCurrentPSRBatch();
+        findFrameMarkers();
         interpolatePSRBatch();
         updateCuboidPSRBatch();
         console.log("batch finished");
@@ -41,7 +43,6 @@ export const useTransformControls = () => {
 
     const onTransformFinished = useCallback(() => {
         batchMode ? debouncedInterpolatePSRBatch() : debouncedInterpolatePSRSingle();
-        findFrameMarkers();
     }, [activeFrameIndex, batchMode, interpolatePSR]);
 
     const onDraggingChanged = useCallback(

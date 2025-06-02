@@ -1,6 +1,6 @@
 import { memo, useCallback } from "react";
 
-import { useCuboids } from "contexts";
+import { useCuboids, useFileManager } from "contexts";
 import { useClickOutsideBlur } from "hooks";
 
 import { Checkbox } from "components";
@@ -14,7 +14,9 @@ const checkboxItems = [
 ];
 
 export const BatchHeader = memo(() => {
+    const { pcdFiles } = useFileManager();
     const { viewsCount, setViewsCount, activeCameraViews, setActiveCameraViews } = useCuboids();
+
     const framesSelectRef = useClickOutsideBlur();
 
     const checkedCount = Object.values(activeCameraViews).filter(Boolean).length;
@@ -39,9 +41,9 @@ export const BatchHeader = memo(() => {
     );
 
     return (
-        <div className="file-navigator">
-            <div className="file-navigator-content">
-                <div className="file-navigator-selectors">
+        <div className="batch-editor">
+            <div className="batch-editor-content">
+                <div className="batch-header-selectors">
                     <select
                         id="frames-select"
                         onChange={handleFramesChange}
@@ -52,7 +54,7 @@ export const BatchHeader = memo(() => {
                             {"Количество батчей"}
                         </option>
                         {frameOptions.map((count) => (
-                            <option key={count} value={count}>
+                            <option key={count} value={count} disabled={count > pcdFiles.length}>
                                 {count}
                             </option>
                         ))}

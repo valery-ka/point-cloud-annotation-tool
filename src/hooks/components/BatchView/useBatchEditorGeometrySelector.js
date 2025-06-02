@@ -29,6 +29,7 @@ export const useBatchEditorGeometrySelector = () => {
                     meshClone.scale.set(scale.x, scale.y, scale.z);
                     meshClone.rotation.set(rotation.x, rotation.y, rotation.z);
 
+                    meshClone.visible = cuboid.visible;
                     meshClone.userData = {
                         ...originalGeometry.userData,
                         frame: frame,

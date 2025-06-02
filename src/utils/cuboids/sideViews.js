@@ -47,6 +47,18 @@ export const updateCamera = (camera, mesh, scaleOrder, getOrientation, aspect, z
     camera.updateMatrixWorld(true);
 };
 
+export const getBatchLayout = (batchCount) => {
+    const shouldUseTwoRows = batchCount > 10;
+    const rows = shouldUseTwoRows ? 2 : 1;
+    const framesPerRow = shouldUseTwoRows ? Math.ceil(batchCount / rows) : batchCount;
+
+    return {
+        rows,
+        framesPerRow,
+        isTwoRows: shouldUseTwoRows,
+    };
+};
+
 export const getCuboidHandlesPositions = (mesh, scaleOrder) => {
     if (!mesh) return [];
 
@@ -278,6 +290,8 @@ export const scalingConfigs = (dx, dy) => {
 
 export const applyKeyTransformToMesh = ({ code, mesh, configTranslate, configRotate }) => {
     if (!mesh || !configTranslate || !configRotate) return;
+
+    if (!mesh.visible) return false;
 
     switch (code) {
         case "KeyW": {

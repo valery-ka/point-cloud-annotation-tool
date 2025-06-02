@@ -64,6 +64,7 @@ export { useCuboidInterpolation } from "./components/CuboidManager/useCuboidInte
 export { useBatchEditor } from "./components/BatchView/useBatchEditor";
 export { useBatchEditorScene } from "./components/BatchView/useBatchEditorScene";
 export { useBatchModeCameras } from "./components/BatchView/useBatchModeCameras";
+export { useBatchEditorEvents } from "./components/BatchView/useBatchEditorEvents";
 export { useBatchCloudsUpdater } from "./components/BatchView/useBatchCloudsUpdater";
 export { useBatchEditorRenderer } from "./components/BatchView/useBatchEditorRenderer";
 export { useBatchEditorGeometrySelector } from "./components/BatchView/useBatchEditorGeometrySelector";

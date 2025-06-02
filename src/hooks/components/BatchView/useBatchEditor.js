@@ -13,6 +13,7 @@ import {
 } from "hooks";
 
 import { SIDE_VIEWS_GAP } from "constants";
+import { getBatchLayout } from "utils/cuboids";
 
 export const useBatchEditor = ({ handlers, views }) => {
     const { pcdFiles } = useFileManager();
@@ -31,7 +32,7 @@ export const useBatchEditor = ({ handlers, views }) => {
     useBatchModeCameras({ aspect, views });
     useBatchCloudsUpdater({ handlers, cameras: BATCH_CAMERAS });
     const { batchSceneRef } = useBatchEditorScene({ handlers });
-    const { canvasRef, containerRef, rendererRef } = useBatchEditorRenderer();
+    const { canvasRef, containerRef, wrapperRef, rendererRef } = useBatchEditorRenderer();
 
     const updateVisibility = () => {
         if (!rendererRef.current || !canvasRef.current || !batchMode) {
@@ -48,26 +49,26 @@ export const useBatchEditor = ({ handlers, views }) => {
     };
 
     const updateRendererSize = () => {
-        const width = containerRef.current.clientWidth;
-        const height = containerRef.current.clientHeight;
+        const height = wrapperRef.current.clientHeight;
+        const width = wrapperRef.current.clientWidth;
 
-        if (width !== rendererRef.current.width || height !== rendererRef.current.height) {
-            rendererRef.current.setSize(width, height);
-        }
-
+        rendererRef.current.setSize(width, height);
         return { width, height };
     };
 
     const calculateViewportDimensions = (width, height) => {
         const numFrames = BATCH_CAMERAS.length;
         const viewsPerFrame = BATCH_CAMERAS[0].length;
-        const frameWidth = (width - SIDE_VIEWS_GAP * (numFrames - 1)) / numFrames;
-        const viewHeight = (height - SIDE_VIEWS_GAP * (viewsPerFrame - 1)) / viewsPerFrame;
+        const { rows, framesPerRow } = getBatchLayout(numFrames);
+
+        const frameWidth = (width - SIDE_VIEWS_GAP * (framesPerRow - 1)) / framesPerRow;
+        const viewHeight =
+            (height - SIDE_VIEWS_GAP * (viewsPerFrame * rows - 1)) / (viewsPerFrame * rows);
 
         if (frameWidth <= 0 || viewHeight <= 0) return null;
 
         setAspect(frameWidth / viewHeight);
-        return { frameWidth, viewHeight, numFrames, viewsPerFrame };
+        return { frameWidth, viewHeight, numFrames, viewsPerFrame, rows, framesPerRow };
     };
 
     const addCloudToScene = (frame, tempObjects) => {
@@ -104,7 +105,9 @@ export const useBatchEditor = ({ handlers, views }) => {
         });
     };
 
-    const renderBatches = (width, height, frameWidth, viewHeight) => {
+    const renderBatches = (width, height, frameWidth, viewHeight, rows, framesPerRow) => {
+        const viewsPerFrame = BATCH_CAMERAS[0].length;
+
         BATCH_CAMERAS.forEach((frameViews, frameIdx) => {
             const frame = frameViews[0].frame;
             const tempObjects = [];
@@ -114,9 +117,18 @@ export const useBatchEditor = ({ handlers, views }) => {
 
             batchSceneRef.current.updateMatrixWorld(true);
 
-            const x = frameIdx * (frameWidth + SIDE_VIEWS_GAP);
+            const row = rows === 2 && frameIdx >= framesPerRow ? 1 : 0;
+            const col = rows === 2 ? frameIdx % framesPerRow : frameIdx;
+
+            const x = col * (frameWidth + SIDE_VIEWS_GAP);
             frameViews.forEach((view, viewIdx) => {
-                const y = height - (viewIdx + 1) * (viewHeight + SIDE_VIEWS_GAP) + SIDE_VIEWS_GAP;
+                const rowOffset = row * (viewsPerFrame * (viewHeight + SIDE_VIEWS_GAP));
+                const y =
+                    height -
+                    (viewIdx + 1 + rowOffset / (viewHeight + SIDE_VIEWS_GAP)) *
+                        (viewHeight + SIDE_VIEWS_GAP) +
+                    SIDE_VIEWS_GAP;
+
                 rendererRef.current.setViewport(x, y, frameWidth, viewHeight);
                 rendererRef.current.setScissor(x, y, frameWidth, viewHeight);
                 rendererRef.current.render(batchSceneRef.current, view.camera);
@@ -135,7 +147,14 @@ export const useBatchEditor = ({ handlers, views }) => {
         const dimensions = calculateViewportDimensions(width, height);
         if (!dimensions) return;
 
-        renderBatches(width, height, dimensions.frameWidth, dimensions.viewHeight);
+        renderBatches(
+            width,
+            height,
+            dimensions.frameWidth,
+            dimensions.viewHeight,
+            dimensions.rows,
+            dimensions.framesPerRow,
+        );
     });
 
     // temp hook

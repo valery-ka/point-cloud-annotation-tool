@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, memo } from "react";
 
 import { useCuboids } from "contexts";
 
@@ -6,7 +6,7 @@ import { SIDE_VIEWS_GAP } from "constants";
 
 import { SideViewSVG } from "./SideViewSVG";
 
-export const SideViews = () => {
+export const SideViews = memo(() => {
     const { selectedCuboidGeometryRef, sideViews } = useCuboids();
 
     const containerRef = useRef(null);
@@ -55,4 +55,4 @@ export const SideViews = () => {
             </div>
         </div>
     );
-};
+});

@@ -31,6 +31,7 @@ export {
     setupCamera,
     getOrientationQuaternion,
     updateCamera,
+    getBatchLayout,
 } from "./sideViews";
 
 export {

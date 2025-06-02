@@ -140,22 +140,30 @@ export const useCuboidInterpolation = () => {
         sideViewsCamerasNeedUpdateRef.current = true;
     }, []);
 
-    const saveCurrentPSRBatch = useCallback(() => {
+    const saveCurrentPSRBatch = useCallback(({ keyFrameToRemove = null } = {}) => {
         const geometries = selectedCuboidBatchGeometriesRef.current;
         const id = selectedCuboidGeometryRef.current.name;
 
         Object.values(geometries).forEach((cube) => {
             if (!cube || cube.name !== id) return;
+
             const mesh = cube;
             const frame = cube.userData.frame;
-            const manual = frame === batchEditingFrameRef.current;
+
+            let manual = frame === batchEditingFrameRef.current;
+            let preserveManual = true;
+
+            if (keyFrameToRemove !== null && frame === keyFrameToRemove) {
+                manual = false;
+                preserveManual = false;
+            }
 
             writePSRToSolution({
                 mesh,
                 frameIndices: [frame],
                 cuboidsSolutionRef,
-                manual: manual,
-                preserveManual: true,
+                manual,
+                preserveManual: preserveManual,
             });
         });
 

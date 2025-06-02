@@ -9,9 +9,10 @@ export { FileNavigator } from "./Editor/FileNavigator";
 export { FrameSwitcher } from "./Editor/FrameSwitcher";
 export { Sidebar } from "./Editor/Sidebar";
 
-export { LoadingOverlay } from "./UI/LoadingOverlay";
-export { TopLoader } from "./UI/TopLoader";
 export { Dialog } from "./UI/Dialog";
-export { ContextMenu } from "./UI/ContextMenu";
-export { default as ErrorBoundary } from "./UI/ErrorBoundary";
+export { SVGText } from "./UI/SVGText";
 export { Checkbox } from "./UI/Checkbox";
+export { TopLoader } from "./UI/TopLoader";
+export { ContextMenu } from "./UI/ContextMenu";
+export { LoadingOverlay } from "./UI/LoadingOverlay";
+export { default as ErrorBoundary } from "./UI/ErrorBoundary";

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useCallback } from "react";
 
 import { useCuboids, useEditor } from "contexts";
-import { useMousetrapPause, useFrameSwitcher, usePlayback } from "hooks";
+import { useMousetrapPause, useFrameSwitcher, usePlayback, useBatchEditorEvents } from "hooks";
 
 import {
     scalingConfigs,
@@ -35,6 +35,7 @@ export const useSideViewsControls = ({ camera, mesh, hoveredView, hoveredHandler
 
     const { stopPlayback } = usePlayback();
     const { handleGoToPreviousFrame, handleGoToNextFrame } = useFrameSwitcher(stopPlayback);
+    const { removeBatchKeyFrame, toggleCuboidVisibility } = useBatchEditorEvents();
 
     const scaleHandlerRef = useRef(null);
     const transformModeRef = useRef(null);
@@ -127,25 +128,30 @@ export const useSideViewsControls = ({ camera, mesh, hoveredView, hoveredHandler
         [mesh, name],
     );
 
-    const handleMouseDown = useCallback(() => {
-        if (!hoveredView) return;
+    const handleMouseDown = useCallback(
+        (e) => {
+            if (e.button !== 0 || !mesh || !mesh.visible) return;
 
-        cameraControlsRef.current.enabled = false;
+            if (!hoveredView) return;
 
-        const type = hoveredHandler?.type;
+            cameraControlsRef.current.enabled = false;
 
-        if (!hoveredHandler) {
-            transformModeRef.current = translate;
-        } else if (type === "edge" || type === "corner") {
-            scaleHandlerRef.current = hoveredHandler?.direction;
-            transformModeRef.current = scale;
-        } else if (type === "rotation") {
-            transformModeRef.current = rotate;
-        }
+            const type = hoveredHandler?.type;
 
-        isCuboidTransformingRef.current = true;
-        batchEditingFrameRef.current = mesh?.userData?.frame;
-    }, [hoveredView, hoveredHandler]);
+            if (!hoveredHandler) {
+                transformModeRef.current = translate;
+            } else if (type === "edge" || type === "corner") {
+                scaleHandlerRef.current = hoveredHandler?.direction;
+                transformModeRef.current = scale;
+            } else if (type === "rotation") {
+                transformModeRef.current = rotate;
+            }
+
+            isCuboidTransformingRef.current = true;
+            batchEditingFrameRef.current = mesh?.userData?.frame;
+        },
+        [hoveredView, hoveredHandler],
+    );
 
     const handleMouseMove = useCallback(
         (e) => {
@@ -219,6 +225,12 @@ export const useSideViewsControls = ({ camera, mesh, hoveredView, hoveredHandler
                 configRotate,
             });
 
+            if (didTransform) {
+                batchEditingFrameRef.current = mesh?.userData?.frame;
+                transformControlsRef.current.dispatchEvent({ type: "change" });
+                transformControlsRef.current.dispatchEvent({ type: "dragging-changed" });
+            }
+
             if (!batchMode) {
                 const frameShortcuts = {
                     1: handleGoToPreviousFrame,
@@ -227,14 +239,22 @@ export const useSideViewsControls = ({ camera, mesh, hoveredView, hoveredHandler
                 frameShortcuts[e.key]?.();
             }
 
-            if (didTransform) {
-                batchEditingFrameRef.current = mesh?.userData?.frame;
-                transformControlsRef.current.dispatchEvent({ type: "change" });
-                transformControlsRef.current.dispatchEvent({ type: "dragging-changed" });
-            }
+            toggleCuboidVisibility(e, mesh);
         },
-        [hoveredView, mesh, name, handleGoToPreviousFrame, handleGoToNextFrame, batchMode],
+        [
+            hoveredView,
+            mesh,
+            name,
+            batchMode,
+            handleGoToPreviousFrame,
+            handleGoToNextFrame,
+            toggleCuboidVisibility,
+        ],
     );
+
+    const handleRightClick = useCallback(() => {
+        removeBatchKeyFrame({ hoveredView, mesh });
+    }, [removeBatchKeyFrame, hoveredView, mesh, name]);
 
     useEffect(() => {
         document.addEventListener("mousedown", handleMouseDown);
@@ -242,6 +262,7 @@ export const useSideViewsControls = ({ camera, mesh, hoveredView, hoveredHandler
         document.addEventListener("mouseup", handleMouseUp);
         document.addEventListener("mousewheel", handleMouseWheel);
         document.addEventListener("keydown", handleKeyDown);
+        document.addEventListener("contextmenu", handleRightClick);
 
         return () => {
             document.removeEventListener("mousedown", handleMouseDown);
@@ -249,6 +270,14 @@ export const useSideViewsControls = ({ camera, mesh, hoveredView, hoveredHandler
             document.removeEventListener("mouseup", handleMouseUp);
             document.removeEventListener("mousewheel", handleMouseWheel);
             document.removeEventListener("keydown", handleKeyDown);
+            document.removeEventListener("contextmenu", handleRightClick);
         };
-    }, [handleMouseDown, handleMouseMove, handleMouseUp, handleMouseWheel, handleKeyDown]);
+    }, [
+        handleMouseDown,
+        handleMouseMove,
+        handleMouseUp,
+        handleMouseWheel,
+        handleKeyDown,
+        handleRightClick,
+    ]);
 };

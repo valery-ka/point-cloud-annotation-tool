@@ -8,16 +8,19 @@ export const useBatchEditorRenderer = () => {
 
     const canvasRef = useRef(null);
     const containerRef = useRef(null);
+    const wrapperRef = useRef(null);
     const rendererRef = useRef(null);
 
     useEffect(() => {
         const canvas = document.getElementById("batch-view-canvas");
         const container = document.getElementById("batch-view-canvas-container");
+        const wrapper = container.querySelector(".batch-canvas-wrapper");
 
         if (!canvas || !container) return;
 
         canvasRef.current = canvas;
         containerRef.current = container;
+        wrapperRef.current = wrapper;
 
         const renderer = new WebGLRenderer({
             canvas,
@@ -32,5 +35,5 @@ export const useBatchEditorRenderer = () => {
         return () => renderer.dispose();
     }, []);
 
-    return { canvasRef, containerRef, rendererRef };
+    return { canvasRef, containerRef, wrapperRef, rendererRef };
 };

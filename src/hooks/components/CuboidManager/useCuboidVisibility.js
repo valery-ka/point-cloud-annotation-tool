@@ -8,14 +8,14 @@ import { computeVisibilityFrameRange } from "utils/cuboids";
 export const useCuboidVisibility = () => {
     const { pcdFiles } = useFileManager();
     const { activeFrameIndex } = useFrames();
-    const { cuboidsSolutionRef, selectedCuboidGeometryRef } = useCuboids();
+    const { batchMode, cuboidsSolutionRef, selectedCuboidGeometryRef } = useCuboids();
 
     const { findFrameMarkers } = useCuboidInterpolation();
 
     useEffect(() => {
         const toggleVisibility = () => {
             const geometry = selectedCuboidGeometryRef.current;
-            if (!geometry) return;
+            if (!geometry || batchMode) return;
 
             const id = geometry.name;
             const newVisibility = !geometry.visible;
@@ -51,5 +51,5 @@ export const useCuboidVisibility = () => {
         return () => {
             document.removeEventListener("keydown", handleKeyDown);
         };
-    }, [pcdFiles, activeFrameIndex]);
+    }, [pcdFiles, activeFrameIndex, batchMode]);
 };
