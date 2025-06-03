@@ -1,17 +1,31 @@
 import { useCallback } from "react";
 
-import { useCuboids } from "contexts";
+import { useCuboids, useFrames } from "contexts";
 import { useCuboidInterpolation } from "hooks";
 
 export const useBatchEditorEvents = () => {
+    const { setActiveFrameIndex } = useFrames();
     const {
         selectedCuboidGeometryRef,
         cuboidsSolutionRef,
         selectedCuboidBatchGeometriesRef,
         batchMode,
+        setBatchMode,
     } = useCuboids();
+
     const { saveCurrentPSRBatch, interpolatePSRBatch, updateCuboidPSRBatch, findFrameMarkers } =
         useCuboidInterpolation();
+
+    const goToHoveredFrame = useCallback(
+        (e, mesh) => {
+            if (e.code === "KeyF" && mesh && batchMode) {
+                const frame = mesh.userData.frame;
+                setActiveFrameIndex(frame);
+                setBatchMode(false);
+            }
+        },
+        [batchMode],
+    );
 
     const removeBatchKeyFrame = useCallback(
         ({ hoveredView, mesh }) => {
@@ -45,9 +59,9 @@ export const useBatchEditorEvents = () => {
             const frame = mesh.userData.frame;
 
             switch (e.code) {
-                case "Delete":
+                case "KeyZ":
                     return setBatchCuboidVisibility(frame, false);
-                case "End":
+                case "KeyX":
                     return setBatchCuboidVisibility(frame, true);
                 default:
                     break;
@@ -56,5 +70,5 @@ export const useBatchEditorEvents = () => {
         [batchMode, setBatchCuboidVisibility],
     );
 
-    return { removeBatchKeyFrame, toggleCuboidVisibility };
+    return { removeBatchKeyFrame, toggleCuboidVisibility, goToHoveredFrame };
 };

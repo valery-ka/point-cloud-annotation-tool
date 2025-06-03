@@ -12,6 +12,7 @@ import { BatchHeader } from "../BatchHeader";
 export const BatchView = memo(() => {
     const { pcdFiles } = useFileManager();
     const { selectedCuboidBatchGeometriesRef, batchEditorCameras, batchMode } = useCuboids();
+    const { cuboidsSolutionRef } = useCuboids();
 
     const containerRef = useRef(null);
     const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
@@ -62,6 +63,10 @@ export const BatchView = memo(() => {
                             const frame = view.frame;
                             const mesh = selectedCuboidBatchGeometriesRef.current?.[frame];
                             if (!mesh) return null;
+                            const id = mesh.name;
+
+                            const solution = cuboidsSolutionRef.current?.[frame];
+                            const cuboid = solution.find((c) => c.id === id);
 
                             const row = rows === 2 && frameIdx >= framesPerRow ? 1 : 0;
                             const col = rows === 2 ? frameIdx % framesPerRow : frameIdx;
@@ -71,6 +76,7 @@ export const BatchView = memo(() => {
                             const y = viewIdx * (viewHeight + SIDE_VIEWS_GAP) + rowOffset;
 
                             const name = pcdFiles[frame].split("/").pop().replace(".pcd", "");
+                            const hasKeyFrame = cuboid.manual;
 
                             return (
                                 <SideViewSVG
@@ -82,8 +88,8 @@ export const BatchView = memo(() => {
                                     height={viewHeight}
                                     mesh={mesh}
                                     camera={view.camera}
-                                    outline={true}
                                     fileName={name}
+                                    keyFrame={hasKeyFrame}
                                 />
                             );
                         }),

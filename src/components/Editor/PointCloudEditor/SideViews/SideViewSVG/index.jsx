@@ -19,7 +19,7 @@ const PICKER_WIDTH = 30;
 const PICKER_OPACITY = 0;
 
 export const SideViewSVG = memo(
-    ({ name, x, y, width, height, mesh, camera, outline = false, fileName = null }) => {
+    ({ name, x, y, width, height, mesh, camera, fileName = null, keyFrame = null }) => {
         const { selectedCuboid, handlePositions, batchHandlePositions, batchMode } = useCuboids();
 
         const frame = mesh?.userData?.frame;
@@ -186,32 +186,33 @@ export const SideViewSVG = memo(
             );
         }, [project, hoveredHandler, corners, height]);
 
-        const renderBoxOutline = useCallback(() => {
-            if (!corners.length || !outline) return null;
+        // может пригодиться, лучше пока не удалять
+        // const renderBoxOutline = useCallback(() => {
+        //     if (!corners.length || !outline) return null;
 
-            const projectedCorners = corners.map(project);
-            if (projectedCorners.some((p) => isNaN(p.x) || isNaN(p.y))) return null;
+        //     const projectedCorners = corners.map(project);
+        //     if (projectedCorners.some((p) => isNaN(p.x) || isNaN(p.y))) return null;
 
-            const color = mesh.userData.color;
+        //     const color = mesh.userData.color;
 
-            return edges.map((_, index) => {
-                const start = projectedCorners[index];
-                const end = projectedCorners[(index + 1) % projectedCorners.length];
+        //     return edges.map((_, index) => {
+        //         const start = projectedCorners[index];
+        //         const end = projectedCorners[(index + 1) % projectedCorners.length];
 
-                return (
-                    <line
-                        key={`hovered-line-${index}`}
-                        x1={Math.max(0, start.x)}
-                        y1={Math.max(0, start.y)}
-                        x2={Math.max(0, end.x)}
-                        y2={Math.max(0, end.y)}
-                        stroke={color}
-                        strokeWidth={1}
-                        pointerEvents="none"
-                    />
-                );
-            });
-        }, [corners, edges, outline]);
+        //         return (
+        //             <line
+        //                 key={`hovered-line-${index}`}
+        //                 x1={Math.max(0, start.x)}
+        //                 y1={Math.max(0, start.y)}
+        //                 x2={Math.max(0, end.x)}
+        //                 y2={Math.max(0, end.y)}
+        //                 stroke={color}
+        //                 strokeWidth={1}
+        //                 pointerEvents="none"
+        //             />
+        //         );
+        //     });
+        // }, [corners, edges, outline]);
 
         useEffect(() => {
             setHoveredView(null);
@@ -234,10 +235,22 @@ export const SideViewSVG = memo(
                 onMouseMove={() => handleMouseEnter(name)}
                 onMouseLeave={() => handleMouseLeave(null)}
             >
-                <SVGText text={fileName ?? name} />
+                <SVGText
+                    text={fileName ?? name}
+                    position={"top-left"}
+                    parentWidth={width}
+                    parentHeight={height}
+                />
+                {keyFrame && (
+                    <SVGText
+                        text={"key"}
+                        position={"top-right"}
+                        parentWidth={width}
+                        parentHeight={height}
+                    />
+                )}
                 {mesh.visible && (
                     <>
-                        {renderBoxOutline()}
                         {edges.map(renderEdgesHandlers)}
                         {renderRotationHandler()}
                         {corners.map(renderCornersHandlers)}

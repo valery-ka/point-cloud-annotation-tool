@@ -21,7 +21,8 @@ export const useBatchEditor = ({ handlers, views }) => {
 
     const { batchMode, setBatchMode, batchEditorCameras } = useCuboids();
     const { selectedCuboid, selectedCuboidGeometryRef } = useCuboids();
-    const { cuboidsSolutionRef, cuboidsGeometriesRef } = useCuboids();
+    const { cuboidsSolutionRef, cuboidsGeometriesRef, selectedCuboidBatchGeometriesRef } =
+        useCuboids();
 
     const BATCH_CAMERAS = Object.values(batchEditorCameras);
 
@@ -105,6 +106,14 @@ export const useBatchEditor = ({ handlers, views }) => {
         });
     };
 
+    const addBatchCuboidsToScene = (frame, tempObjects) => {
+        const selectedBatchCuboid = selectedCuboidBatchGeometriesRef.current;
+        const batchClone = selectedBatchCuboid[frame];
+
+        batchSceneRef.current.add(batchClone);
+        tempObjects.push(batchClone);
+    };
+
     const renderBatches = (width, height, frameWidth, viewHeight, rows, framesPerRow) => {
         const viewsPerFrame = BATCH_CAMERAS[0].length;
 
@@ -112,8 +121,9 @@ export const useBatchEditor = ({ handlers, views }) => {
             const frame = frameViews[0].frame;
             const tempObjects = [];
 
-            addCuboidsToScene(frame, tempObjects);
             addCloudToScene(frame, tempObjects);
+            addCuboidsToScene(frame, tempObjects);
+            addBatchCuboidsToScene(frame, tempObjects);
 
             batchSceneRef.current.updateMatrixWorld(true);
 

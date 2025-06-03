@@ -1,1 +1,7 @@
-export { getNextId, getChildObjects, getChildTypes, formatObjectData } from "./main";
+export {
+    getNextId,
+    getChildObjects,
+    getChildTypes,
+    formatObjectData,
+    getSVGPosition,
+} from "./main";

@@ -1,9 +1,10 @@
 import { useEffect } from "react";
 
-import { useCuboids, useFileManager } from "contexts";
+import { useCuboids, useFileManager, useFrames } from "contexts";
 
 export const useBatchCloudsUpdater = ({ handlers }) => {
     const { pcdFiles } = useFileManager();
+    const { activeFrameIndex } = useFrames();
     const { batchMode, currentFrame, setCurrentFrame, viewsCount, setViewsCount } = useCuboids();
 
     useEffect(() => {
@@ -61,4 +62,14 @@ export const useBatchCloudsUpdater = ({ handlers }) => {
 
         setCurrentFrame([0, clampedViews - 1]);
     }, [viewsCount, pcdFiles]);
+
+    useEffect(() => {
+        if (batchMode && pcdFiles.length > 0) {
+            const clampedViews = Math.max(1, Math.min(viewsCount, pcdFiles.length));
+            const startFrame = Math.min(activeFrameIndex, pcdFiles.length - clampedViews);
+            const endFrame = Math.min(startFrame + clampedViews - 1, pcdFiles.length - 1);
+
+            setCurrentFrame([startFrame, endFrame]);
+        }
+    }, [batchMode]);
 };

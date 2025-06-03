@@ -35,7 +35,8 @@ export const useSideViewsControls = ({ camera, mesh, hoveredView, hoveredHandler
 
     const { stopPlayback } = usePlayback();
     const { handleGoToPreviousFrame, handleGoToNextFrame } = useFrameSwitcher(stopPlayback);
-    const { removeBatchKeyFrame, toggleCuboidVisibility } = useBatchEditorEvents();
+    const { removeBatchKeyFrame, toggleCuboidVisibility, goToHoveredFrame } =
+        useBatchEditorEvents();
 
     const scaleHandlerRef = useRef(null);
     const transformModeRef = useRef(null);
@@ -239,6 +240,7 @@ export const useSideViewsControls = ({ camera, mesh, hoveredView, hoveredHandler
                 frameShortcuts[e.key]?.();
             }
 
+            goToHoveredFrame(e, mesh);
             toggleCuboidVisibility(e, mesh);
         },
         [
@@ -249,12 +251,13 @@ export const useSideViewsControls = ({ camera, mesh, hoveredView, hoveredHandler
             handleGoToPreviousFrame,
             handleGoToNextFrame,
             toggleCuboidVisibility,
+            goToHoveredFrame,
         ],
     );
 
     const handleRightClick = useCallback(() => {
         removeBatchKeyFrame({ hoveredView, mesh });
-    }, [removeBatchKeyFrame, hoveredView, mesh, name]);
+    }, [removeBatchKeyFrame, hoveredView, mesh]);
 
     useEffect(() => {
         document.addEventListener("mousedown", handleMouseDown);
