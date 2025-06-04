@@ -3,29 +3,38 @@ import { useEffect, useRef, useCallback } from "react";
 import { useFileManager, useSettings, useEditor, useFrames, useConfig, useImages } from "contexts";
 import { useSubscribeFunction } from "hooks";
 
-import { hexToRgb, changeClassOfSelection, updatePointCloudColors } from "utils/editor";
+import {
+    hexToRgb,
+    changeClassOfSelection,
+    updatePointCloudColors,
+    updateCuboidPointsColor,
+} from "utils/editor";
 
 export const usePaintFramePoints = (updateGlobalBox) => {
-    const classColorsCache = useRef({});
     const selectedClassColor = useRef(null);
+
+    const classColorsCache = useRef({});
+    const objectColorsCache = useRef({});
 
     const { settings } = useSettings();
     const pointColorRef = useRef(settings.editorSettings.colors);
 
     const { pcdFiles } = useFileManager();
-    const { nonHiddenClasses } = useConfig();
+    const { config, nonHiddenClasses } = useConfig();
     const { activeFrameIndex, arePointCloudsLoading } = useFrames();
     const { pointCloudRefs, selectedClassIndex, pointLabelsRef, classesVisibilityRef, minMaxZRef } =
         useEditor();
 
     const { imagePointsColorNeedsUpdateRef, imagePointsAlphaNeedsUpdateRef } = useImages();
 
+    // когда будем красить объекты, тоже обновляем selectedClassColor по objectColorsCache
     useEffect(() => {
         if (selectedClassIndex === null) return;
         const originalClassIndex = nonHiddenClasses[selectedClassIndex]?.originalIndex;
         selectedClassColor.current = classColorsCache.current[originalClassIndex];
     }, [selectedClassIndex, nonHiddenClasses]);
 
+    // cache classes colors
     useEffect(() => {
         if (!pcdFiles.length || arePointCloudsLoading) return;
 
@@ -40,6 +49,22 @@ export const usePaintFramePoints = (updateGlobalBox) => {
         classColorsCache.current = newColorMap;
     }, [arePointCloudsLoading, nonHiddenClasses, pcdFiles]);
 
+    // cache objects colors
+    useEffect(() => {
+        const objects = config.objects?.[0];
+        if (!objects) return;
+
+        const newObjectColorMap = Object.entries(objects).reduce((map, [key, value]) => {
+            if (!value.color) return map;
+            const rgb = hexToRgb(value.color);
+            map[key] = rgb;
+            return map;
+        }, {});
+
+        objectColorsCache.current = newObjectColorMap;
+    }, [config.objects]);
+
+    // main functions
     const paintSelectedPoints = useCallback(
         (mode, points) => {
             const activeFrameFilePath = pcdFiles[activeFrameIndex];
@@ -101,17 +126,46 @@ export const usePaintFramePoints = (updateGlobalBox) => {
                         labels: activeFrameLabels,
                     },
                     colorData: {
-                        classColorsCache,
+                        colorsCache: classColorsCache,
                         pointColor: pointColorRef.current,
                     },
                 });
+
                 imagePointsColorNeedsUpdateRef.current = true;
             }
         },
         [pcdFiles, activeFrameIndex],
     );
 
+    const handleCuboidPointsColor = useCallback(
+        (frame = null, points = null, label = null) => {
+            const frameFilePath = pcdFiles[frame];
+
+            const frameCloud = pointCloudRefs.current[frameFilePath];
+            const frameLabels = pointLabelsRef.current[frameFilePath];
+
+            if (frameCloud?.geometry?.attributes?.color) {
+                updateCuboidPointsColor({
+                    cloudData: {
+                        cloud: frameCloud,
+                        labels: frameLabels,
+                    },
+                    colorData: {
+                        colorsCache: objectColorsCache,
+                        pointColor: pointColorRef.current,
+                    },
+                    selectionData: {
+                        selectedPoints: points,
+                        cuboidLabel: label,
+                    },
+                });
+                imagePointsColorNeedsUpdateRef.current = true;
+            }
+        },
+        [pcdFiles],
+    );
+
     useSubscribeFunction("pointColor", handlePointCloudColors, []);
 
-    return { handlePointCloudColors, paintSelectedPoints };
+    return { handlePointCloudColors, paintSelectedPoints, handleCuboidPointsColor };
 };

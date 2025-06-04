@@ -88,7 +88,7 @@ export const changeClassOfSelection = ({
 
 export const updatePointCloudColors = ({ cloudData, colorData }) => {
     const { cloud, labels } = cloudData;
-    const { classColorsCache, pointColor } = colorData;
+    const { colorsCache, pointColor } = colorData;
 
     const geometry = cloud.geometry;
     const colorAttribute = geometry.attributes.color;
@@ -115,11 +115,57 @@ export const updatePointCloudColors = ({ cloudData, colorData }) => {
             colorArray[i] = defaultColor;
             colorArray[i + 1] = defaultColor;
             colorArray[i + 2] = defaultColor;
-        } else if (classColorsCache.current[labelIndex]) {
-            const rgb = classColorsCache.current[labelIndex];
+        } else if (colorsCache.current[labelIndex]) {
+            const rgb = colorsCache.current[labelIndex];
             colorArray[i] = rgb[0];
             colorArray[i + 1] = rgb[1];
             colorArray[i + 2] = rgb[2];
+        }
+    }
+
+    invalidateCloudColor(geometry);
+};
+
+export const updateCuboidPointsColor = ({ cloudData, colorData, selectionData }) => {
+    const { cloud, labels } = cloudData;
+    const { colorsCache, pointColor } = colorData;
+    const { selectedPoints, cuboidLabel } = selectionData;
+
+    const geometry = cloud.geometry;
+    const colorAttribute = geometry.attributes.color;
+    const intensityAttribute = geometry.attributes.intensity;
+
+    if (!colorAttribute) return;
+
+    const colorArray = colorAttribute.array;
+    const intensityArray = intensityAttribute?.array;
+    const brightnessFactor = pointColor.pointBrightness;
+    const intensityFactor = pointColor.pointIntensity;
+
+    const rgb = colorsCache.current[cuboidLabel] || [0, 0, 0];
+    if (!rgb) return;
+
+    const selectedSet = new Set(selectedPoints);
+    const mixFactor = 0.5; // pointColor.cuboidPointsMixFactor
+
+    for (let i = 0, j = 0; i < colorArray.length; i += 3, j++) {
+        if (labels[j] !== 0) continue;
+
+        const defaultColor = getDefaultPointColor(
+            j,
+            intensityArray,
+            brightnessFactor,
+            intensityFactor,
+        );
+
+        if (selectedSet.has(j)) {
+            colorArray[i] = rgb[0] * mixFactor + defaultColor * (1 - mixFactor);
+            colorArray[i + 1] = rgb[1] * mixFactor + defaultColor * (1 - mixFactor);
+            colorArray[i + 2] = rgb[2] * mixFactor + defaultColor * (1 - mixFactor);
+        } else {
+            colorArray[i] = defaultColor;
+            colorArray[i + 1] = defaultColor;
+            colorArray[i + 2] = defaultColor;
         }
     }
 

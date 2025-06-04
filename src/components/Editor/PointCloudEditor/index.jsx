@@ -26,7 +26,7 @@ export const PointCloudEditor = () => {
 
     const { handlePointsSize, handleSelectedPointsSize } = HOOKS.useFramePointsSize();
 
-    const { handlePointCloudColors, paintSelectedPoints } =
+    const { handlePointCloudColors, paintSelectedPoints, handleCuboidPointsColor } =
         HOOKS.usePaintFramePoints(updateGlobalBox);
 
     const selectorTools = HOOKS.useSelectorTools(
@@ -52,7 +52,12 @@ export const PointCloudEditor = () => {
 
     HOOKS.useStats();
 
-    HOOKS.useCuboidManager({ handlePointCloudColors, handlePointsSize, filterFramePoints });
+    HOOKS.useCuboidManager({
+        handlePointCloudColors,
+        handlePointsSize,
+        filterFramePoints,
+        handleCuboidPointsColor,
+    });
 
     return (
         <>

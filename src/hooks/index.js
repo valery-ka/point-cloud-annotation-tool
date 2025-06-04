@@ -60,6 +60,7 @@ export { useTransformControls } from "./components/CuboidManager/useTransformCon
 export { useSideViewsControls } from "./components/CuboidManager/useSideViewsControls";
 export { useSideViewsRenderer } from "./components/CuboidManager/useSideViewsRenderer";
 export { useCuboidInterpolation } from "./components/CuboidManager/useCuboidInterpolation";
+export { useUpdateCuboidInfoCard } from "./components/CuboidManager/useUpdateCuboidInfoCard";
 
 export { useBatchEditor } from "./components/BatchView/useBatchEditor";
 export { useBatchEditorScene } from "./components/BatchView/useBatchEditorScene";

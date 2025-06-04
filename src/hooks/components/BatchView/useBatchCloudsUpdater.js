@@ -5,7 +5,14 @@ import { useCuboids, useFileManager, useFrames } from "contexts";
 export const useBatchCloudsUpdater = ({ handlers }) => {
     const { pcdFiles } = useFileManager();
     const { activeFrameIndex } = useFrames();
-    const { batchMode, currentFrame, setCurrentFrame, viewsCount, setViewsCount } = useCuboids();
+    const {
+        batchMode,
+        currentFrame,
+        setCurrentFrame,
+        viewsCount,
+        setViewsCount,
+        cuboidColorsUpdateRef,
+    } = useCuboids();
 
     useEffect(() => {
         const { filterFramePoints, handlePointCloudColors, handlePointsSize } = handlers;
@@ -15,6 +22,8 @@ export const useBatchCloudsUpdater = ({ handlers }) => {
             handlePointCloudColors(null, frame);
             handlePointsSize(null, null, frame);
         }
+
+        cuboidColorsUpdateRef.current = true;
     }, [batchMode, currentFrame]);
 
     useEffect(() => {

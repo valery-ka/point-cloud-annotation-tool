@@ -1,13 +1,21 @@
 import { useEffect } from "react";
-import { useCuboids } from "contexts";
+import { useFrame } from "@react-three/fiber";
 
-export const useBatchEditorGeometrySelector = () => {
+import { useCuboids, useFileManager, useEditor } from "contexts";
+
+import { getPointsInsideCuboid } from "utils/cuboids";
+
+export const useBatchEditorGeometrySelector = (handlers) => {
+    const { pcdFiles } = useFileManager();
+    const { pointCloudRefs } = useEditor();
     const {
         batchMode,
         selectedCuboid,
         cuboidsGeometriesRef,
         cuboidsSolutionRef,
         selectedCuboidBatchGeometriesRef,
+        currentFrame,
+        cuboidColorsUpdateRef,
     } = useCuboids();
 
     useEffect(() => {
@@ -44,4 +52,29 @@ export const useBatchEditorGeometrySelector = () => {
             selectedCuboidBatchGeometriesRef.current = null;
         }
     }, [selectedCuboid, batchMode]);
+
+    useFrame(() => {
+        const batch = selectedCuboidBatchGeometriesRef.current;
+
+        if (batch && cuboidColorsUpdateRef.current) {
+            const { handleCuboidPointsColor } = handlers;
+
+            for (let frame = currentFrame[0]; frame < currentFrame[1] + 1; frame++) {
+                const cuboid = batch[frame];
+                const { position, scale, quaternion } = cuboid;
+                const { label } = cuboid.userData;
+
+                const frameFilePath = pcdFiles[frame];
+                const cloud = pointCloudRefs.current[frameFilePath];
+                if (!cloud) return;
+
+                const positions = cloud.geometry.attributes.position.array;
+                const insidePoints = getPointsInsideCuboid(positions, position, quaternion, scale);
+
+                handleCuboidPointsColor(frame, insidePoints, label);
+            }
+        }
+
+        cuboidColorsUpdateRef.current = false;
+    });
 };

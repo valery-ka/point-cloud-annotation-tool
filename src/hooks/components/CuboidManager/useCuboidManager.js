@@ -1,8 +1,6 @@
-import { useFrame } from "@react-three/fiber";
-
 import { useEffect, useCallback } from "react";
 
-import { useCuboids, useEditor, useFileManager, useFrames, useEvent } from "contexts";
+import { useCuboids, useEditor, useFrames, useEvent } from "contexts";
 import {
     useTransformControls,
     useRaycastClickSelect,
@@ -10,23 +8,20 @@ import {
     useHoveredCuboid,
     useCuboidInterpolation,
     useCuboidVisibility,
+    useUpdateCuboidInfoCard,
 } from "hooks";
-
-import { getPointsInsideCuboid } from "utils/cuboids";
 
 import { TABS } from "constants";
 
 export const useCuboidManager = (handlers) => {
-    const { pcdFiles } = useFileManager();
     const { activeFrameIndex } = useFrames();
     const { publish } = useEvent();
-    const { pointCloudRefs, cameraControlsRef, transformControlsRef } = useEditor();
+    const { cameraControlsRef, transformControlsRef } = useEditor();
     const {
         cuboids,
         cuboidsGeometriesRef,
         selectedCuboid,
         selectedCuboidGeometryRef,
-        selectedCuboidInfoRef,
         sideViewsCamerasNeedUpdateRef,
         setSelectedCuboid,
         setFrameMarkers,
@@ -53,11 +48,15 @@ export const useCuboidManager = (handlers) => {
     );
 
     const unselectCuboid = useCallback(() => {
+        const { handleCuboidPointsColor } = handlers;
+
         transformControlsRef.current.detach();
         selectedCuboidGeometryRef.current = null;
         cameraControlsRef.current.enabled = true;
         setFrameMarkers([]);
-    }, []);
+
+        handleCuboidPointsColor(activeFrameIndex);
+    }, [activeFrameIndex, handlers.handleCuboidPointsColor]);
 
     useHoveredCuboid({
         meshMap: () => {
@@ -84,48 +83,11 @@ export const useCuboidManager = (handlers) => {
     useEffect(() => {
         const id = selectedCuboid?.id;
         id ? onCuboidSelect(id) : unselectCuboid();
-    }, [selectedCuboid?.id]);
+    }, [selectedCuboid?.id, unselectCuboid]);
 
     useEffect(() => {
         updateCuboidPSR();
     }, [updateCuboidPSR]);
 
-    // update info card
-    useFrame(() => {
-        const geometry = selectedCuboidGeometryRef.current;
-        if (!geometry) {
-            selectedCuboidInfoRef.current.selected = false;
-            return;
-        }
-
-        const { position, scale, rotation, quaternion } = geometry;
-        const newPosition = [position.x, position.y, position.z];
-        const newScale = [scale.x, scale.y, scale.z];
-        const newRotation = [rotation.x, rotation.y, rotation.z];
-
-        const info = selectedCuboidInfoRef.current;
-
-        const positionChanged = !newPosition.every((v, i) => v === info.position[i]);
-        const scaleChanged = !newScale.every((v, i) => v === info.scale[i]);
-        const rotationChanged = !newRotation.every((v, i) => v === info.rotation[i]);
-
-        if (positionChanged || scaleChanged || rotationChanged) {
-            info.position = newPosition;
-            info.scale = newScale;
-            info.rotation = newRotation;
-            info.selected = true;
-
-            const activeFrameFilePath = pcdFiles[activeFrameIndex];
-            const activeFrame = pointCloudRefs.current[activeFrameFilePath];
-            if (!activeFrame) return;
-
-            const positions = activeFrame.geometry.attributes.position.array;
-
-            const insidePoints = getPointsInsideCuboid(positions, position, quaternion, scale);
-            const insidePointsCount = insidePoints.length;
-            if (insidePointsCount !== info.insidePointsCount) {
-                info.insidePointsCount = insidePointsCount;
-            }
-        }
-    });
+    useUpdateCuboidInfoCard(handlers);
 };

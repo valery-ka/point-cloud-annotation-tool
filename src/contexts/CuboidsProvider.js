@@ -54,6 +54,7 @@ export const CuboidsProvider = ({ children }) => {
     const isCuboidTransformingRef = useRef(false);
     const sideViewCameraZoomsRef = useRef(DEFAULT_ZOOM);
     const sideViewsCamerasNeedUpdateRef = useRef(true);
+    const cuboidColorsUpdateRef = useRef(false);
 
     const cuboidsSolutionRef = useRef({});
 
@@ -94,6 +95,7 @@ export const CuboidsProvider = ({ children }) => {
                 setViewsCount,
                 activeCameraViews,
                 setActiveCameraViews,
+                cuboidColorsUpdateRef,
             }}
         >
             {children}

@@ -29,7 +29,7 @@ export const useBatchEditor = ({ handlers, views }) => {
     const [aspect, setAspect] = useState(null);
 
     useMousetrapPause(batchMode);
-    useBatchEditorGeometrySelector();
+    useBatchEditorGeometrySelector(handlers);
     useBatchModeCameras({ aspect, views });
     useBatchCloudsUpdater({ handlers, cameras: BATCH_CAMERAS });
     const { batchSceneRef } = useBatchEditorScene({ handlers });
