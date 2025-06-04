@@ -3,11 +3,11 @@ import { Scene } from "three";
 import { useEffect, useRef } from "react";
 import { useThree } from "@react-three/fiber";
 
-import { useCuboids } from "contexts";
+import { useBatch } from "contexts";
 
 export const useBatchEditorScene = ({ handlers }) => {
     const { scene } = useThree();
-    const { batchMode } = useCuboids();
+    const { batchMode } = useBatch();
 
     const batchSceneRef = useRef(new Scene());
 

@@ -1,22 +1,20 @@
 import { useEffect } from "react";
 import { useFrame } from "@react-three/fiber";
 
-import { useCuboids, useFileManager, useEditor } from "contexts";
+import { useCuboids, useFileManager, useEditor, useBatch } from "contexts";
 
 import { getPointsInsideCuboid } from "utils/cuboids";
 
 export const useBatchEditorGeometrySelector = (handlers) => {
     const { pcdFiles } = useFileManager();
     const { pointCloudRefs } = useEditor();
+    const { selectedCuboid, cuboidsGeometriesRef, cuboidsSolutionRef } = useCuboids();
     const {
         batchMode,
-        selectedCuboid,
-        cuboidsGeometriesRef,
-        cuboidsSolutionRef,
         selectedCuboidBatchGeometriesRef,
         currentFrame,
-        cuboidColorsUpdateRef,
-    } = useCuboids();
+        batchCuboidColorsUpdateRef,
+    } = useBatch();
 
     useEffect(() => {
         if (batchMode && selectedCuboid) {
@@ -56,7 +54,7 @@ export const useBatchEditorGeometrySelector = (handlers) => {
     useFrame(() => {
         const batch = selectedCuboidBatchGeometriesRef.current;
 
-        if (batch && cuboidColorsUpdateRef.current) {
+        if (batch && batchCuboidColorsUpdateRef.current) {
             const { handleCuboidPointsColor } = handlers;
 
             for (let frame = currentFrame[0]; frame < currentFrame[1] + 1; frame++) {
@@ -75,6 +73,6 @@ export const useBatchEditorGeometrySelector = (handlers) => {
             }
         }
 
-        cuboidColorsUpdateRef.current = false;
+        batchCuboidColorsUpdateRef.current = false;
     });
 };

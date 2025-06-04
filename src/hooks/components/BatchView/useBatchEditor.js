@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 
-import { useCuboids, useFileManager, useEditor } from "contexts";
+import { useCuboids, useFileManager, useEditor, useBatch } from "contexts";
 
 import {
     useBatchEditorRenderer,
@@ -19,9 +19,9 @@ export const useBatchEditor = ({ handlers, views }) => {
     const { pcdFiles } = useFileManager();
     const { pointCloudRefs } = useEditor();
 
-    const { batchMode, setBatchMode, batchEditorCameras } = useCuboids();
-    const { selectedCuboid, selectedCuboidGeometryRef } = useCuboids();
-    const { cuboidsSolutionRef, cuboidsGeometriesRef, selectedCuboidBatchGeometriesRef } =
+    const { batchMode, setBatchMode, batchEditorCameras, selectedCuboidBatchGeometriesRef } =
+        useBatch();
+    const { selectedCuboid, selectedCuboidGeometryRef, cuboidsSolutionRef, cuboidsGeometriesRef } =
         useCuboids();
 
     const BATCH_CAMERAS = Object.values(batchEditorCameras);

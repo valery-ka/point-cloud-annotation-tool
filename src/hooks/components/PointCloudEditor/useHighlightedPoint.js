@@ -10,6 +10,7 @@ import {
     useTools,
     useSettings,
     useCuboids,
+    useBatch,
 } from "contexts";
 
 import { findNearestPoints } from "utils/editor";
@@ -30,7 +31,8 @@ export const useHighlightedPoint = () => {
         setSelectedClassIndex,
         isIntersectingMap,
     } = useEditor();
-    const { batchMode, setSelectedCuboid } = useCuboids();
+    const { batchMode } = useBatch();
+    const { setSelectedCuboid } = useCuboids();
     const { selectedTool } = useTools();
     const { highlightedPoint, setHighlightedPoint } = useHoveredPoint();
     const { settings } = useSettings();

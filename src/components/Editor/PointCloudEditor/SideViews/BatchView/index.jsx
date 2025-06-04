@@ -1,7 +1,7 @@
 import { createPortal } from "react-dom";
 import { useEffect, useRef, useState, memo } from "react";
 
-import { useCuboids, useFileManager } from "contexts";
+import { useCuboids, useFileManager, useBatch } from "contexts";
 
 import { SIDE_VIEWS_GAP } from "constants";
 import { getBatchLayout } from "utils/cuboids";
@@ -11,7 +11,7 @@ import { BatchHeader } from "../BatchHeader";
 
 export const BatchView = memo(() => {
     const { pcdFiles } = useFileManager();
-    const { selectedCuboidBatchGeometriesRef, batchEditorCameras, batchMode } = useCuboids();
+    const { selectedCuboidBatchGeometriesRef, batchEditorCameras, batchMode } = useBatch();
     const { cuboidsSolutionRef } = useCuboids();
 
     const containerRef = useRef(null);

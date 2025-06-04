@@ -2,14 +2,15 @@ import { useEffect, useRef } from "react";
 import { useThree, useFrame } from "@react-three/fiber";
 import { WebGLRenderer } from "three";
 
-import { useCuboids } from "contexts";
+import { useBatch, useCuboids } from "contexts";
 
 import { SIDE_VIEWS_GAP } from "constants";
 
 export const useSideViewsRenderer = ({ aspectRef }) => {
     const { size, scene } = useThree();
 
-    const { sideViews, selectedCuboid, selectedCuboidGeometryRef, batchMode } = useCuboids();
+    const { sideViews, selectedCuboid, selectedCuboidGeometryRef } = useCuboids();
+    const { batchMode } = useBatch();
 
     const canvasRef = useRef(null);
     const containerRef = useRef(null);

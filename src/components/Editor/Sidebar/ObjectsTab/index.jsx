@@ -2,7 +2,15 @@ import React, { useEffect, useState, useCallback, memo } from "react";
 import { useTranslation } from "react-i18next";
 import { faEye, faEyeSlash, faPlus } from "@fortawesome/free-solid-svg-icons";
 
-import { useEditor, useConfig, useEvent, useSettings, useTools, useCuboids } from "contexts";
+import {
+    useEditor,
+    useConfig,
+    useEvent,
+    useSettings,
+    useTools,
+    useCuboids,
+    useBatch,
+} from "contexts";
 import { useSubscribeFunction, useBindHotkey } from "hooks";
 
 import { SidebarIcon } from "../SidebarIcon";
@@ -19,7 +27,8 @@ export const ObjectsTab = memo(({ title }) => {
     const { nonHiddenClasses } = useConfig();
     const { subscribe, unsubscribe } = useEvent();
     const { classesVisibilityRef, selectedClassIndex, setSelectedClassIndex } = useEditor();
-    const { cuboids, selectedCuboid, setSelectedCuboid, setBatchMode } = useCuboids();
+    const { cuboids, selectedCuboid, setSelectedCuboid } = useCuboids();
+    const { setBatchMode } = useBatch();
     const { setSelectedTool } = useTools();
     const { settings } = useSettings();
     const { hotkeys } = settings;

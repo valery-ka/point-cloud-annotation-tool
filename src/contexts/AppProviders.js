@@ -1,4 +1,3 @@
-import React from "react";
 import {
     ConfigProvider,
     EventProvider,
@@ -12,6 +11,7 @@ import {
     ImagesProvider,
     CalibrationsProvider,
     CuboidsProvider,
+    BatchProvider,
 } from "contexts";
 
 const DataProviders = ({ children }) => (
@@ -30,7 +30,9 @@ const PointCloudProvider = ({ children }) => (
     <EditorProvider>
         <ToolsProvider>
             <HoveredPointProvider>
-                <CuboidsProvider>{children}</CuboidsProvider>
+                <CuboidsProvider>
+                    <BatchProvider>{children}</BatchProvider>
+                </CuboidsProvider>
             </HoveredPointProvider>
         </ToolsProvider>
     </EditorProvider>

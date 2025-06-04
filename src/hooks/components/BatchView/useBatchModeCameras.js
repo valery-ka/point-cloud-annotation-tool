@@ -1,23 +1,23 @@
 import { useEffect } from "react";
 import { useFrame } from "@react-three/fiber";
 
-import { useCuboids } from "contexts";
+import { useBatch, useCuboids } from "contexts";
 
 import { setupCamera, updateCamera, getCuboidHandlesPositions } from "utils/cuboids";
 
 export const useBatchModeCameras = ({ aspect, views }) => {
+    const { sideViewCameraZoomsRef } = useCuboids();
     const {
         viewsCount,
         batchMode,
         batchEditorCameras,
         setBatchEditorCameras,
-        sideViewCameraZoomsRef,
         setBatchHandlePositions,
         selectedCuboidBatchGeometriesRef,
         batchViewsCamerasNeedUpdateRef,
         currentFrame,
         activeCameraViews,
-    } = useCuboids();
+    } = useBatch();
 
     useEffect(() => {
         const batchFramesList = {};

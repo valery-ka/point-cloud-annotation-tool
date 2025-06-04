@@ -1,6 +1,6 @@
 import { memo, useCallback } from "react";
 
-import { useCuboids, useFileManager } from "contexts";
+import { useBatch, useFileManager } from "contexts";
 import { useClickOutsideBlur } from "hooks";
 
 import { Checkbox } from "components";
@@ -15,7 +15,7 @@ const checkboxItems = [
 
 export const BatchHeader = memo(() => {
     const { pcdFiles } = useFileManager();
-    const { viewsCount, setViewsCount, activeCameraViews, setActiveCameraViews } = useCuboids();
+    const { viewsCount, setViewsCount, activeCameraViews, setActiveCameraViews } = useBatch();
 
     const framesSelectRef = useClickOutsideBlur();
 

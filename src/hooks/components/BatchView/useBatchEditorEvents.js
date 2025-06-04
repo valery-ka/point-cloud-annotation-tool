@@ -1,17 +1,12 @@
 import { useCallback } from "react";
 
-import { useCuboids, useFrames } from "contexts";
+import { useBatch, useCuboids, useFrames } from "contexts";
 import { useCuboidInterpolation } from "hooks";
 
 export const useBatchEditorEvents = () => {
     const { setActiveFrameIndex } = useFrames();
-    const {
-        selectedCuboidGeometryRef,
-        cuboidsSolutionRef,
-        selectedCuboidBatchGeometriesRef,
-        batchMode,
-        setBatchMode,
-    } = useCuboids();
+    const { selectedCuboidGeometryRef, cuboidsSolutionRef } = useCuboids();
+    const { selectedCuboidBatchGeometriesRef, batchMode, setBatchMode } = useBatch();
 
     const { saveCurrentPSRBatch, interpolatePSRBatch, updateCuboidPSRBatch, findFrameMarkers } =
         useCuboidInterpolation();

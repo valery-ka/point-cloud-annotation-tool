@@ -11,3 +11,4 @@ export { ModerationProvider, useModeration } from "./ModerationProvider";
 export { ImagesProvider, useImages } from "./ImagesProvider";
 export { CalibrationsProvider, useCalibrations } from "./CalibrationsProvider";
 export { CuboidsProvider, useCuboids } from "./CuboidsProvider";
+export { BatchProvider, useBatch } from "./BatchProvider";

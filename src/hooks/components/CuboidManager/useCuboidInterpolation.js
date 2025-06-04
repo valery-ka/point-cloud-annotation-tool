@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { useCuboids, useFrames, useFileManager } from "contexts";
+import { useCuboids, useFrames, useFileManager, useBatch } from "contexts";
 
 import { writePSRToSolution, interpolateBetweenFrames } from "utils/cuboids";
 
@@ -19,7 +19,8 @@ export const useCuboidInterpolation = () => {
         selectedCuboidBatchGeometriesRef,
         batchEditingFrameRef,
         batchMode,
-    } = useCuboids();
+        batchCuboidColorsUpdateRef,
+    } = useBatch();
 
     const interpolatePSR = useCallback(() => {
         const selectedCuboid = selectedCuboidGeometryRef.current;
@@ -168,6 +169,7 @@ export const useCuboidInterpolation = () => {
         });
 
         batchViewsCamerasNeedUpdateRef.current = true;
+        batchCuboidColorsUpdateRef.current = true;
         batchEditingFrameRef.current = null;
     }, []);
 

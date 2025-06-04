@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect, Fragment, memo } from "react";
 
-import { useCuboids } from "contexts";
+import { useBatch, useCuboids } from "contexts";
 import { useSideViewsControls, useDelayedHover } from "hooks";
 
 import { SVGText } from "components";
@@ -20,7 +20,8 @@ const PICKER_OPACITY = 0;
 
 export const SideViewSVG = memo(
     ({ name, x, y, width, height, mesh, camera, fileName = null, keyFrame = null }) => {
-        const { selectedCuboid, handlePositions, batchHandlePositions, batchMode } = useCuboids();
+        const { selectedCuboid, handlePositions } = useCuboids();
+        const { batchHandlePositions, batchMode } = useBatch();
 
         const frame = mesh?.userData?.frame;
 

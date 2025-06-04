@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-import { useCuboids, useFrames, useFileManager } from "contexts";
+import { useCuboids, useFrames, useFileManager, useBatch } from "contexts";
 import { useCuboidInterpolation } from "hooks";
 
 import { computeVisibilityFrameRange } from "utils/cuboids";
@@ -8,7 +8,8 @@ import { computeVisibilityFrameRange } from "utils/cuboids";
 export const useCuboidVisibility = () => {
     const { pcdFiles } = useFileManager();
     const { activeFrameIndex } = useFrames();
-    const { batchMode, cuboidsSolutionRef, selectedCuboidGeometryRef } = useCuboids();
+    const { cuboidsSolutionRef, selectedCuboidGeometryRef } = useCuboids();
+    const { batchMode } = useBatch();
 
     const { findFrameMarkers } = useCuboidInterpolation();
 

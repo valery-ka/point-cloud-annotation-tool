@@ -1,7 +1,7 @@
 import { useRef, useEffect } from "react";
 import { useFrame } from "@react-three/fiber";
 
-import { useCuboids, useEditor, useFileManager, useFrames } from "contexts";
+import { useBatch, useCuboids, useEditor, useFileManager, useFrames } from "contexts";
 
 import { getPointsInsideCuboid } from "utils/cuboids";
 
@@ -9,8 +9,8 @@ export const useUpdateCuboidInfoCard = (handlers) => {
     const { pcdFiles } = useFileManager();
     const { activeFrameIndex } = useFrames();
     const { pointCloudRefs } = useEditor();
-    const { batchMode, selectedCuboid, selectedCuboidGeometryRef, selectedCuboidInfoRef } =
-        useCuboids();
+    const { selectedCuboid, selectedCuboidGeometryRef, selectedCuboidInfoRef } = useCuboids();
+    const { batchMode } = useBatch();
 
     const prevFrameRef = useRef(activeFrameIndex);
     const prevCuboidRef = useRef(selectedCuboid?.id);

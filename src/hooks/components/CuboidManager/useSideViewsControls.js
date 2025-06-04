@@ -1,6 +1,6 @@
 import { useEffect, useRef, useCallback } from "react";
 
-import { useCuboids, useEditor } from "contexts";
+import { useBatch, useCuboids, useEditor } from "contexts";
 import { useMousetrapPause, useFrameSwitcher, usePlayback, useBatchEditorEvents } from "hooks";
 
 import {
@@ -27,11 +27,10 @@ const scale = "scale";
 const rotate = "rotate";
 
 export const useSideViewsControls = ({ camera, mesh, hoveredView, hoveredHandler, name }) => {
+    const { cameraControlsRef, transformControlsRef } = useEditor();
     const { sideViewsCamerasNeedUpdateRef, isCuboidTransformingRef, sideViewCameraZoomsRef } =
         useCuboids();
-    const { batchMode, batchViewsCamerasNeedUpdateRef, batchEditingFrameRef } = useCuboids();
-
-    const { cameraControlsRef, transformControlsRef } = useEditor();
+    const { batchMode, batchViewsCamerasNeedUpdateRef, batchEditingFrameRef } = useBatch();
 
     const { stopPlayback } = usePlayback();
     const { handleGoToPreviousFrame, handleGoToNextFrame } = useFrameSwitcher(stopPlayback);

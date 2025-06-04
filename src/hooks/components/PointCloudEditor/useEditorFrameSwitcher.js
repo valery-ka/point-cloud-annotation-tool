@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 
-import { useFileManager, useEditor, useFrames, useCuboids } from "contexts";
+import { useFileManager, useEditor, useFrames, useBatch } from "contexts";
 
 import { useThree } from "@react-three/fiber";
 
@@ -14,7 +14,7 @@ export const useEditorFrameSwitcher = (onFrameChanged) => {
     const { pcdFiles } = useFileManager();
     const { activeFrameIndex, arePointCloudsLoading } = useFrames();
     const { pointCloudRefs, setHasFilterSelectionPoint } = useEditor();
-    const { batchMode } = useCuboids();
+    const { batchMode } = useBatch();
 
     const previousFrameRef = useRef(null);
 

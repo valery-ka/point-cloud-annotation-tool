@@ -2,7 +2,7 @@ import { useThree } from "@react-three/fiber";
 
 import { useCallback, useEffect } from "react";
 
-import { useEditor, useCuboids, useFrames } from "contexts";
+import { useEditor, useCuboids, useFrames, useBatch } from "contexts";
 import { useCuboidInterpolation, useDebouncedCallback } from "hooks";
 
 import { TransformControls } from "utils/cuboids";
@@ -15,7 +15,7 @@ export const useTransformControls = () => {
     const { activeFrameIndex } = useFrames();
     const { cameraControlsRef, transformControlsRef } = useEditor();
     const { sideViewsCamerasNeedUpdateRef, isCuboidTransformingRef } = useCuboids();
-    const { batchMode, batchViewsCamerasNeedUpdateRef, cuboidColorsUpdateRef } = useCuboids();
+    const { batchMode, batchViewsCamerasNeedUpdateRef, batchCuboidColorsUpdateRef } = useBatch();
 
     const { saveCurrentPSR, interpolatePSR, findFrameMarkers } = useCuboidInterpolation();
     const { saveCurrentPSRBatch, interpolatePSRBatch, updateCuboidPSRBatch } =
@@ -33,7 +33,7 @@ export const useTransformControls = () => {
         findFrameMarkers();
         interpolatePSRBatch();
         updateCuboidPSRBatch();
-        cuboidColorsUpdateRef.current = true;
+        batchCuboidColorsUpdateRef.current = true;
         console.log("batch finished");
     }, REQUEST_INTERPOLATE_PSR_TIME);
 
