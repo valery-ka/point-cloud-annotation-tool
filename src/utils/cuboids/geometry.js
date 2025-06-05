@@ -12,6 +12,7 @@ import {
     LineSegments,
     Euler,
     Matrix4,
+    Quaternion,
 } from "three";
 
 import { LAYERS } from "constants";
@@ -143,29 +144,38 @@ export const removeCuboid = (scene, cuboid) => {
     arrow.cleanup();
 };
 
-export const getPointsInsideCuboid = (positions, position, quaternion, scale) => {
-    const matrix = new Matrix4().compose(position, quaternion, scale);
-    const inverseMatrix = new Matrix4().copy(matrix).invert();
+export const getPointsInsideCuboid = (positions, position, quaternionObj, scale) => {
+    const quaternion = new Quaternion(
+        quaternionObj.x,
+        quaternionObj.y,
+        quaternionObj.z,
+        quaternionObj.w,
+    );
 
-    const halfSize = new Vector3(0.5, 0.5, 0.5);
-    const point = new Vector3();
-    const localPoint = new Vector3();
-    const insidePoints = [];
+    const matrix = new Matrix4().compose(position, quaternion, scale);
+    const inverse = new Matrix4().copy(matrix).invert();
+    const e = inverse.elements;
+
+    const result = [];
+    const hx = 0.5,
+        hy = 0.5,
+        hz = 0.5;
 
     for (let i = 0; i < positions.length; i += 3) {
-        point.set(positions[i], positions[i + 1], positions[i + 2]);
-        localPoint.copy(point).applyMatrix4(inverseMatrix);
+        const x = positions[i],
+            y = positions[i + 1],
+            z = positions[i + 2];
 
-        if (
-            Math.abs(localPoint.x) <= halfSize.x &&
-            Math.abs(localPoint.y) <= halfSize.y &&
-            Math.abs(localPoint.z) <= halfSize.z
-        ) {
-            insidePoints.push(i / 3);
+        const lx = e[0] * x + e[4] * y + e[8] * z + e[12];
+        const ly = e[1] * x + e[5] * y + e[9] * z + e[13];
+        const lz = e[2] * x + e[6] * y + e[10] * z + e[14];
+
+        if (Math.abs(lx) <= hx && Math.abs(ly) <= hy && Math.abs(lz) <= hz) {
+            result.push(i / 3);
         }
     }
 
-    return insidePoints;
+    return result;
 };
 
 export const getCuboidMeshPositionById = (cuboidsGeometriesRef, id) => {

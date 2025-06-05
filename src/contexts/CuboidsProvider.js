@@ -39,6 +39,11 @@ export const CuboidsProvider = ({ children }) => {
 
     const cuboidsSolutionRef = useRef({});
 
+    const cuboidIdToLabelRef = useRef({});
+    const pointsInsideCuboidsRef = useRef({});
+
+    const updateSingleCuboidRef = useRef(false);
+
     return (
         <CuboidsContext.Provider
             value={{
@@ -61,6 +66,9 @@ export const CuboidsProvider = ({ children }) => {
                 sideViewCameraZoomsRef,
                 sideViewsCamerasNeedUpdateRef,
                 cuboidsSolutionRef,
+                pointsInsideCuboidsRef,
+                cuboidIdToLabelRef,
+                updateSingleCuboidRef,
             }}
         >
             {children}

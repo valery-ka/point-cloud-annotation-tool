@@ -14,8 +14,10 @@ export const useTransformControls = () => {
 
     const { activeFrameIndex } = useFrames();
     const { cameraControlsRef, transformControlsRef } = useEditor();
-    const { sideViewsCamerasNeedUpdateRef, isCuboidTransformingRef } = useCuboids();
-    const { batchMode, batchViewsCamerasNeedUpdateRef, batchCuboidColorsUpdateRef } = useBatch();
+
+    const { sideViewsCamerasNeedUpdateRef, isCuboidTransformingRef, updateSingleCuboidRef } =
+        useCuboids();
+    const { batchMode, batchViewsCamerasNeedUpdateRef, updateBatchCuboidRef } = useBatch();
 
     const { saveCurrentPSR, interpolatePSR, findFrameMarkers } = useCuboidInterpolation();
     const { saveCurrentPSRBatch, interpolatePSRBatch, updateCuboidPSRBatch } =
@@ -25,7 +27,7 @@ export const useTransformControls = () => {
         saveCurrentPSR({ activeFrameIndex: activeFrameIndex });
         findFrameMarkers();
         interpolatePSR();
-        console.log("single finished");
+        updateSingleCuboidRef.current = true;
     }, REQUEST_INTERPOLATE_PSR_TIME);
 
     const debouncedInterpolatePSRBatch = useDebouncedCallback(() => {
@@ -33,8 +35,7 @@ export const useTransformControls = () => {
         findFrameMarkers();
         interpolatePSRBatch();
         updateCuboidPSRBatch();
-        batchCuboidColorsUpdateRef.current = true;
-        console.log("batch finished");
+        updateBatchCuboidRef.current = true;
     }, REQUEST_INTERPOLATE_PSR_TIME);
 
     const onTransformChange = useCallback(() => {

@@ -30,7 +30,7 @@ const OBJECTS_TAB_INDEX = 0;
 
 export const ObjectCardTab = memo(() => {
     const { publish } = useEvent();
-    const { sceneRef, transformControlsRef } = useEditor();
+    const { sceneRef, transformControlsRef, cloudPointsColorNeedsUpdateRef } = useEditor();
     const {
         cuboids,
         setCuboids,
@@ -41,6 +41,7 @@ export const ObjectCardTab = memo(() => {
         selectedCuboidInfoRef,
         cuboidsGeometriesRef,
         cuboidsSolutionRef,
+        pointsInsideCuboidsRef,
     } = useCuboids();
     const { config } = useConfig();
     const { objects } = config;
@@ -91,8 +92,21 @@ export const ObjectCardTab = memo(() => {
             }
         }
 
+        for (const filePath in pointsInsideCuboidsRef.current) {
+            const cuboidMap = pointsInsideCuboidsRef.current[filePath];
+            if (cuboidMap && cuboidId in cuboidMap) {
+                delete cuboidMap[cuboidId];
+
+                if (Object.keys(cuboidMap).length === 0) {
+                    delete pointsInsideCuboidsRef.current[filePath];
+                }
+            }
+        }
+
         setCuboids((prevCuboids) => prevCuboids.filter((cuboid) => cuboid.id !== cuboidId));
         setSelectedCuboid(null);
+
+        cloudPointsColorNeedsUpdateRef.current = true;
     }, []);
 
     useSubscribeFunction("removeObject", removeObject, []);

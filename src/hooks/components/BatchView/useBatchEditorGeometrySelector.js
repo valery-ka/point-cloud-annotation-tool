@@ -1,20 +1,10 @@
 import { useEffect } from "react";
-import { useFrame } from "@react-three/fiber";
 
-import { useCuboids, useFileManager, useEditor, useBatch } from "contexts";
+import { useCuboids, useBatch } from "contexts";
 
-import { getPointsInsideCuboid } from "utils/cuboids";
-
-export const useBatchEditorGeometrySelector = (handlers) => {
-    const { pcdFiles } = useFileManager();
-    const { pointCloudRefs } = useEditor();
+export const useBatchEditorGeometrySelector = () => {
     const { selectedCuboid, cuboidsGeometriesRef, cuboidsSolutionRef } = useCuboids();
-    const {
-        batchMode,
-        selectedCuboidBatchGeometriesRef,
-        currentFrame,
-        batchCuboidColorsUpdateRef,
-    } = useBatch();
+    const { batchMode, selectedCuboidBatchGeometriesRef } = useBatch();
 
     useEffect(() => {
         if (batchMode && selectedCuboid) {
@@ -50,29 +40,4 @@ export const useBatchEditorGeometrySelector = (handlers) => {
             selectedCuboidBatchGeometriesRef.current = null;
         }
     }, [selectedCuboid, batchMode]);
-
-    useFrame(() => {
-        const batch = selectedCuboidBatchGeometriesRef.current;
-
-        if (batch && batchCuboidColorsUpdateRef.current) {
-            const { handleCuboidPointsColor } = handlers;
-
-            for (let frame = currentFrame[0]; frame < currentFrame[1] + 1; frame++) {
-                const cuboid = batch[frame];
-                const { position, scale, quaternion } = cuboid;
-                const { label } = cuboid.userData;
-
-                const frameFilePath = pcdFiles[frame];
-                const cloud = pointCloudRefs.current[frameFilePath];
-                if (!cloud) return;
-
-                const positions = cloud.geometry.attributes.position.array;
-                const insidePoints = getPointsInsideCuboid(positions, position, quaternion, scale);
-
-                handleCuboidPointsColor(frame, insidePoints, label);
-            }
-        }
-
-        batchCuboidColorsUpdateRef.current = false;
-    });
 };

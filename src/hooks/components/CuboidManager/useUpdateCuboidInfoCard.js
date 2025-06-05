@@ -1,39 +1,19 @@
-import { useRef, useEffect } from "react";
+import { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 
-import { useBatch, useCuboids, useEditor, useFileManager, useFrames } from "contexts";
+import { useCuboids, useEditor, useFileManager, useFrames } from "contexts";
 
 import { getPointsInsideCuboid } from "utils/cuboids";
 
-export const useUpdateCuboidInfoCard = (handlers) => {
+export const useUpdateCuboidInfoCard = () => {
     const { pcdFiles } = useFileManager();
     const { activeFrameIndex } = useFrames();
     const { pointCloudRefs } = useEditor();
     const { selectedCuboid, selectedCuboidGeometryRef, selectedCuboidInfoRef } = useCuboids();
-    const { batchMode } = useBatch();
 
     const prevFrameRef = useRef(activeFrameIndex);
     const prevCuboidRef = useRef(selectedCuboid?.id);
     const prevLabelRef = useRef(null);
-
-    useEffect(() => {
-        if (!batchMode) {
-            const geometry = selectedCuboidGeometryRef.current;
-            if (!geometry) return;
-
-            const { position, scale, quaternion } = geometry;
-
-            const activeFrameFilePath = pcdFiles[activeFrameIndex];
-            const activeFrame = pointCloudRefs.current[activeFrameFilePath];
-            if (!activeFrame) return;
-
-            const positions = activeFrame.geometry.attributes.position.array;
-            const insidePoints = getPointsInsideCuboid(positions, position, quaternion, scale);
-
-            const { handleCuboidPointsColor } = handlers;
-            handleCuboidPointsColor(activeFrameIndex, insidePoints, prevLabelRef.current);
-        }
-    }, [pcdFiles, activeFrameIndex, batchMode]);
 
     useFrame(() => {
         const geometry = selectedCuboidGeometryRef.current;
@@ -80,8 +60,6 @@ export const useUpdateCuboidInfoCard = (handlers) => {
             const activeFrame = pointCloudRefs.current[activeFrameFilePath];
             if (!activeFrame) return;
 
-            const { handleCuboidPointsColor } = handlers;
-
             const positions = activeFrame.geometry.attributes.position.array;
 
             const insidePoints = getPointsInsideCuboid(positions, position, quaternion, scale);
@@ -89,8 +67,6 @@ export const useUpdateCuboidInfoCard = (handlers) => {
             if (insidePointsCount !== info.insidePointsCount) {
                 info.insidePointsCount = insidePointsCount;
             }
-
-            handleCuboidPointsColor(activeFrameIndex, insidePoints, label);
         }
     });
 };

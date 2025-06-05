@@ -59,6 +59,7 @@ export { useOrthographicView } from "./components/CuboidManager/useOrthographicV
 export { useTransformControls } from "./components/CuboidManager/useTransformControls";
 export { useSideViewsControls } from "./components/CuboidManager/useSideViewsControls";
 export { useSideViewsRenderer } from "./components/CuboidManager/useSideViewsRenderer";
+export { usePointsInsideCuboids } from "./components/CuboidManager/usePointsInsideCuboids";
 export { useCuboidInterpolation } from "./components/CuboidManager/useCuboidInterpolation";
 export { useUpdateCuboidInfoCard } from "./components/CuboidManager/useUpdateCuboidInfoCard";
 

@@ -9,6 +9,7 @@ import {
     useFrames,
     useImages,
     useCalibrations,
+    useCuboids,
 } from "contexts";
 
 import {
@@ -33,6 +34,8 @@ export const ImageGeometryUpdater = memo(({ image }) => {
         selectedCamera,
     } = useImages();
     const { projectedPointsRef } = useCalibrations();
+
+    const { pointsInsideCuboidsRef } = useCuboids();
 
     const { settings } = useSettings();
 
@@ -82,6 +85,7 @@ export const ImageGeometryUpdater = memo(({ image }) => {
         const activeFrameFilePath = pcdFiles[activeFrameIndex];
         const activeFrameCloudGeometry = pointCloudRefs.current[activeFrameFilePath]?.geometry;
         const activeFrameLabels = pointLabelsRef.current[activeFrameFilePath];
+        const activeFrameCuboidsPoints = pointsInsideCuboidsRef.current[activeFrameFilePath];
         const projectedPoints = projectedPointsRef.current;
         const imageGeometry = projectedPointsRef.current[image?.src]?.geometry;
 
@@ -91,6 +95,7 @@ export const ImageGeometryUpdater = memo(({ image }) => {
                 cloudData: {
                     geometry: activeFrameCloudGeometry,
                     labels: activeFrameLabels,
+                    cuboids: activeFrameCuboidsPoints,
                 },
                 imageData: {
                     image,

@@ -29,6 +29,8 @@ export const EditorProvider = ({ children }) => {
 
     const isIntersectingMap = useRef(new Map());
 
+    const cloudPointsColorNeedsUpdateRef = useRef(false);
+
     return (
         <EditorContext.Provider
             value={{
@@ -52,6 +54,7 @@ export const EditorProvider = ({ children }) => {
                 transformControlsRef,
                 isIntersectingMap,
                 sceneRef,
+                cloudPointsColorNeedsUpdateRef,
             }}
         >
             {children}

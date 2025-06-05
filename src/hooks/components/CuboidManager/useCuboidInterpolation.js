@@ -19,7 +19,7 @@ export const useCuboidInterpolation = () => {
         selectedCuboidBatchGeometriesRef,
         batchEditingFrameRef,
         batchMode,
-        batchCuboidColorsUpdateRef,
+        updateBatchCuboidRef,
     } = useBatch();
 
     const interpolatePSR = useCallback(() => {
@@ -169,7 +169,6 @@ export const useCuboidInterpolation = () => {
         });
 
         batchViewsCamerasNeedUpdateRef.current = true;
-        batchCuboidColorsUpdateRef.current = true;
         batchEditingFrameRef.current = null;
     }, []);
 

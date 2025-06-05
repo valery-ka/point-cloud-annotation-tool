@@ -137,6 +137,17 @@ export const SettingsTab = memo(({ title }) => {
                         step={0.01}
                         decimals={2}
                     />
+                    <SettingsSlider
+                        title={t(`${COMPONENT_NAME}cuboidPointsMixFactor`)}
+                        action={"pointColor"}
+                        setting={"editorSettings"}
+                        settingType={"colors"}
+                        settingKey={"cuboidPointsMixFactor"}
+                        min={0}
+                        max={1}
+                        step={0.01}
+                        decimals={2}
+                    />
                 </Spoiler>
                 <Spoiler title={t(`${COMPONENT_NAME}editorSettings`)} defaultIsOpen={false}>
                     <SettingsSlider

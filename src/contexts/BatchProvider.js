@@ -16,7 +16,7 @@ export const BatchProvider = ({ children }) => {
     const selectedCuboidBatchGeometriesRef = useRef(null);
     const batchViewsCamerasNeedUpdateRef = useRef(true);
     const batchEditingFrameRef = useRef(null);
-    const batchCuboidColorsUpdateRef = useRef(false);
+    const updateBatchCuboidRef = useRef(false);
 
     return (
         <BatchContext.Provider
@@ -36,7 +36,7 @@ export const BatchProvider = ({ children }) => {
                 selectedCuboidBatchGeometriesRef,
                 batchViewsCamerasNeedUpdateRef,
                 batchEditingFrameRef,
-                batchCuboidColorsUpdateRef,
+                updateBatchCuboidRef,
             }}
         >
             {children}

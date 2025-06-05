@@ -1,6 +1,6 @@
 import { useEffect, useCallback } from "react";
 
-import { useCuboids, useEditor, useFrames, useEvent } from "contexts";
+import { useCuboids, useEditor, useEvent } from "contexts";
 import {
     useTransformControls,
     useRaycastClickSelect,
@@ -9,12 +9,12 @@ import {
     useCuboidInterpolation,
     useCuboidVisibility,
     useUpdateCuboidInfoCard,
+    usePointsInsideCuboids,
 } from "hooks";
 
 import { TABS } from "constants";
 
 export const useCuboidManager = (handlers) => {
-    const { activeFrameIndex } = useFrames();
     const { publish } = useEvent();
     const { cameraControlsRef, transformControlsRef } = useEditor();
     const {
@@ -25,6 +25,7 @@ export const useCuboidManager = (handlers) => {
         sideViewsCamerasNeedUpdateRef,
         setSelectedCuboid,
         setFrameMarkers,
+        updateSingleCuboidRef,
     } = useCuboids();
 
     const { updateCuboidPSR, findFrameMarkers } = useCuboidInterpolation();
@@ -43,20 +44,17 @@ export const useCuboidManager = (handlers) => {
             setSelectedCuboid(cuboids.find((cube) => cube.id === id));
             findFrameMarkers();
             publish("setActiveTab", TABS.OBJECT_CARD);
+            updateSingleCuboidRef.current = true;
         },
         [cuboids],
     );
 
     const unselectCuboid = useCallback(() => {
-        const { handleCuboidPointsColor } = handlers;
-
         transformControlsRef.current.detach();
         selectedCuboidGeometryRef.current = null;
         cameraControlsRef.current.enabled = true;
         setFrameMarkers([]);
-
-        handleCuboidPointsColor(activeFrameIndex);
-    }, [activeFrameIndex, handlers.handleCuboidPointsColor]);
+    }, []);
 
     useHoveredCuboid({
         meshMap: () => {
@@ -90,4 +88,5 @@ export const useCuboidManager = (handlers) => {
     }, [updateCuboidPSR]);
 
     useUpdateCuboidInfoCard(handlers);
+    usePointsInsideCuboids();
 };

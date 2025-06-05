@@ -22,6 +22,12 @@ export const interpolatePSR = (start, end, t) => {
         position: { x: interpolatedPos.x, y: interpolatedPos.y, z: interpolatedPos.z },
         rotation: { x: interpolatedEuler._x, y: interpolatedEuler._y, z: interpolatedEuler._z },
         scale: { x: interpolatedScale.x, y: interpolatedScale.y, z: interpolatedScale.z },
+        quaternion: {
+            x: interpolatedQuat.x,
+            y: interpolatedQuat.y,
+            z: interpolatedQuat.z,
+            w: interpolatedQuat.w,
+        },
     };
 };
 
@@ -179,6 +185,7 @@ export const writePSRToSolution = ({
     const position = mesh.position.clone();
     const scale = mesh.scale.clone();
     const rotation = mesh.rotation.clone();
+    const quaternion = mesh.quaternion.clone();
 
     for (const frameIndex of frameIndices) {
         if (!cuboidsSolutionRef.current[frameIndex]) {
@@ -197,6 +204,7 @@ export const writePSRToSolution = ({
                 position: { x: position.x, y: position.y, z: position.z },
                 rotation: { x: rotation.x, y: rotation.y, z: rotation.z },
                 scale: { x: scale.x, y: scale.y, z: scale.z },
+                quaternion: { x: quaternion.x, y: quaternion.y, z: quaternion.z, w: quaternion.w },
             },
         };
 

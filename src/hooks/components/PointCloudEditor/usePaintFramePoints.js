@@ -1,14 +1,19 @@
 import { useEffect, useRef, useCallback } from "react";
 
-import { useFileManager, useSettings, useEditor, useFrames, useConfig, useImages } from "contexts";
+import {
+    useFileManager,
+    useSettings,
+    useEditor,
+    useFrames,
+    useConfig,
+    useImages,
+    useCuboids,
+    useBatch,
+} from "contexts";
 import { useSubscribeFunction } from "hooks";
 
-import {
-    hexToRgb,
-    changeClassOfSelection,
-    updatePointCloudColors,
-    updateCuboidPointsColor,
-} from "utils/editor";
+import { hexToRgb, changeClassOfSelection, updatePointCloudColors } from "utils/editor";
+import { useFrame } from "@react-three/fiber";
 
 export const usePaintFramePoints = (updateGlobalBox) => {
     const selectedClassColor = useRef(null);
@@ -22,8 +27,17 @@ export const usePaintFramePoints = (updateGlobalBox) => {
     const { pcdFiles } = useFileManager();
     const { config, nonHiddenClasses } = useConfig();
     const { activeFrameIndex, arePointCloudsLoading } = useFrames();
-    const { pointCloudRefs, selectedClassIndex, pointLabelsRef, classesVisibilityRef, minMaxZRef } =
-        useEditor();
+    const {
+        pointCloudRefs,
+        selectedClassIndex,
+        pointLabelsRef,
+        classesVisibilityRef,
+        minMaxZRef,
+        cloudPointsColorNeedsUpdateRef,
+    } = useEditor();
+
+    const { cuboidIdToLabelRef, pointsInsideCuboidsRef } = useCuboids();
+    const { batchMode, currentFrame } = useBatch();
 
     const { imagePointsColorNeedsUpdateRef, imagePointsAlphaNeedsUpdateRef } = useImages();
 
@@ -118,16 +132,24 @@ export const usePaintFramePoints = (updateGlobalBox) => {
 
             const activeFrameCloud = pointCloudRefs.current[activeFrameFilePath];
             const activeFrameLabels = pointLabelsRef.current[activeFrameFilePath];
+            const activeFrameCuboidsPoints = pointsInsideCuboidsRef.current[activeFrameFilePath];
+
+            const idToLabel = cuboidIdToLabelRef.current;
 
             if (activeFrameCloud?.geometry?.attributes?.color) {
                 updatePointCloudColors({
                     cloudData: {
                         cloud: activeFrameCloud,
                         labels: activeFrameLabels,
+                        cuboids: activeFrameCuboidsPoints,
                     },
                     colorData: {
-                        colorsCache: classColorsCache,
+                        classColorsCache: classColorsCache.current,
+                        objectColorsCache: objectColorsCache.current,
                         pointColor: pointColorRef.current,
+                    },
+                    misc: {
+                        idToLabel: idToLabel,
                     },
                 });
 
@@ -137,35 +159,20 @@ export const usePaintFramePoints = (updateGlobalBox) => {
         [pcdFiles, activeFrameIndex],
     );
 
-    const handleCuboidPointsColor = useCallback(
-        (frame = null, points = null, label = null) => {
-            const frameFilePath = pcdFiles[frame];
-
-            const frameCloud = pointCloudRefs.current[frameFilePath];
-            const frameLabels = pointLabelsRef.current[frameFilePath];
-
-            if (frameCloud?.geometry?.attributes?.color) {
-                updateCuboidPointsColor({
-                    cloudData: {
-                        cloud: frameCloud,
-                        labels: frameLabels,
-                    },
-                    colorData: {
-                        colorsCache: objectColorsCache,
-                        pointColor: pointColorRef.current,
-                    },
-                    selectionData: {
-                        selectedPoints: points,
-                        cuboidLabel: label,
-                    },
-                });
-                imagePointsColorNeedsUpdateRef.current = true;
+    useFrame(() => {
+        if (cloudPointsColorNeedsUpdateRef.current) {
+            if (!batchMode) {
+                handlePointCloudColors(null, activeFrameIndex);
+            } else {
+                for (let frame = currentFrame[0]; frame < currentFrame[1] + 1; frame++) {
+                    handlePointCloudColors(null, frame);
+                }
             }
-        },
-        [pcdFiles],
-    );
+        }
+        cloudPointsColorNeedsUpdateRef.current = false;
+    });
 
     useSubscribeFunction("pointColor", handlePointCloudColors, []);
 
-    return { handlePointCloudColors, paintSelectedPoints, handleCuboidPointsColor };
+    return { handlePointCloudColors, paintSelectedPoints };
 };

@@ -6,6 +6,7 @@ export const defaultEditorSettings = {
     colors: {
         pointBrightness: 0.25,
         pointIntensity: 1.0,
+        cuboidPointsMixFactor: 0.5,
     },
     sizes: {
         generalPointSize: 1.5,

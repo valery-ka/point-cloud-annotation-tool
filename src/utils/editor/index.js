@@ -27,7 +27,6 @@ export {
     changeClassOfSelection,
     getDefaultPointColor,
     updatePointCloudColors,
-    updateCuboidPointsColor,
 } from "./colors/cloud";
 export { invalidateImagePointsColor, getRGBFromMatchedColorArray } from "./colors/image";
 export { invalidateHighlighterPointsColor } from "./colors/highlighter";

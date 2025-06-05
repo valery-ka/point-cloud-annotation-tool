@@ -1,11 +1,12 @@
 import { useCallback, useState, useEffect } from "react";
 
-import { useFileManager, useFrames } from "contexts";
+import { useFileManager, useFrames, useCuboids } from "contexts";
 import { useCuboidInterpolation } from "hooks";
 
 export const useFrameLaneMouseEvents = (frameLaneRef) => {
     const { pcdFiles } = useFileManager();
     const { activeFrameIndex, setActiveFrameIndex } = useFrames();
+    const { updateSingleCuboidRef } = useCuboids();
 
     const { interpolatePSR, updateCuboidPSR, findFrameMarkers, saveCurrentPSR } =
         useCuboidInterpolation();
@@ -73,6 +74,7 @@ export const useFrameLaneMouseEvents = (frameLaneRef) => {
                 interpolatePSR();
                 findFrameMarkers();
                 updateCuboidPSR();
+                updateSingleCuboidRef.current = true;
             }
         },
         [interpolatePSR, updateCuboidPSR],

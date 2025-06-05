@@ -6,7 +6,8 @@ import { useCuboidInterpolation } from "hooks";
 export const useBatchEditorEvents = () => {
     const { setActiveFrameIndex } = useFrames();
     const { selectedCuboidGeometryRef, cuboidsSolutionRef } = useCuboids();
-    const { selectedCuboidBatchGeometriesRef, batchMode, setBatchMode } = useBatch();
+    const { selectedCuboidBatchGeometriesRef, batchMode, setBatchMode, updateBatchCuboidRef } =
+        useBatch();
 
     const { saveCurrentPSRBatch, interpolatePSRBatch, updateCuboidPSRBatch, findFrameMarkers } =
         useCuboidInterpolation();
@@ -29,6 +30,7 @@ export const useBatchEditorEvents = () => {
                 findFrameMarkers();
                 interpolatePSRBatch();
                 updateCuboidPSRBatch();
+                updateBatchCuboidRef.current = true;
             }
         },
         [batchMode, interpolatePSRBatch],

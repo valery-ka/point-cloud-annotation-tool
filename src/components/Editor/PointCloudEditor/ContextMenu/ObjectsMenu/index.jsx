@@ -27,6 +27,7 @@ export const ObjectsMenu = ({
         setCuboids,
         setSelectedCuboid,
         selectedCuboidInfoRef,
+        updateSingleCuboidRef,
     } = useCuboids();
     const { sceneRef } = useEditor();
 
@@ -105,6 +106,7 @@ export const ObjectsMenu = ({
                 prev.map((cuboid) => (cuboid.id === id ? { ...cuboid, label, color } : cuboid)),
             );
             setSelectedCuboid({ id, label, color });
+            updateSingleCuboidRef.current = true;
         },
         [cuboidsGeometriesRef],
     );
