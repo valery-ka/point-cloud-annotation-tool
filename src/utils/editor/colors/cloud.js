@@ -40,6 +40,10 @@ export const getDefaultPointColor = (index, frameIntensity, brightnessFactor, in
     return defaultColor;
 };
 
+export const getCuboidPointColor = (defaultColor, cuboidColor, mixFactor) => {
+    return cuboidColor.map((c) => c * mixFactor + defaultColor * (1 - mixFactor));
+};
+
 export const changeClassOfSelection = ({
     cloudData,
     colorData,
@@ -60,7 +64,7 @@ export const changeClassOfSelection = ({
         cloudData: cloudData,
         selectionData: { selectedPoints: selectedPoints },
         colorData: colorData,
-        callbacks: { updateGlobalBox, getDefaultPointColor },
+        callbacks: { updateGlobalBox, getDefaultPointColor, getCuboidPointColor },
     });
 
     if (!classVisible) {
@@ -148,9 +152,11 @@ const updateCuboidsColors = (
                 intensityFactor,
             );
 
-            colorArray[i] = rgb[0] * mixFactor + defaultColor * (1 - mixFactor);
-            colorArray[i + 1] = rgb[1] * mixFactor + defaultColor * (1 - mixFactor);
-            colorArray[i + 2] = rgb[2] * mixFactor + defaultColor * (1 - mixFactor);
+            const [r, g, b] = getCuboidPointColor(defaultColor, rgb, mixFactor);
+
+            colorArray[i] = r;
+            colorArray[i + 1] = g;
+            colorArray[i + 2] = b;
         }
     }
 };

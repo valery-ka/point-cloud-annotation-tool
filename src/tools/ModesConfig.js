@@ -58,33 +58,47 @@ export const MODES = {
             return labels[index] === originalClassIndex;
         },
         paint: ({ cloudData, selectionData, colorData, callbacks }) => {
-            const { cloud, labels } = cloudData;
+            const { cloud, labels, cuboids, idToLabel } = cloudData;
             const { selectedPoints } = selectionData;
-            const { pointColor } = colorData;
-            const { getDefaultPointColor } = callbacks;
+            const { pointColor, objectColorsCache } = colorData;
+            const { getDefaultPointColor, getCuboidPointColor } = callbacks;
 
             const colors = cloud.geometry.attributes.color.array;
             const intensity = cloud.geometry.attributes.intensity?.array;
-
-            if (!selectedPoints.length) return;
-
             const brightnessFactor = pointColor.pointBrightness;
             const intensityFactor = pointColor.pointIntensity;
+            const cuboidPointsMixFactor = pointColor.cuboidPointsMixFactor;
+
+            const cuboidPointToLabel = new Map();
+            for (const cuboidId in cuboids) {
+                const pointIndices = cuboids[cuboidId];
+                const label = idToLabel[cuboidId];
+                for (let i = 0; i < pointIndices.length; i++) {
+                    cuboidPointToLabel.set(pointIndices[i], label);
+                }
+            }
 
             for (let i = 0; i < selectedPoints.length; i++) {
                 const pointIndex = selectedPoints[i];
+                labels[pointIndex] = 0;
 
-                const pointColor = getDefaultPointColor(
+                const defaultColor = getDefaultPointColor(
                     pointIndex,
                     intensity,
                     brightnessFactor,
                     intensityFactor,
                 );
 
-                const defaultColor = [pointColor, pointColor, pointColor];
+                const labelInCuboid = cuboidPointToLabel.get(pointIndex);
+                const cuboidColor = objectColorsCache[labelInCuboid];
 
-                labels[pointIndex] = 0;
-                colors.set(defaultColor, pointIndex * 3);
+                let [r, g, b] = cuboidColor
+                    ? getCuboidPointColor(defaultColor, cuboidColor, cuboidPointsMixFactor)
+                    : [defaultColor, defaultColor, defaultColor];
+
+                colors[pointIndex * 3] = r;
+                colors[pointIndex * 3 + 1] = g;
+                colors[pointIndex * 3 + 2] = b;
             }
         },
     },

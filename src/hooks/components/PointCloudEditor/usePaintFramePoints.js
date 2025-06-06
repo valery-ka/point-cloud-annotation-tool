@@ -85,22 +85,27 @@ export const usePaintFramePoints = (updateGlobalBox) => {
 
             const activeFrameCloud = pointCloudRefs.current[activeFrameFilePath];
             const activeFrameLabels = pointLabelsRef.current[activeFrameFilePath];
+            const activeFrameCuboidsPoints = pointsInsideCuboidsRef.current[activeFrameFilePath];
 
             if (!activeFrameCloud?.geometry.attributes.color.array || !selectedClassColor.current)
                 return;
 
             const originalClassIndex = nonHiddenClasses[selectedClassIndex].originalIndex;
             const classVisible = classesVisibilityRef.current[originalClassIndex].visible;
+            const idToLabel = cuboidIdToLabelRef.current;
 
             changeClassOfSelection({
                 cloudData: {
                     cloud: activeFrameCloud,
                     labels: activeFrameLabels,
+                    cuboids: activeFrameCuboidsPoints,
+                    idToLabel: idToLabel,
                 },
                 colorData: {
                     pointColor: pointColorRef.current,
                     selectedClassColor: selectedClassColor.current,
                     originalClassIndex: originalClassIndex,
+                    objectColorsCache: objectColorsCache.current,
                 },
                 selectionData: {
                     selectionMode: mode,
