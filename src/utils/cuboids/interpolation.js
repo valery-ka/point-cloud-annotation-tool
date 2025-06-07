@@ -112,17 +112,20 @@ export const interpolateBetweenFrames = ({
     totalFrames,
     selectedId,
 }) => {
+    const cube = cuboidsGeometriesRef.current[selectedId]?.cube?.mesh;
+    if (!cube) return;
+
     for (let frame = 0; frame < totalFrames; frame++) {
         const frameSolution = cuboidsSolutionRef.current[frame] ?? [];
 
-        const entry = frameSolution.find((e) => e.id === selectedId);
-        if (!entry || entry.manual) continue;
+        const entryIndex = frameSolution.findIndex((e) => e.id === selectedId);
+        if (entryIndex === -1 || frameSolution[entryIndex]?.manual) continue;
 
-        const cube = cuboidsGeometriesRef.current[selectedId]?.cube?.mesh;
-        if (!cube) continue;
+        const [prev, next] = [
+            findNearestManualEntry(cuboidsSolutionRef, selectedId, frame, -1, totalFrames),
+            findNearestManualEntry(cuboidsSolutionRef, selectedId, frame, 1, totalFrames),
+        ];
 
-        const prev = findNearestManualEntry(cuboidsSolutionRef, selectedId, frame, -1, totalFrames);
-        const next = findNearestManualEntry(cuboidsSolutionRef, selectedId, frame, 1, totalFrames);
         const interpolatedPSR = computeInterpolatedPSR(
             prev,
             next,
@@ -132,14 +135,10 @@ export const interpolateBetweenFrames = ({
             selectedId,
         );
 
-        if (interpolatedPSR) {
-            if (!cuboidsSolutionRef.current[frame]) cuboidsSolutionRef.current[frame] = {};
-            if (!cuboidsSolutionRef.current[frame][selectedId]) {
-                cuboidsSolutionRef.current[frame][selectedId] = { id: selectedId };
-            }
+        if (!interpolatedPSR) continue;
 
-            cuboidsSolutionRef.current[frame][selectedId].psr = interpolatedPSR;
-        }
+        cuboidsSolutionRef.current[frame] ??= [];
+        cuboidsSolutionRef.current[frame][entryIndex].psr = interpolatedPSR;
     }
 };
 

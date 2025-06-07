@@ -19,7 +19,6 @@ export const useCuboidInterpolation = () => {
         selectedCuboidBatchGeometriesRef,
         batchEditingFrameRef,
         batchMode,
-        updateBatchCuboidRef,
     } = useBatch();
 
     const interpolatePSR = useCallback(() => {
