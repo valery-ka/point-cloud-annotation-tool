@@ -20,7 +20,7 @@ export const useSelectorTools = (
     paintSelectedPoints,
     filterSelectedPoints,
     handleSelectedPointsSize,
-    requestSaveFrame,
+    requestSaveLabels,
 ) => {
     const { pcdFiles } = useFileManager();
     const { nonHiddenClasses } = useConfig();
@@ -55,7 +55,7 @@ export const useSelectorTools = (
                 paintSelectedPoints,
                 filterSelectedPoints,
                 handleSelectedPointsSize,
-                requestSaveFrame,
+                requestSaveLabels,
             },
             selectionData: {
                 theme,

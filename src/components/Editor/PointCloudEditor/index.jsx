@@ -1,4 +1,3 @@
-import React from "react";
 import * as HOOKS from "hooks";
 
 import { ModerationComments } from "./ModerationComments";
@@ -19,7 +18,9 @@ export const PointCloudEditor = () => {
 
     HOOKS.useHighlightedPoint();
 
-    const requestSaveFrame = HOOKS.useSaveOutput(() => updateUndoRedoState());
+    const { requestSaveLabels, requestSaveObjects } = HOOKS.useSaveOutput(() =>
+        updateUndoRedoState(),
+    );
 
     const { filterFramePoints, filterSelectedPoints } =
         HOOKS.useFramePointsVisibility(updateGlobalBox);
@@ -33,7 +34,7 @@ export const PointCloudEditor = () => {
         paintSelectedPoints,
         filterSelectedPoints,
         handleSelectedPointsSize,
-        requestSaveFrame,
+        requestSaveLabels,
     );
 
     HOOKS.useToolsMouseEvents(selectorTools);
@@ -44,7 +45,7 @@ export const PointCloudEditor = () => {
         handlePointsSize();
     });
 
-    const updateUndoRedoState = HOOKS.useUndoRedo(requestSaveFrame, () => {
+    const updateUndoRedoState = HOOKS.useUndoRedo(requestSaveLabels, () => {
         filterFramePoints();
         handlePointCloudColors();
         handlePointsSize();

@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { useCuboids, useFrames, useFileManager, useBatch } from "contexts";
+import { useCuboids, useFrames, useFileManager, useBatch, useEvent } from "contexts";
 
 import { writePSRToSolution, interpolateBetweenFrames } from "utils/cuboids";
 
@@ -13,6 +13,7 @@ export const useCuboidInterpolation = () => {
         selectedCuboidGeometryRef,
         setFrameMarkers,
     } = useCuboids();
+    const { publish } = useEvent();
 
     const {
         batchViewsCamerasNeedUpdateRef,
@@ -20,6 +21,10 @@ export const useCuboidInterpolation = () => {
         batchEditingFrameRef,
         batchMode,
     } = useBatch();
+
+    const requestSave = useCallback(() => {
+        publish("saveObjectsSolution", { updateStack: true, isAutoSave: false });
+    }, [publish]);
 
     const interpolatePSR = useCallback(() => {
         const selectedCuboid = selectedCuboidGeometryRef.current;
@@ -31,7 +36,9 @@ export const useCuboidInterpolation = () => {
             totalFrames: pcdFiles.length,
             selectedId: selectedCuboid.name,
         });
-    }, [pcdFiles]);
+
+        requestSave();
+    }, [requestSave, pcdFiles]);
 
     const interpolatePSRBatch = useCallback(() => {
         const geometries = selectedCuboidBatchGeometriesRef.current;
@@ -50,8 +57,9 @@ export const useCuboidInterpolation = () => {
             });
         });
 
+        requestSave();
         batchViewsCamerasNeedUpdateRef.current = true;
-    }, [pcdFiles]);
+    }, [requestSave, pcdFiles]);
 
     const updateCuboidPSR = useCallback(
         (frame) => {

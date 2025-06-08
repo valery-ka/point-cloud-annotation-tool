@@ -1,13 +1,14 @@
 import { useEffect, useRef, useCallback, useMemo, useState } from "react";
 
-import { useFileManager, useEditor, useFrames, useSettings } from "contexts";
+import { useFileManager, useEditor, useFrames, useSettings, useCuboids } from "contexts";
 import { useSubscribeFunction, useDebouncedCallback } from "hooks";
 
-import { SaveOutputWorker } from "workers";
-import { saveLabels, formatPointLabels } from "utils/editor";
+import { SaveOutputWorker, SaveObjectsWorker } from "workers";
+import { saveLabels, saveObjects, formatPointLabels, formatObjects } from "utils/editor";
 import * as APP_CONSTANTS from "constants";
 
-const { UNDO_REDO_STACK_DEPTH, SAVE_FRAME_REQUEST_TIME } = APP_CONSTANTS;
+const { UNDO_REDO_STACK_DEPTH, SAVE_LABELS_REQUEST_TIME, SAVE_OBJECTS_REQUEST_TIME } =
+    APP_CONSTANTS;
 
 export const useSaveOutput = (updateUndoRedoState) => {
     const { pcdFiles, folderName } = useFileManager();
@@ -16,10 +17,15 @@ export const useSaveOutput = (updateUndoRedoState) => {
         useEditor();
     const { settings } = useSettings();
 
+    const { cuboidsSolutionRef } = useCuboids();
+
     const [hasUnsavedSolution, setHasUnsavedSolution] = useState(false);
 
-    const worker = useRef(null);
-    const controller = useRef(null);
+    const labelsWorker = useRef(null);
+    const objectsWorker = useRef(null);
+
+    const labelsController = useRef(null);
+    const objectsController = useRef(null);
 
     const isAutoSaveTimerEnabled = useMemo(() => {
         return settings.editorSettings.performance.autoSaveTimerEnabled;
@@ -30,21 +36,25 @@ export const useSaveOutput = (updateUndoRedoState) => {
     }, [settings.editorSettings.performance.autoSaveTimer]);
 
     useEffect(() => {
-        worker.current = SaveOutputWorker();
+        labelsWorker.current = SaveOutputWorker();
+        objectsWorker.current = SaveObjectsWorker();
         return () => {
-            if (worker.current) {
-                worker.current.terminate();
+            if (labelsWorker.current) {
+                labelsWorker.current.terminate();
+            }
+            if (objectsWorker.current) {
+                objectsWorker.current.terminate();
             }
         };
     }, []);
 
-    const saveFrame = useCallback(
+    const saveLabelsSolution = useCallback(
         async (controllerInstance) => {
             const signal = controllerInstance?.signal;
 
             const abortHandler = () => {
-                if (controller.current === controllerInstance) {
-                    controller.current = null;
+                if (labelsController.current === controllerInstance) {
+                    labelsController.current = null;
                 }
                 signal?.removeEventListener("abort", abortHandler);
             };
@@ -52,28 +62,77 @@ export const useSaveOutput = (updateUndoRedoState) => {
             signal?.addEventListener("abort", abortHandler);
 
             try {
-                const formattedData = formatPointLabels(folderName, pointLabelsRef.current);
-                const result = await saveLabels(folderName, formattedData, worker.current, signal);
-                if (result.saved) {
+                const formattedLabels = formatPointLabels(folderName, pointLabelsRef.current);
+                const labelsResult = await saveLabels(
+                    folderName,
+                    formattedLabels,
+                    labelsWorker.current,
+                    signal,
+                );
+                if (labelsResult.saved) {
                     setHasUnsavedSolution(false);
                     setPendingSaveState(false);
                 }
             } catch (err) {
             } finally {
                 signal?.removeEventListener("abort", abortHandler);
-                if (controller.current === controllerInstance) {
-                    controller.current = null;
+                if (labelsController.current === controllerInstance) {
+                    labelsController.current = null;
                 }
             }
         },
         [updateUndoRedoState],
     );
 
-    const debouncedSaveFrame = useDebouncedCallback((controllerInstance) => {
-        saveFrame(controllerInstance);
-    }, SAVE_FRAME_REQUEST_TIME);
+    const saveObjectsSolution = useCallback(
+        async (controllerInstance) => {
+            const signal = controllerInstance?.signal;
 
-    const requestSaveFrame = useCallback(
+            const abortHandler = () => {
+                if (objectsController.current === controllerInstance) {
+                    objectsController.current = null;
+                }
+                signal?.removeEventListener("abort", abortHandler);
+            };
+
+            signal?.addEventListener("abort", abortHandler);
+
+            try {
+                const formattedObjects = formatObjects(
+                    folderName,
+                    cuboidsSolutionRef.current,
+                    pcdFiles,
+                );
+                const objectsResult = await saveObjects(
+                    folderName,
+                    formattedObjects,
+                    objectsWorker.current,
+                    signal,
+                );
+                if (objectsResult.saved) {
+                    setHasUnsavedSolution(false);
+                    setPendingSaveState(false);
+                }
+            } catch (err) {
+            } finally {
+                signal?.removeEventListener("abort", abortHandler);
+                if (objectsController.current === controllerInstance) {
+                    objectsController.current = null;
+                }
+            }
+        },
+        [updateUndoRedoState],
+    );
+
+    const debouncedSaveLabels = useDebouncedCallback((controllerInstance) => {
+        saveLabelsSolution(controllerInstance);
+    }, SAVE_LABELS_REQUEST_TIME);
+
+    const debouncedSaveObjects = useDebouncedCallback((controllerInstance) => {
+        saveObjectsSolution(controllerInstance);
+    }, SAVE_OBJECTS_REQUEST_TIME);
+
+    const requestSaveLabels = useCallback(
         ({ updateStack = true, isAutoSave = false }) => {
             if (!pcdFiles.length) return;
 
@@ -96,12 +155,12 @@ export const useSaveOutput = (updateUndoRedoState) => {
             prevLabelsRef.current[activeFrameFilePath] = new Uint8Array(activeFrameLabels);
             updateUndoRedoState?.();
 
-            if (controller.current) {
-                controller.current.abort();
+            if (labelsController.current) {
+                labelsController.current.abort();
             }
 
             const newController = new AbortController();
-            controller.current = newController;
+            labelsController.current = newController;
 
             setHasUnsavedSolution(true);
             if (isAutoSaveTimerEnabled && !isAutoSave) {
@@ -110,27 +169,54 @@ export const useSaveOutput = (updateUndoRedoState) => {
 
             setPendingSaveState(true);
 
-            debouncedSaveFrame(newController);
+            debouncedSaveLabels(newController);
         },
-        [saveFrame, pcdFiles, activeFrameIndex],
+        [saveLabelsSolution, pcdFiles, activeFrameIndex],
+    );
+
+    const requestSaveObjects = useCallback(
+        ({ updateStack = true, isAutoSave = false }) => {
+            if (!pcdFiles.length) return;
+
+            if (objectsController.current) {
+                objectsController.current.abort();
+            }
+
+            const newController = new AbortController();
+            objectsController.current = newController;
+
+            setHasUnsavedSolution(true);
+            if (isAutoSaveTimerEnabled && !isAutoSave) {
+                return;
+            }
+
+            setPendingSaveState(true);
+
+            debouncedSaveObjects(newController);
+        },
+        [saveObjectsSolution, pcdFiles],
     );
 
     useEffect(() => {
         if (!pcdFiles.length || arePointCloudsLoading) return;
-        requestSaveFrame({ updateStack: false, isAutoSave: true });
+        requestSaveLabels({ updateStack: false, isAutoSave: true });
+        requestSaveObjects({ updateStack: false, isAutoSave: true });
     }, [pcdFiles, arePointCloudsLoading]);
 
     useEffect(() => {
         if (isAutoSaveTimerEnabled && pcdFiles.length > 0 && !arePointCloudsLoading) {
             const interval = setInterval(() => {
-                requestSaveFrame({ updateStack: false, isAutoSave: true });
+                requestSaveLabels({ updateStack: false, isAutoSave: true });
+                requestSaveObjects({ updateStack: false, isAutoSave: true });
             }, autoSaveTimer * 1000);
 
             return () => clearInterval(interval);
         }
     }, [autoSaveTimer, arePointCloudsLoading, isAutoSaveTimerEnabled]);
 
-    useSubscribeFunction("saveSolution", requestSaveFrame, []);
+    useSubscribeFunction("saveLabelsSolution", requestSaveLabels, []);
+
+    useSubscribeFunction("saveObjectsSolution", requestSaveObjects, []);
 
     useEffect(() => {
         const handleBeforeUnload = (event) => {
@@ -146,5 +232,5 @@ export const useSaveOutput = (updateUndoRedoState) => {
         };
     }, [hasUnsavedSolution]);
 
-    return requestSaveFrame;
+    return { requestSaveLabels, requestSaveObjects };
 };

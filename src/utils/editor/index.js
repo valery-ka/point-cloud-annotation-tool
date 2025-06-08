@@ -60,6 +60,8 @@ export {
     cleanupPointClouds,
 } from "./geometry/loader";
 
-export { formatPointLabels } from "./output/general";
+export { formatPointLabels, formatObjects } from "./output/general";
 export { saveLabels } from "./output/saveLabels";
 export { loadLabels } from "./output/loadLabels";
+export { saveObjects } from "./output/saveObjects";
+export { loadObjects } from "./output/loadObjects";

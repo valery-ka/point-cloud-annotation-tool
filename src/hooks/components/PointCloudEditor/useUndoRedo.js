@@ -3,7 +3,7 @@ import { useEffect, useCallback } from "react";
 import { useFileManager, useEditor, useFrames, useEvent } from "contexts";
 import { useSubscribeFunction } from "hooks";
 
-export const useUndoRedo = (requestSaveFrame, onUndoRedo) => {
+export const useUndoRedo = (requestSaveLabels, onUndoRedo) => {
     const { pcdFiles } = useFileManager();
     const { publish } = useEvent();
     const { pointLabelsRef, undoStackRef, redoStackRef } = useEditor();
@@ -40,7 +40,7 @@ export const useUndoRedo = (requestSaveFrame, onUndoRedo) => {
         onUndoRedo?.();
         updateUndoRedoState();
 
-        requestSaveFrame({ updateStack: false, isAutoSave: false });
+        requestSaveLabels({ updateStack: false, isAutoSave: false });
     }, [arePointCloudsLoading, isPlaying, onUndoRedo]);
 
     useSubscribeFunction("undoAction", undoAction, []);
@@ -67,7 +67,7 @@ export const useUndoRedo = (requestSaveFrame, onUndoRedo) => {
         onUndoRedo?.();
         updateUndoRedoState();
 
-        requestSaveFrame({ updateStack: false, isAutoSave: false });
+        requestSaveLabels({ updateStack: false, isAutoSave: false });
     }, [arePointCloudsLoading, isPlaying, onUndoRedo]);
 
     useSubscribeFunction("redoAction", redoAction, []);

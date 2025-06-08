@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { useThree } from "@react-three/fiber";
 
 import { useFileManager, useEditor, useFrames, useSettings, useConfig } from "contexts";
+import { useLabelsLoader, useObjectsLoader } from "hooks";
 
 import { CloudPointShader } from "shaders";
 import { PCDLoaderWorker } from "workers";
@@ -15,6 +16,7 @@ import {
     createPointCloud,
     cleanupPointClouds,
 } from "utils/editor";
+
 import * as APP_CONSTANTS from "constants";
 
 const { POINT_SIZE_MULTIPLIER } = APP_CONSTANTS;
@@ -41,26 +43,11 @@ export const usePointCloudLoader = (THEME_COLORS) => {
         });
     }, [theme]);
 
-    const labelsCacheRef = useRef({});
-    const [areLabelsLoaded, setAreLabelsLoaded] = useState(false);
+    const { labelsCacheRef, areLabelsLoaded } = useLabelsLoader();
+    const { areObjectsLoaded, findPointsInsideCuboids } = useObjectsLoader();
 
     useEffect(() => {
-        const loadAllLabels = async () => {
-            if (!labelsCacheRef.current[folderName]) {
-                const labels = await loadLabels(folderName);
-                labelsCacheRef.current[folderName] = labels;
-                console.log(labels);
-            }
-            setAreLabelsLoaded(true);
-        };
-
-        if (availableLabels.size) {
-            loadAllLabels();
-        }
-    }, [availableLabels, pcdFiles]);
-
-    useEffect(() => {
-        if (!availableLabels.size || !areLabelsLoaded) return;
+        if (!availableLabels.size || !areLabelsLoaded || !areObjectsLoaded) return;
 
         const loaderWorker = PCDLoaderWorker();
         let activeWorkers = 0;
@@ -124,6 +111,7 @@ export const usePointCloudLoader = (THEME_COLORS) => {
         const updateProgress = () => {
             const totalFiles = pcdFiles.length;
             if (loadedFrames === totalFiles && loadedLabels === totalFiles) {
+                findPointsInsideCuboids();
                 setLoadingProgress(1);
                 setArePointCloudsLoading(false);
                 loaderWorker.terminate();
@@ -139,5 +127,9 @@ export const usePointCloudLoader = (THEME_COLORS) => {
         return () => {
             cleanupPointClouds(scene, pointCloudRefs, pointLabelsRef, prevLabelsRef, loaderWorker);
         };
-    }, [pcdFiles, scene, availableLabels, areLabelsLoaded]);
+    }, [pcdFiles, scene, availableLabels, areLabelsLoaded, areObjectsLoaded]);
+
+    useEffect(() => {
+        return () => console.log("ДУ НОТ ФОРГЕТ ТУ ОЧИСТИТЬ СЦЕНУ ХРИСТА РАДИ!!!!!!!!!");
+    }, [folderName]);
 };

@@ -62,7 +62,8 @@ export const FileNavigator = memo(() => {
 
     const handleSaveClick = () => {
         if (isEmpty(folderName)) return;
-        publish("saveSolution", { updateStack: false, isAutoSave: true });
+        publish("saveLabelsSolution", { updateStack: false, isAutoSave: true });
+        publish("saveObjectsSolution", { updateStack: false, isAutoSave: true });
     };
 
     useEffect(() => {

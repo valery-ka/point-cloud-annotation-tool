@@ -3,7 +3,7 @@ import { Tooltip } from "react-tooltip";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faQuestionCircle, faCaretRight } from "@fortawesome/free-solid-svg-icons";
 
-import { useConfig, useCuboids, useEditor, useFileManager } from "contexts";
+import { useConfig, useCuboids, useEditor, useFileManager, useEvent } from "contexts";
 import { useMousetrapPause } from "hooks";
 
 import { addCuboid, updateCuboid, writePSRToSolution } from "utils/cuboids";
@@ -20,6 +20,7 @@ export const ObjectsMenu = ({
 }) => {
     const { pcdFiles } = useFileManager();
     const { config } = useConfig();
+    const { publish } = useEvent();
     const { objects } = config;
     const {
         cuboidsSolutionRef,
@@ -66,8 +67,9 @@ export const ObjectsMenu = ({
 
             initializeCuboidPSRForAllFrames(cuboidGeometry.cube.mesh);
             setSelectedCuboid(toSelect);
+            publish("saveObjectsSolution", { updateStack: true, isAutoSave: false });
         },
-        [initializeCuboidPSRForAllFrames],
+        [publish, initializeCuboidPSRForAllFrames],
     );
 
     const addNewObject = useCallback(

@@ -73,41 +73,46 @@ export const ObjectCardTab = memo(() => {
         transformControlsRef.current.dispatchEvent({ type: "change" });
     }, []);
 
-    const removeObject = useCallback((data) => {
-        const cuboidId = data.index;
+    const removeObject = useCallback(
+        (data) => {
+            const cuboidId = data.index;
 
-        for (const geometry of Object.values(cuboidsGeometriesRef.current)) {
-            if (geometry?.cube?.mesh?.name === cuboidId) {
-                removeCuboid(sceneRef.current, geometry);
-                delete cuboidsGeometriesRef.current[cuboidId];
-            }
-        }
-
-        for (const solution of Object.values(cuboidsSolutionRef.current)) {
-            for (let i = 0; i < solution.length; i++) {
-                if (solution[i]?.id === cuboidId) {
-                    solution.splice(i, 1);
-                    i--;
+            for (const geometry of Object.values(cuboidsGeometriesRef.current)) {
+                if (geometry?.cube?.mesh?.name === cuboidId) {
+                    removeCuboid(sceneRef.current, geometry);
+                    delete cuboidsGeometriesRef.current[cuboidId];
                 }
             }
-        }
 
-        for (const filePath in pointsInsideCuboidsRef.current) {
-            const cuboidMap = pointsInsideCuboidsRef.current[filePath];
-            if (cuboidMap && cuboidId in cuboidMap) {
-                delete cuboidMap[cuboidId];
-
-                if (Object.keys(cuboidMap).length === 0) {
-                    delete pointsInsideCuboidsRef.current[filePath];
+            for (const solution of Object.values(cuboidsSolutionRef.current)) {
+                for (let i = 0; i < solution.length; i++) {
+                    if (solution[i]?.id === cuboidId) {
+                        solution.splice(i, 1);
+                        i--;
+                    }
                 }
             }
-        }
 
-        setCuboids((prevCuboids) => prevCuboids.filter((cuboid) => cuboid.id !== cuboidId));
-        setSelectedCuboid(null);
+            for (const filePath in pointsInsideCuboidsRef.current) {
+                const cuboidMap = pointsInsideCuboidsRef.current[filePath];
+                if (cuboidMap && cuboidId in cuboidMap) {
+                    delete cuboidMap[cuboidId];
 
-        cloudPointsColorNeedsUpdateRef.current = true;
-    }, []);
+                    if (Object.keys(cuboidMap).length === 0) {
+                        delete pointsInsideCuboidsRef.current[filePath];
+                    }
+                }
+            }
+
+            setCuboids((prevCuboids) => prevCuboids.filter((cuboid) => cuboid.id !== cuboidId));
+            setSelectedCuboid(null);
+
+            publish("saveObjectsSolution", { updateStack: true, isAutoSave: false });
+
+            cloudPointsColorNeedsUpdateRef.current = true;
+        },
+        [publish],
+    );
 
     useSubscribeFunction("removeObject", removeObject, []);
 

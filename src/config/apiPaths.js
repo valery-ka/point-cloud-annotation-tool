@@ -17,7 +17,7 @@ export const API_PATHS = {
         },
         SOLUTION: {
             LABELS: (folder) => `${API_NAVIGATOR_BASE}/${folder}/labels.msgpack.pako`,
-            OBJECTS: (folder) => `${API_NAVIGATOR_BASE}/${folder}/objects.json`,
+            OBJECTS: (folder) => `${API_NAVIGATOR_BASE}/${folder}/objects.msgpack.pako`,
             MODERATION: (folder) => `${API_NAVIGATOR_BASE}/${folder}/moderation.json`,
         },
     },

@@ -1,9 +1,14 @@
 import { memo, useCallback } from "react";
+import { faSave } from "@fortawesome/free-solid-svg-icons";
+import { useTranslation } from "react-i18next";
+import { isEmpty } from "lodash";
 
-import { useBatch, useFileManager } from "contexts";
+import { useBatch, useFileManager, useEditor, useEvent } from "contexts";
 import { useClickOutsideBlur } from "hooks";
 
 import { Checkbox } from "components";
+
+import { RenderFileNavigatorButton } from "../../../FileNavigator/RenderFileNavigatorButton";
 
 const frameOptions = [1, 5, 10, 20];
 
@@ -13,8 +18,15 @@ const checkboxItems = [
     { id: "front", label: "Камера спереди" },
 ];
 
+// const COMPONENT_NAME = "BatchHeader.";
+const COMPONENT_NAME = "";
+
 export const BatchHeader = memo(() => {
-    const { pcdFiles } = useFileManager();
+    const { t } = useTranslation();
+
+    const { publish } = useEvent();
+    const { pendingSaveState } = useEditor();
+    const { pcdFiles, folderName } = useFileManager();
     const { viewsCount, setViewsCount, activeCameraViews, setActiveCameraViews } = useBatch();
 
     const framesSelectRef = useClickOutsideBlur();
@@ -39,6 +51,12 @@ export const BatchHeader = memo(() => {
         },
         [checkedCount],
     );
+
+    const handleSaveClick = () => {
+        if (isEmpty(folderName)) return;
+        publish("saveLabelsSolution", { updateStack: false, isAutoSave: true });
+        publish("saveObjectsSolution", { updateStack: false, isAutoSave: true });
+    };
 
     return (
         <div className="batch-editor">
@@ -70,6 +88,14 @@ export const BatchHeader = memo(() => {
                             />
                         ))}
                     </div>
+                </div>
+                <div className="file-navigator-buttons-group">
+                    <RenderFileNavigatorButton
+                        icon={faSave}
+                        title={t(`${COMPONENT_NAME}saveFolder`)}
+                        className={`${pendingSaveState ? "saving" : ""}`}
+                        onClick={handleSaveClick}
+                    />
                 </div>
             </div>
         </div>
