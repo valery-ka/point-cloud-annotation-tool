@@ -1,13 +1,19 @@
 import { useEffect, useCallback } from "react";
 
-import { useFileManager, useEditor, useFrames, useEvent } from "contexts";
-import { useSubscribeFunction } from "hooks";
+import { useFileManager, useEditor, useFrames, useEvent, useCuboids } from "contexts";
+import { useSubscribeFunction, useCuboidInterpolation } from "hooks";
 
 export const useUndoRedo = (requestSaveLabels, onUndoRedo) => {
-    const { pcdFiles } = useFileManager();
     const { publish } = useEvent();
+
+    const { pcdFiles } = useFileManager();
     const { pointLabelsRef, undoStackRef, redoStackRef } = useEditor();
     const { isPlaying, activeFrameIndex, arePointCloudsLoading } = useFrames();
+
+    const { cuboidsSolutionRef } = useCuboids();
+
+    const { saveCurrentPSR, interpolatePSR, findFrameMarkers, updateCuboidPSR } =
+        useCuboidInterpolation();
 
     const updateUndoRedoState = useCallback(() => {
         const activeFrameFilePath = pcdFiles[activeFrameIndex];
@@ -28,20 +34,38 @@ export const useUndoRedo = (requestSaveLabels, onUndoRedo) => {
 
         const lastState = undoStack[undoStack.length - 1];
 
-        if (!lastState.labels) return;
+        if (lastState.labels) {
+            const redoStack = redoStackRef.current[activeFrameFilePath] || [];
+            redoStack.push({ labels: pointLabelsRef.current[activeFrameFilePath] });
+            redoStackRef.current[activeFrameFilePath] = redoStack;
 
-        const redoStack = redoStackRef.current[activeFrameFilePath] || [];
-        redoStack.push({ labels: pointLabelsRef.current[activeFrameFilePath] });
-        redoStackRef.current[activeFrameFilePath] = redoStack;
+            pointLabelsRef.current[activeFrameFilePath] = lastState.labels;
 
-        pointLabelsRef.current[activeFrameFilePath] = lastState.labels;
+            undoStack.pop();
+            onUndoRedo?.();
+            updateUndoRedoState();
 
-        undoStack.pop();
-        onUndoRedo?.();
-        updateUndoRedoState();
+            requestSaveLabels({ updateStack: false, isAutoSave: false });
+        }
 
-        requestSaveLabels({ updateStack: false, isAutoSave: false });
-    }, [arePointCloudsLoading, isPlaying, onUndoRedo]);
+        if (lastState.objects) {
+            const redoStack = redoStackRef.current[activeFrameFilePath] || [];
+            redoStack.push({ objects: cuboidsSolutionRef.current[activeFrameIndex] });
+            redoStackRef.current[activeFrameFilePath] = redoStack;
+
+            cuboidsSolutionRef.current[activeFrameIndex] = lastState.objects;
+            undoStack.pop();
+
+            updateCuboidPSR(activeFrameIndex);
+            saveCurrentPSR({ activeFrameIndex: activeFrameIndex });
+            findFrameMarkers();
+
+            onUndoRedo?.();
+            updateUndoRedoState();
+
+            interpolatePSR(false);
+        }
+    }, [arePointCloudsLoading, isPlaying, onUndoRedo, updateCuboidPSR, interpolatePSR]);
 
     useSubscribeFunction("undoAction", undoAction, []);
 
@@ -55,20 +79,38 @@ export const useUndoRedo = (requestSaveLabels, onUndoRedo) => {
 
         const nextState = redoStack[redoStack.length - 1];
 
-        if (!nextState.labels) return;
+        if (nextState.labels) {
+            const undoStack = undoStackRef.current[activeFrameFilePath] || [];
+            undoStack.push({ labels: pointLabelsRef.current[activeFrameFilePath] });
+            undoStackRef.current[activeFrameFilePath] = undoStack;
 
-        const undoStack = undoStackRef.current[activeFrameFilePath] || [];
-        undoStack.push({ labels: pointLabelsRef.current[activeFrameFilePath] });
-        undoStackRef.current[activeFrameFilePath] = undoStack;
+            pointLabelsRef.current[activeFrameFilePath] = nextState.labels;
 
-        pointLabelsRef.current[activeFrameFilePath] = nextState.labels;
+            redoStack.pop();
+            onUndoRedo?.();
+            updateUndoRedoState();
 
-        redoStack.pop();
-        onUndoRedo?.();
-        updateUndoRedoState();
+            requestSaveLabels({ updateStack: false, isAutoSave: false });
+        }
 
-        requestSaveLabels({ updateStack: false, isAutoSave: false });
-    }, [arePointCloudsLoading, isPlaying, onUndoRedo]);
+        if (nextState.objects) {
+            const undoStack = undoStackRef.current[activeFrameFilePath] || [];
+            undoStack.push({ objects: cuboidsSolutionRef.current[activeFrameIndex] });
+            undoStackRef.current[activeFrameFilePath] = undoStack;
+
+            cuboidsSolutionRef.current[activeFrameIndex] = nextState.objects;
+            redoStack.pop();
+
+            updateCuboidPSR(activeFrameIndex);
+            saveCurrentPSR({ activeFrameIndex: activeFrameIndex });
+            findFrameMarkers();
+
+            onUndoRedo?.();
+            updateUndoRedoState();
+
+            interpolatePSR(false);
+        }
+    }, [arePointCloudsLoading, isPlaying, onUndoRedo, updateCuboidPSR, interpolatePSR]);
 
     useSubscribeFunction("redoAction", redoAction, []);
 
@@ -77,5 +119,5 @@ export const useUndoRedo = (requestSaveLabels, onUndoRedo) => {
         updateUndoRedoState();
     }, [arePointCloudsLoading, isPlaying, onUndoRedo]);
 
-    return updateUndoRedoState;
+    return { updateUndoRedoState };
 };

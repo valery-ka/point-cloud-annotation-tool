@@ -1,6 +1,6 @@
 import { useEffect, useRef, useCallback, useMemo, useState } from "react";
 
-import { useFileManager, useEditor, useFrames, useSettings, useCuboids } from "contexts";
+import { useFileManager, useEditor, useFrames, useSettings, useCuboids, useBatch } from "contexts";
 import { useSubscribeFunction, useDebouncedCallback } from "hooks";
 
 import { SaveOutputWorker, SaveObjectsWorker } from "workers";
@@ -17,7 +17,8 @@ export const useSaveOutput = (updateUndoRedoState) => {
         useEditor();
     const { settings } = useSettings();
 
-    const { cuboidsSolutionRef } = useCuboids();
+    const { prevCuboidsRef, cuboidsSolutionRef, cuboidEditingFrameRef } = useCuboids();
+    const { batchEditingFrameRef } = useBatch();
 
     const [hasUnsavedSolution, setHasUnsavedSolution] = useState(false);
 
@@ -178,6 +179,30 @@ export const useSaveOutput = (updateUndoRedoState) => {
         ({ updateStack = true, isAutoSave = false }) => {
             if (!pcdFiles.length) return;
 
+            const frame =
+                batchEditingFrameRef.current ?? cuboidEditingFrameRef.current ?? activeFrameIndex;
+            const activeFrameFilePath = pcdFiles[frame];
+            if (!activeFrameFilePath) return;
+
+            const activeFrameCuboids = cuboidsSolutionRef.current[frame];
+
+            if (updateStack) {
+                undoStackRef.current[activeFrameFilePath] ??= [];
+                redoStackRef.current[activeFrameFilePath] = [];
+
+                const previousCuboids = prevCuboidsRef.current[frame];
+
+                undoStackRef.current[activeFrameFilePath] = [
+                    ...undoStackRef.current[activeFrameFilePath].slice(
+                        -(UNDO_REDO_STACK_DEPTH - 1),
+                    ),
+                    { objects: structuredClone(previousCuboids) },
+                ];
+            }
+
+            prevCuboidsRef.current[frame] = structuredClone(activeFrameCuboids);
+            updateUndoRedoState?.();
+
             if (objectsController.current) {
                 objectsController.current.abort();
             }
@@ -186,6 +211,10 @@ export const useSaveOutput = (updateUndoRedoState) => {
             objectsController.current = newController;
 
             setHasUnsavedSolution(true);
+
+            cuboidEditingFrameRef.current = null;
+            batchEditingFrameRef.current = null;
+
             if (isAutoSaveTimerEnabled && !isAutoSave) {
                 return;
             }
@@ -194,7 +223,7 @@ export const useSaveOutput = (updateUndoRedoState) => {
 
             debouncedSaveObjects(newController);
         },
-        [saveObjectsSolution, pcdFiles],
+        [saveObjectsSolution, pcdFiles, activeFrameIndex],
     );
 
     useEffect(() => {
@@ -215,7 +244,6 @@ export const useSaveOutput = (updateUndoRedoState) => {
     }, [autoSaveTimer, arePointCloudsLoading, isAutoSaveTimerEnabled]);
 
     useSubscribeFunction("saveLabelsSolution", requestSaveLabels, []);
-
     useSubscribeFunction("saveObjectsSolution", requestSaveObjects, []);
 
     useEffect(() => {

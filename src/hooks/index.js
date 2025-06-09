@@ -18,6 +18,7 @@ export { useContinuousAction } from "./shared/useContinuousAction";
 export { useClickOutsideBlur } from "./shared/useClickOutsideBlur";
 export { useSubscribeFunction } from "./shared/useSubscribeFunction";
 export { useDebouncedCallback } from "./shared/useDebouncedCallback";
+export { useContextMenuSelector } from "./shared/useContextMenuSelector";
 export { useGlobalEventListeners } from "./shared/useGlobalEventListeners";
 export { useCustomClassesSettings } from "./shared/useCustomClassesSettings";
 

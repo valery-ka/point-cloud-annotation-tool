@@ -67,7 +67,7 @@ export const ObjectsMenu = ({
 
             initializeCuboidPSRForAllFrames(cuboidGeometry.cube.mesh);
             setSelectedCuboid(toSelect);
-            publish("saveObjectsSolution", { updateStack: true, isAutoSave: false });
+            publish("saveObjectsSolution", { updateStack: false, isAutoSave: false });
         },
         [publish, initializeCuboidPSRForAllFrames],
     );
@@ -99,6 +99,7 @@ export const ObjectsMenu = ({
         [addCuboidOnScene],
     );
 
+    // лейбл меняется не на всех кадрах, нужно так же обновить solution
     const updateExistingObject = useCallback(
         (id, object) => {
             const { type: label, color } = object;

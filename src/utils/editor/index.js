@@ -1,6 +1,6 @@
 export { updatePixelProjections } from "./positions/updatePixelProjections";
 
-// positions (points visibility)
+// positions (points visibility) utils
 export {
     hidePoint,
     showPoint,
@@ -18,7 +18,7 @@ export {
     updateClassFilter,
 } from "./positions/filters";
 
-// points colors
+// points colors utils
 export {
     getColorArray,
     invalidateCloudColor,
@@ -31,7 +31,7 @@ export {
 export { invalidateImagePointsColor, getRGBFromMatchedColorArray } from "./colors/image";
 export { invalidateHighlighterPointsColor } from "./colors/highlighter";
 
-// points sizes
+// points sizes utils
 export {
     getSizeArray,
     invalidateCloudPointsSize,
@@ -42,6 +42,7 @@ export {
 export { invalidateImagePointsSize } from "./sizes/image";
 export { invalidateHighlighterPointsSize } from "./sizes/highlighter";
 
+// geometry utils
 export {
     rebuildGeometry,
     drawGlobalBox,
@@ -51,6 +52,13 @@ export {
     drawAxesHelper,
     disposeMesh,
 } from "./geometry/general";
+
+// save / load utils
+export { formatPointLabels, formatObjects } from "./output/general";
+export { saveLabels } from "./output/saveLabels";
+export { loadLabels } from "./output/loadLabels";
+export { saveObjects } from "./output/saveObjects";
+export { loadObjects } from "./output/loadObjects";
 export {
     handleIntensityAttribute,
     handleLabelAttribute,
@@ -59,9 +67,3 @@ export {
     createPointCloud,
     cleanupPointClouds,
 } from "./geometry/loader";
-
-export { formatPointLabels, formatObjects } from "./output/general";
-export { saveLabels } from "./output/saveLabels";
-export { loadLabels } from "./output/loadLabels";
-export { saveObjects } from "./output/saveObjects";
-export { loadObjects } from "./output/loadObjects";

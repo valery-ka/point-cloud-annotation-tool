@@ -42,6 +42,8 @@ export const ObjectCardTab = memo(() => {
         cuboidsGeometriesRef,
         cuboidsSolutionRef,
         pointsInsideCuboidsRef,
+        deletedCuboidsRef,
+        setDeletedObjects,
     } = useCuboids();
     const { config } = useConfig();
     const { objects } = config;
@@ -76,39 +78,71 @@ export const ObjectCardTab = memo(() => {
     const removeObject = useCallback(
         (data) => {
             const cuboidId = data.index;
+            const deletedObjects = deletedCuboidsRef.current;
 
-            for (const geometry of Object.values(cuboidsGeometriesRef.current)) {
-                if (geometry?.cube?.mesh?.name === cuboidId) {
-                    removeCuboid(sceneRef.current, geometry);
-                    delete cuboidsGeometriesRef.current[cuboidId];
-                }
-            }
+            const removed = {
+                geometry: null,
+                solutions: [],
+                points: {},
+            };
 
-            for (const solution of Object.values(cuboidsSolutionRef.current)) {
-                for (let i = 0; i < solution.length; i++) {
-                    if (solution[i]?.id === cuboidId) {
-                        solution.splice(i, 1);
-                        i--;
+            const removeFromScene = () => {
+                for (const geometry of Object.values(cuboidsGeometriesRef.current)) {
+                    if (geometry?.cube?.mesh?.name === cuboidId) {
+                        removeCuboid(sceneRef.current, geometry);
+                        removed.geometry = geometry;
+                        delete cuboidsGeometriesRef.current[cuboidId];
+                        break;
                     }
                 }
-            }
+            };
 
-            for (const filePath in pointsInsideCuboidsRef.current) {
-                const cuboidMap = pointsInsideCuboidsRef.current[filePath];
-                if (cuboidMap && cuboidId in cuboidMap) {
-                    delete cuboidMap[cuboidId];
-
-                    if (Object.keys(cuboidMap).length === 0) {
-                        delete pointsInsideCuboidsRef.current[filePath];
+            const removeFromSolutions = () => {
+                for (const [key, solution] of Object.entries(cuboidsSolutionRef.current)) {
+                    for (let i = 0; i < solution.length; i++) {
+                        if (solution[i]?.id === cuboidId) {
+                            removed.solutions.push(solution[i]);
+                            solution.splice(i, 1);
+                            i--;
+                        }
                     }
                 }
-            }
+            };
 
-            setCuboids((prevCuboids) => prevCuboids.filter((cuboid) => cuboid.id !== cuboidId));
+            const removeFromPointMap = () => {
+                const ref = pointsInsideCuboidsRef.current;
+                for (const [filePath, cuboidMap] of Object.entries(ref)) {
+                    if (cuboidMap?.[cuboidId]) {
+                        removed.points[filePath] = cuboidMap[cuboidId];
+                        delete cuboidMap[cuboidId];
+
+                        if (Object.keys(cuboidMap).length === 0) {
+                            delete ref[filePath];
+                        }
+                    }
+                }
+            };
+
+            removeFromScene();
+            removeFromSolutions();
+            removeFromPointMap();
+
+            deletedObjects.push(removed);
+            const deleteditems = deletedCuboidsRef.current
+                .map((item) => {
+                    const firstSolution = item.solutions[0];
+                    if (firstSolution && firstSolution.id && firstSolution.type) {
+                        return `${firstSolution.id}_${firstSolution.type}`;
+                    }
+                    return null;
+                })
+                .filter(Boolean);
+
+            setDeletedObjects(deleteditems);
+
+            setCuboids((prev) => prev.filter((c) => c.id !== cuboidId));
             setSelectedCuboid(null);
-
-            publish("saveObjectsSolution", { updateStack: true, isAutoSave: false });
-
+            publish("saveObjectsSolution", { updateStack: false, isAutoSave: false });
             cloudPointsColorNeedsUpdateRef.current = true;
         },
         [publish],

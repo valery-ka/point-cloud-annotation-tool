@@ -22,6 +22,10 @@ const DEFAULT_ZOOM = {
 
 export const CuboidsProvider = ({ children }) => {
     const cuboidsGeometriesRef = useRef({});
+
+    const deletedCuboidsRef = useRef([]);
+    const [deletedObjects, setDeletedObjects] = useState([]);
+
     const selectedCuboidGeometryRef = useRef(null);
     const selectedCuboidInfoRef = useRef(DEFAULT_INFO_CARD);
 
@@ -38,6 +42,8 @@ export const CuboidsProvider = ({ children }) => {
     const sideViewsCamerasNeedUpdateRef = useRef(true);
 
     const cuboidsSolutionRef = useRef({});
+    const prevCuboidsRef = useRef({});
+    const cuboidEditingFrameRef = useRef(null);
 
     const cuboidIdToLabelRef = useRef({});
     const pointsInsideCuboidsRef = useRef({});
@@ -69,6 +75,11 @@ export const CuboidsProvider = ({ children }) => {
                 pointsInsideCuboidsRef,
                 cuboidIdToLabelRef,
                 updateSingleCuboidRef,
+                prevCuboidsRef,
+                cuboidEditingFrameRef,
+                deletedCuboidsRef,
+                deletedObjects,
+                setDeletedObjects,
             }}
         >
             {children}

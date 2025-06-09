@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, memo } from "react";
+import React, { useEffect, useState, useCallback, useRef, memo } from "react";
 import { useTranslation } from "react-i18next";
 import { faEye, faEyeSlash, faPlus } from "@fortawesome/free-solid-svg-icons";
 
@@ -10,13 +10,18 @@ import {
     useTools,
     useCuboids,
     useBatch,
+    useFrames,
 } from "contexts";
-import { useSubscribeFunction, useBindHotkey } from "hooks";
+import { useSubscribeFunction, useBindHotkey, useContextMenuSelector } from "hooks";
+
+import { ContextMenu } from "components";
 
 import { SidebarIcon } from "../SidebarIcon";
 import { ClassItem } from "./ClassItem";
 import { CuboidItem } from "./CuboidItem";
 
+import { addCuboid } from "utils/cuboids";
+import { getNextId } from "utils/shared";
 import * as APP_CONSTANTS from "constants";
 
 // const COMPONENT_NAME = "ObjectsTab.";
@@ -24,10 +29,21 @@ const COMPONENT_NAME = "";
 const { DEFAULT_TOOL } = APP_CONSTANTS;
 
 export const ObjectsTab = memo(({ title }) => {
-    const { nonHiddenClasses } = useConfig();
-    const { subscribe, unsubscribe } = useEvent();
-    const { classesVisibilityRef, selectedClassIndex, setSelectedClassIndex } = useEditor();
-    const { cuboids, selectedCuboid, setSelectedCuboid } = useCuboids();
+    const { config, nonHiddenClasses } = useConfig();
+    const { publish, subscribe, unsubscribe } = useEvent();
+    const { sceneRef, classesVisibilityRef, selectedClassIndex, setSelectedClassIndex } =
+        useEditor();
+    const {
+        cuboids,
+        setCuboids,
+        selectedCuboid,
+        setSelectedCuboid,
+        deletedObjects,
+        deletedCuboidsRef,
+        cuboidsGeometriesRef,
+        cuboidsSolutionRef,
+        pointsInsideCuboidsRef,
+    } = useCuboids();
     const { setBatchMode } = useBatch();
     const { setSelectedTool } = useTools();
     const { settings } = useSettings();
@@ -35,6 +51,8 @@ export const ObjectsTab = memo(({ title }) => {
     const { t } = useTranslation();
 
     const [visibilityState, setVisibilityState] = useState({});
+
+    const containerRef = useRef(null);
 
     const handleIsClassVisible = useCallback((cls) => {
         return classesVisibilityRef.current[cls]?.visible;
@@ -65,6 +83,98 @@ export const ObjectsTab = memo(({ title }) => {
     }, []);
 
     useBindHotkey(hotkeys["fixed"]["unselectObject"], unselectObject);
+
+    // вынести восстановление объекта в отдельное место
+    // СТАРТ
+    const { activeFrameIndex } = useFrames();
+
+    const addCuboidOnScene = useCallback(
+        (cuboid, toRestore) => {
+            const { points, solutions } = toRestore;
+            const toSelect = { id: cuboid.id, label: cuboid.label, color: cuboid.color };
+
+            const restoreToScene = () => {
+                const cuboidGeometry = addCuboid(sceneRef.current, cuboid);
+                cuboidsGeometriesRef.current[cuboid.id] = cuboidGeometry;
+            };
+
+            const restoreSolutions = () => {
+                solutions.forEach((frameSolution, frameIndex) => {
+                    if (!cuboidsSolutionRef.current[frameIndex]) {
+                        cuboidsSolutionRef.current[frameIndex] = [];
+                    }
+
+                    const restored = { ...frameSolution, id: cuboid.id };
+                    cuboidsSolutionRef.current[frameIndex].push(restored);
+                });
+            };
+
+            const restorePointMap = () => {
+                for (const [filePath, pointData] of Object.entries(points)) {
+                    if (!pointsInsideCuboidsRef.current[filePath]) {
+                        pointsInsideCuboidsRef.current[filePath] = {};
+                    }
+
+                    pointsInsideCuboidsRef.current[filePath][cuboid.id] = new Uint32Array(
+                        pointData,
+                    );
+                }
+            };
+
+            restoreToScene();
+            restoreSolutions();
+            restorePointMap();
+
+            setSelectedCuboid(toSelect);
+            publish("saveObjectsSolution", { updateStack: false, isAutoSave: false });
+        },
+        [publish],
+    );
+
+    const restoreObject = useCallback(
+        (index) => {
+            const objects = config.objects[0];
+
+            const deletedCuboids = deletedCuboidsRef.current;
+            const toRestore = deletedCuboids[index];
+
+            const label = toRestore.solutions[activeFrameIndex].type;
+            const color = objects[label].color;
+
+            const position = toRestore.solutions[activeFrameIndex].psr.position;
+            const scale = toRestore.solutions[activeFrameIndex].psr.scale;
+            const rotation = toRestore.solutions[activeFrameIndex].psr.rotation;
+
+            setCuboids((prev = []) => {
+                const newId = String(getNextId(prev));
+                const cuboid = {
+                    id: newId,
+                    label,
+                    color,
+                    position: [position.x, position.y, position.z],
+                    scale: [scale.x, scale.y, scale.z],
+                    rotation: [rotation.x, rotation.y, rotation.z],
+                };
+                addCuboidOnScene(cuboid, toRestore);
+                deletedCuboids.splice(index, 1);
+                return [...prev, { id: newId, label, color }];
+            });
+        },
+        [activeFrameIndex, config?.objects],
+    );
+    // КОНЕЦ
+    //
+
+    const {
+        openContextMenu,
+        contextMenuPosition,
+        handleSelect,
+        handleCloseContextMenu,
+        setMenuDimensions,
+    } = useContextMenuSelector({
+        wrapperRef: containerRef,
+        onSelect: restoreObject,
+    });
 
     useEffect(() => {
         const subscriptions = nonHiddenClasses.map((cls, index) => {
@@ -111,7 +221,7 @@ export const ObjectsTab = memo(({ title }) => {
     }, [selectedCuboid]);
 
     return (
-        <div className="sidebar-tab-panel">
+        <div className="sidebar-tab-panel" ref={containerRef}>
             <div className="tab-header-container" onClick={unselectObject}>
                 <h2 className="tab-header">{title}</h2>
                 <div className="tab-header-buttons">
@@ -128,12 +238,22 @@ export const ObjectsTab = memo(({ title }) => {
                         action={getHideShowToggleState() ? "hideAll" : "showAll"}
                         hotkey={hotkeys["misc"]["hideShowAll"]}
                     />
-                    <SidebarIcon
-                        className="icon-style disabled"
-                        size="20px"
-                        title="Добавить объект"
-                        icon={faPlus}
-                    />
+                    {/* гига криво появляется и вообще пока что без понятия почему */}
+                    <div
+                        onMouseUp={() =>
+                            openContextMenu({
+                                offsetX: -40,
+                                offsetY: -40,
+                            })
+                        }
+                    >
+                        <SidebarIcon
+                            className="icon-style"
+                            size="20px"
+                            title="Список удаленных кубоидов"
+                            icon={faPlus}
+                        />
+                    </div>
                 </div>
             </div>
             <div className="sidebar-content">
@@ -164,6 +284,14 @@ export const ObjectsTab = memo(({ title }) => {
                         ))}
                 </div>
             </div>
+            <ContextMenu
+                position={contextMenuPosition}
+                itemsList={deletedObjects}
+                onSelect={handleSelect}
+                onClose={handleCloseContextMenu}
+                setMenuDimensions={setMenuDimensions}
+                selectMode={"index"}
+            />
         </div>
     );
 });

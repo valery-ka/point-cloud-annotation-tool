@@ -18,6 +18,7 @@ export const useObjectsLoader = () => {
         cuboidsGeometriesRef,
         cuboidsSolutionRef,
         setCuboids,
+        prevCuboidsRef,
     } = useCuboids();
 
     const objectsCacheRef = useRef({});
@@ -62,7 +63,8 @@ export const useObjectsLoader = () => {
             if (!objectsCacheRef.current[folderName]) {
                 try {
                     const objects = await loadObjects(folderName);
-                    cuboidsSolutionRef.current = objects;
+                    cuboidsSolutionRef.current = structuredClone(objects);
+                    prevCuboidsRef.current = structuredClone(objects);
                     console.log("objects", objects);
                 } catch (error) {
                     console.error(`Error loading objects for ${folderName}`, error);

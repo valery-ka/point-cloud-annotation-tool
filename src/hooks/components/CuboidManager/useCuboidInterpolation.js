@@ -12,6 +12,7 @@ export const useCuboidInterpolation = () => {
         sideViewsCamerasNeedUpdateRef,
         selectedCuboidGeometryRef,
         setFrameMarkers,
+        cuboidEditingFrameRef,
     } = useCuboids();
     const { publish } = useEvent();
 
@@ -22,23 +23,29 @@ export const useCuboidInterpolation = () => {
         batchMode,
     } = useBatch();
 
-    const requestSave = useCallback(() => {
-        publish("saveObjectsSolution", { updateStack: true, isAutoSave: false });
-    }, [publish]);
+    const requestSave = useCallback(
+        (updateStack = true) => {
+            publish("saveObjectsSolution", { updateStack: updateStack, isAutoSave: false });
+        },
+        [publish],
+    );
 
-    const interpolatePSR = useCallback(() => {
-        const selectedCuboid = selectedCuboidGeometryRef.current;
-        if (!selectedCuboid?.name) return;
+    const interpolatePSR = useCallback(
+        (updateStack = true) => {
+            const selectedCuboid = selectedCuboidGeometryRef.current;
+            if (!selectedCuboid?.name) return;
 
-        interpolateBetweenFrames({
-            cuboidsGeometriesRef,
-            cuboidsSolutionRef,
-            totalFrames: pcdFiles.length,
-            selectedId: selectedCuboid.name,
-        });
+            interpolateBetweenFrames({
+                cuboidsGeometriesRef,
+                cuboidsSolutionRef,
+                totalFrames: pcdFiles.length,
+                selectedId: selectedCuboid.name,
+            });
 
-        requestSave();
-    }, [requestSave, pcdFiles]);
+            requestSave(updateStack);
+        },
+        [requestSave, pcdFiles],
+    );
 
     const interpolatePSRBatch = useCallback(() => {
         const geometries = selectedCuboidBatchGeometriesRef.current;
@@ -132,6 +139,7 @@ export const useCuboidInterpolation = () => {
         const solution = cuboidsSolutionRef.current;
 
         solution[activeFrameIndex] = solution[activeFrameIndex] || [];
+        cuboidEditingFrameRef.current = activeFrameIndex;
 
         Object.values(geometries).forEach((entry) => {
             const cube = entry.cube?.mesh;
@@ -176,7 +184,6 @@ export const useCuboidInterpolation = () => {
         });
 
         batchViewsCamerasNeedUpdateRef.current = true;
-        batchEditingFrameRef.current = null;
     }, []);
 
     const findFrameMarkers = useCallback(() => {

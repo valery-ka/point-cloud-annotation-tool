@@ -18,9 +18,7 @@ export const PointCloudEditor = () => {
 
     HOOKS.useHighlightedPoint();
 
-    const { requestSaveLabels, requestSaveObjects } = HOOKS.useSaveOutput(() =>
-        updateUndoRedoState(),
-    );
+    const { requestSaveLabels } = HOOKS.useSaveOutput(() => updateUndoRedoState());
 
     const { filterFramePoints, filterSelectedPoints } =
         HOOKS.useFramePointsVisibility(updateGlobalBox);
@@ -45,7 +43,7 @@ export const PointCloudEditor = () => {
         handlePointsSize();
     });
 
-    const updateUndoRedoState = HOOKS.useUndoRedo(requestSaveLabels, () => {
+    const { updateUndoRedoState } = HOOKS.useUndoRedo(requestSaveLabels, () => {
         filterFramePoints();
         handlePointCloudColors();
         handlePointsSize();

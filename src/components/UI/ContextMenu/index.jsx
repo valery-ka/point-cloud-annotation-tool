@@ -1,6 +1,13 @@
-import React, { useRef, useEffect } from "react";
+import { useRef, useEffect } from "react";
 
-export const ContextMenu = ({ position, itemsList, onSelect, onClose, setMenuDimensions }) => {
+export const ContextMenu = ({
+    position,
+    itemsList,
+    onSelect,
+    onClose,
+    setMenuDimensions,
+    selectMode = "item",
+}) => {
     const menuRef = useRef(null);
 
     useEffect(() => {
@@ -41,13 +48,13 @@ export const ContextMenu = ({ position, itemsList, onSelect, onClose, setMenuDim
                 >
                     <div className="ui-context-menu-item">none</div>
                 </div>
-                {itemsList.map((item) => (
+                {itemsList.map((item, index) => (
                     <div
                         key={item}
                         className="ui-context-menu-item-container"
                         onClick={(e) => {
                             e.stopPropagation();
-                            onSelect(item);
+                            onSelect(selectMode === "index" ? index : item);
                             onClose();
                         }}
                     >
