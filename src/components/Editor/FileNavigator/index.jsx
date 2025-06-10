@@ -3,8 +3,8 @@ import { faSave, faDownload } from "@fortawesome/free-solid-svg-icons";
 import { useTranslation } from "react-i18next";
 import { isEmpty } from "lodash";
 
-import { useFileManager, useFrames, useEditor, useEvent } from "contexts";
-import { useClickOutsideBlur } from "hooks";
+import { useFileManager, useFrames, useEditor } from "contexts";
+import { useClickOutsideBlur, useSaveSolution } from "hooks";
 
 import { RenderFileNavigatorButton } from "./RenderFileNavigatorButton";
 
@@ -24,10 +24,11 @@ export const FileNavigator = memo(() => {
 
     const { t } = useTranslation();
 
-    const { publish } = useEvent();
     const { pendingSaveState } = useEditor();
     const { activeFrameIndex } = useFrames();
     const { handleFileChange, handleFolderChange, folderName, pcdFiles } = useFileManager();
+
+    const { saveLabelsSolution, saveObjectsSolution } = useSaveSolution();
 
     const handleSceneChange = (event) => {
         const folderName = event.target.value;
@@ -62,8 +63,8 @@ export const FileNavigator = memo(() => {
 
     const handleSaveClick = () => {
         if (isEmpty(folderName)) return;
-        publish("saveLabelsSolution", { updateStack: false, isAutoSave: true });
-        publish("saveObjectsSolution", { updateStack: false, isAutoSave: true });
+        saveLabelsSolution({ updateStack: false, isAutoSave: true });
+        saveObjectsSolution({ updateStack: false, isAutoSave: true });
     };
 
     useEffect(() => {

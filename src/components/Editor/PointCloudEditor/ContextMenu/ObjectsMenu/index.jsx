@@ -3,8 +3,8 @@ import { Tooltip } from "react-tooltip";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faQuestionCircle, faCaretRight } from "@fortawesome/free-solid-svg-icons";
 
-import { useConfig, useCuboids, useEditor, useFileManager, useEvent } from "contexts";
-import { useMousetrapPause } from "hooks";
+import { useConfig, useCuboids, useEditor, useFileManager } from "contexts";
+import { useMousetrapPause, useSaveSolution } from "hooks";
 
 import { addCuboid, updateCuboid, writePSRToSolution } from "utils/cuboids";
 import { getChildObjects, getChildTypes, formatObjectData, getNextId } from "utils/shared";
@@ -20,7 +20,6 @@ export const ObjectsMenu = ({
 }) => {
     const { pcdFiles } = useFileManager();
     const { config } = useConfig();
-    const { publish } = useEvent();
     const { objects } = config;
     const {
         cuboidsSolutionRef,
@@ -31,6 +30,8 @@ export const ObjectsMenu = ({
         updateSingleCuboidRef,
     } = useCuboids();
     const { sceneRef } = useEditor();
+
+    const { saveObjectsSolution } = useSaveSolution();
 
     const objectList = useMemo(() => {
         if (!objects) return [];
@@ -67,9 +68,9 @@ export const ObjectsMenu = ({
 
             initializeCuboidPSRForAllFrames(cuboidGeometry.cube.mesh);
             setSelectedCuboid(toSelect);
-            publish("saveObjectsSolution", { updateStack: false, isAutoSave: false });
+            saveObjectsSolution({ updateStack: false, isAutoSave: false });
         },
-        [publish, initializeCuboidPSRForAllFrames],
+        [saveObjectsSolution, initializeCuboidPSRForAllFrames],
     );
 
     const addNewObject = useCallback(
@@ -99,19 +100,20 @@ export const ObjectsMenu = ({
         [addCuboidOnScene],
     );
 
-    // лейбл меняется не на всех кадрах, нужно так же обновить solution
     const updateExistingObject = useCallback(
         (id, object) => {
             const { type: label, color } = object;
 
-            updateCuboid(id, label, color, cuboidsGeometriesRef);
+            updateCuboid(id, label, color, cuboidsGeometriesRef, cuboidsSolutionRef);
             setCuboids((prev) =>
                 prev.map((cuboid) => (cuboid.id === id ? { ...cuboid, label, color } : cuboid)),
             );
             setSelectedCuboid({ id, label, color });
-            updateSingleCuboidRef.current = true;
+            updateSingleCuboidRef.current = { needsUpdate: true, id: id };
+
+            saveObjectsSolution({ updateStack: false, isAutoSave: false });
         },
-        [cuboidsGeometriesRef],
+        [saveObjectsSolution],
     );
 
     const handleObjectAction = useCallback(

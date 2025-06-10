@@ -10,7 +10,7 @@ export const useUndoRedo = (requestSaveLabels, onUndoRedo) => {
     const { pointLabelsRef, undoStackRef, redoStackRef } = useEditor();
     const { isPlaying, activeFrameIndex, arePointCloudsLoading } = useFrames();
 
-    const { cuboidsSolutionRef } = useCuboids();
+    const { cuboidsSolutionRef, updateSingleCuboidRef } = useCuboids();
 
     const { saveCurrentPSR, interpolatePSR, findFrameMarkers, updateCuboidPSR } =
         useCuboidInterpolation();
@@ -50,7 +50,10 @@ export const useUndoRedo = (requestSaveLabels, onUndoRedo) => {
 
         if (lastState.objects) {
             const redoStack = redoStackRef.current[activeFrameFilePath] || [];
-            redoStack.push({ objects: cuboidsSolutionRef.current[activeFrameIndex] });
+            redoStack.push({
+                objects: cuboidsSolutionRef.current[activeFrameIndex],
+                id: lastState.id,
+            });
             redoStackRef.current[activeFrameFilePath] = redoStack;
 
             cuboidsSolutionRef.current[activeFrameIndex] = lastState.objects;
@@ -63,7 +66,8 @@ export const useUndoRedo = (requestSaveLabels, onUndoRedo) => {
             onUndoRedo?.();
             updateUndoRedoState();
 
-            interpolatePSR(false);
+            interpolatePSR(false, lastState.id);
+            updateSingleCuboidRef.current = { needsUpdate: true, id: lastState.id };
         }
     }, [arePointCloudsLoading, isPlaying, onUndoRedo, updateCuboidPSR, interpolatePSR]);
 
@@ -95,7 +99,10 @@ export const useUndoRedo = (requestSaveLabels, onUndoRedo) => {
 
         if (nextState.objects) {
             const undoStack = undoStackRef.current[activeFrameFilePath] || [];
-            undoStack.push({ objects: cuboidsSolutionRef.current[activeFrameIndex] });
+            undoStack.push({
+                objects: cuboidsSolutionRef.current[activeFrameIndex],
+                id: nextState.id,
+            });
             undoStackRef.current[activeFrameFilePath] = undoStack;
 
             cuboidsSolutionRef.current[activeFrameIndex] = nextState.objects;
@@ -108,7 +115,8 @@ export const useUndoRedo = (requestSaveLabels, onUndoRedo) => {
             onUndoRedo?.();
             updateUndoRedoState();
 
-            interpolatePSR(false);
+            interpolatePSR(false, nextState.id);
+            updateSingleCuboidRef.current = { needsUpdate: true, id: nextState.id };
         }
     }, [arePointCloudsLoading, isPlaying, onUndoRedo, updateCuboidPSR, interpolatePSR]);
 

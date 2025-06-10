@@ -1,17 +1,19 @@
 import { useEffect } from "react";
 
 import { useCuboids, useFrames, useFileManager, useBatch } from "contexts";
-import { useCuboidInterpolation } from "hooks";
+import { useCuboidInterpolation, useSaveSolution } from "hooks";
 
 import { computeVisibilityFrameRange } from "utils/cuboids";
 
 export const useCuboidVisibility = () => {
     const { pcdFiles } = useFileManager();
     const { activeFrameIndex } = useFrames();
-    const { cuboidsSolutionRef, selectedCuboidGeometryRef } = useCuboids();
+
+    const { cuboidsSolutionRef, updateSingleCuboidRef, selectedCuboidGeometryRef } = useCuboids();
     const { batchMode } = useBatch();
 
     const { findFrameMarkers } = useCuboidInterpolation();
+    const { saveObjectsSolution } = useSaveSolution();
 
     useEffect(() => {
         const toggleVisibility = () => {
@@ -40,6 +42,9 @@ export const useCuboidVisibility = () => {
             }
 
             findFrameMarkers();
+            saveObjectsSolution({ updateStack: true, isAutoSave: false });
+
+            updateSingleCuboidRef.current.needsUpdate = true;
         };
 
         const handleKeyDown = (e) => {
@@ -52,5 +57,5 @@ export const useCuboidVisibility = () => {
         return () => {
             document.removeEventListener("keydown", handleKeyDown);
         };
-    }, [pcdFiles, activeFrameIndex, batchMode]);
+    }, [pcdFiles, activeFrameIndex, batchMode, saveObjectsSolution]);
 };

@@ -27,7 +27,7 @@ export const useTransformControls = () => {
         saveCurrentPSR({ activeFrameIndex: activeFrameIndex });
         findFrameMarkers();
         interpolatePSR();
-        updateSingleCuboidRef.current = true;
+        updateSingleCuboidRef.current.needsUpdate = true;
     }, REQUEST_INTERPOLATE_PSR_TIME);
 
     const debouncedInterpolatePSRBatch = useDebouncedCallback(() => {

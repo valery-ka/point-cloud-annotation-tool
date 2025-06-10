@@ -46,10 +46,17 @@ export const useObjectsLoader = () => {
             colors[filePath] = colors[filePath] || {};
 
             Object.values(frameSolution).forEach((cuboid) => {
-                const { id, type: label, psr } = cuboid;
+                const { id, type: label, psr, visible } = cuboid;
                 const { position, scale, quaternion } = psr;
 
-                const points = getPointsInsideCuboid(positions, position, quaternion, scale);
+                const points = getPointsInsideCuboid(
+                    positions,
+                    position,
+                    quaternion,
+                    scale,
+                    visible,
+                );
+
                 colors[filePath][id] = new Uint32Array(points);
                 labels[id] = label;
             });
@@ -94,6 +101,7 @@ export const useObjectsLoader = () => {
                         };
 
                         const cuboidGeometry = addCuboid(scene, cuboidToAdd);
+                        cuboidGeometry.cube.mesh.visible = false;
                         cuboidsGeometriesRef.current[cuboidToAdd.id] = cuboidGeometry;
 
                         newCuboids.push({

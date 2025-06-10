@@ -1,14 +1,16 @@
 import { useCallback } from "react";
 
 import { useBatch, useCuboids, useFrames } from "contexts";
-import { useCuboidInterpolation } from "hooks";
+import { useCuboidInterpolation, useSaveSolution } from "hooks";
 
 export const useBatchEditorEvents = () => {
     const { setActiveFrameIndex } = useFrames();
+
     const { selectedCuboidGeometryRef, cuboidsSolutionRef } = useCuboids();
     const { selectedCuboidBatchGeometriesRef, batchMode, setBatchMode, updateBatchCuboidRef } =
         useBatch();
 
+    const { saveObjectsSolution } = useSaveSolution();
     const { saveCurrentPSRBatch, interpolatePSRBatch, updateCuboidPSRBatch, findFrameMarkers } =
         useCuboidInterpolation();
 
@@ -36,18 +38,24 @@ export const useBatchEditorEvents = () => {
         [batchMode, interpolatePSRBatch],
     );
 
-    const setBatchCuboidVisibility = useCallback((frame, visible) => {
-        const cuboid = selectedCuboidBatchGeometriesRef.current[frame];
-        if (cuboid) cuboid.visible = visible;
+    const setBatchCuboidVisibility = useCallback(
+        (frame, visible) => {
+            const cuboid = selectedCuboidBatchGeometriesRef.current[frame];
+            if (cuboid) cuboid.visible = visible;
 
-        const solution = cuboidsSolutionRef.current;
-        const id = selectedCuboidGeometryRef.current.name;
-        const frameSol = solution[frame];
-        const existingEntry = frameSol?.find((e) => e.id === id);
-        if (existingEntry) existingEntry.visible = visible;
+            const solution = cuboidsSolutionRef.current;
+            const id = selectedCuboidGeometryRef.current.name;
+            const frameSol = solution[frame];
+            const existingEntry = frameSol?.find((e) => e.id === id);
+            if (existingEntry) existingEntry.visible = visible;
 
-        findFrameMarkers();
-    }, []);
+            findFrameMarkers();
+            saveObjectsSolution({ updateStack: false, isAutoSave: false });
+
+            updateBatchCuboidRef.current = true;
+        },
+        [saveObjectsSolution],
+    );
 
     const toggleCuboidVisibility = useCallback(
         (e, mesh) => {

@@ -14,46 +14,56 @@ export const usePointsInsideCuboids = () => {
         cuboidIdToLabelRef,
         updateSingleCuboidRef,
         cuboidsSolutionRef,
+        cuboidsGeometriesRef,
     } = useCuboids();
     const { updateBatchCuboidRef } = useBatch();
 
     const { imagePointsAlphaNeedsUpdateRef } = useImages();
 
     useFrame(() => {
-        if (updateSingleCuboidRef.current || updateBatchCuboidRef.current) {
-            const mesh = selectedCuboidGeometryRef.current;
-            if (!mesh) return;
+        const updateSingle = updateSingleCuboidRef.current.needsUpdate;
+        const updateBatch = updateBatchCuboidRef.current;
 
-            const id = mesh.name;
-            const label = mesh.userData.label;
+        if (!updateSingle && !updateBatch) return;
 
-            const colors = pointsInsideCuboidsRef.current;
-            const labels = cuboidIdToLabelRef.current;
+        const requestedId = updateSingleCuboidRef.current.id;
+        const requestedMesh = cuboidsGeometriesRef.current?.[requestedId]?.cube?.mesh;
+        const selectedMesh = selectedCuboidGeometryRef.current;
 
-            for (let i = 0; i < pcdFiles.length; i++) {
-                const filePath = pcdFiles[i];
-                const cloud = pointCloudRefs.current[filePath];
-                if (!cloud) continue;
+        const mesh = requestedMesh || selectedMesh;
 
-                const solution = cuboidsSolutionRef.current;
-                const object = solution[i]?.find((obj) => obj.id === id);
+        if (!mesh) return;
 
-                const { position, scale, quaternion } = object.psr;
+        const id = mesh.name;
+        const label = mesh.userData.label;
 
-                const positions = cloud.geometry.attributes.position.array;
+        const colors = pointsInsideCuboidsRef.current;
+        const labels = cuboidIdToLabelRef.current;
 
-                colors[filePath] = colors[filePath] || {};
-                const points = getPointsInsideCuboid(positions, position, quaternion, scale);
-                colors[filePath][id] = new Uint32Array(points);
-            }
+        for (let i = 0; i < pcdFiles.length; i++) {
+            const filePath = pcdFiles[i];
+            const cloud = pointCloudRefs.current[filePath];
+            if (!cloud) continue;
 
-            labels[id] = label;
+            const solution = cuboidsSolutionRef.current;
+            const object = solution[i]?.find((obj) => obj.id === id);
+            if (!object) continue;
 
-            cloudPointsColorNeedsUpdateRef.current = true;
-            imagePointsAlphaNeedsUpdateRef.current = true;
+            const { visible } = object;
+            const { position, scale, quaternion } = object.psr;
+            const positions = cloud.geometry.attributes.position.array;
 
-            updateSingleCuboidRef.current = false;
-            updateBatchCuboidRef.current = false;
+            colors[filePath] = colors[filePath] || {};
+            const points = getPointsInsideCuboid(positions, position, quaternion, scale, visible);
+            colors[filePath][id] = new Uint32Array(points);
         }
+
+        labels[id] = label;
+
+        cloudPointsColorNeedsUpdateRef.current = true;
+        imagePointsAlphaNeedsUpdateRef.current = true;
+
+        updateSingleCuboidRef.current = { needsUpdate: false, id: null };
+        updateBatchCuboidRef.current = false;
     });
 };

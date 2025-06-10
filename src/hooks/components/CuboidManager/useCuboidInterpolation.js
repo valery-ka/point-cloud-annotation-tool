@@ -1,5 +1,7 @@
 import { useCallback } from "react";
-import { useCuboids, useFrames, useFileManager, useBatch, useEvent } from "contexts";
+
+import { useCuboids, useFrames, useFileManager, useBatch } from "contexts";
+import { useSaveSolution } from "hooks";
 
 import { writePSRToSolution, interpolateBetweenFrames } from "utils/cuboids";
 
@@ -14,7 +16,6 @@ export const useCuboidInterpolation = () => {
         setFrameMarkers,
         cuboidEditingFrameRef,
     } = useCuboids();
-    const { publish } = useEvent();
 
     const {
         batchViewsCamerasNeedUpdateRef,
@@ -23,50 +24,59 @@ export const useCuboidInterpolation = () => {
         batchMode,
     } = useBatch();
 
+    const { saveObjectsSolution } = useSaveSolution();
+
     const requestSave = useCallback(
-        (updateStack = true) => {
-            publish("saveObjectsSolution", { updateStack: updateStack, isAutoSave: false });
+        (updateStack = true, id = null) => {
+            saveObjectsSolution({ updateStack: updateStack, isAutoSave: false, id: id });
         },
-        [publish],
+        [saveObjectsSolution],
     );
 
     const interpolatePSR = useCallback(
-        (updateStack = true) => {
+        (updateStack = true, cuboidId = null) => {
             const selectedCuboid = selectedCuboidGeometryRef.current;
-            if (!selectedCuboid?.name) return;
+            const id = cuboidId ?? selectedCuboid?.name;
+
+            if (!id) return;
 
             interpolateBetweenFrames({
                 cuboidsGeometriesRef,
                 cuboidsSolutionRef,
                 totalFrames: pcdFiles.length,
-                selectedId: selectedCuboid.name,
+                selectedId: id,
             });
 
-            requestSave(updateStack);
+            requestSave(updateStack, id);
         },
         [requestSave, pcdFiles],
     );
 
-    const interpolatePSRBatch = useCallback(() => {
-        const geometries = selectedCuboidBatchGeometriesRef.current;
-        if (!geometries) return;
+    const interpolatePSRBatch = useCallback(
+        (updateStack = false) => {
+            const geometries = selectedCuboidBatchGeometriesRef.current;
+            if (!geometries) return;
 
-        const totalFrames = pcdFiles.length;
+            const totalFrames = pcdFiles.length;
 
-        Object.values(geometries).forEach((cube) => {
-            if (!cube?.name) return;
+            Object.values(geometries).forEach((cube) => {
+                if (!cube?.name) return;
 
-            interpolateBetweenFrames({
-                cuboidsGeometriesRef,
-                cuboidsSolutionRef,
-                totalFrames,
-                selectedId: cube.name,
+                interpolateBetweenFrames({
+                    cuboidsGeometriesRef,
+                    cuboidsSolutionRef,
+                    totalFrames,
+                    selectedId: cube.name,
+                });
             });
-        });
 
-        requestSave();
-        batchViewsCamerasNeedUpdateRef.current = true;
-    }, [requestSave, pcdFiles]);
+            const id = geometries[0].name;
+
+            requestSave(updateStack, id);
+            batchViewsCamerasNeedUpdateRef.current = true;
+        },
+        [requestSave, pcdFiles],
+    );
 
     const updateCuboidPSR = useCallback(
         (frame) => {

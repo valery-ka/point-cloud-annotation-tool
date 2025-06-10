@@ -3,8 +3,8 @@ import { faSave } from "@fortawesome/free-solid-svg-icons";
 import { useTranslation } from "react-i18next";
 import { isEmpty } from "lodash";
 
-import { useBatch, useFileManager, useEditor, useEvent } from "contexts";
-import { useClickOutsideBlur } from "hooks";
+import { useBatch, useFileManager, useEditor } from "contexts";
+import { useClickOutsideBlur, useSaveSolution } from "hooks";
 
 import { Checkbox } from "components";
 
@@ -24,12 +24,12 @@ const COMPONENT_NAME = "";
 export const BatchHeader = memo(() => {
     const { t } = useTranslation();
 
-    const { publish } = useEvent();
     const { pendingSaveState } = useEditor();
     const { pcdFiles, folderName } = useFileManager();
     const { viewsCount, setViewsCount, activeCameraViews, setActiveCameraViews } = useBatch();
 
     const framesSelectRef = useClickOutsideBlur();
+    const { saveLabelsSolution, saveObjectsSolution } = useSaveSolution();
 
     const checkedCount = Object.values(activeCameraViews).filter(Boolean).length;
 
@@ -54,8 +54,8 @@ export const BatchHeader = memo(() => {
 
     const handleSaveClick = () => {
         if (isEmpty(folderName)) return;
-        publish("saveLabelsSolution", { updateStack: false, isAutoSave: true });
-        publish("saveObjectsSolution", { updateStack: false, isAutoSave: true });
+        saveLabelsSolution({ updateStack: false, isAutoSave: true });
+        saveObjectsSolution({ updateStack: false, isAutoSave: true });
     };
 
     return (

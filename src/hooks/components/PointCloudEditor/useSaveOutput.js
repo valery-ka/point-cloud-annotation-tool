@@ -176,12 +176,13 @@ export const useSaveOutput = (updateUndoRedoState) => {
     );
 
     const requestSaveObjects = useCallback(
-        ({ updateStack = true, isAutoSave = false }) => {
+        ({ updateStack = true, isAutoSave = false, id = null }) => {
             if (!pcdFiles.length) return;
 
             const frame =
                 batchEditingFrameRef.current ?? cuboidEditingFrameRef.current ?? activeFrameIndex;
             const activeFrameFilePath = pcdFiles[frame];
+
             if (!activeFrameFilePath) return;
 
             const activeFrameCuboids = cuboidsSolutionRef.current[frame];
@@ -196,7 +197,7 @@ export const useSaveOutput = (updateUndoRedoState) => {
                     ...undoStackRef.current[activeFrameFilePath].slice(
                         -(UNDO_REDO_STACK_DEPTH - 1),
                     ),
-                    { objects: structuredClone(previousCuboids) },
+                    { objects: structuredClone(previousCuboids), id: id },
                 ];
             }
 

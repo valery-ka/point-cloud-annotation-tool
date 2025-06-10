@@ -1,6 +1,6 @@
 import { useEffect, useCallback } from "react";
 
-import { useCuboids, useEditor, useEvent } from "contexts";
+import { useCuboids, useEditor, useEvent, useFrames } from "contexts";
 import {
     useTransformControls,
     useRaycastClickSelect,
@@ -16,7 +16,10 @@ import { TABS } from "constants";
 
 export const useCuboidManager = (handlers) => {
     const { publish } = useEvent();
+
+    const { arePointCloudsLoading } = useFrames();
     const { cameraControlsRef, transformControlsRef } = useEditor();
+
     const {
         cuboids,
         cuboidsGeometriesRef,
@@ -44,7 +47,7 @@ export const useCuboidManager = (handlers) => {
             setSelectedCuboid(cuboids.find((cube) => cube.id === id));
             findFrameMarkers();
             publish("setActiveTab", TABS.OBJECT_CARD);
-            updateSingleCuboidRef.current = true;
+            updateSingleCuboidRef.current = { needsUpdate: true, id: id };
         },
         [cuboids],
     );
@@ -85,7 +88,7 @@ export const useCuboidManager = (handlers) => {
 
     useEffect(() => {
         updateCuboidPSR();
-    }, [updateCuboidPSR]);
+    }, [arePointCloudsLoading, updateCuboidPSR]);
 
     useUpdateCuboidInfoCard(handlers);
     usePointsInsideCuboids();

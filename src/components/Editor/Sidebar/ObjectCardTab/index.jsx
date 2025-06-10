@@ -10,12 +10,12 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 import { useEvent, useCuboids, useConfig, useEditor } from "contexts";
-import { useSubscribeFunction, useContinuousAction } from "hooks";
+import { useSubscribeFunction, useContinuousAction, useRemoveRestore } from "hooks";
 
 import { SidebarIcon } from "../SidebarIcon";
 import { ObjectCardInfoBlock } from "./ObjectCardInfoBlock";
 
-import { getCuboidMeshPositionById, removeCuboid } from "utils/cuboids";
+import { getCuboidMeshPositionById } from "utils/cuboids";
 import { TABS } from "constants";
 import {
     POSITION_HANDLERS,
@@ -30,25 +30,21 @@ const OBJECTS_TAB_INDEX = 0;
 
 export const ObjectCardTab = memo(() => {
     const { publish } = useEvent();
-    const { sceneRef, transformControlsRef, cloudPointsColorNeedsUpdateRef } = useEditor();
+    const { transformControlsRef } = useEditor();
     const {
         cuboids,
-        setCuboids,
         selectedCuboid,
         setSelectedCuboid,
         selectedCuboidGeometryRef,
         isCuboidTransformingRef,
         selectedCuboidInfoRef,
         cuboidsGeometriesRef,
-        cuboidsSolutionRef,
-        pointsInsideCuboidsRef,
-        deletedCuboidsRef,
-        setDeletedObjects,
     } = useCuboids();
     const { config } = useConfig();
     const { objects } = config;
 
     const { startContinuousAction } = useContinuousAction({ delay: 100 });
+    const { removeObject } = useRemoveRestore();
 
     const { isPrevButtonActive, isNextButtonActive } = useMemo(() => {
         if (!selectedCuboid?.id || cuboids.length === 0) {
@@ -74,79 +70,6 @@ export const ObjectCardTab = memo(() => {
         isCuboidTransformingRef.current = true;
         transformControlsRef.current.dispatchEvent({ type: "change" });
     }, []);
-
-    const removeObject = useCallback(
-        (data) => {
-            const cuboidId = data.index;
-            const deletedObjects = deletedCuboidsRef.current;
-
-            const removed = {
-                geometry: null,
-                solutions: [],
-                points: {},
-            };
-
-            const removeFromScene = () => {
-                for (const geometry of Object.values(cuboidsGeometriesRef.current)) {
-                    if (geometry?.cube?.mesh?.name === cuboidId) {
-                        removeCuboid(sceneRef.current, geometry);
-                        removed.geometry = geometry;
-                        delete cuboidsGeometriesRef.current[cuboidId];
-                        break;
-                    }
-                }
-            };
-
-            const removeFromSolutions = () => {
-                for (const [key, solution] of Object.entries(cuboidsSolutionRef.current)) {
-                    for (let i = 0; i < solution.length; i++) {
-                        if (solution[i]?.id === cuboidId) {
-                            removed.solutions.push(solution[i]);
-                            solution.splice(i, 1);
-                            i--;
-                        }
-                    }
-                }
-            };
-
-            const removeFromPointMap = () => {
-                const ref = pointsInsideCuboidsRef.current;
-                for (const [filePath, cuboidMap] of Object.entries(ref)) {
-                    if (cuboidMap?.[cuboidId]) {
-                        removed.points[filePath] = cuboidMap[cuboidId];
-                        delete cuboidMap[cuboidId];
-
-                        if (Object.keys(cuboidMap).length === 0) {
-                            delete ref[filePath];
-                        }
-                    }
-                }
-            };
-
-            removeFromScene();
-            removeFromSolutions();
-            removeFromPointMap();
-
-            deletedObjects.push(removed);
-            const deleteditems = deletedCuboidsRef.current
-                .map((item) => {
-                    const firstSolution = item.solutions[0];
-                    if (firstSolution && firstSolution.id && firstSolution.type) {
-                        return `${firstSolution.id}_${firstSolution.type}`;
-                    }
-                    return null;
-                })
-                .filter(Boolean);
-
-            setDeletedObjects(deleteditems);
-
-            setCuboids((prev) => prev.filter((c) => c.id !== cuboidId));
-            setSelectedCuboid(null);
-            publish("saveObjectsSolution", { updateStack: false, isAutoSave: false });
-            cloudPointsColorNeedsUpdateRef.current = true;
-        },
-        [publish],
-    );
 
     useSubscribeFunction("removeObject", removeObject, []);
 

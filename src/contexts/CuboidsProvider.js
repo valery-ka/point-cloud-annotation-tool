@@ -48,7 +48,7 @@ export const CuboidsProvider = ({ children }) => {
     const cuboidIdToLabelRef = useRef({});
     const pointsInsideCuboidsRef = useRef({});
 
-    const updateSingleCuboidRef = useRef(false);
+    const updateSingleCuboidRef = useRef({ needsUpdate: false, id: null });
 
     return (
         <CuboidsContext.Provider

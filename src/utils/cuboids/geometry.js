@@ -123,7 +123,7 @@ export const addCuboid = (scene, cuboid) => {
     return { cube, edges, arrow };
 };
 
-export const updateCuboid = (id, label, color, cuboidsGeometriesRef) => {
+export const updateCuboid = (id, label, color, cuboidsGeometriesRef, cuboidsSolutionRef) => {
     for (const geometry of Object.values(cuboidsGeometriesRef.current)) {
         if (geometry?.cube?.mesh?.name === id) {
             cuboidsGeometriesRef.current[id].cube.mesh.material.color = new Color(color);
@@ -131,6 +131,13 @@ export const updateCuboid = (id, label, color, cuboidsGeometriesRef) => {
             cuboidsGeometriesRef.current[id].arrow.mesh.material.color = new Color(color);
             cuboidsGeometriesRef.current[id].cube.mesh.userData.color = color;
             cuboidsGeometriesRef.current[id].cube.mesh.userData.label = label;
+        }
+    }
+    for (const solutionFrame of Object.values(cuboidsSolutionRef.current)) {
+        for (const cuboid of Object.values(solutionFrame)) {
+            if (cuboid.id === id) {
+                cuboid.type = label;
+            }
         }
     }
 };
@@ -144,7 +151,9 @@ export const removeCuboid = (scene, cuboid) => {
     arrow.cleanup();
 };
 
-export const getPointsInsideCuboid = (positions, position, quaternionObj, scale) => {
+export const getPointsInsideCuboid = (positions, position, quaternionObj, scale, visible) => {
+    if (!visible) return [];
+
     const quaternion = new Quaternion(
         quaternionObj.x,
         quaternionObj.y,

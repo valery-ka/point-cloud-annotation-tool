@@ -74,7 +74,7 @@ export const useFrameLaneMouseEvents = (frameLaneRef) => {
                 interpolatePSR();
                 findFrameMarkers();
                 updateCuboidPSR();
-                updateSingleCuboidRef.current = true;
+                updateSingleCuboidRef.current.needsUpdate = true;
             }
         },
         [interpolatePSR, updateCuboidPSR],

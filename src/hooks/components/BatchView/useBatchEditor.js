@@ -108,6 +108,8 @@ export const useBatchEditor = ({ handlers, views }) => {
 
     const addBatchCuboidsToScene = (frame, tempObjects) => {
         const selectedBatchCuboid = selectedCuboidBatchGeometriesRef.current;
+        if (!selectedBatchCuboid) return;
+
         const batchClone = selectedBatchCuboid[frame];
 
         batchSceneRef.current.add(batchClone);
