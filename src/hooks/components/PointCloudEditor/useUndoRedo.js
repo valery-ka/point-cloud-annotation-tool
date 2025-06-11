@@ -24,6 +24,8 @@ export const useUndoRedo = (requestSaveLabels, onUndoRedo) => {
         publish(redoStack.length ? "enableRedo" : "disableRedo");
     }, [onUndoRedo, arePointCloudsLoading, publish]);
 
+    useSubscribeFunction("updateUndoRedoState", updateUndoRedoState, []);
+
     const undoAction = useCallback(() => {
         if (!pcdFiles.length || arePointCloudsLoading || isPlaying) return;
 
@@ -41,10 +43,6 @@ export const useUndoRedo = (requestSaveLabels, onUndoRedo) => {
 
             pointLabelsRef.current[activeFrameFilePath] = lastState.labels;
 
-            undoStack.pop();
-            onUndoRedo?.();
-            updateUndoRedoState();
-
             requestSaveLabels({ updateStack: false, isAutoSave: false });
         }
 
@@ -57,18 +55,18 @@ export const useUndoRedo = (requestSaveLabels, onUndoRedo) => {
             redoStackRef.current[activeFrameFilePath] = redoStack;
 
             cuboidsSolutionRef.current[activeFrameIndex] = lastState.objects;
-            undoStack.pop();
 
             updateCuboidPSR(activeFrameIndex);
             saveCurrentPSR({ activeFrameIndex: activeFrameIndex });
             findFrameMarkers();
-
-            onUndoRedo?.();
-            updateUndoRedoState();
-
             interpolatePSR(false, lastState.id);
+
             updateSingleCuboidRef.current = { needsUpdate: true, id: lastState.id };
         }
+
+        undoStack.pop();
+        onUndoRedo?.();
+        updateUndoRedoState();
     }, [arePointCloudsLoading, isPlaying, onUndoRedo, updateCuboidPSR, interpolatePSR]);
 
     useSubscribeFunction("undoAction", undoAction, []);
@@ -90,10 +88,6 @@ export const useUndoRedo = (requestSaveLabels, onUndoRedo) => {
 
             pointLabelsRef.current[activeFrameFilePath] = nextState.labels;
 
-            redoStack.pop();
-            onUndoRedo?.();
-            updateUndoRedoState();
-
             requestSaveLabels({ updateStack: false, isAutoSave: false });
         }
 
@@ -106,18 +100,18 @@ export const useUndoRedo = (requestSaveLabels, onUndoRedo) => {
             undoStackRef.current[activeFrameFilePath] = undoStack;
 
             cuboidsSolutionRef.current[activeFrameIndex] = nextState.objects;
-            redoStack.pop();
 
             updateCuboidPSR(activeFrameIndex);
             saveCurrentPSR({ activeFrameIndex: activeFrameIndex });
             findFrameMarkers();
-
-            onUndoRedo?.();
-            updateUndoRedoState();
-
             interpolatePSR(false, nextState.id);
+
             updateSingleCuboidRef.current = { needsUpdate: true, id: nextState.id };
         }
+
+        redoStack.pop();
+        onUndoRedo?.();
+        updateUndoRedoState();
     }, [arePointCloudsLoading, isPlaying, onUndoRedo, updateCuboidPSR, interpolatePSR]);
 
     useSubscribeFunction("redoAction", redoAction, []);

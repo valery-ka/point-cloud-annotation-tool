@@ -15,7 +15,7 @@ import {
     useSubscribeFunction,
     useBindHotkey,
     useContextMenuSelector,
-    useRemoveRestore,
+    useAddRemoveRestoreCuboid,
 } from "hooks";
 
 import { ContextMenu } from "components";
@@ -44,9 +44,18 @@ export const ObjectsTab = memo(({ title }) => {
     const { setBatchMode } = useBatch();
     const { cuboids, selectedCuboid, setSelectedCuboid, deletedObjects } = useCuboids();
 
-    const { restoreObject } = useRemoveRestore();
+    const { restoreObject } = useAddRemoveRestoreCuboid();
 
+    //
+    // Context Menu Start
     const containerRef = useRef(null);
+    const isEnabled = deletedObjects.length > 0;
+
+    useEffect(() => {
+        const container = document.getElementsByClassName("tool-3d-scene");
+        containerRef.current = container[0];
+    }, []);
+
     const {
         openContextMenu,
         contextMenuPosition,
@@ -56,7 +65,10 @@ export const ObjectsTab = memo(({ title }) => {
     } = useContextMenuSelector({
         wrapperRef: containerRef,
         onSelect: restoreObject,
+        isEnabled: isEnabled,
     });
+    // Context Menu Start
+    //
 
     const [visibilityState, setVisibilityState] = useState({});
 
@@ -90,6 +102,8 @@ export const ObjectsTab = memo(({ title }) => {
 
     useBindHotkey(hotkeys["fixed"]["unselectObject"], unselectObject);
 
+    //
+    // Classes Subs Start
     useEffect(() => {
         const subscriptions = nonHiddenClasses.map((cls, index) => {
             const originalIndex = cls.originalIndex;
@@ -108,7 +122,11 @@ export const ObjectsTab = memo(({ title }) => {
             });
         };
     }, [subscribe, unsubscribe, nonHiddenClasses]);
+    // Classes Subs End
+    //
 
+    //
+    // Objects Subs Start
     useEffect(() => {
         const subscriptions = cuboids.map((obj, index) => {
             const id = obj.id;
@@ -127,6 +145,8 @@ export const ObjectsTab = memo(({ title }) => {
             });
         };
     }, [subscribe, unsubscribe, cuboids]);
+    // Objects Subs End
+    //
 
     useEffect(() => {
         if (selectedCuboid) {
@@ -135,7 +155,7 @@ export const ObjectsTab = memo(({ title }) => {
     }, [selectedCuboid]);
 
     return (
-        <div className="sidebar-tab-panel" ref={containerRef}>
+        <div className="sidebar-tab-panel">
             <div className="tab-header-container" onClick={unselectObject}>
                 <h2 className="tab-header">{title}</h2>
                 <div className="tab-header-buttons">
@@ -152,17 +172,15 @@ export const ObjectsTab = memo(({ title }) => {
                         action={getHideShowToggleState() ? "hideAll" : "showAll"}
                         hotkey={hotkeys["misc"]["hideShowAll"]}
                     />
-                    {/* гига криво появляется и вообще пока что без понятия почему */}
                     <div
-                        onMouseUp={() =>
+                        onMouseUp={(e) =>
                             openContextMenu({
-                                offsetX: -40,
-                                offsetY: -40,
+                                targetElement: e.currentTarget,
                             })
                         }
                     >
                         <SidebarIcon
-                            className="icon-style"
+                            className={`icon-style ${isEnabled ? "" : "disabled"}`}
                             size="20px"
                             title="Список удаленных кубоидов"
                             icon={faPlus}
@@ -205,6 +223,7 @@ export const ObjectsTab = memo(({ title }) => {
                 onClose={handleCloseContextMenu}
                 setMenuDimensions={setMenuDimensions}
                 selectMode={"index"}
+                hasNone={false}
             />
         </div>
     );

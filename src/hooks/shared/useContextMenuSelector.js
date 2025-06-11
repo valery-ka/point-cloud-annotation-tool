@@ -2,13 +2,13 @@ import { useCallback, useState } from "react";
 
 const CONTEXT_MENU_RESET_POSITION = { x: -1000, y: -1000 };
 
-export const useContextMenuSelector = ({ wrapperRef, onSelect }) => {
+export const useContextMenuSelector = ({ wrapperRef, onSelect, isEnabled = true }) => {
     const [contextMenuPosition, setContextMenuPosition] = useState(CONTEXT_MENU_RESET_POSITION);
     const [menuDimensions, setMenuDimensions] = useState({ width: 0, height: 0 });
 
     const handleMouseUp = useCallback(
         (e) => {
-            if (e.button === 2 && wrapperRef?.current) {
+            if (e.button === 2 && wrapperRef?.current && isEnabled) {
                 e.preventDefault();
 
                 const padding = 10;
@@ -29,22 +29,43 @@ export const useContextMenuSelector = ({ wrapperRef, onSelect }) => {
                 setContextMenuPosition({ x, y });
             }
         },
-        [menuDimensions],
+        [menuDimensions, isEnabled],
     );
 
     const openContextMenu = useCallback(
-        ({ offsetX = 0, offsetY = 0 } = {}) => {
-            if (!wrapperRef?.current) return;
+        ({ offsetX = 0, offsetY = 0, targetElement } = {}) => {
+            if (!wrapperRef?.current || !isEnabled) return;
 
             const wrapperRect = wrapperRef.current.getBoundingClientRect();
             const { width: menuWidth, height: menuHeight } = menuDimensions;
+            const padding = 10;
 
-            let x = wrapperRect.width - menuWidth + offsetX;
-            let y = wrapperRect.height - menuHeight + offsetY;
+            let x, y;
+
+            if (targetElement) {
+                const targetRect = targetElement.getBoundingClientRect();
+                const anchorX = targetRect.left - wrapperRect.left;
+                const anchorY = targetRect.bottom - wrapperRect.top;
+
+                x = Math.max(
+                    padding,
+                    Math.min(
+                        anchorX - menuWidth + offsetX,
+                        wrapperRect.width - menuWidth - padding,
+                    ),
+                );
+                y = Math.max(
+                    padding,
+                    Math.min(anchorY + offsetY, wrapperRect.height - menuHeight - padding),
+                );
+            } else {
+                x = wrapperRect.width - menuWidth + offsetX;
+                y = wrapperRect.height - menuHeight + offsetY;
+            }
 
             setContextMenuPosition({ x, y });
         },
-        [menuDimensions],
+        [menuDimensions, isEnabled],
     );
 
     const handleSelect = useCallback(

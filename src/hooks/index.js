@@ -58,7 +58,6 @@ export { useImageCanvasMouseEvents } from "./components/CameraImages/useImageCan
 
 export { useCuboidManager } from "./components/CuboidManager/useCuboidManager";
 export { useHoveredCuboid } from "./components/CuboidManager/useHoveredCuboid";
-export { useRemoveRestore } from "./components/CuboidManager/useRemoveRestore";
 export { useCuboidVisibility } from "./components/CuboidManager/useCuboidVisibility";
 export { useOrthographicView } from "./components/CuboidManager/useOrthographicView";
 export { useTransformControls } from "./components/CuboidManager/useTransformControls";
@@ -67,6 +66,7 @@ export { useSideViewsRenderer } from "./components/CuboidManager/useSideViewsRen
 export { usePointsInsideCuboids } from "./components/CuboidManager/usePointsInsideCuboids";
 export { useCuboidInterpolation } from "./components/CuboidManager/useCuboidInterpolation";
 export { useUpdateCuboidInfoCard } from "./components/CuboidManager/useUpdateCuboidInfoCard";
+export { useAddRemoveRestoreCuboid } from "./components/CuboidManager/useAddRemoveRestoreCuboid";
 
 export { useBatchEditor } from "./components/BatchView/useBatchEditor";
 export { useBatchEditorScene } from "./components/BatchView/useBatchEditorScene";

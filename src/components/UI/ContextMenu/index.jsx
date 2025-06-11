@@ -7,15 +7,21 @@ export const ContextMenu = ({
     onClose,
     setMenuDimensions,
     selectMode = "item",
+    hasNone = true,
 }) => {
     const menuRef = useRef(null);
 
     useEffect(() => {
-        if (menuRef.current) {
+        if (!menuRef.current) return;
+
+        const observer = new ResizeObserver(() => {
             const { offsetWidth, offsetHeight } = menuRef.current;
             setMenuDimensions({ width: offsetWidth, height: offsetHeight });
-        }
-    }, [itemsList]);
+        });
+
+        observer.observe(menuRef.current);
+        return () => observer.disconnect();
+    }, []);
 
     useEffect(() => {
         const handleClickOutside = (e) => {
@@ -37,20 +43,22 @@ export const ContextMenu = ({
     return (
         <div className="ui-context-menu" style={{ top: y, left: x }} ref={menuRef}>
             <div className="ui-context-menu-content">
-                <div
-                    key="none"
-                    className="ui-context-menu-item-container"
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        onSelect("none");
-                        onClose();
-                    }}
-                >
-                    <div className="ui-context-menu-item">none</div>
-                </div>
+                {hasNone && (
+                    <div
+                        key="none"
+                        className="ui-context-menu-item-container"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onSelect("none");
+                            onClose();
+                        }}
+                    >
+                        <div className="ui-context-menu-item">none</div>
+                    </div>
+                )}
                 {itemsList.map((item, index) => (
                     <div
-                        key={item}
+                        key={`${item}_${index}`}
                         className="ui-context-menu-item-container"
                         onClick={(e) => {
                             e.stopPropagation();

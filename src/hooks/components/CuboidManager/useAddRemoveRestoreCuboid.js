@@ -1,16 +1,18 @@
 import { useCallback } from "react";
 
-import { useCuboids, useEditor, useFrames, useConfig } from "contexts";
+import { useCuboids, useEditor, useFrames, useConfig, useFileManager, useEvent } from "contexts";
 import { useSaveSolution } from "hooks";
 
-import { addCuboid, removeCuboid } from "utils/cuboids";
+import { addCuboid, updateCuboid, removeCuboid, writePSRToSolution } from "utils/cuboids";
 import { getNextId } from "utils/shared";
 
-export const useRemoveRestore = () => {
+export const useAddRemoveRestoreCuboid = () => {
+    const { publish } = useEvent();
     const { config } = useConfig();
+    const { pcdFiles } = useFileManager();
 
     const { activeFrameIndex } = useFrames();
-    const { sceneRef, cloudPointsColorNeedsUpdateRef } = useEditor();
+    const { sceneRef, cloudPointsColorNeedsUpdateRef, undoStackRef, redoStackRef } = useEditor();
 
     const {
         setCuboids,
@@ -20,21 +22,98 @@ export const useRemoveRestore = () => {
         pointsInsideCuboidsRef,
         deletedCuboidsRef,
         setDeletedObjects,
+        selectedCuboidInfoRef,
+        updateSingleCuboidRef,
     } = useCuboids();
 
     const { saveObjectsSolution } = useSaveSolution();
+
+    const resetUndoRedoStacks = useCallback(() => {
+        undoStackRef.current = {};
+        redoStackRef.current = {};
+        publish("updateUndoRedoState");
+    }, [publish]);
 
     const getDeletedItemsList = useCallback(() => {
         return deletedCuboidsRef.current
             .map((item) => {
                 const firstSolution = item.solutions[0];
                 if (firstSolution && firstSolution.id && firstSolution.type) {
-                    return `${firstSolution.id}_${firstSolution.type}`;
+                    return `ID: ${firstSolution.id} Label: ${firstSolution.type}`;
                 }
                 return null;
             })
             .filter(Boolean);
     }, []);
+
+    const initializeCuboidPSRForAllFrames = useCallback(
+        (mesh) => {
+            const allFrames = pcdFiles.map((_, i) => i);
+            writePSRToSolution({
+                mesh,
+                frameIndices: allFrames,
+                cuboidsSolutionRef,
+            });
+        },
+        [pcdFiles],
+    );
+
+    const addCuboidOnScene = useCallback(
+        (cuboid) => {
+            const toSelect = { id: cuboid.id, label: cuboid.label, color: cuboid.color };
+            const cuboidGeometry = addCuboid(sceneRef.current, cuboid);
+            cuboidsGeometriesRef.current[cuboid.id] = cuboidGeometry;
+
+            initializeCuboidPSRForAllFrames(cuboidGeometry.cube.mesh);
+            setSelectedCuboid(toSelect);
+
+            resetUndoRedoStacks();
+            saveObjectsSolution({ updateStack: false, isAutoSave: false });
+        },
+        [saveObjectsSolution, initializeCuboidPSRForAllFrames, resetUndoRedoStacks],
+    );
+
+    const addNewObject = useCallback(
+        (object, position) => {
+            const { color, type: label, dimensions } = object;
+            const { selected, scale, position: selPos, rotation } = selectedCuboidInfoRef.current;
+
+            const defaultScale = [dimensions.length, dimensions.width, dimensions.height];
+            const newPosition = selected
+                ? [position[0], position[1], selPos[2] - (scale[2] - defaultScale[2]) / 2]
+                : [position[0], position[1], position[2] + defaultScale[2] / 2];
+
+            setCuboids((prev = []) => {
+                const newId = String(getNextId(prev));
+                const cuboid = {
+                    id: newId,
+                    label,
+                    color,
+                    position: newPosition,
+                    scale: defaultScale,
+                    rotation: selected ? rotation : [0, 0, 0],
+                };
+                addCuboidOnScene(cuboid);
+                return [...prev, { id: newId, label, color }];
+            });
+        },
+        [addCuboidOnScene],
+    );
+
+    const updateExistingObject = useCallback(
+        (id, object) => {
+            const { type: label, color } = object;
+
+            updateCuboid(id, label, color, cuboidsGeometriesRef, cuboidsSolutionRef);
+            setCuboids((prev) =>
+                prev.map((cuboid) => (cuboid.id === id ? { ...cuboid, label, color } : cuboid)),
+            );
+
+            updateSingleCuboidRef.current = { needsUpdate: true, id: id };
+            saveObjectsSolution({ updateStack: false, isAutoSave: false });
+        },
+        [saveObjectsSolution],
+    );
 
     const addRemovedObject = useCallback(
         (cuboid, toRestore) => {
@@ -74,9 +153,11 @@ export const useRemoveRestore = () => {
             restorePointMap();
 
             setSelectedCuboid(toSelect);
+
+            resetUndoRedoStacks();
             saveObjectsSolution({ updateStack: false, isAutoSave: false });
         },
-        [saveObjectsSolution],
+        [saveObjectsSolution, resetUndoRedoStacks],
     );
 
     const restoreObject = useCallback(
@@ -89,9 +170,7 @@ export const useRemoveRestore = () => {
             const label = toRestore.solutions[activeFrameIndex].type;
             const color = objects[label].color;
 
-            const position = toRestore.solutions[activeFrameIndex].psr.position;
-            const scale = toRestore.solutions[activeFrameIndex].psr.scale;
-            const rotation = toRestore.solutions[activeFrameIndex].psr.rotation;
+            const { position, scale, rotation } = toRestore.solutions[activeFrameIndex].psr;
 
             setCuboids((prev = []) => {
                 const newId = String(getNextId(prev));
@@ -168,14 +247,15 @@ export const useRemoveRestore = () => {
 
             deletedObjects.push(removed);
             setDeletedObjects(getDeletedItemsList());
-
             setCuboids((prev) => prev.filter((c) => c.id !== cuboidId));
             setSelectedCuboid(null);
+
+            resetUndoRedoStacks();
             saveObjectsSolution({ updateStack: false, isAutoSave: false });
             cloudPointsColorNeedsUpdateRef.current = true;
         },
-        [saveObjectsSolution],
+        [saveObjectsSolution, resetUndoRedoStacks],
     );
 
-    return { addRemovedObject, restoreObject, removeObject };
+    return { addNewObject, updateExistingObject, addRemovedObject, restoreObject, removeObject };
 };

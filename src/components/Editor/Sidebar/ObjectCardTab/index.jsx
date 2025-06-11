@@ -10,7 +10,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 import { useEvent, useCuboids, useConfig, useEditor } from "contexts";
-import { useSubscribeFunction, useContinuousAction, useRemoveRestore } from "hooks";
+import { useSubscribeFunction, useContinuousAction, useAddRemoveRestoreCuboid } from "hooks";
 
 import { SidebarIcon } from "../SidebarIcon";
 import { ObjectCardInfoBlock } from "./ObjectCardInfoBlock";
@@ -44,7 +44,7 @@ export const ObjectCardTab = memo(() => {
     const { objects } = config;
 
     const { startContinuousAction } = useContinuousAction({ delay: 100 });
-    const { removeObject } = useRemoveRestore();
+    const { removeObject } = useAddRemoveRestoreCuboid();
 
     const { isPrevButtonActive, isNextButtonActive } = useMemo(() => {
         if (!selectedCuboid?.id || cuboids.length === 0) {

@@ -42,7 +42,7 @@ export const useCuboidVisibility = () => {
             }
 
             findFrameMarkers();
-            saveObjectsSolution({ updateStack: true, isAutoSave: false });
+            saveObjectsSolution({ updateStack: true, isAutoSave: false, id: id });
 
             updateSingleCuboidRef.current.needsUpdate = true;
         };
