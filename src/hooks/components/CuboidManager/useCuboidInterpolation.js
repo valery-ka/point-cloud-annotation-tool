@@ -168,6 +168,8 @@ export const useCuboidInterpolation = () => {
 
     const saveCurrentPSRBatch = useCallback(({ keyFrameToRemove = null } = {}) => {
         const geometries = selectedCuboidBatchGeometriesRef.current;
+        if (!geometries) return;
+
         const id = selectedCuboidGeometryRef.current.name;
 
         Object.values(geometries).forEach((cube) => {
@@ -207,6 +209,8 @@ export const useCuboidInterpolation = () => {
         const solution = cuboidsSolutionRef.current;
         for (const [frameIndexStr, frameSolution] of Object.entries(solution)) {
             const frameIndex = Number(frameIndexStr);
+
+            if (!frameSolution) continue;
 
             for (const cuboid of Object.values(frameSolution)) {
                 if (cuboid.id === id) {

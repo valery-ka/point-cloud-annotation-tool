@@ -68,6 +68,7 @@ export const useAddRemoveRestoreCuboid = () => {
             setSelectedCuboid(toSelect);
 
             resetUndoRedoStacks();
+            updateSingleCuboidRef.current = { needsUpdate: true, id: cuboid.id };
             saveObjectsSolution({ updateStack: false, isAutoSave: false });
         },
         [saveObjectsSolution, initializeCuboidPSRForAllFrames, resetUndoRedoStacks],
@@ -84,7 +85,7 @@ export const useAddRemoveRestoreCuboid = () => {
                 : [position[0], position[1], position[2] + defaultScale[2] / 2];
 
             setCuboids((prev = []) => {
-                const newId = String(getNextId(prev));
+                const newId = String(getNextId(prev, deletedCuboidsRef.current));
                 const cuboid = {
                     id: newId,
                     label,
@@ -146,6 +147,7 @@ export const useAddRemoveRestoreCuboid = () => {
                         pointData,
                     );
                 }
+                updateSingleCuboidRef.current = { needsUpdate: true, id: cuboid.id };
             };
 
             restoreToScene();
@@ -173,7 +175,7 @@ export const useAddRemoveRestoreCuboid = () => {
             const { position, scale, rotation } = toRestore.solutions[activeFrameIndex].psr;
 
             setCuboids((prev = []) => {
-                const newId = String(getNextId(prev));
+                const newId = String(getNextId(prev, deletedCuboids));
                 const cuboid = {
                     id: newId,
                     label,
@@ -199,6 +201,7 @@ export const useAddRemoveRestoreCuboid = () => {
             const deletedObjects = deletedCuboidsRef.current;
 
             const removed = {
+                id: cuboidId,
                 geometry: null,
                 solutions: [],
                 points: {},

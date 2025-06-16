@@ -22,7 +22,7 @@ export const useUpdateCuboidInfoCard = () => {
             return;
         }
 
-        const { position, scale, rotation, quaternion } = geometry;
+        const { position, scale, rotation, quaternion, visible } = geometry;
         const { label } = geometry.userData;
 
         const newPosition = [position.x, position.y, position.z];
@@ -62,7 +62,14 @@ export const useUpdateCuboidInfoCard = () => {
 
             const positions = activeFrame.geometry.attributes.position.array;
 
-            const insidePoints = getPointsInsideCuboid(positions, position, quaternion, scale);
+            const insidePoints = getPointsInsideCuboid(
+                positions,
+                position,
+                quaternion,
+                scale,
+                visible,
+            );
+
             const insidePointsCount = insidePoints.length;
             if (insidePointsCount !== info.insidePointsCount) {
                 info.insidePointsCount = insidePointsCount;

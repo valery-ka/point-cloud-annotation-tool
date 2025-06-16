@@ -28,7 +28,6 @@ export const useCuboidManager = (handlers) => {
         sideViewsCamerasNeedUpdateRef,
         setSelectedCuboid,
         setFrameMarkers,
-        updateSingleCuboidRef,
     } = useCuboids();
 
     const { updateCuboidPSR, findFrameMarkers } = useCuboidInterpolation();
@@ -47,7 +46,6 @@ export const useCuboidManager = (handlers) => {
             setSelectedCuboid(cuboids.find((cube) => cube.id === id));
             findFrameMarkers();
             publish("setActiveTab", TABS.OBJECT_CARD);
-            updateSingleCuboidRef.current = { needsUpdate: true, id: id };
         },
         [cuboids],
     );

@@ -187,37 +187,12 @@ export const SideViewSVG = memo(
             );
         }, [project, hoveredHandler, corners, height]);
 
-        // может пригодиться, лучше пока не удалять
-        // const renderBoxOutline = useCallback(() => {
-        //     if (!corners.length || !outline) return null;
-
-        //     const projectedCorners = corners.map(project);
-        //     if (projectedCorners.some((p) => isNaN(p.x) || isNaN(p.y))) return null;
-
-        //     const color = mesh.userData.color;
-
-        //     return edges.map((_, index) => {
-        //         const start = projectedCorners[index];
-        //         const end = projectedCorners[(index + 1) % projectedCorners.length];
-
-        //         return (
-        //             <line
-        //                 key={`hovered-line-${index}`}
-        //                 x1={Math.max(0, start.x)}
-        //                 y1={Math.max(0, start.y)}
-        //                 x2={Math.max(0, end.x)}
-        //                 y2={Math.max(0, end.y)}
-        //                 stroke={color}
-        //                 strokeWidth={1}
-        //                 pointerEvents="none"
-        //             />
-        //         );
-        //     });
-        // }, [corners, edges, outline]);
-
         useEffect(() => {
-            setHoveredView(null);
-            setHoveredHandler(null);
+            const delay = 50;
+            setTimeout(() => {
+                setHoveredView(null);
+                setHoveredHandler(null);
+            }, delay);
         }, [selectedCuboid, batchMode]);
 
         if (!mesh || !camera || width <= 0 || height <= 0) return null;
@@ -234,6 +209,7 @@ export const SideViewSVG = memo(
                     cursor: "move",
                 }}
                 onMouseMove={() => handleMouseEnter(name)}
+                onMouseEnter={() => handleMouseEnter(name)}
                 onMouseLeave={() => handleMouseLeave(null)}
             >
                 <SVGText
