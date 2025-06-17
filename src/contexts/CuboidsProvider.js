@@ -45,6 +45,7 @@ export const CuboidsProvider = ({ children }) => {
     const prevCuboidsRef = useRef({});
     const cuboidEditingFrameRef = useRef(null);
 
+    const cuboidsVisibilityRef = useRef({});
     const cuboidIdToLabelRef = useRef({});
     const pointsInsideCuboidsRef = useRef({});
 
@@ -80,6 +81,7 @@ export const CuboidsProvider = ({ children }) => {
                 deletedCuboidsRef,
                 deletedObjects,
                 setDeletedObjects,
+                cuboidsVisibilityRef,
             }}
         >
             {children}

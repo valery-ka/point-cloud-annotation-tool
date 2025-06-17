@@ -16,6 +16,7 @@ import {
     useBindHotkey,
     useContextMenuSelector,
     useAddRemoveRestoreCuboid,
+    useForceUpdate,
 } from "hooks";
 
 import { ContextMenu } from "components";
@@ -42,7 +43,9 @@ export const ObjectsTab = memo(({ title }) => {
     const { classesVisibilityRef, selectedClassIndex, setSelectedClassIndex } = useEditor();
 
     const { setBatchMode } = useBatch();
-    const { cuboids, selectedCuboid, setSelectedCuboid, deletedObjects } = useCuboids();
+
+    const { cuboids, selectedCuboid, cuboidsVisibilityRef, setSelectedCuboid, deletedObjects } =
+        useCuboids();
 
     const { restoreObject } = useAddRemoveRestoreCuboid();
 
@@ -67,31 +70,28 @@ export const ObjectsTab = memo(({ title }) => {
         onSelect: restoreObject,
         isEnabled: isEnabled,
     });
-    // Context Menu Start
+    // Context Menu End
     //
 
-    const [visibilityState, setVisibilityState] = useState({});
-
-    const handleIsClassVisible = useCallback((cls) => {
-        return classesVisibilityRef.current[cls]?.visible;
-    }, []);
-
-    const handleIsObjectVisible = useCallback((obj) => {
-        return true;
-    }, []);
+    //
+    // General objects
+    const { forceUpdate } = useForceUpdate();
 
     const getHideShowToggleState = useCallback(() => {
-        return Object.values(classesVisibilityRef.current).every((cls) => cls.visible === true);
+        const allClassesVisible = Object.values(classesVisibilityRef.current).every(
+            (cls) => cls.visible === true,
+        );
+        const allCuboidsVisible = Object.values(cuboidsVisibilityRef.current).every(
+            (obj) => obj.visible === true,
+        );
+        return allClassesVisible && allCuboidsVisible;
     }, []);
 
     const handleVisibilityState = useCallback(() => {
-        const newVisibilityState = Object.fromEntries(
-            Object.entries(classesVisibilityRef.current).map(([idx, cls]) => [idx, cls.visible]),
-        );
-        setVisibilityState(newVisibilityState);
+        forceUpdate();
     }, []);
 
-    useSubscribeFunction("filterClass", handleVisibilityState, []);
+    useSubscribeFunction("filterObject", handleVisibilityState, []);
 
     const unselectObject = useCallback(() => {
         setSelectedClassIndex(null);
@@ -101,9 +101,15 @@ export const ObjectsTab = memo(({ title }) => {
     }, []);
 
     useBindHotkey(hotkeys["fixed"]["unselectObject"], unselectObject);
+    // General objects
+    //
 
     //
     // Classes Subs Start
+    const handleIsClassVisible = useCallback((cls) => {
+        return classesVisibilityRef.current[cls]?.visible;
+    }, []);
+
     useEffect(() => {
         const subscriptions = nonHiddenClasses.map((cls, index) => {
             const originalIndex = cls.originalIndex;
@@ -127,6 +133,10 @@ export const ObjectsTab = memo(({ title }) => {
 
     //
     // Objects Subs Start
+    const handleIsObjectVisible = useCallback((obj) => {
+        return cuboidsVisibilityRef.current[obj]?.visible;
+    }, []);
+
     useEffect(() => {
         const subscriptions = cuboids.map((obj, index) => {
             const id = obj.id;
@@ -168,8 +178,12 @@ export const ObjectsTab = memo(({ title }) => {
                                 : t(`${COMPONENT_NAME}showAll`)
                         }
                         icon={getHideShowToggleState() ? faEyeSlash : faEye}
-                        type={"filterClass"}
-                        action={getHideShowToggleState() ? "hideAll" : "showAll"}
+                        type={"filterObject"}
+                        action={
+                            getHideShowToggleState()
+                                ? { filter: "hideAll", unit: "all" }
+                                : { filter: "showAll", unit: "all" }
+                        }
                         hotkey={hotkeys["misc"]["hideShowAll"]}
                     />
                     <div
@@ -208,7 +222,7 @@ export const ObjectsTab = memo(({ title }) => {
                             <CuboidItem
                                 key={idx}
                                 obj={obj}
-                                index={idx}
+                                index={obj.id}
                                 action={`selectObject${obj.id}`}
                                 isSelected={selectedCuboid?.id === obj?.id}
                                 isVisible={handleIsObjectVisible(obj?.id)}

@@ -42,7 +42,7 @@ export const CuboidItem = memo(({ obj, index, action, isSelected, isVisible }) =
                 icon={faBullseye}
                 index={index}
                 type={"filterObject"}
-                action={"show"}
+                action={{ filter: "show", unit: "cuboid" }}
                 toggleable={true}
                 altIcon={faBan}
             />
@@ -52,7 +52,7 @@ export const CuboidItem = memo(({ obj, index, action, isSelected, isVisible }) =
                 icon={faEyeSlash}
                 index={index}
                 type={"filterObject"}
-                action={"hide"}
+                action={{ filter: "hide", unit: "cuboid" }}
                 toggleable={true}
                 altIcon={faEye}
             />

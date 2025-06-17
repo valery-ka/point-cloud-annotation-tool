@@ -7,7 +7,7 @@ import {
     useOrthographicView,
     useHoveredCuboid,
     useCuboidInterpolation,
-    useCuboidVisibility,
+    useCuboidsVisibility,
     useUpdateCuboidInfoCard,
     usePointsInsideCuboids,
 } from "hooks";
@@ -34,7 +34,7 @@ export const useCuboidManager = (handlers) => {
 
     useOrthographicView(handlers);
     useTransformControls();
-    useCuboidVisibility();
+    useCuboidsVisibility();
 
     const onCuboidSelect = useCallback(
         (id) => {

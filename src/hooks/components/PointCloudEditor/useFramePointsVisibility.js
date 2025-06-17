@@ -1,11 +1,11 @@
 import { useEffect, useCallback } from "react";
 
-import { useFileManager, useEditor, useFrames, useConfig, useImages } from "contexts";
+import { useFileManager, useEditor, useFrames, useConfig, useImages, useCuboids } from "contexts";
 import { useSubscribeFunction } from "hooks";
 
 import {
     filterPoints,
-    updateClassFilter,
+    updateObjectsFilter,
     filterPointsBySelection,
     showFilterPointsBySelection,
 } from "utils/editor";
@@ -24,6 +24,7 @@ export const useFramePointsVisibility = (updateGlobalBox) => {
         minMaxZRef,
         setHasFilterSelectionPoint,
     } = useEditor();
+    const { cuboidsVisibilityRef } = useCuboids();
 
     const { imagePointsAlphaNeedsUpdateRef } = useImages();
 
@@ -162,28 +163,17 @@ export const useFramePointsVisibility = (updateGlobalBox) => {
 
     useSubscribeFunction("minMaxZ", updateMinMaxZ, []);
 
-    const updateClassesVisibility = useCallback(
-        (data) => {
-            if (data) {
-                const action = data.action;
-                const classIndex = data.index;
-
-                updateClassFilter(action, classIndex, classesVisibilityRef);
-            }
-            filterFramePoints();
-        },
-        [filterFramePoints],
-    );
-
-    useSubscribeFunction("filterClass", updateClassesVisibility, []);
-
     const updateObjectsVisibility = useCallback(
         (data) => {
             if (data) {
-                const action = data.action;
-                const classIndex = data.index;
+                const unit = data.action.unit;
+                const action = data.action.filter;
+                const index = data.index;
 
-                console.log(data);
+                const classesData = classesVisibilityRef.current;
+                const cuboidsData = cuboidsVisibilityRef.current;
+
+                updateObjectsFilter(unit, action, index, classesData, cuboidsData);
             }
             filterFramePoints();
         },

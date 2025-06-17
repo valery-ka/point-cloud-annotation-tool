@@ -104,34 +104,60 @@ export const showFilterPointsBySelection = ({ cloudData, filterData, index }) =>
     invalidateCloudPointsPosition(geometry);
 };
 
-export const updateClassFilter = (action, classIndex, classesVisibilityRef) => {
-    const classesData = classesVisibilityRef.current;
-
-    if (ACTIONS[action]?.classFilter) {
-        ACTIONS[action].classFilter(classesData);
-        return;
-    }
-
+export const updateObjectsFilter = (unit, action, index, classesData, cuboidsData) => {
+    ACTIONS[action]?.classFilter(classesData);
+    ACTIONS[action]?.cuboidFilter(cuboidsData);
     classesData[Object.keys(classesData)[0]].show = false;
 
-    const classVisibility = classesData[classIndex];
-    classVisibility[action] = !classVisibility[action];
+    switch (unit) {
+        case "class":
+            classesData[index][action] = !classesData[index][action];
+            break;
+        case "cuboid":
+            cuboidsData[index][action] = !cuboidsData[index][action];
+            break;
+    }
 
-    const showMode = Object.values(classesData).some((classObj) => classObj.show);
+    const classList = Object.values(classesData);
+    const cuboidList = Object.values(cuboidsData);
 
-    Object.values(classesData).forEach((classObj) => {
-        classObj.visible = showMode ? classObj.show : !classObj.hide;
+    const showClasses = classList.filter((c) => c.show);
+    const showCuboids = cuboidList.filter((c) => c.show);
+
+    const inShowMode = showClasses.length > 0 || showCuboids.length > 0;
+
+    classList.forEach((classObj) => {
+        if (inShowMode) {
+            classObj.visible = showClasses.includes(classObj);
+        } else {
+            classObj.visible = !classObj.hide;
+        }
+    });
+
+    cuboidList.forEach((cuboidObj) => {
+        if (inShowMode) {
+            cuboidObj.visible = showCuboids.includes(cuboidObj);
+        } else {
+            cuboidObj.visible = !cuboidObj.hide;
+        }
     });
 };
 
 export const ACTIONS = {
     hideAll: {
         classFilter: (classesData) => {
-            Object.keys(classesData).forEach((key) => {
-                const VOIDClass = key === Object.keys(classesData)[0];
+            Object.keys(classesData).forEach((key, i) => {
+                const VOIDClass = i === 0;
                 classesData[key].hide = !VOIDClass;
                 classesData[key].show = VOIDClass;
                 classesData[key].visible = VOIDClass;
+            });
+        },
+        cuboidFilter: (cuboidsData) => {
+            Object.keys(cuboidsData).forEach((key) => {
+                cuboidsData[key].hide = true;
+                cuboidsData[key].show = false;
+                cuboidsData[key].visible = false;
             });
         },
         isActive: (action) => action === "hide",
@@ -142,6 +168,13 @@ export const ACTIONS = {
                 classesData[key].hide = false;
                 classesData[key].show = false;
                 classesData[key].visible = true;
+            });
+        },
+        cuboidFilter: (cuboidsData) => {
+            Object.keys(cuboidsData).forEach((key) => {
+                cuboidsData[key].hide = false;
+                cuboidsData[key].show = false;
+                cuboidsData[key].visible = true;
             });
         },
         isActive: () => false,

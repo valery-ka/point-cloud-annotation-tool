@@ -15,7 +15,7 @@ export {
     filterPoints,
     filterPointsBySelection,
     showFilterPointsBySelection,
-    updateClassFilter,
+    updateObjectsFilter,
 } from "./positions/filters";
 
 // points colors utils

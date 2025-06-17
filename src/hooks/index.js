@@ -58,7 +58,7 @@ export { useImageCanvasMouseEvents } from "./components/CameraImages/useImageCan
 
 export { useCuboidManager } from "./components/CuboidManager/useCuboidManager";
 export { useHoveredCuboid } from "./components/CuboidManager/useHoveredCuboid";
-export { useCuboidVisibility } from "./components/CuboidManager/useCuboidVisibility";
+export { useCuboidsVisibility } from "./components/CuboidManager/useCuboidsVisibility";
 export { useOrthographicView } from "./components/CuboidManager/useOrthographicView";
 export { useTransformControls } from "./components/CuboidManager/useTransformControls";
 export { useSideViewsControls } from "./components/CuboidManager/useSideViewsControls";

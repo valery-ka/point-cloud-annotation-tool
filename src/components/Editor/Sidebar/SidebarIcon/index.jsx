@@ -35,7 +35,7 @@ export const SidebarIcon = memo(
 
         const handleIsActive = useCallback(
             (data) => {
-                const handler = ACTIONS[data.action]?.isActive;
+                const handler = ACTIONS[data.action.filter]?.isActive;
                 if (handler) {
                     setIsActive(handler(action));
                 }
@@ -43,7 +43,7 @@ export const SidebarIcon = memo(
             [action],
         );
 
-        useSubscribeFunction("filterClass", handleIsActive, []);
+        useSubscribeFunction("filterObject", handleIsActive, []);
 
         const tooltipTitle =
             hotkey !== undefined

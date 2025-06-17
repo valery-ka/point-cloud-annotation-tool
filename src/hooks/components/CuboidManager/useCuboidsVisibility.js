@@ -5,11 +5,17 @@ import { useCuboidInterpolation, useSaveSolution } from "hooks";
 
 import { computeVisibilityFrameRange } from "utils/cuboids";
 
-export const useCuboidVisibility = () => {
+export const useCuboidsVisibility = () => {
     const { pcdFiles } = useFileManager();
-    const { activeFrameIndex } = useFrames();
+    const { activeFrameIndex, arePointCloudsLoading } = useFrames();
 
-    const { cuboidsSolutionRef, updateSingleCuboidRef, selectedCuboidGeometryRef } = useCuboids();
+    const {
+        cuboids,
+        cuboidsSolutionRef,
+        cuboidsVisibilityRef,
+        updateSingleCuboidRef,
+        selectedCuboidGeometryRef,
+    } = useCuboids();
     const { batchMode } = useBatch();
 
     const { findFrameMarkers } = useCuboidInterpolation();
@@ -58,4 +64,18 @@ export const useCuboidVisibility = () => {
             document.removeEventListener("keydown", handleKeyDown);
         };
     }, [pcdFiles, activeFrameIndex, batchMode, saveObjectsSolution]);
+
+    useEffect(() => {
+        if (arePointCloudsLoading || !pcdFiles.length || !cuboids.length) return;
+
+        cuboids.forEach(({ id }) => {
+            if (!(id in cuboidsVisibilityRef.current)) {
+                cuboidsVisibilityRef.current[id] = {
+                    hide: false,
+                    show: false,
+                    visible: true,
+                };
+            }
+        });
+    }, [arePointCloudsLoading, pcdFiles]);
 };
