@@ -151,9 +151,7 @@ export const removeCuboid = (scene, cuboid) => {
     arrow.cleanup();
 };
 
-export const getPointsInsideCuboid = (positions, position, quaternionObj, scale, visible) => {
-    if (!visible) return [];
-
+export const getPointsInsideCuboid = (positions, position, quaternionObj, scale) => {
     const quaternion = new Quaternion(
         quaternionObj.x,
         quaternionObj.y,

@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-import { useCuboids, useFrames, useFileManager, useBatch } from "contexts";
+import { useCuboids, useFrames, useFileManager, useBatch, useEditor } from "contexts";
 import { useCuboidInterpolation, useSaveSolution } from "hooks";
 
 import { computeVisibilityFrameRange } from "utils/cuboids";
@@ -8,14 +8,10 @@ import { computeVisibilityFrameRange } from "utils/cuboids";
 export const useCuboidsVisibility = () => {
     const { pcdFiles } = useFileManager();
     const { activeFrameIndex, arePointCloudsLoading } = useFrames();
+    const { cloudPointsColorNeedsUpdateRef } = useEditor();
 
-    const {
-        cuboids,
-        cuboidsSolutionRef,
-        cuboidsVisibilityRef,
-        updateSingleCuboidRef,
-        selectedCuboidGeometryRef,
-    } = useCuboids();
+    const { cuboids, cuboidsSolutionRef, cuboidsVisibilityRef, selectedCuboidGeometryRef } =
+        useCuboids();
     const { batchMode } = useBatch();
 
     const { findFrameMarkers } = useCuboidInterpolation();
@@ -50,7 +46,7 @@ export const useCuboidsVisibility = () => {
             findFrameMarkers();
             saveObjectsSolution({ updateStack: true, isAutoSave: false, id: id });
 
-            updateSingleCuboidRef.current.needsUpdate = true;
+            cloudPointsColorNeedsUpdateRef.current = true;
         };
 
         const handleKeyDown = (e) => {
@@ -66,7 +62,15 @@ export const useCuboidsVisibility = () => {
     }, [pcdFiles, activeFrameIndex, batchMode, saveObjectsSolution]);
 
     useEffect(() => {
-        if (arePointCloudsLoading || !pcdFiles.length || !cuboids.length) return;
+        if (arePointCloudsLoading || !pcdFiles.length) return;
+
+        const currentCuboidIds = new Set(cuboids.map(({ id }) => id));
+
+        Object.keys(cuboidsVisibilityRef.current).forEach((id) => {
+            if (!currentCuboidIds.has(id)) {
+                delete cuboidsVisibilityRef.current[id];
+            }
+        });
 
         cuboids.forEach(({ id }) => {
             if (!(id in cuboidsVisibilityRef.current)) {
@@ -77,5 +81,5 @@ export const useCuboidsVisibility = () => {
                 };
             }
         });
-    }, [arePointCloudsLoading, pcdFiles]);
+    }, [arePointCloudsLoading, cuboids, pcdFiles]);
 };

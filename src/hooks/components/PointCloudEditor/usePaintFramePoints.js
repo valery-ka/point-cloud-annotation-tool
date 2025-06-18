@@ -36,7 +36,8 @@ export const usePaintFramePoints = (updateGlobalBox) => {
         cloudPointsColorNeedsUpdateRef,
     } = useEditor();
 
-    const { cuboidIdToLabelRef, pointsInsideCuboidsRef } = useCuboids();
+    const { cuboidIdToLabelRef, pointsInsideCuboidsRef, cuboidsSolutionRef, cuboidsVisibilityRef } =
+        useCuboids();
     const { batchMode, currentFrame } = useBatch();
 
     const { imagePointsColorNeedsUpdateRef, imagePointsAlphaNeedsUpdateRef } = useImages();
@@ -92,20 +93,27 @@ export const usePaintFramePoints = (updateGlobalBox) => {
 
             const originalClassIndex = nonHiddenClasses[selectedClassIndex].originalIndex;
             const classVisible = classesVisibilityRef.current[originalClassIndex].visible;
+
+            const cuboidsSolution = cuboidsSolutionRef.current[activeFrameIndex];
+            const cuboidsVisibility = cuboidsVisibilityRef.current;
             const idToLabel = cuboidIdToLabelRef.current;
 
             changeClassOfSelection({
                 cloudData: {
                     cloud: activeFrameCloud,
                     labels: activeFrameLabels,
-                    cuboids: activeFrameCuboidsPoints,
-                    idToLabel: idToLabel,
                 },
                 colorData: {
                     pointColor: pointColorRef.current,
                     selectedClassColor: selectedClassColor.current,
                     originalClassIndex: originalClassIndex,
                     objectColorsCache: objectColorsCache.current,
+                },
+                cuboidData: {
+                    idToLabel: idToLabel,
+                    cuboidsPoints: activeFrameCuboidsPoints,
+                    cuboidsSolution: cuboidsSolution,
+                    cuboidsVisibility: cuboidsVisibility,
                 },
                 selectionData: {
                     selectionMode: mode,
@@ -137,8 +145,10 @@ export const usePaintFramePoints = (updateGlobalBox) => {
 
             const activeFrameCloud = pointCloudRefs.current[activeFrameFilePath];
             const activeFrameLabels = pointLabelsRef.current[activeFrameFilePath];
-            const activeFrameCuboidsPoints = pointsInsideCuboidsRef.current[activeFrameFilePath];
 
+            const cuboidsVisibility = cuboidsVisibilityRef.current;
+            const activeFrameCuboidsPoints = pointsInsideCuboidsRef.current[activeFrameFilePath];
+            const cuboidsSolution = cuboidsSolutionRef.current[frameIndex];
             const idToLabel = cuboidIdToLabelRef.current;
 
             if (activeFrameCloud?.geometry?.attributes?.color) {
@@ -146,15 +156,17 @@ export const usePaintFramePoints = (updateGlobalBox) => {
                     cloudData: {
                         cloud: activeFrameCloud,
                         labels: activeFrameLabels,
-                        cuboids: activeFrameCuboidsPoints,
                     },
                     colorData: {
                         classColorsCache: classColorsCache.current,
                         objectColorsCache: objectColorsCache.current,
                         pointColor: pointColorRef.current,
                     },
-                    misc: {
+                    cuboidData: {
                         idToLabel: idToLabel,
+                        cuboidsPoints: activeFrameCuboidsPoints,
+                        cuboidsSolution: cuboidsSolution,
+                        cuboidsVisibility: cuboidsVisibility,
                     },
                 });
 

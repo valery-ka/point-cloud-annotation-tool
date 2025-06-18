@@ -188,11 +188,20 @@ export const SideViewSVG = memo(
         }, [project, hoveredHandler, corners, height]);
 
         useEffect(() => {
-            const delay = 50;
-            setTimeout(() => {
+            const resetView = () => {
                 setHoveredView(null);
                 setHoveredHandler(null);
+            };
+
+            const delay = 50;
+            const timer = setTimeout(() => {
+                resetView();
             }, delay);
+
+            return () => {
+                clearTimeout(timer);
+                resetView();
+            };
         }, [selectedCuboid, batchMode]);
 
         if (!mesh || !camera || width <= 0 || height <= 0) return null;

@@ -137,6 +137,9 @@ export const updateObjectsFilter = (unit, action, index, classesData, cuboidsDat
     cuboidList.forEach((cuboidObj) => {
         if (inShowMode) {
             cuboidObj.visible = showCuboids.includes(cuboidObj);
+            if (!showClasses.length) {
+                classesData[Object.keys(classesData)[0]].visible = true;
+            }
         } else {
             cuboidObj.visible = !cuboidObj.hide;
         }

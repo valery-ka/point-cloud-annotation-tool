@@ -15,6 +15,7 @@ export const useCuboidInterpolation = () => {
         selectedCuboidGeometryRef,
         setFrameMarkers,
         cuboidEditingFrameRef,
+        cuboidsVisibilityRef,
     } = useCuboids();
 
     const {
@@ -86,6 +87,7 @@ export const useCuboidInterpolation = () => {
 
             const frameIndex = frame ?? activeFrameIndex;
             const frameSolution = cuboidsSolutionRef.current[frameIndex] ?? [];
+            const cuboidsVisibility = cuboidsVisibilityRef.current;
 
             const solutionMap = {};
             for (const cuboid of frameSolution) {
@@ -100,12 +102,13 @@ export const useCuboidInterpolation = () => {
                 if (!cuboidData || !cuboidData.psr) return;
 
                 const { position, rotation, scale } = cuboidData.psr;
+                const globalVisible = cuboidsVisibility[id].visible;
 
                 cube.position.set(position.x, position.y, position.z);
                 cube.scale.set(scale.x, scale.y, scale.z);
                 cube.rotation.set(rotation.x, rotation.y, rotation.z);
 
-                cube.visible = cuboidData.visible !== false;
+                cube.visible = (cuboidData.visible && globalVisible) === true;
             });
 
             sideViewsCamerasNeedUpdateRef.current = true;

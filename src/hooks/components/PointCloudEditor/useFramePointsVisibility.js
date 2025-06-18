@@ -1,7 +1,7 @@
 import { useEffect, useCallback } from "react";
 
 import { useFileManager, useEditor, useFrames, useConfig, useImages, useCuboids } from "contexts";
-import { useSubscribeFunction } from "hooks";
+import { useSubscribeFunction, useCuboidInterpolation } from "hooks";
 
 import {
     filterPoints,
@@ -23,10 +23,13 @@ export const useFramePointsVisibility = (updateGlobalBox) => {
         pointLabelsRef,
         minMaxZRef,
         setHasFilterSelectionPoint,
+        cloudPointsColorNeedsUpdateRef,
     } = useEditor();
     const { cuboidsVisibilityRef } = useCuboids();
 
     const { imagePointsAlphaNeedsUpdateRef } = useImages();
+
+    const { updateCuboidPSR } = useCuboidInterpolation();
 
     const filterFramePoints = useCallback(
         (frame) => {
@@ -175,9 +178,12 @@ export const useFramePointsVisibility = (updateGlobalBox) => {
 
                 updateObjectsFilter(unit, action, index, classesData, cuboidsData);
             }
+            updateCuboidPSR();
             filterFramePoints();
+
+            cloudPointsColorNeedsUpdateRef.current = true;
         },
-        [filterFramePoints],
+        [filterFramePoints, updateCuboidPSR],
     );
 
     useSubscribeFunction("filterObject", updateObjectsVisibility, []);

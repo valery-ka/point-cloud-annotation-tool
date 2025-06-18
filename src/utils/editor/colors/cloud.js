@@ -47,6 +47,7 @@ export const getCuboidPointColor = (defaultColor, cuboidColor, mixFactor) => {
 export const changeClassOfSelection = ({
     cloudData,
     colorData,
+    cuboidData,
     selectionData,
     visibilityData,
     callbacks,
@@ -64,6 +65,7 @@ export const changeClassOfSelection = ({
         cloudData: cloudData,
         selectionData: { selectedPoints: selectedPoints },
         colorData: colorData,
+        cuboidData: cuboidData,
         callbacks: { updateGlobalBox, getDefaultPointColor, getCuboidPointColor },
     });
 
@@ -123,7 +125,7 @@ const updateLabelsColors = (
 
 const updateCuboidsColors = (
     cuboids,
-    idToLabel,
+    cuboidsPoints,
     objectColorsCache,
     labels,
     colorArray,
@@ -131,13 +133,19 @@ const updateCuboidsColors = (
     brightnessFactor,
     intensityFactor,
     mixFactor,
+    cuboidsSolution,
+    cuboidsVisibility,
 ) => {
     for (const cuboidId in cuboids) {
         const indices = cuboids[cuboidId];
-        const labelName = idToLabel[cuboidId];
+        const labelName = cuboidsPoints[cuboidId];
         const rgb = objectColorsCache[labelName];
 
         if (!rgb) continue;
+
+        const frameVisible = cuboidsSolution.find((cube) => cube.id === cuboidId)?.visible;
+        const globalVisible = cuboidsVisibility[cuboidId]?.visible ?? true;
+        const isVisible = (frameVisible && globalVisible) === true;
 
         for (let k = 0; k < indices.length; k++) {
             const pointIndex = indices[k];
@@ -154,17 +162,17 @@ const updateCuboidsColors = (
 
             const [r, g, b] = getCuboidPointColor(defaultColor, rgb, mixFactor);
 
-            colorArray[i] = r;
-            colorArray[i + 1] = g;
-            colorArray[i + 2] = b;
+            colorArray[i] = isVisible ? r : defaultColor;
+            colorArray[i + 1] = isVisible ? g : defaultColor;
+            colorArray[i + 2] = isVisible ? b : defaultColor;
         }
     }
 };
 
-export const updatePointCloudColors = ({ cloudData, colorData, misc }) => {
-    const { cloud, labels, cuboids } = cloudData;
+export const updatePointCloudColors = ({ cloudData, colorData, cuboidData }) => {
+    const { cloud, labels } = cloudData;
     const { classColorsCache, objectColorsCache, pointColor } = colorData;
-    const { idToLabel } = misc;
+    const { idToLabel, cuboidsPoints, cuboidsSolution, cuboidsVisibility } = cuboidData;
 
     const geometry = cloud.geometry;
     const colorAttribute = geometry.attributes.color;
@@ -188,7 +196,7 @@ export const updatePointCloudColors = ({ cloudData, colorData, misc }) => {
     );
 
     updateCuboidsColors(
-        cuboids,
+        cuboidsPoints,
         idToLabel,
         objectColorsCache,
         labels,
@@ -197,6 +205,8 @@ export const updatePointCloudColors = ({ cloudData, colorData, misc }) => {
         brightnessFactor,
         intensityFactor,
         cuboidMixFactor,
+        cuboidsSolution,
+        cuboidsVisibility,
     );
 
     invalidateCloudColor(geometry);

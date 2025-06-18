@@ -1,14 +1,14 @@
 import { useCallback } from "react";
 
-import { useBatch, useCuboids, useFrames } from "contexts";
+import { useBatch, useCuboids, useFrames, useEditor } from "contexts";
 import { useCuboidInterpolation, useSaveSolution } from "hooks";
 
 export const useBatchEditorEvents = () => {
     const { setActiveFrameIndex } = useFrames();
+    const { cloudPointsColorNeedsUpdateRef } = useEditor();
 
     const { selectedCuboidGeometryRef, cuboidsSolutionRef } = useCuboids();
-    const { selectedCuboidBatchGeometriesRef, batchMode, setBatchMode, updateBatchCuboidRef } =
-        useBatch();
+    const { selectedCuboidBatchGeometriesRef, batchMode, setBatchMode } = useBatch();
 
     const { saveObjectsSolution } = useSaveSolution();
     const { saveCurrentPSRBatch, interpolatePSRBatch, updateCuboidPSRBatch, findFrameMarkers } =
@@ -32,7 +32,7 @@ export const useBatchEditorEvents = () => {
                 findFrameMarkers();
                 interpolatePSRBatch();
                 updateCuboidPSRBatch();
-                updateBatchCuboidRef.current = true;
+                cloudPointsColorNeedsUpdateRef.current = true;
             }
         },
         [batchMode, interpolatePSRBatch],
@@ -52,7 +52,7 @@ export const useBatchEditorEvents = () => {
             findFrameMarkers();
             saveObjectsSolution({ updateStack: false, isAutoSave: false });
 
-            updateBatchCuboidRef.current = true;
+            cloudPointsColorNeedsUpdateRef.current = true;
         },
         [saveObjectsSolution],
     );
