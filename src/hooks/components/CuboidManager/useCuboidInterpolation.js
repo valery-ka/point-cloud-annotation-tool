@@ -28,14 +28,14 @@ export const useCuboidInterpolation = () => {
     const { saveObjectsSolution } = useSaveSolution();
 
     const requestSave = useCallback(
-        (updateStack = true, id = null) => {
+        ({ updateStack = true, id = null }) => {
             saveObjectsSolution({ updateStack: updateStack, isAutoSave: false, id: id });
         },
         [saveObjectsSolution],
     );
 
     const interpolatePSR = useCallback(
-        (updateStack = true, cuboidId = null) => {
+        ({ updateStack = true, cuboidId = null } = {}) => {
             const selectedCuboid = selectedCuboidGeometryRef.current;
             const id = cuboidId ?? selectedCuboid?.name;
 
@@ -48,13 +48,13 @@ export const useCuboidInterpolation = () => {
                 selectedId: id,
             });
 
-            requestSave(updateStack, id);
+            requestSave({ updateStack, id });
         },
         [requestSave, pcdFiles],
     );
 
     const interpolatePSRBatch = useCallback(
-        (updateStack = false) => {
+        ({ updateStack = true } = {}) => {
             const geometries = selectedCuboidBatchGeometriesRef.current;
             if (!geometries) return;
 
@@ -73,14 +73,14 @@ export const useCuboidInterpolation = () => {
 
             const id = geometries[0].name;
 
-            requestSave(updateStack, id);
+            requestSave({ updateStack, id });
             batchViewsCamerasNeedUpdateRef.current = true;
         },
         [requestSave, pcdFiles],
     );
 
     const updateCuboidPSR = useCallback(
-        (frame) => {
+        ({ frame = null } = {}) => {
             if (batchMode) return;
 
             const geometries = cuboidsGeometriesRef.current;
@@ -143,16 +143,17 @@ export const useCuboidInterpolation = () => {
         batchViewsCamerasNeedUpdateRef.current = true;
     }, []);
 
-    const saveCurrentPSR = useCallback(({ manual = true, activeFrameIndex }) => {
+    const saveCurrentPSR = useCallback(({ manual = true, frame, cuboidId = null }) => {
         const selectedCuboid = selectedCuboidGeometryRef.current;
-        if (!selectedCuboid?.name) return;
+        const id = cuboidId ?? selectedCuboid?.name;
+
+        if (!id) return;
 
         const geometries = cuboidsGeometriesRef.current;
-        const id = selectedCuboid.name;
         const solution = cuboidsSolutionRef.current;
 
-        solution[activeFrameIndex] = solution[activeFrameIndex] || [];
-        cuboidEditingFrameRef.current = activeFrameIndex;
+        solution[frame] = solution[frame] || [];
+        cuboidEditingFrameRef.current = frame;
 
         Object.values(geometries).forEach((entry) => {
             const cube = entry.cube?.mesh;
@@ -160,7 +161,7 @@ export const useCuboidInterpolation = () => {
 
             writePSRToSolution({
                 mesh: cube,
-                frameIndices: [activeFrameIndex],
+                frameIndices: [frame],
                 cuboidsSolutionRef,
                 manual: manual,
             });

@@ -56,10 +56,10 @@ export const useUndoRedo = (requestSaveLabels, onUndoRedo) => {
 
             cuboidsSolutionRef.current[activeFrameIndex] = lastState.objects;
 
-            updateCuboidPSR(activeFrameIndex);
-            saveCurrentPSR({ activeFrameIndex: activeFrameIndex });
+            updateCuboidPSR({ frame: activeFrameIndex });
+            saveCurrentPSR({ frame: activeFrameIndex, cuboidId: lastState.id });
             findFrameMarkers();
-            interpolatePSR(false, lastState.id);
+            interpolatePSR({ updateStack: false, cuboidId: lastState.id });
 
             updateSingleCuboidRef.current = { needsUpdate: true, id: lastState.id };
         }
@@ -101,10 +101,10 @@ export const useUndoRedo = (requestSaveLabels, onUndoRedo) => {
 
             cuboidsSolutionRef.current[activeFrameIndex] = nextState.objects;
 
-            updateCuboidPSR(activeFrameIndex);
-            saveCurrentPSR({ activeFrameIndex: activeFrameIndex });
+            updateCuboidPSR({ frame: activeFrameIndex });
+            saveCurrentPSR({ frame: activeFrameIndex, cuboidId: nextState.id });
             findFrameMarkers();
-            interpolatePSR(false, nextState.id);
+            interpolatePSR({ updateStack: false, cuboidId: nextState.id });
 
             updateSingleCuboidRef.current = { needsUpdate: true, id: nextState.id };
         }

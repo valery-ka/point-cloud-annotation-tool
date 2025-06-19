@@ -24,7 +24,7 @@ export const useTransformControls = () => {
         useCuboidInterpolation();
 
     const debouncedInterpolatePSRSingle = useDebouncedCallback(() => {
-        saveCurrentPSR({ activeFrameIndex: activeFrameIndex });
+        saveCurrentPSR({ frame: activeFrameIndex });
         findFrameMarkers();
         interpolatePSR();
         updateSingleCuboidRef.current.needsUpdate = true;

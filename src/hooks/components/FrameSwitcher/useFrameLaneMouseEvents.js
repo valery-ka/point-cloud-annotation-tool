@@ -70,7 +70,7 @@ export const useFrameLaneMouseEvents = (frameLaneRef) => {
     const removeKeyFrame = useCallback(
         (event, frame) => {
             if (event.button === 2) {
-                saveCurrentPSR({ manual: false, activeFrameIndex: frame });
+                saveCurrentPSR({ manual: false, frame: frame });
                 interpolatePSR();
                 findFrameMarkers();
                 updateCuboidPSR();

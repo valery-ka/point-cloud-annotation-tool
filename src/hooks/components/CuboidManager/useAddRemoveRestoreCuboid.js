@@ -24,6 +24,8 @@ export const useAddRemoveRestoreCuboid = () => {
         setDeletedObjects,
         selectedCuboidInfoRef,
         updateSingleCuboidRef,
+        cuboidIdToLabelRef,
+        prevCuboidsRef,
     } = useCuboids();
 
     const { saveObjectsSolution } = useSaveSolution();
@@ -31,6 +33,7 @@ export const useAddRemoveRestoreCuboid = () => {
     const resetUndoRedoStacks = useCallback(() => {
         undoStackRef.current = {};
         redoStackRef.current = {};
+        prevCuboidsRef.current = structuredClone(cuboidsSolutionRef.current);
         publish("updateUndoRedoState");
     }, [publish]);
 
@@ -244,9 +247,14 @@ export const useAddRemoveRestoreCuboid = () => {
                 }
             };
 
+            const removeFromLabelMap = () => {
+                delete cuboidIdToLabelRef.current[cuboidId];
+            };
+
             removeFromScene();
             removeFromSolutions();
             removeFromPointMap();
+            removeFromLabelMap();
 
             deletedObjects.push(removed);
             setDeletedObjects(getDeletedItemsList());

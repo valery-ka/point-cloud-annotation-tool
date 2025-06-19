@@ -8,7 +8,13 @@ export const useBatchEditorEvents = () => {
     const { cloudPointsColorNeedsUpdateRef } = useEditor();
 
     const { selectedCuboidGeometryRef, cuboidsSolutionRef } = useCuboids();
-    const { selectedCuboidBatchGeometriesRef, batchMode, setBatchMode } = useBatch();
+    const {
+        updateBatchCuboidRef,
+        selectedCuboidBatchGeometriesRef,
+        batchMode,
+        setBatchMode,
+        batchEditingFrameRef,
+    } = useBatch();
 
     const { saveObjectsSolution } = useSaveSolution();
     const { saveCurrentPSRBatch, interpolatePSRBatch, updateCuboidPSRBatch, findFrameMarkers } =
@@ -28,11 +34,13 @@ export const useBatchEditorEvents = () => {
     const removeBatchKeyFrame = useCallback(
         ({ hoveredView, mesh }) => {
             if (batchMode && hoveredView && mesh) {
-                saveCurrentPSRBatch({ keyFrameToRemove: mesh.userData.frame });
+                const frame = mesh.userData.frame;
+                batchEditingFrameRef.current = frame;
+                saveCurrentPSRBatch({ keyFrameToRemove: frame });
                 findFrameMarkers();
                 interpolatePSRBatch();
                 updateCuboidPSRBatch();
-                cloudPointsColorNeedsUpdateRef.current = true;
+                updateBatchCuboidRef.current = true;
             }
         },
         [batchMode, interpolatePSRBatch],

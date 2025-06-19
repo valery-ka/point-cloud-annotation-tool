@@ -41,8 +41,8 @@ export const CuboidsProvider = ({ children }) => {
     const sideViewCameraZoomsRef = useRef(DEFAULT_ZOOM);
     const sideViewsCamerasNeedUpdateRef = useRef(true);
 
-    const cuboidsSolutionRef = useRef({});
-    const prevCuboidsRef = useRef({});
+    const cuboidsSolutionRef = useRef([]);
+    const prevCuboidsRef = useRef([]);
     const cuboidEditingFrameRef = useRef(null);
 
     const cuboidsVisibilityRef = useRef({});
