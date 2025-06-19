@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 
 import { useCuboids, useEditor, useFrames, useConfig, useFileManager, useEvent } from "contexts";
-import { useSaveSolution } from "hooks";
+import { useSaveSolution, useSubscribeFunction } from "hooks";
 
 import { addCuboid, updateCuboid, removeCuboid, writePSRToSolution } from "utils/cuboids";
 import { getNextId } from "utils/shared";
@@ -267,6 +267,8 @@ export const useAddRemoveRestoreCuboid = () => {
         },
         [saveObjectsSolution, resetUndoRedoStacks],
     );
+
+    useSubscribeFunction("removeObject", removeObject, []);
 
     return { addNewObject, updateExistingObject, addRemovedObject, restoreObject, removeObject };
 };

@@ -29,6 +29,8 @@ export const CuboidsProvider = ({ children }) => {
     const selectedCuboidGeometryRef = useRef(null);
     const selectedCuboidInfoRef = useRef(DEFAULT_INFO_CARD);
 
+    const copiedPSRRef = useRef([]);
+
     const [cuboids, setCuboids] = useState([]);
     const [selectedCuboid, setSelectedCuboid] = useState(null);
     const [frameMarkers, setFrameMarkers] = useState([[], []]); // [0] - keyframes, [1] - visibility
@@ -82,6 +84,7 @@ export const CuboidsProvider = ({ children }) => {
                 deletedObjects,
                 setDeletedObjects,
                 cuboidsVisibilityRef,
+                copiedPSRRef,
             }}
         >
             {children}

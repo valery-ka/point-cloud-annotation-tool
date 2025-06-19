@@ -39,3 +39,5 @@ export {
     interpolateBetweenFrames,
     computeVisibilityFrameRange,
 } from "./interpolation";
+
+export { computeRelativePSRs, applyRelativePSRsToTarget } from "./shifting";

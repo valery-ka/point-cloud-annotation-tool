@@ -10,6 +10,7 @@ import {
     useCuboidsVisibility,
     useUpdateCuboidInfoCard,
     usePointsInsideCuboids,
+    useWorldShifting,
 } from "hooks";
 
 import { TABS } from "constants";
@@ -90,4 +91,6 @@ export const useCuboidManager = (handlers) => {
 
     useUpdateCuboidInfoCard(handlers);
     usePointsInsideCuboids();
+
+    useWorldShifting();
 };

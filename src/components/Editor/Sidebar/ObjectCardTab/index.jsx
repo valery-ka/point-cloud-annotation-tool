@@ -7,10 +7,12 @@ import {
     faRefresh,
     faAngleDoubleLeft,
     faAngleDoubleRight,
+    faCopy,
+    faPaste,
 } from "@fortawesome/free-solid-svg-icons";
 
 import { useEvent, useCuboids, useConfig, useEditor } from "contexts";
-import { useSubscribeFunction, useContinuousAction, useAddRemoveRestoreCuboid } from "hooks";
+import { useSubscribeFunction, useContinuousAction } from "hooks";
 
 import { SidebarIcon } from "../SidebarIcon";
 import { ObjectCardInfoBlock } from "./ObjectCardInfoBlock";
@@ -44,7 +46,6 @@ export const ObjectCardTab = memo(() => {
     const { objects } = config;
 
     const { startContinuousAction } = useContinuousAction({ delay: 100 });
-    const { removeObject } = useAddRemoveRestoreCuboid();
 
     const { isPrevButtonActive, isNextButtonActive } = useMemo(() => {
         if (!selectedCuboid?.id || cuboids.length === 0) {
@@ -70,8 +71,6 @@ export const ObjectCardTab = memo(() => {
         isCuboidTransformingRef.current = true;
         transformControlsRef.current.dispatchEvent({ type: "change" });
     }, []);
-
-    useSubscribeFunction("removeObject", removeObject, []);
 
     const prevCuboid = useCallback(() => {
         if (!selectedCuboid?.id) return;
@@ -195,6 +194,20 @@ export const ObjectCardTab = memo(() => {
             <div className="tab-header-container">
                 <h2 className="tab-header">ID: {selectedCuboid?.id}</h2>
                 <div className="tab-header-buttons">
+                    <SidebarIcon
+                        className="icon-style"
+                        size="20px"
+                        title={"Скопировать смещение"}
+                        icon={faCopy}
+                        action={"copyPsrId"}
+                    />
+                    <SidebarIcon
+                        className="icon-style"
+                        size="20px"
+                        title={"Применить смещение"}
+                        icon={faPaste}
+                        action={"applyPsr"}
+                    />
                     <SidebarIcon
                         className={`icon-style ${isPrevButtonActive ? "" : "disabled"}`}
                         size="20px"
