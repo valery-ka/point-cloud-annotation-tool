@@ -9,6 +9,7 @@ export const API_PATHS = {
         IMG: (folder, camera, file) => `${API_NAVIGATOR_BASE}/${folder}/images/${camera}/${file}`,
         CALIBRATIONS: (folder, camera) =>
             `${API_NAVIGATOR_BASE}/${folder}/calibrations/${camera}.json`,
+        ODOMETRY: (folder, file) => `${API_NAVIGATOR_BASE}/${folder}/odometry/${file}.json`,
         CONFIG: {
             JOB: (folder) => `${API_NAVIGATOR_BASE}/${folder}/config/job-config.json`,
             CLASSES: (folder) => `${API_NAVIGATOR_BASE}/${folder}/config/classes-config.json`,

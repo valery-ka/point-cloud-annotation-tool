@@ -29,7 +29,7 @@ export const CuboidsProvider = ({ children }) => {
     const selectedCuboidGeometryRef = useRef(null);
     const selectedCuboidInfoRef = useRef(DEFAULT_INFO_CARD);
 
-    const copiedPSRRef = useRef([]);
+    const copiedPSRRef = useRef(null);
 
     const [cuboids, setCuboids] = useState([]);
     const [selectedCuboid, setSelectedCuboid] = useState(null);

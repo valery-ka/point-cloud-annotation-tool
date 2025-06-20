@@ -12,6 +12,7 @@ import {
     CalibrationsProvider,
     CuboidsProvider,
     BatchProvider,
+    OdometryProvider,
 } from "contexts";
 
 const DataProviders = ({ children }) => (
@@ -31,7 +32,9 @@ const PointCloudProvider = ({ children }) => (
         <ToolsProvider>
             <HoveredPointProvider>
                 <CuboidsProvider>
-                    <BatchProvider>{children}</BatchProvider>
+                    <OdometryProvider>
+                        <BatchProvider>{children}</BatchProvider>
+                    </OdometryProvider>
                 </CuboidsProvider>
             </HoveredPointProvider>
         </ToolsProvider>

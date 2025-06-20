@@ -1,4 +1,4 @@
-import { memo, useCallback, useMemo } from "react";
+import { memo, useCallback, useMemo, useEffect } from "react";
 import {
     faClose,
     faTrash,
@@ -6,14 +6,17 @@ import {
     faAngleDoubleRight,
     faTruck,
     faTrailer,
+    faMagic,
+    faCheck,
 } from "@fortawesome/free-solid-svg-icons";
 
-import { useEvent, useCuboids } from "contexts";
+import { useEvent, useCuboids, useOdometry, useFrames } from "contexts";
 import { useSubscribeFunction } from "hooks";
 
 import { SidebarIcon } from "../../SidebarIcon";
 
 import { getCuboidMeshPositionById } from "utils/cuboids";
+import { isEmpty } from "lodash";
 
 // const COMPONENT_NAME = "ObjectCardButtons.";
 const COMPONENT_NAME = "";
@@ -21,7 +24,11 @@ const OBJECTS_TAB_INDEX = 0;
 
 export const ObjectCardButtons = memo(() => {
     const { publish } = useEvent();
-    const { cuboids, selectedCuboid, setSelectedCuboid, cuboidsGeometriesRef } = useCuboids();
+
+    const { activeFrameIndex } = useFrames();
+    const { odometry } = useOdometry();
+    const { cuboids, selectedCuboid, setSelectedCuboid, cuboidsGeometriesRef, copiedPSRRef } =
+        useCuboids();
 
     const { isPrevButtonActive, isNextButtonActive } = useMemo(() => {
         if (!selectedCuboid?.id || cuboids.length === 0) {
@@ -36,6 +43,27 @@ export const ObjectCardButtons = memo(() => {
             isNextButtonActive: index >= 0 && index < sorted.length - 1,
         };
     }, [selectedCuboid?.id, cuboids]);
+
+    const hasOdometry = useMemo(() => {
+        return !isEmpty(odometry);
+    }, [odometry]);
+
+    const isPsrCopied = copiedPSRRef.current?.id === selectedCuboid?.id;
+    const isOdometryCopied = copiedPSRRef.current?.frame === activeFrameIndex;
+    const isApplyPsrActive = copiedPSRRef.current;
+
+    const getTransformInfo = () => {
+        const transformAction = copiedPSRRef.current;
+
+        switch (transformAction?.source) {
+            case "psr":
+                return `по ID: ${transformAction.id}`;
+            case "odometry":
+                return `по кадру: ${transformAction.frame}`;
+            default:
+                break;
+        }
+    };
 
     const prevCuboid = useCallback(() => {
         if (!selectedCuboid?.id) return;
@@ -72,17 +100,24 @@ export const ObjectCardButtons = memo(() => {
     return (
         <div className="tab-header-buttons">
             <SidebarIcon
-                className="icon-style"
+                className={`icon-style ${hasOdometry && !isOdometryCopied ? "" : "disabled"}`}
                 size="20px"
-                title={"Применить смещение"}
-                icon={faTrailer}
-                action={"applyPsr"}
+                title={"Зафиксировать кадр одометрии"}
+                icon={isOdometryCopied ? faCheck : faMagic}
+                action={"copyOdometryFrame"}
             />
             <SidebarIcon
-                className="icon-style"
+                className={`icon-style ${isApplyPsrActive ? "" : "disabled"}`}
                 size="20px"
-                title={"Скопировать смещение"}
-                icon={faTruck}
+                title={`Применить смещение ${getTransformInfo()}`}
+                icon={faTrailer}
+                action={"applyTransform"}
+            />
+            <SidebarIcon
+                className={`icon-style ${isPsrCopied ? "disabled" : ""}`}
+                size="20px"
+                title={"Скопировать смещение объекта"}
+                icon={isPsrCopied ? faCheck : faTruck}
                 action={"copyPsrId"}
             />
             <SidebarIcon

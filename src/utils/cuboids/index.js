@@ -40,4 +40,9 @@ export {
     computeVisibilityFrameRange,
 } from "./interpolation";
 
-export { computeRelativePSRs, applyRelativePSRsToTarget } from "./shifting";
+export {
+    computeRelativeMatrix,
+    applyRelativeMatrix,
+    computeOdometryTransform,
+    applyOdometryTransform,
+} from "./shifting";
