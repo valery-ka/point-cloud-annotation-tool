@@ -24,7 +24,7 @@ export const useHoveredCuboid = ({ meshMap }) => {
 
             raycasterRef.current.setFromCamera(mouseRef.current, camera);
 
-            const meshes = Object.values(meshMap()).filter((obj) => obj.isMesh);
+            const meshes = Object.values(meshMap()).filter((obj) => obj.isMesh && obj.visible);
             return raycasterRef.current.intersectObjects(meshes);
         },
         [camera, gl.domElement],
@@ -40,11 +40,7 @@ export const useHoveredCuboid = ({ meshMap }) => {
             const intersects = getIntersects(event);
             const object = intersects[0]?.object;
 
-            if (object && object.visible) {
-                setHoveredCuboid(object.name);
-            } else {
-                setHoveredCuboid(null);
-            }
+            setHoveredCuboid(object ? object.name : null);
         }
     }, []);
 

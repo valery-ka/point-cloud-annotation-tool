@@ -112,6 +112,7 @@ export const useAddRemoveRestoreCuboid = () => {
             setCuboids((prev) =>
                 prev.map((cuboid) => (cuboid.id === id ? { ...cuboid, label, color } : cuboid)),
             );
+            setSelectedCuboid({ id, label, color });
 
             updateSingleCuboidRef.current = { needsUpdate: true, id: id };
             saveObjectsSolution({ updateStack: false, isAutoSave: false });

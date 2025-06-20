@@ -35,7 +35,7 @@ export const useRaycastClickSelect = ({ getMeshMap, onSelect, groupKey }) => {
 
             raycasterRef.current.setFromCamera(mouseRef.current, camera);
 
-            const meshes = Object.values(getMeshMap()).filter((obj) => obj.isMesh);
+            const meshes = Object.values(getMeshMap()).filter((obj) => obj.isMesh && obj.visible);
             return raycasterRef.current.intersectObjects(meshes);
         },
         [camera, gl.domElement],

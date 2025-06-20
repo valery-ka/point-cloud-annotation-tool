@@ -1,23 +1,12 @@
-import { memo, useEffect, useCallback, useMemo } from "react";
-import {
-    faClose,
-    faTrash,
-    faPlus,
-    faMinus,
-    faRefresh,
-    faAngleDoubleLeft,
-    faAngleDoubleRight,
-    faCopy,
-    faPaste,
-} from "@fortawesome/free-solid-svg-icons";
+import { memo, useEffect, useCallback } from "react";
+import { faPlus, faMinus, faRefresh } from "@fortawesome/free-solid-svg-icons";
 
 import { useEvent, useCuboids, useConfig, useEditor } from "contexts";
-import { useSubscribeFunction, useContinuousAction } from "hooks";
+import { useContinuousAction } from "hooks";
 
-import { SidebarIcon } from "../SidebarIcon";
 import { ObjectCardInfoBlock } from "./ObjectCardInfoBlock";
+import { ObjectCardButtons } from "./ObjectCardButtons";
 
-import { getCuboidMeshPositionById } from "utils/cuboids";
 import { TABS } from "constants";
 import {
     POSITION_HANDLERS,
@@ -34,32 +23,15 @@ export const ObjectCardTab = memo(() => {
     const { publish } = useEvent();
     const { transformControlsRef } = useEditor();
     const {
-        cuboids,
         selectedCuboid,
-        setSelectedCuboid,
         selectedCuboidGeometryRef,
         isCuboidTransformingRef,
         selectedCuboidInfoRef,
-        cuboidsGeometriesRef,
     } = useCuboids();
     const { config } = useConfig();
     const { objects } = config;
 
     const { startContinuousAction } = useContinuousAction({ delay: 100 });
-
-    const { isPrevButtonActive, isNextButtonActive } = useMemo(() => {
-        if (!selectedCuboid?.id || cuboids.length === 0) {
-            return { isPrevButtonActive: false, isNextButtonActive: false };
-        }
-
-        const sorted = [...cuboids].sort((a, b) => Number(a.id) - Number(b.id));
-        const index = sorted.findIndex((c) => c.id === selectedCuboid.id);
-
-        return {
-            isPrevButtonActive: index > 0,
-            isNextButtonActive: index >= 0 && index < sorted.length - 1,
-        };
-    }, [selectedCuboid?.id, cuboids]);
 
     useEffect(() => {
         selectedCuboid
@@ -71,38 +43,6 @@ export const ObjectCardTab = memo(() => {
         isCuboidTransformingRef.current = true;
         transformControlsRef.current.dispatchEvent({ type: "change" });
     }, []);
-
-    const prevCuboid = useCallback(() => {
-        if (!selectedCuboid?.id) return;
-
-        const sorted = [...cuboids].sort((a, b) => Number(a.id) - Number(b.id));
-        const index = sorted.findIndex((c) => c.id === selectedCuboid.id);
-
-        if (index > 0) {
-            const prevCuboid = sorted[index - 1];
-            const target = getCuboidMeshPositionById(cuboidsGeometriesRef, prevCuboid.id);
-            publish("switchCameraToPoint", target);
-            setSelectedCuboid(prevCuboid);
-        }
-    }, [selectedCuboid?.id, cuboids]);
-
-    useSubscribeFunction("prevCuboid", prevCuboid, []);
-
-    const nextCuboid = useCallback(() => {
-        if (!selectedCuboid?.id) return;
-
-        const sorted = [...cuboids].sort((a, b) => Number(a.id) - Number(b.id));
-        const index = sorted.findIndex((c) => c.id === selectedCuboid.id);
-
-        if (index !== -1 && index < sorted.length - 1) {
-            const nextCuboid = sorted[index + 1];
-            const target = getCuboidMeshPositionById(cuboidsGeometriesRef, nextCuboid.id);
-            publish("switchCameraToPoint", target);
-            setSelectedCuboid(nextCuboid);
-        }
-    }, [selectedCuboid?.id, cuboids]);
-
-    useSubscribeFunction("nextCuboid", nextCuboid, []);
 
     const handleAction = useCallback(
         (type, op) => (data) => {
@@ -193,53 +133,7 @@ export const ObjectCardTab = memo(() => {
         <div className="sidebar-tab-panel">
             <div className="tab-header-container">
                 <h2 className="tab-header">ID: {selectedCuboid?.id}</h2>
-                <div className="tab-header-buttons">
-                    <SidebarIcon
-                        className="icon-style"
-                        size="20px"
-                        title={"Скопировать смещение"}
-                        icon={faCopy}
-                        action={"copyPsrId"}
-                    />
-                    <SidebarIcon
-                        className="icon-style"
-                        size="20px"
-                        title={"Применить смещение"}
-                        icon={faPaste}
-                        action={"applyPsr"}
-                    />
-                    <SidebarIcon
-                        className={`icon-style ${isPrevButtonActive ? "" : "disabled"}`}
-                        size="20px"
-                        title={"Предыдущий объект"}
-                        icon={faAngleDoubleLeft}
-                        action={"prevCuboid"}
-                    />
-                    <SidebarIcon
-                        className={`icon-style ${isNextButtonActive ? "" : "disabled"}`}
-                        size="20px"
-                        title={"Следующий объект"}
-                        icon={faAngleDoubleRight}
-                        action={"nextCuboid"}
-                    />
-                    <SidebarIcon
-                        className="icon-style"
-                        size="20px"
-                        title="Удалить кубоид со всех кадров"
-                        icon={faTrash}
-                        action={"removeObject"}
-                        type={"removeObject"}
-                        index={selectedCuboid?.id}
-                    />
-                    <SidebarIcon
-                        className="icon-style"
-                        size="20px"
-                        title="Закрыть карточку"
-                        icon={faClose}
-                        type="setActiveTab"
-                        index={OBJECTS_TAB_INDEX}
-                    />
-                </div>
+                <ObjectCardButtons />
             </div>
             <div className="sidebar-content">
                 <div className="object-info-container">
