@@ -8,8 +8,7 @@ export const useFrameLaneMouseEvents = (frameLaneRef) => {
     const { activeFrameIndex, setActiveFrameIndex } = useFrames();
     const { updateSingleCuboidRef } = useCuboids();
 
-    const { interpolatePSR, updateCuboidPSR, findFrameMarkers, saveCurrentPSR } =
-        useCuboidInterpolation();
+    const { removeKeyFrame } = useCuboidInterpolation();
 
     const [isDragging, setIsDragging] = useState(false);
     const [laneStartX, setLaneStartX] = useState(0);
@@ -67,17 +66,13 @@ export const useFrameLaneMouseEvents = (frameLaneRef) => {
         }
     }, []);
 
-    const removeKeyFrame = useCallback(
+    const removeKeyFrameLane = useCallback(
         (event, frame) => {
             if (event.button === 2) {
-                saveCurrentPSR({ manual: false, frame: frame });
-                interpolatePSR();
-                findFrameMarkers();
-                updateCuboidPSR();
-                updateSingleCuboidRef.current.needsUpdate = true;
+                removeKeyFrame({ frame });
             }
         },
-        [interpolatePSR, updateCuboidPSR],
+        [removeKeyFrame],
     );
 
     useEffect(() => {
@@ -90,5 +85,5 @@ export const useFrameLaneMouseEvents = (frameLaneRef) => {
         };
     }, [handleMouseMoveLane, handleMouseUpLane]);
 
-    return { handleMouseDownLane, removeKeyFrame };
+    return { handleMouseDownLane, removeKeyFrameLane };
 };

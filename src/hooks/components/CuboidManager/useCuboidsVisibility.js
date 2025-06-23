@@ -1,7 +1,7 @@
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 
 import { useCuboids, useFrames, useFileManager, useBatch, useEditor } from "contexts";
-import { useCuboidInterpolation, useSaveSolution } from "hooks";
+import { useCuboidInterpolation, useSaveSolution, useSubscribeFunction } from "hooks";
 
 import { computeVisibilityFrameRange } from "utils/cuboids";
 
@@ -17,38 +17,40 @@ export const useCuboidsVisibility = () => {
     const { findFrameMarkers } = useCuboidInterpolation();
     const { saveObjectsSolution } = useSaveSolution();
 
+    const toggleVisibility = useCallback(() => {
+        const geometry = selectedCuboidGeometryRef.current;
+        if (!geometry || batchMode) return;
+
+        const id = geometry.name;
+        const newVisibility = !geometry.visible;
+        geometry.visible = newVisibility;
+
+        const solution = cuboidsSolutionRef.current;
+        const totalFrames = pcdFiles.length;
+
+        const { startFrame, endFrame } = computeVisibilityFrameRange({
+            activeFrameIndex,
+            id,
+            cuboidsSolutionRef,
+            totalFrames,
+        });
+
+        for (let frame = startFrame; frame <= endFrame; frame++) {
+            if (!solution[frame]) solution[frame] = [];
+            const frameSol = solution[frame];
+            const existingEntry = frameSol.find((e) => e.id === id);
+            existingEntry.visible = newVisibility;
+        }
+
+        findFrameMarkers();
+        saveObjectsSolution({ updateStack: true, isAutoSave: false, id: id });
+
+        cloudPointsColorNeedsUpdateRef.current = true;
+    }, [pcdFiles, activeFrameIndex, batchMode, saveObjectsSolution]);
+
+    useSubscribeFunction("toggleCuboidVisibility", toggleVisibility, []);
+
     useEffect(() => {
-        const toggleVisibility = () => {
-            const geometry = selectedCuboidGeometryRef.current;
-            if (!geometry || batchMode) return;
-
-            const id = geometry.name;
-            const newVisibility = !geometry.visible;
-            geometry.visible = newVisibility;
-
-            const solution = cuboidsSolutionRef.current;
-            const totalFrames = pcdFiles.length;
-
-            const { startFrame, endFrame } = computeVisibilityFrameRange({
-                activeFrameIndex,
-                id,
-                cuboidsSolutionRef,
-                totalFrames,
-            });
-
-            for (let frame = startFrame; frame <= endFrame; frame++) {
-                if (!solution[frame]) solution[frame] = [];
-                const frameSol = solution[frame];
-                const existingEntry = frameSol.find((e) => e.id === id);
-                existingEntry.visible = newVisibility;
-            }
-
-            findFrameMarkers();
-            saveObjectsSolution({ updateStack: true, isAutoSave: false, id: id });
-
-            cloudPointsColorNeedsUpdateRef.current = true;
-        };
-
         const handleKeyDown = (e) => {
             if (e.key === "Delete") {
                 toggleVisibility();
@@ -59,7 +61,7 @@ export const useCuboidsVisibility = () => {
         return () => {
             document.removeEventListener("keydown", handleKeyDown);
         };
-    }, [pcdFiles, activeFrameIndex, batchMode, saveObjectsSolution]);
+    }, [toggleVisibility]);
 
     useEffect(() => {
         if (arePointCloudsLoading || !pcdFiles.length) return;

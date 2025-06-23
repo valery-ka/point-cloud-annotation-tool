@@ -27,7 +27,7 @@ export const FrameSwitcherLane = ({ stopPlayback }) => {
         }, {});
     }, [pcdFiles]);
 
-    const { handleMouseDownLane, removeKeyFrame } = useFrameLaneMouseEvents(frameLaneRef);
+    const { handleMouseDownLane, removeKeyFrameLane } = useFrameLaneMouseEvents(frameLaneRef);
 
     return (
         <div className="frame-switcher-lane-frames" ref={frameLaneRef}>
@@ -42,7 +42,7 @@ export const FrameSwitcherLane = ({ stopPlayback }) => {
                         handleMouseDownLane(e, value);
                     }}
                     onPointerUp={(e) => {
-                        removeKeyFrame(e, value);
+                        removeKeyFrameLane(e, value);
                     }}
                 >
                     <div

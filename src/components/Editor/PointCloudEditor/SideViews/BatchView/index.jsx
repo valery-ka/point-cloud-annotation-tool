@@ -9,6 +9,8 @@ import { getBatchLayout } from "utils/cuboids";
 import { SideViewSVG } from "../SideViewSVG";
 import { BatchHeader } from "../BatchHeader";
 
+import { isEmpty } from "lodash";
+
 export const BatchView = memo(() => {
     const { pcdFiles } = useFileManager();
     const { selectedCuboidBatchGeometriesRef, batchEditorCameras, batchMode } = useBatch();
@@ -47,7 +49,7 @@ export const BatchView = memo(() => {
     }, [batchMode]);
 
     return createPortal(
-        <div id="batch-view-canvas-container">
+        <div id="batch-view-canvas-container" className={`${isEmpty(pcdFiles) ? "hidden" : ""}`}>
             <div className="batch-header-wrapper">
                 <BatchHeader />
             </div>

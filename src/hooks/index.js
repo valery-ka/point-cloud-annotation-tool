@@ -13,6 +13,7 @@ export { useButtonState } from "./shared/useButtonState";
 export { useSaveSolution } from "./shared/useSaveSolution";
 export { useDelayedHover } from "./shared/useDelayedHover";
 export { useUpdateHotkeys } from "./shared/useUpdateHotkeys";
+export { usePublishActions } from "./shared/usePublishActions";
 export { useMousetrapPause } from "./shared/useMousetrapPause";
 export { useSettingsStorage } from "./shared/useSettingsStorage";
 export { useContinuousAction } from "./shared/useContinuousAction";

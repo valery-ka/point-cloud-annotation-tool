@@ -149,7 +149,7 @@ export const useWorldShifting = () => {
     ]);
 
     const applyTransform = useCallback(() => {
-        const transformAction = copiedPSRRef.current.source;
+        const transformAction = copiedPSRRef.current?.source;
 
         switch (transformAction) {
             case "psr":

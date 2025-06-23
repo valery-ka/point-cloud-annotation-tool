@@ -16,6 +16,7 @@ export const useCuboidInterpolation = () => {
         setFrameMarkers,
         cuboidEditingFrameRef,
         cuboidsVisibilityRef,
+        updateSingleCuboidRef,
     } = useCuboids();
 
     const {
@@ -228,6 +229,19 @@ export const useCuboidInterpolation = () => {
         setFrameMarkers([keyframes, visibility]);
     }, []);
 
+    const removeKeyFrame = useCallback(
+        ({ frame }) => {
+            if (frame && !batchMode) {
+                saveCurrentPSR({ manual: false, frame: frame });
+                interpolatePSR();
+                findFrameMarkers();
+                updateCuboidPSR();
+                updateSingleCuboidRef.current.needsUpdate = true;
+            }
+        },
+        [interpolatePSR, updateCuboidPSR, batchMode],
+    );
+
     return {
         interpolatePSR,
         updateCuboidPSR,
@@ -236,5 +250,6 @@ export const useCuboidInterpolation = () => {
         saveCurrentPSRBatch,
         interpolatePSRBatch,
         updateCuboidPSRBatch,
+        removeKeyFrame,
     };
 };

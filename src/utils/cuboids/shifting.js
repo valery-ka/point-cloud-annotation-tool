@@ -41,7 +41,7 @@ export const computeOdometryTransform = (odometry, sourcePath, targetPath) => {
     return sourceMatrixInv.multiply(targetMatrix);
 };
 
-const applyMatrixTransformation = (sourceCuboid, targetCuboid, matrixTransformer) => {
+const applyMatrixTransformation = (sourceCuboid, targetCuboid, keyFrame, matrixTransformer) => {
     const sourcePos = new Vector3().copy(sourceCuboid.psr.position);
     const sourceQuat = new Quaternion().setFromEuler(
         new Euler(
@@ -69,7 +69,8 @@ const applyMatrixTransformation = (sourceCuboid, targetCuboid, matrixTransformer
         z: finalQuat.z,
         w: finalQuat.w,
     };
-    targetCuboid.manual = true;
+
+    targetCuboid.manual = keyFrame ? true : sourceCuboid.manual;
 };
 
 export const applyOdometryTransform = (
@@ -87,7 +88,9 @@ export const applyOdometryTransform = (
     const targetCuboid = frame.find((c) => c.id === cuboidId);
     if (!baseCuboid || !targetCuboid) return;
 
-    applyMatrixTransformation(baseCuboid, targetCuboid, (baseMatrix) => {
+    const keyFrame = true;
+
+    applyMatrixTransformation(baseCuboid, targetCuboid, keyFrame, (baseMatrix) => {
         return odomMatrix.clone().invert().multiply(baseMatrix);
     });
 };
@@ -98,7 +101,9 @@ export const applyRelativeMatrix = (frames, sourceId, targetId, relativeMatrix) 
         const targetCuboid = frame.find((c) => c.id === targetId);
         if (!sourceCuboid || !targetCuboid) return;
 
-        applyMatrixTransformation(sourceCuboid, targetCuboid, (sourceMatrix) => {
+        const keyFrame = false;
+
+        applyMatrixTransformation(sourceCuboid, targetCuboid, keyFrame, (sourceMatrix) => {
             return sourceMatrix.clone().multiply(relativeMatrix);
         });
     });

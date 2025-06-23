@@ -52,7 +52,7 @@ export const EditorTopLeftControls = memo(() => {
         [publish],
     );
 
-    const buttonStates = useButtonState(["undo", "redo"]);
+    const { undo, redo } = useButtonState(["undo", "redo"]);
 
     const renderButton = (name, icon, type, actionType, persistent, toggleable, onClick) => {
         return (
@@ -75,18 +75,8 @@ export const EditorTopLeftControls = memo(() => {
                 {renderButton("switchToOriginView", faHome, "single", "camera")}
             </div>
             <div className="tool-3d-controls-group">
-                {renderButton(
-                    "undoAction",
-                    faUndo,
-                    `left ${buttonStates.undo ? "" : "disabled"}`,
-                    "misc",
-                )}
-                {renderButton(
-                    "redoAction",
-                    faRedo,
-                    `right ${buttonStates.redo ? "" : "disabled"}`,
-                    "misc",
-                )}
+                {renderButton("undoAction", faUndo, `left ${undo ? "" : "disabled"}`, "misc")}
+                {renderButton("redoAction", faRedo, `right ${redo ? "" : "disabled"}`, "misc")}
             </div>
             <div className="tool-3d-controls-group">
                 {renderButton("toggleGlobalBox", faCube, "left", "misc", true)}

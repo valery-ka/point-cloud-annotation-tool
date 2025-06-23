@@ -1,7 +1,15 @@
 import { useCallback } from "react";
 
-import { useCuboids, useEditor, useFrames, useConfig, useFileManager, useEvent } from "contexts";
-import { useSaveSolution, useSubscribeFunction } from "hooks";
+import {
+    useCuboids,
+    useEditor,
+    useFrames,
+    useConfig,
+    useFileManager,
+    useEvent,
+    useImages,
+} from "contexts";
+import { useSaveSolution } from "hooks";
 
 import { addCuboid, updateCuboid, removeCuboid, writePSRToSolution } from "utils/cuboids";
 import { getNextId } from "utils/shared";
@@ -27,6 +35,8 @@ export const useAddRemoveRestoreCuboid = () => {
         cuboidIdToLabelRef,
         prevCuboidsRef,
     } = useCuboids();
+
+    const { imagePointsAlphaNeedsUpdateRef } = useImages();
 
     const { saveObjectsSolution } = useSaveSolution();
 
@@ -264,12 +274,12 @@ export const useAddRemoveRestoreCuboid = () => {
 
             resetUndoRedoStacks();
             saveObjectsSolution({ updateStack: false, isAutoSave: false });
+
             cloudPointsColorNeedsUpdateRef.current = true;
+            imagePointsAlphaNeedsUpdateRef.current = true;
         },
         [saveObjectsSolution, resetUndoRedoStacks],
     );
-
-    useSubscribeFunction("removeObject", removeObject, []);
 
     return { addNewObject, updateExistingObject, addRemovedObject, restoreObject, removeObject };
 };

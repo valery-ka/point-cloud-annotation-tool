@@ -1,7 +1,12 @@
 import { useEffect, useRef, useCallback } from "react";
 
-import { useBatch, useCuboids, useEditor } from "contexts";
-import { useMousetrapPause, useFrameSwitcher, usePlayback, useBatchEditorEvents } from "hooks";
+import { useBatch, useCuboids, useEditor, useFrames } from "contexts";
+import {
+    useMousetrapPause,
+    useBatchEditorEvents,
+    usePublishActions,
+    useCuboidInterpolation,
+} from "hooks";
 
 import {
     scalingConfigs,
@@ -26,16 +31,48 @@ const translate = "translate";
 const scale = "scale";
 const rotate = "rotate";
 
+//
+// fixed shortcuts for hovered view start
+const handleFrameShortcuts = (e, actions, batchMode) => {
+    if (batchMode) return;
+
+    const frameShortcuts = {
+        Digit1: actions.publishGoToPreviousFrame,
+        Digit2: actions.publishGoToNextFrame,
+        KeyZ: e.ctrlKey ? actions.publishUndoAction : actions.publishToggleCuboidVisibility,
+        KeyX: e.ctrlKey ? actions.publishRedoAction : actions.publishCopyObjectTransform,
+        KeyC: actions.publishFixOdometryFrame,
+        KeyV: actions.publishApplyTransform,
+    };
+
+    frameShortcuts[e.code]?.();
+};
+// fixed shortcuts for hovered view end
+//
+
 export const useSideViewsControls = ({ camera, mesh, hoveredView, hoveredHandler, name }) => {
     const { cameraControlsRef, transformControlsRef } = useEditor();
+    const { activeFrameIndex } = useFrames();
+
     const { sideViewsCamerasNeedUpdateRef, isCuboidTransformingRef, sideViewCameraZoomsRef } =
         useCuboids();
     const { batchMode, batchViewsCamerasNeedUpdateRef, batchEditingFrameRef } = useBatch();
 
-    const { stopPlayback } = usePlayback();
-    const { handleGoToPreviousFrame, handleGoToNextFrame } = useFrameSwitcher(stopPlayback);
     const { removeBatchKeyFrame, toggleCuboidVisibility, goToHoveredFrame } =
         useBatchEditorEvents();
+
+    const { removeKeyFrame } = useCuboidInterpolation();
+    const actions = usePublishActions([
+        "fixOdometryFrame",
+        "copyObjectTransform",
+        "applyTransform",
+        "goToPreviousFrame",
+        "goToPreviousFrame",
+        "goToNextFrame",
+        "toggleCuboidVisibility",
+        "undoAction",
+        "redoAction",
+    ]);
 
     const scaleHandlerRef = useRef(null);
     const transformModeRef = useRef(null);
@@ -231,32 +268,24 @@ export const useSideViewsControls = ({ camera, mesh, hoveredView, hoveredHandler
                 transformControlsRef.current.dispatchEvent({ type: "dragging-changed" });
             }
 
-            if (!batchMode) {
-                const frameShortcuts = {
-                    1: handleGoToPreviousFrame,
-                    2: handleGoToNextFrame,
-                };
-                frameShortcuts[e.key]?.();
-            }
+            handleFrameShortcuts(e, actions, batchMode);
 
+            //
+            // batch shortcuts start
             goToHoveredFrame(e, mesh);
             toggleCuboidVisibility(e, mesh);
+            // batch shortcuts end
+            //
         },
-        [
-            hoveredView,
-            mesh,
-            name,
-            batchMode,
-            handleGoToPreviousFrame,
-            handleGoToNextFrame,
-            toggleCuboidVisibility,
-            goToHoveredFrame,
-        ],
+        [hoveredView, mesh, name, batchMode, actions, toggleCuboidVisibility, goToHoveredFrame],
     );
 
     const handleRightClick = useCallback(() => {
-        removeBatchKeyFrame({ hoveredView, mesh });
-    }, [removeBatchKeyFrame, hoveredView, mesh]);
+        if (hoveredView) {
+            removeBatchKeyFrame({ hoveredView, mesh });
+            removeKeyFrame({ frame: activeFrameIndex });
+        }
+    }, [removeBatchKeyFrame, hoveredView, mesh, activeFrameIndex]);
 
     useEffect(() => {
         document.addEventListener("mousedown", handleMouseDown);

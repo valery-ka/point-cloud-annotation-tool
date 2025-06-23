@@ -1,12 +1,15 @@
 import { useEffect, useRef, useState, memo } from "react";
 
-import { useCuboids } from "contexts";
+import { useCuboids, useFileManager } from "contexts";
 
 import { SIDE_VIEWS_GAP } from "constants";
 
 import { SideViewSVG } from "./SideViewSVG";
 
+import { isEmpty } from "lodash";
+
 export const SideViews = memo(() => {
+    const { pcdFiles } = useFileManager();
     const { selectedCuboidGeometryRef, sideViews } = useCuboids();
 
     const containerRef = useRef(null);
@@ -33,7 +36,11 @@ export const SideViews = memo(() => {
     }, []);
 
     return (
-        <div id="side-views-canvas-container" ref={containerRef}>
+        <div
+            id="side-views-canvas-container"
+            className={`${isEmpty(pcdFiles) ? "hidden" : ""}`}
+            ref={containerRef}
+        >
             <canvas id="side-views-canvas" />
             <div className="side-views-container">
                 {VIEW_NAMES.map((name, idx) => {

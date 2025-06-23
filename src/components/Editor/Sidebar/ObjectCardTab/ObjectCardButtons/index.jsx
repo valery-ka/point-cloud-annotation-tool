@@ -1,4 +1,4 @@
-import { memo, useCallback, useMemo } from "react";
+import { memo, useCallback, useMemo, useEffect } from "react";
 import {
     faClose,
     faTrash,
@@ -11,8 +11,8 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 import { useTranslation } from "react-i18next";
-import { useEvent, useCuboids, useOdometry, useFrames } from "contexts";
-import { useSubscribeFunction } from "hooks";
+import { useEvent, useCuboids, useOdometry, useFrames, useSettings } from "contexts";
+import { useSubscribeFunction, useAddRemoveRestoreCuboid, useButtonState } from "hooks";
 
 import { SidebarIcon } from "../../SidebarIcon";
 
@@ -27,6 +27,9 @@ export const ObjectCardButtons = memo(() => {
     const { t } = useTranslation();
 
     const { publish } = useEvent();
+
+    const { settings } = useSettings();
+    const { hotkeys } = settings;
 
     const { activeFrameIndex } = useFrames();
     const { odometry } = useOdometry();
@@ -50,10 +53,6 @@ export const ObjectCardButtons = memo(() => {
     const hasOdometry = useMemo(() => {
         return !isEmpty(odometry);
     }, [odometry]);
-
-    const isPsrCopied = copiedPSRRef.current?.id === selectedCuboid?.id;
-    const isOdometryCopied = copiedPSRRef.current?.frame === activeFrameIndex;
-    const isApplyPsrActive = copiedPSRRef.current;
 
     const getTransformInfo = () => {
         const transformAction = copiedPSRRef.current;
@@ -100,28 +99,62 @@ export const ObjectCardButtons = memo(() => {
 
     useSubscribeFunction("nextObject", nextObject, []);
 
+    const { removeObject } = useAddRemoveRestoreCuboid();
+    useSubscribeFunction("removeObject", removeObject, []);
+
+    //
+    // Buttons State start
+    const { fixOdometryFrame, applyTransform, copyObjectTransform } = useButtonState([
+        "fixOdometryFrame",
+        "applyTransform",
+        "copyObjectTransform",
+    ]);
+
+    const updateButtonsState = useCallback(() => {
+        const odometryFrame = copiedPSRRef.current?.frame === activeFrameIndex;
+        const applyTransform = !!copiedPSRRef.current;
+        const copyObjectTransform = copiedPSRRef.current?.id === selectedCuboid?.id;
+
+        publish(odometryFrame ? "enableFixOdometryFrame" : "disableFixOdometryFrame");
+        publish(applyTransform ? "enableApplyTransform" : "disableApplyTransform");
+        publish(copyObjectTransform ? "enableCopyObjectTransform" : "disableCopyObjectTransform");
+    }, [publish, activeFrameIndex, selectedCuboid]);
+
+    useSubscribeFunction("fixOdometryFrame", updateButtonsState, []);
+    useSubscribeFunction("applyTransform", updateButtonsState, []);
+    useSubscribeFunction("copyObjectTransform", updateButtonsState, []);
+
+    useEffect(() => {
+        updateButtonsState();
+    }, [updateButtonsState]);
+    // Buttons State end
+    //
+
     return (
         <div className="tab-header-buttons">
             <SidebarIcon
-                className={`icon-style ${hasOdometry && !isOdometryCopied ? "" : "disabled"}`}
+                className={`icon-style ${hasOdometry && !fixOdometryFrame ? "" : "disabled"}`}
                 size="20px"
                 title={t("fixOdometryFrame")}
-                icon={isOdometryCopied ? faCheck : faMagic}
+                icon={fixOdometryFrame ? faCheck : faMagic}
                 action={"fixOdometryFrame"}
+                hotkey={hotkeys["cuboids"]["fixOdometryFrame"]}
             />
             <SidebarIcon
-                className={`icon-style ${isApplyPsrActive ? "" : "disabled"}`}
+                className={`icon-style ${applyTransform ? "" : "disabled"}`}
                 size="20px"
                 title={getTransformInfo()}
                 icon={faTrailer}
                 action={"applyTransform"}
+                hotkey={hotkeys["cuboids"]["applyTransform"]}
             />
             <SidebarIcon
-                className={`icon-style ${isPsrCopied ? "disabled" : ""}`}
+                className={`icon-style ${copyObjectTransform ? "disabled" : ""}`}
                 size="20px"
                 title={t("copyObjectTransform")}
-                icon={isPsrCopied ? faCheck : faTruck}
+                icon={copyObjectTransform ? faCheck : faTruck}
                 action={"copyObjectTransform"}
+                hotkey={hotkeys["cuboids"]["copyObjectTransform"]}
             />
             <SidebarIcon
                 className={`icon-style ${isPrevButtonActive ? "" : "disabled"}`}
@@ -142,7 +175,6 @@ export const ObjectCardButtons = memo(() => {
                 size="20px"
                 title={t("removeObjectFromAllFrames")}
                 icon={faTrash}
-                action={"removeObject"}
                 type={"removeObject"}
                 index={selectedCuboid?.id}
             />
