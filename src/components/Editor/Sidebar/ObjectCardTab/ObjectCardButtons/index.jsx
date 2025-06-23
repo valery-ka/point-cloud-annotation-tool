@@ -1,4 +1,4 @@
-import { memo, useCallback, useMemo, useEffect } from "react";
+import { memo, useCallback, useMemo } from "react";
 import {
     faClose,
     faTrash,
@@ -10,6 +10,7 @@ import {
     faCheck,
 } from "@fortawesome/free-solid-svg-icons";
 
+import { useTranslation } from "react-i18next";
 import { useEvent, useCuboids, useOdometry, useFrames } from "contexts";
 import { useSubscribeFunction } from "hooks";
 
@@ -23,6 +24,8 @@ const COMPONENT_NAME = "";
 const OBJECTS_TAB_INDEX = 0;
 
 export const ObjectCardButtons = memo(() => {
+    const { t } = useTranslation();
+
     const { publish } = useEvent();
 
     const { activeFrameIndex } = useFrames();
@@ -57,87 +60,87 @@ export const ObjectCardButtons = memo(() => {
 
         switch (transformAction?.source) {
             case "psr":
-                return `по ID: ${transformAction.id}`;
+                return `${t("applyTransformByID")} ${transformAction.id}`;
             case "odometry":
-                return `по кадру: ${transformAction.frame}`;
+                return `${t("applyTransformByFrame")} ${transformAction.frame + 1}`;
             default:
                 break;
         }
     };
 
-    const prevCuboid = useCallback(() => {
+    const prevObject = useCallback(() => {
         if (!selectedCuboid?.id) return;
 
         const sorted = [...cuboids].sort((a, b) => Number(a.id) - Number(b.id));
         const index = sorted.findIndex((c) => c.id === selectedCuboid.id);
 
         if (index > 0) {
-            const prevCuboid = sorted[index - 1];
-            const target = getCuboidMeshPositionById(cuboidsGeometriesRef, prevCuboid.id);
+            const prevObject = sorted[index - 1];
+            const target = getCuboidMeshPositionById(cuboidsGeometriesRef, prevObject.id);
             publish("switchCameraToPoint", target);
-            setSelectedCuboid(prevCuboid);
+            setSelectedCuboid(prevObject);
         }
     }, [selectedCuboid?.id, cuboids]);
 
-    useSubscribeFunction("prevCuboid", prevCuboid, []);
+    useSubscribeFunction("prevObject", prevObject, []);
 
-    const nextCuboid = useCallback(() => {
+    const nextObject = useCallback(() => {
         if (!selectedCuboid?.id) return;
 
         const sorted = [...cuboids].sort((a, b) => Number(a.id) - Number(b.id));
         const index = sorted.findIndex((c) => c.id === selectedCuboid.id);
 
         if (index !== -1 && index < sorted.length - 1) {
-            const nextCuboid = sorted[index + 1];
-            const target = getCuboidMeshPositionById(cuboidsGeometriesRef, nextCuboid.id);
+            const nextObject = sorted[index + 1];
+            const target = getCuboidMeshPositionById(cuboidsGeometriesRef, nextObject.id);
             publish("switchCameraToPoint", target);
-            setSelectedCuboid(nextCuboid);
+            setSelectedCuboid(nextObject);
         }
     }, [selectedCuboid?.id, cuboids]);
 
-    useSubscribeFunction("nextCuboid", nextCuboid, []);
+    useSubscribeFunction("nextObject", nextObject, []);
 
     return (
         <div className="tab-header-buttons">
             <SidebarIcon
                 className={`icon-style ${hasOdometry && !isOdometryCopied ? "" : "disabled"}`}
                 size="20px"
-                title={"Зафиксировать кадр одометрии"}
+                title={t("fixOdometryFrame")}
                 icon={isOdometryCopied ? faCheck : faMagic}
-                action={"copyOdometryFrame"}
+                action={"fixOdometryFrame"}
             />
             <SidebarIcon
                 className={`icon-style ${isApplyPsrActive ? "" : "disabled"}`}
                 size="20px"
-                title={`Применить смещение ${getTransformInfo()}`}
+                title={getTransformInfo()}
                 icon={faTrailer}
                 action={"applyTransform"}
             />
             <SidebarIcon
                 className={`icon-style ${isPsrCopied ? "disabled" : ""}`}
                 size="20px"
-                title={"Скопировать смещение объекта"}
+                title={t("copyObjectTransform")}
                 icon={isPsrCopied ? faCheck : faTruck}
-                action={"copyPsrId"}
+                action={"copyObjectTransform"}
             />
             <SidebarIcon
                 className={`icon-style ${isPrevButtonActive ? "" : "disabled"}`}
                 size="20px"
-                title={"Предыдущий объект"}
+                title={t("prevObject")}
                 icon={faAngleDoubleLeft}
-                action={"prevCuboid"}
+                action={"prevObject"}
             />
             <SidebarIcon
                 className={`icon-style ${isNextButtonActive ? "" : "disabled"}`}
                 size="20px"
-                title={"Следующий объект"}
+                title={t("nextObject")}
                 icon={faAngleDoubleRight}
-                action={"nextCuboid"}
+                action={"nextObject"}
             />
             <SidebarIcon
                 className="icon-style"
                 size="20px"
-                title="Удалить кубоид со всех кадров"
+                title={t("removeObjectFromAllFrames")}
                 icon={faTrash}
                 action={"removeObject"}
                 type={"removeObject"}
@@ -146,7 +149,7 @@ export const ObjectCardButtons = memo(() => {
             <SidebarIcon
                 className="icon-style"
                 size="20px"
-                title="Закрыть карточку"
+                title={t("closeObjectCard")}
                 icon={faClose}
                 type="setActiveTab"
                 index={OBJECTS_TAB_INDEX}

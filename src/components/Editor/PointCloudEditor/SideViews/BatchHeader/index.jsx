@@ -13,9 +13,9 @@ import { RenderFileNavigatorButton } from "../../../FileNavigator/RenderFileNavi
 const frameOptions = [1, 5, 10, 20];
 
 const checkboxItems = [
-    { id: "top", label: "Камера сверху" },
-    { id: "left", label: "Камера сбоку" },
-    { id: "front", label: "Камера спереди" },
+    { id: "top", label: "cameraTop" },
+    { id: "left", label: "cameraLeft" },
+    { id: "front", label: "cameraFront" },
 ];
 
 // const COMPONENT_NAME = "BatchHeader.";
@@ -81,7 +81,7 @@ export const BatchHeader = memo(() => {
                         {checkboxItems.map(({ id, label }) => (
                             <Checkbox
                                 key={id}
-                                label={label}
+                                label={t(`${label}`)}
                                 checked={activeCameraViews[id]}
                                 disabled={checkedCount === 1 && activeCameraViews[id]}
                                 onChange={(val) => handleCheckboxChange(id, val)}

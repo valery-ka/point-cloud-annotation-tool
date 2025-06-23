@@ -72,19 +72,19 @@ export const useWorldShifting = () => {
 
     //
     // Shift functions start
-    const copyCuboidId = useCallback(() => {
+    const copyObjectTransform = useCallback(() => {
         if (!selectedCuboid?.id) return;
         copiedPSRRef.current = { source: "psr", id: selectedCuboid.id };
     }, [selectedCuboid?.id]);
 
-    useSubscribeFunction("copyPsrId", copyCuboidId, []);
+    useSubscribeFunction("copyObjectTransform", copyObjectTransform, []);
 
-    const copyOdometryFrame = useCallback(() => {
+    const fixOdometryFrame = useCallback(() => {
         if (!selectedCuboid?.id) return;
         copiedPSRRef.current = { source: "odometry", frame: activeFrameIndex };
     }, [activeFrameIndex, selectedCuboid?.id]);
 
-    useSubscribeFunction("copyOdometryFrame", copyOdometryFrame, []);
+    useSubscribeFunction("fixOdometryFrame", fixOdometryFrame, []);
 
     const applyCuboidRelativePSR = useCallback(() => {
         const sourceId = copiedPSRRef.current.id;

@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect, Fragment, memo } from "react";
 
+import { useTranslation } from "react-i18next";
 import { useBatch, useCuboids } from "contexts";
 import { useSideViewsControls, useDelayedHover } from "hooks";
 
@@ -20,6 +21,8 @@ const PICKER_OPACITY = 0;
 
 export const SideViewSVG = memo(
     ({ name, x, y, width, height, mesh, camera, fileName = null, keyFrame = null }) => {
+        const { t } = useTranslation();
+
         const { selectedCuboid, handlePositions } = useCuboids();
         const { batchHandlePositions, batchMode } = useBatch();
 
@@ -222,7 +225,7 @@ export const SideViewSVG = memo(
                 onMouseLeave={() => handleMouseLeave(null)}
             >
                 <SVGText
-                    text={fileName ?? name}
+                    text={fileName ?? t(`${name}`)}
                     position={"top-left"}
                     parentWidth={width}
                     parentHeight={height}

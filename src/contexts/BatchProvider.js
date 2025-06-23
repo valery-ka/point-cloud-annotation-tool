@@ -7,7 +7,7 @@ export const BatchProvider = ({ children }) => {
     const [currentFrame, setCurrentFrame] = useState([]);
     const [batchEditorCameras, setBatchEditorCameras] = useState({});
     const [batchHandlePositions, setBatchHandlePositions] = useState({});
-    const [viewsCount, setViewsCount] = useState(10);
+    const [viewsCount, setViewsCount] = useState(5);
     const [activeCameraViews, setActiveCameraViews] = useState({
         top: true,
         left: true,

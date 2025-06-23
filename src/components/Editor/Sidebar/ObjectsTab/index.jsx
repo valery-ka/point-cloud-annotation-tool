@@ -196,7 +196,7 @@ export const ObjectsTab = memo(({ title }) => {
                         <SidebarIcon
                             className={`icon-style ${isEnabled ? "" : "disabled"}`}
                             size="20px"
-                            title="Список удаленных кубоидов"
+                            title={t("removedObjectsList")}
                             icon={faPlus}
                         />
                     </div>

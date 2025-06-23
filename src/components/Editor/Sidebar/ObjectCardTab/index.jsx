@@ -1,6 +1,7 @@
 import { memo, useEffect, useCallback } from "react";
 import { faPlus, faMinus, faRefresh } from "@fortawesome/free-solid-svg-icons";
 
+import { useTranslation } from "react-i18next";
 import { useEvent, useCuboids, useConfig, useEditor } from "contexts";
 import { useContinuousAction } from "hooks";
 
@@ -20,6 +21,8 @@ const COMPONENT_NAME = "";
 const OBJECTS_TAB_INDEX = 0;
 
 export const ObjectCardTab = memo(() => {
+    const { t } = useTranslation();
+
     const { publish } = useEvent();
     const { transformControlsRef } = useEditor();
     const {
@@ -31,7 +34,7 @@ export const ObjectCardTab = memo(() => {
     const { config } = useConfig();
     const { objects } = config;
 
-    const { startContinuousAction } = useContinuousAction({ delay: 100 });
+    const { startContinuousAction } = useContinuousAction({ delay: 200 });
 
     useEffect(() => {
         selectedCuboid
@@ -99,23 +102,23 @@ export const ObjectCardTab = memo(() => {
 
         const valueMap = {
             points: {
-                "Точек внутри бокса": info.insidePointsCount,
-                "Покрашенных точек": 0,
+                [t("pointsInsideCount")]: info.insidePointsCount,
+                [t("paintedPointsCount")]: 0,
             },
             position: {
-                "Позиция X": info.position[0],
-                "Позиция Y": info.position[1],
-                "Позиция Z": info.position[2] - info.scale[2] / 2,
+                [t("positionX")]: info.position[0],
+                [t("positionY")]: info.position[1],
+                [t("positionZ")]: info.position[2] - info.scale[2] / 2,
             },
             scale: {
-                Длина: info.scale[0],
-                Ширина: info.scale[1],
-                Высота: info.scale[2],
+                [t("length")]: info.scale[0],
+                [t("width")]: info.scale[1],
+                [t("height")]: info.scale[2],
             },
             rotation: {
-                Крен: info.rotation[0] * (180 / Math.PI),
-                Тангаж: info.rotation[1] * (180 / Math.PI),
-                Рыскание: info.rotation[2] * (180 / Math.PI),
+                [t("roll")]: info.rotation[0] * (180 / Math.PI),
+                [t("pitch")]: info.rotation[1] * (180 / Math.PI),
+                [t("yaw")]: info.rotation[2] * (180 / Math.PI),
             },
         };
 
@@ -123,10 +126,10 @@ export const ObjectCardTab = memo(() => {
     }, []);
 
     const infoBlocksConfig = [
-        { title: "Точки", type: "points", decimals: 0 },
-        { title: "Позиция коробки", type: "position", action: "position", unit: " m" },
-        { title: "Размеры коробки", type: "scale", action: "scale", unit: " m" },
-        { title: "Вращение коробки", type: "rotation", action: "rotation", unit: "°" },
+        { title: [t("points")], type: "points", decimals: 0 },
+        { title: [t("cuboidPosition")], type: "position", action: "position", unit: " m" },
+        { title: [t("cuboidScale")], type: "scale", action: "scale", unit: " m" },
+        { title: [t("cuboidRotation")], type: "rotation", action: "rotation", unit: "°" },
     ];
 
     return (
