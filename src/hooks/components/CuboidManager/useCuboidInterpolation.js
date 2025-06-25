@@ -231,7 +231,7 @@ export const useCuboidInterpolation = () => {
 
     const removeKeyFrame = useCallback(
         ({ frame }) => {
-            if (frame && !batchMode) {
+            if (typeof frame === "number" && !batchMode) {
                 saveCurrentPSR({ manual: false, frame: frame });
                 interpolatePSR();
                 findFrameMarkers();

@@ -130,15 +130,17 @@ export const ObjectCardButtons = memo(() => {
     // Buttons State end
     //
 
+    const isOdometryEnabled = hasOdometry && !fixOdometryFrame;
+
     return (
         <div className="tab-header-buttons">
             <SidebarIcon
-                className={`icon-style ${hasOdometry && !fixOdometryFrame ? "" : "disabled"}`}
+                className={`icon-style ${isOdometryEnabled ? "" : "disabled"}`}
                 size="20px"
                 title={t("fixOdometryFrame")}
                 icon={fixOdometryFrame ? faCheck : faMagic}
                 action={"fixOdometryFrame"}
-                hotkey={hotkeys["cuboids"]["fixOdometryFrame"]}
+                hotkey={isOdometryEnabled ? hotkeys["cuboids"]["fixOdometryFrame"] : null}
             />
             <SidebarIcon
                 className={`icon-style ${applyTransform ? "" : "disabled"}`}

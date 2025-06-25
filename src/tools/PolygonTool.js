@@ -58,16 +58,23 @@ export default class PolygonTool extends SelectorTools {
         }
     }
 
+    /** TODO: в будущем можно добавить кнопку, которая будет запомнить положение камеры и нарисованный полигон
+     *  и затем просто одним нажатием красить на нужном кадре нужную область.
+     */
     confirmSelection(ev) {
         if (!this.isDrawing) return;
         if (ev.key === "Enter" || ev.key === " ") {
+            let lastPoint = null;
             if (this.polygon.length > 3) {
-                this.polygon.pop();
+                lastPoint = this.polygon.pop();
             }
+
             this.selectByPolygon(this.polygon);
-            this.reset();
-            this.updateDrawingStatus(false);
-            this.canvasSelectionIsDirty = true;
+
+            if (lastPoint) {
+                this.polygon.push(lastPoint);
+            }
+
             this.saveFrame();
         }
         this.clearHoveredPoint();

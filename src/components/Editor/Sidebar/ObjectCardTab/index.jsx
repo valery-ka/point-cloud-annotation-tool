@@ -1,5 +1,5 @@
 import { memo, useEffect, useCallback } from "react";
-import { faPlus, faMinus, faRefresh } from "@fortawesome/free-solid-svg-icons";
+import { faPlus, faMinus, faRefresh, faBox } from "@fortawesome/free-solid-svg-icons";
 
 import { useTranslation } from "react-i18next";
 import { useEvent, useCuboids, useConfig, useEditor } from "contexts";
@@ -9,16 +9,17 @@ import { ObjectCardInfoBlock } from "./ObjectCardInfoBlock";
 import { ObjectCardButtons } from "./ObjectCardButtons";
 
 import { TABS } from "constants";
+
 import {
     POSITION_HANDLERS,
     SCALE_HANDLERS,
     ROTATION_HANDLERS,
     RESET_HANDLERS,
 } from "./handlersConfig";
+import { infoBlocksConfig } from "./infoBlocksConfig";
 
 // const COMPONENT_NAME = "ObjectCardTab.";
 const COMPONENT_NAME = "";
-const OBJECTS_TAB_INDEX = 0;
 
 export const ObjectCardTab = memo(() => {
     const { t } = useTranslation();
@@ -30,6 +31,7 @@ export const ObjectCardTab = memo(() => {
         selectedCuboidGeometryRef,
         isCuboidTransformingRef,
         selectedCuboidInfoRef,
+        cuboidsSolutionRef,
     } = useCuboids();
     const { config } = useConfig();
     const { objects } = config;
@@ -39,7 +41,7 @@ export const ObjectCardTab = memo(() => {
     useEffect(() => {
         selectedCuboid
             ? publish("setActiveTab", TABS.OBJECT_CARD)
-            : publish("setActiveTab", OBJECTS_TAB_INDEX);
+            : publish("setActiveTab", TABS.OBJECTS);
     }, [selectedCuboid?.id]);
 
     const updateCuboidState = useCallback(() => {
@@ -75,6 +77,35 @@ export const ObjectCardTab = memo(() => {
         [objects, selectedCuboid],
     );
 
+    const syncObjectSize = useCallback((data) => {
+        // размеры достаточно обновить только единожды поэтому return
+        // (вызов кнопки проходит по всем координатам [x, y, z] т.е трижды)
+        if (data.index !== 0) return;
+
+        const cuboid = selectedCuboidGeometryRef.current;
+        const solution = cuboidsSolutionRef.current;
+
+        if (!cuboid || !solution) return;
+
+        const { scale } = cuboid;
+        const { x, y, z } = scale;
+
+        for (const frame of solution) {
+            const objectPsr = frame.find((obj) => obj.id === cuboid.name).psr;
+            if (objectPsr) {
+                const position = objectPsr.position;
+                const scale = objectPsr.scale;
+
+                const scaleDiff = z - scale.z;
+
+                [scale.x, scale.y, scale.z] = [x, y, z];
+                position.z += scaleDiff / 2;
+            }
+        }
+
+        updateCuboidState();
+    }, []);
+
     const getButtons = useCallback(
         (type) => ({
             plus: {
@@ -92,8 +123,13 @@ export const ObjectCardTab = memo(() => {
                 callback: resetUnit,
                 continuous: false,
             },
+            sync: {
+                icon: faBox,
+                callback: syncObjectSize,
+                continuous: false,
+            },
         }),
-        [resetUnit],
+        [resetUnit, syncObjectSize],
     );
 
     const getData = useCallback((type) => {
@@ -125,13 +161,6 @@ export const ObjectCardTab = memo(() => {
         return valueMap[type] || {};
     }, []);
 
-    const infoBlocksConfig = [
-        { title: [t("points")], type: "points", decimals: 0 },
-        { title: [t("cuboidPosition")], type: "position", action: "position", unit: " m" },
-        { title: [t("cuboidScale")], type: "scale", action: "scale", unit: " m" },
-        { title: [t("cuboidRotation")], type: "rotation", action: "rotation", unit: "°" },
-    ];
-
     return (
         <div className="sidebar-tab-panel">
             <div className="tab-header-container">
@@ -150,17 +179,20 @@ export const ObjectCardTab = memo(() => {
                         </div>
                     </div>
                     <div className="object-card-info-block-container">
-                        {infoBlocksConfig.map(({ title, type, action, unit, decimals }) => (
-                            <ObjectCardInfoBlock
-                                key={type}
-                                title={title}
-                                action={action}
-                                data={getData(type)}
-                                buttons={action ? getButtons(action) : undefined}
-                                unit={unit}
-                                decimals={decimals}
-                            />
-                        ))}
+                        {infoBlocksConfig(t).map(
+                            ({ title, type, action, unit, decimals, buttons }) => (
+                                <ObjectCardInfoBlock
+                                    key={type}
+                                    title={title}
+                                    action={action}
+                                    data={getData(type)}
+                                    buttons={action ? getButtons(action) : undefined}
+                                    buttonsConfig={buttons}
+                                    unit={unit}
+                                    decimals={decimals}
+                                />
+                            ),
+                        )}
                     </div>
                 </div>
             </div>
