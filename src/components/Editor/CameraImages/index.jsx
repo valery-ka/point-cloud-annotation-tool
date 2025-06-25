@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMinus, faExpandAlt, faCompressAlt, faCamera } from "@fortawesome/free-solid-svg-icons";
 import { useTranslation } from "react-i18next";
 
-import { useImages, useFrames } from "contexts";
+import { useImages, useLoading } from "contexts";
 import { useImageResize, useImageLoader, useImageSelector, useFetchCalibrations } from "hooks";
 
 import { TopLoader, ContextMenu } from "components";
@@ -15,12 +15,10 @@ export const CameraImages = memo(() => {
     const { t } = useTranslation();
     const { imageSize, imageMaximized, loadedImages, selectedImagePath, imagesByCamera } =
         useImages();
-    const { arePointCloudsLoading } = useFrames();
-
-    const loadingBarRef = useRef(null);
+    const { globalIsLoading } = useLoading();
 
     useFetchCalibrations();
-    useImageLoader(loadingBarRef);
+    useImageLoader();
 
     const { cameraWrapperRef, handleResizeStart, toggleImageSize } = useImageResize();
 
@@ -33,11 +31,11 @@ export const CameraImages = memo(() => {
         openContextMenu,
     } = useImageSelector(cameraWrapperRef);
 
-    if (arePointCloudsLoading) return;
+    if (globalIsLoading) return;
 
     return (
         <div className="camera-wrapper" ref={cameraWrapperRef}>
-            <TopLoader loadingBarRef={loadingBarRef} />
+            <TopLoader />
             <div
                 className={`camera-image-container ${!selectedImagePath ? "hidden" : ""}`}
                 style={imageSize}

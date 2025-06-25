@@ -40,7 +40,6 @@ export const getLabelsForFile = async ({
     prevLabelsRef,
     availableLabels,
     loadLabels,
-    onLoaded,
 }) => {
     const path = filePath.split("/");
     const fileName = path.pop();
@@ -66,8 +65,6 @@ export const getLabelsForFile = async ({
 
     pointLabelsRef.current[filePath] = new Uint8Array(updatedLabels);
     prevLabelsRef.current[filePath] = new Uint8Array(updatedLabels);
-
-    onLoaded?.();
 };
 
 export const setupPointCloudGeometry = (geometry) => {

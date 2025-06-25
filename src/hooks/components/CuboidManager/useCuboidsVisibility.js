@@ -1,13 +1,14 @@
 import { useEffect, useCallback } from "react";
 
-import { useCuboids, useFrames, useFileManager, useBatch, useEditor } from "contexts";
+import { useCuboids, useFrames, useFileManager, useBatch, useEditor, useLoading } from "contexts";
 import { useCuboidInterpolation, useSaveSolution, useSubscribeFunction } from "hooks";
 
 import { computeVisibilityFrameRange } from "utils/cuboids";
 
 export const useCuboidsVisibility = () => {
     const { pcdFiles } = useFileManager();
-    const { activeFrameIndex, arePointCloudsLoading } = useFrames();
+    const { activeFrameIndex } = useFrames();
+    const { globalIsLoading } = useLoading();
     const { cloudPointsColorNeedsUpdateRef } = useEditor();
 
     const { cuboids, cuboidsSolutionRef, cuboidsVisibilityRef, selectedCuboidGeometryRef } =
@@ -64,7 +65,7 @@ export const useCuboidsVisibility = () => {
     }, [toggleVisibility]);
 
     useEffect(() => {
-        if (arePointCloudsLoading || !pcdFiles.length) return;
+        if (globalIsLoading || !pcdFiles.length) return;
 
         const currentCuboidIds = new Set(cuboids.map(({ id }) => id));
 
@@ -83,5 +84,5 @@ export const useCuboidsVisibility = () => {
                 };
             }
         });
-    }, [arePointCloudsLoading, cuboids, pcdFiles]);
+    }, [globalIsLoading, cuboids, pcdFiles]);
 };

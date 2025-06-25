@@ -1,6 +1,14 @@
 import { useEffect, useRef, useCallback, useMemo, useState } from "react";
 
-import { useFileManager, useEditor, useFrames, useSettings, useCuboids, useBatch } from "contexts";
+import {
+    useFileManager,
+    useEditor,
+    useFrames,
+    useSettings,
+    useCuboids,
+    useBatch,
+    useLoading,
+} from "contexts";
 import { useSubscribeFunction, useDebouncedCallback } from "hooks";
 
 import { SaveOutputWorker, SaveObjectsWorker } from "workers";
@@ -12,7 +20,8 @@ const { UNDO_REDO_STACK_DEPTH, SAVE_LABELS_REQUEST_TIME, SAVE_OBJECTS_REQUEST_TI
 
 export const useSaveOutput = (updateUndoRedoState) => {
     const { pcdFiles, folderName } = useFileManager();
-    const { activeFrameIndex, arePointCloudsLoading } = useFrames();
+    const { activeFrameIndex } = useFrames();
+    const { globalIsLoading } = useLoading();
     const { pointLabelsRef, prevLabelsRef, undoStackRef, redoStackRef, setPendingSaveState } =
         useEditor();
     const { settings } = useSettings();
@@ -228,13 +237,13 @@ export const useSaveOutput = (updateUndoRedoState) => {
     );
 
     useEffect(() => {
-        if (!pcdFiles.length || arePointCloudsLoading) return;
+        if (!pcdFiles.length || globalIsLoading) return;
         requestSaveLabels({ updateStack: false, isAutoSave: true });
         requestSaveObjects({ updateStack: false, isAutoSave: true });
-    }, [pcdFiles, arePointCloudsLoading]);
+    }, [pcdFiles, globalIsLoading]);
 
     useEffect(() => {
-        if (isAutoSaveTimerEnabled && pcdFiles.length > 0 && !arePointCloudsLoading) {
+        if (isAutoSaveTimerEnabled && pcdFiles.length > 0 && !globalIsLoading) {
             const interval = setInterval(() => {
                 requestSaveLabels({ updateStack: false, isAutoSave: true });
                 requestSaveObjects({ updateStack: false, isAutoSave: true });
@@ -242,7 +251,7 @@ export const useSaveOutput = (updateUndoRedoState) => {
 
             return () => clearInterval(interval);
         }
-    }, [autoSaveTimer, arePointCloudsLoading, isAutoSaveTimerEnabled]);
+    }, [autoSaveTimer, globalIsLoading, isAutoSaveTimerEnabled]);
 
     useSubscribeFunction("saveLabelsSolution", requestSaveLabels, []);
     useSubscribeFunction("saveObjectsSolution", requestSaveObjects, []);

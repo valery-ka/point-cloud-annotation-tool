@@ -1,6 +1,6 @@
 import { useEffect, useCallback } from "react";
 
-import { useCuboids, useEditor, useEvent, useFrames } from "contexts";
+import { useCuboids, useEditor, useEvent, useLoading } from "contexts";
 import {
     useTransformControls,
     useRaycastClickSelect,
@@ -18,7 +18,7 @@ import { TABS } from "constants";
 export const useCuboidManager = (handlers) => {
     const { publish } = useEvent();
 
-    const { arePointCloudsLoading } = useFrames();
+    const { globalIsLoading } = useLoading();
     const { cameraControlsRef, transformControlsRef } = useEditor();
 
     const {
@@ -87,7 +87,7 @@ export const useCuboidManager = (handlers) => {
 
     useEffect(() => {
         updateCuboidPSR();
-    }, [arePointCloudsLoading, updateCuboidPSR]);
+    }, [globalIsLoading, updateCuboidPSR]);
 
     useUpdateCuboidInfoCard(handlers);
     usePointsInsideCuboids();

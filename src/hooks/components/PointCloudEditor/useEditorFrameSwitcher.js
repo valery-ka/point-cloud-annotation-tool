@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 
-import { useFileManager, useEditor, useFrames, useBatch } from "contexts";
+import { useFileManager, useEditor, useFrames, useBatch, useLoading } from "contexts";
 
 import { useThree } from "@react-three/fiber";
 
@@ -12,14 +12,15 @@ export const useEditorFrameSwitcher = (onFrameChanged) => {
     const { gl, camera, scene } = useThree();
 
     const { pcdFiles } = useFileManager();
-    const { activeFrameIndex, arePointCloudsLoading } = useFrames();
+    const { activeFrameIndex } = useFrames();
+    const { globalIsLoading } = useLoading();
     const { pointCloudRefs, setHasFilterSelectionPoint } = useEditor();
     const { batchMode } = useBatch();
 
     const previousFrameRef = useRef(null);
 
     useEffect(() => {
-        if (arePointCloudsLoading || !pcdFiles.length) return;
+        if (globalIsLoading || !pcdFiles.length) return;
 
         const newFilePath = pcdFiles[activeFrameIndex];
         const newPointCloud = pointCloudRefs.current[newFilePath];
@@ -44,5 +45,5 @@ export const useEditorFrameSwitcher = (onFrameChanged) => {
         }
 
         onFrameChanged?.();
-    }, [activeFrameIndex, arePointCloudsLoading, pcdFiles, batchMode]);
+    }, [activeFrameIndex, globalIsLoading, pcdFiles, batchMode]);
 };

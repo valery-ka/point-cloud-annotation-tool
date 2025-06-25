@@ -99,6 +99,8 @@
     "loadingConfig": "Loading config",
     "loadingFrames": "Loading frames",
     "loadingImages": "Loading images",
+    "loadingCalibrations": "Loading calibrations",
+    "loadingOdometry": "Loading odometry",
     "BSOD": "Something went wrong :С",
     "setCamera": "Set camera image",
     "cameraProjections": "Camera image points projections",

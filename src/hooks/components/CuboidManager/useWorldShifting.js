@@ -2,7 +2,7 @@ import { Matrix4 } from "three";
 
 import { useCallback, useEffect } from "react";
 
-import { useFrames, useCuboids, useOdometry, useFileManager } from "contexts";
+import { useFrames, useCuboids, useOdometry, useFileManager, useLoading } from "contexts";
 import { useSubscribeFunction, useCuboidInterpolation, useSaveSolution } from "hooks";
 
 import {
@@ -20,7 +20,8 @@ export const useWorldShifting = () => {
     const { folderName, pcdFiles } = useFileManager();
     const { activeFrameIndex } = useFrames();
 
-    const { odometry, setOdometry, isOdometryProcessed, setIsOdometryProcessed } = useOdometry();
+    const { odometry, setOdometry } = useOdometry();
+    const { setLoadingProgress } = useLoading();
     const { selectedCuboid, copiedPSRRef, cuboidsSolutionRef, updateSingleCuboidRef } =
         useCuboids();
 
@@ -31,10 +32,12 @@ export const useWorldShifting = () => {
     // Fetch odometry start
     useEffect(() => {
         if (!pcdFiles.length) return;
-
-        setIsOdometryProcessed(false);
+        const message = "loadingOdometry";
+        let loadedOdometriesCount = 0;
 
         const loadAllOdometries = async () => {
+            setLoadingProgress({ message: message, progress: 0, isLoading: true });
+
             const allOdometries = {};
 
             await Promise.all(
@@ -57,16 +60,25 @@ export const useWorldShifting = () => {
                         allOdometries[filePath] = matrix;
                     } catch (error) {
                         console.warn(`Failed to load odometry for ${filePath}:`, error);
+                    } finally {
+                        loadedOdometriesCount++;
+                        const progress = loadedOdometriesCount / pcdFiles.length;
+
+                        setLoadingProgress({
+                            message: message,
+                            progress: progress,
+                            isLoading: true,
+                        });
                     }
                 }),
             );
 
             setOdometry(allOdometries);
-            setIsOdometryProcessed(true);
+            setLoadingProgress({ message: message, progress: 0, isLoading: false });
         };
 
         loadAllOdometries();
-    }, [folderName, pcdFiles]);
+    }, [folderName]);
     // Fetch odometry end
     //
 
@@ -109,7 +121,7 @@ export const useWorldShifting = () => {
     }, [activeFrameIndex, selectedCuboid?.id, saveObjectsSolution, updateCuboidPSR]);
 
     const applyOdometry = useCallback(() => {
-        if (!isOdometryProcessed || !selectedCuboid?.id) return;
+        if (!selectedCuboid?.id) return;
 
         const targetId = selectedCuboid.id;
         const sourceFrame = copiedPSRRef.current.frame;
@@ -142,7 +154,6 @@ export const useWorldShifting = () => {
         odometry,
         pcdFiles,
         activeFrameIndex,
-        isOdometryProcessed,
         selectedCuboid?.id,
         saveObjectsSolution,
         updateCuboidPSR,

@@ -9,6 +9,7 @@ import {
     useImages,
     useCuboids,
     useBatch,
+    useLoading,
 } from "contexts";
 import { useSubscribeFunction } from "hooks";
 
@@ -26,7 +27,8 @@ export const usePaintFramePoints = (updateGlobalBox) => {
 
     const { pcdFiles } = useFileManager();
     const { config, nonHiddenClasses } = useConfig();
-    const { activeFrameIndex, arePointCloudsLoading } = useFrames();
+    const { activeFrameIndex } = useFrames();
+    const { globalIsLoading } = useLoading();
     const {
         pointCloudRefs,
         selectedClassIndex,
@@ -51,7 +53,7 @@ export const usePaintFramePoints = (updateGlobalBox) => {
 
     // cache classes colors
     useEffect(() => {
-        if (!pcdFiles.length || arePointCloudsLoading) return;
+        if (!pcdFiles.length || globalIsLoading) return;
 
         const newColorMap = nonHiddenClasses.reduce((map, cls) => {
             const hex = cls.color;
@@ -62,7 +64,7 @@ export const usePaintFramePoints = (updateGlobalBox) => {
             return map;
         }, {});
         classColorsCache.current = newColorMap;
-    }, [arePointCloudsLoading, nonHiddenClasses, pcdFiles]);
+    }, [globalIsLoading, nonHiddenClasses, pcdFiles]);
 
     // cache objects colors
     useEffect(() => {

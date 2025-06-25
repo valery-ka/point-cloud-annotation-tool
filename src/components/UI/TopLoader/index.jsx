@@ -1,16 +1,18 @@
 import React from "react";
 import LoadingBar from "react-top-loading-bar";
 
-import { useImages } from "contexts";
+import { useLoading } from "contexts";
 
-export const TopLoader = ({ loadingBarRef }) => {
-    const { areImagesLoading } = useImages();
+export const TopLoader = () => {
+    const { topLoaderBarRef, topLoaderLoadingProgress } = useLoading();
+
+    const isLoading = topLoaderLoadingProgress.isLoading;
 
     return (
         <>
-            {areImagesLoading && (
+            {isLoading && (
                 <LoadingBar
-                    ref={loadingBarRef}
+                    ref={topLoaderBarRef}
                     color="#008cffc4"
                     height={3}
                     shadowStyle={{ boxShadow: "none" }}

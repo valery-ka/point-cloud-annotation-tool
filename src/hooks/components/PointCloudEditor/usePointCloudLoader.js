@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from "react";
 import { useThree } from "@react-three/fiber";
 
-import { useFileManager, useEditor, useFrames, useSettings, useConfig } from "contexts";
+import { useFileManager, useEditor, useSettings, useLoading } from "contexts";
 import { useLabelsLoader, useObjectsLoader } from "hooks";
 
 import { CloudPointShader } from "shaders";
@@ -27,13 +27,8 @@ export const usePointCloudLoader = (THEME_COLORS) => {
     const { settings } = useSettings();
     const { theme } = settings.general;
     const { pcdFiles, folderName } = useFileManager();
-    const { setArePointCloudsLoading, setLoadingProgress } = useFrames();
+    const { setGlobalIsLoading, setLoadingProgress } = useLoading();
     const { pointCloudRefs, pointLabelsRef, prevLabelsRef } = useEditor();
-    const { nonHiddenClasses } = useConfig();
-
-    const availableLabels = useMemo(() => {
-        return new Set(nonHiddenClasses.map((cls) => cls.originalIndex));
-    }, [nonHiddenClasses]);
 
     const POINT_MATERIAL = useMemo(() => {
         return CloudPointShader({
@@ -43,12 +38,13 @@ export const usePointCloudLoader = (THEME_COLORS) => {
         });
     }, [theme]);
 
-    const { labelsCacheRef, areLabelsLoaded } = useLabelsLoader();
+    const { labelsCacheRef, areLabelsLoaded, availableLabels } = useLabelsLoader();
     const { areObjectsLoaded, findPointsInsideCuboids } = useObjectsLoader();
 
     useEffect(() => {
         if (!availableLabels.size || !areLabelsLoaded || !areObjectsLoaded) return;
 
+        const message = "loadingFrames";
         const loaderWorker = PCDLoaderWorker();
         let activeWorkers = 0;
         const MAX_WORKERS = 8;
@@ -56,9 +52,9 @@ export const usePointCloudLoader = (THEME_COLORS) => {
         const loadQueue = [...pcdFiles];
         const loadedPointClouds = {};
         let loadedFrames = 0;
-        let loadedLabels = 0;
 
         const labelsCache = labelsCacheRef.current;
+        setLoadingProgress({ message: message, progress: 0, isLoading: true });
 
         const processNextFile = () => {
             if (loadQueue.length === 0) return;
@@ -92,10 +88,6 @@ export const usePointCloudLoader = (THEME_COLORS) => {
                     prevLabelsRef,
                     availableLabels,
                     loadLabels,
-                    onLoaded: () => {
-                        loadedLabels++;
-                        updateProgress();
-                    },
                 });
 
                 loadedFrames++;
@@ -110,13 +102,18 @@ export const usePointCloudLoader = (THEME_COLORS) => {
 
         const updateProgress = () => {
             const totalFiles = pcdFiles.length;
-            if (loadedFrames === totalFiles && loadedLabels === totalFiles) {
+            if (loadedFrames === totalFiles) {
                 findPointsInsideCuboids();
-                setLoadingProgress(1);
-                setArePointCloudsLoading(false);
+                setLoadingProgress({ message: message, progress: 0, isLoading: false });
+                setGlobalIsLoading(false);
                 loaderWorker.terminate();
             } else {
-                setLoadingProgress((loadedFrames + loadedLabels) / (2 * totalFiles));
+                const progress = loadedFrames / totalFiles;
+                setLoadingProgress({
+                    message: message,
+                    progress: progress,
+                    isLoading: true,
+                });
             }
         };
 

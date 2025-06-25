@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState } from "react";
 import { isEmpty } from "lodash";
 
-import { useFrames } from "./FramesProvider";
+import { useFrames, useLoading } from "contexts";
 
 import { API_PATHS } from "config/apiPaths";
 
@@ -10,7 +10,8 @@ const { NAVIGATOR } = API_PATHS;
 const FileManagerContext = createContext();
 
 export const FileManagerProvider = ({ children }) => {
-    const { setActiveFrameIndex, setLoadingProgress, setArePointCloudsLoading } = useFrames();
+    const { setActiveFrameIndex } = useFrames();
+    const { setGlobalIsLoading } = useLoading();
 
     const [folderName, setFolderName] = useState([]);
     const [pcdFiles, setPcdFiles] = useState([]);
@@ -37,8 +38,7 @@ export const FileManagerProvider = ({ children }) => {
         setImages(imagesPaths);
 
         setActiveFrameIndex(0);
-        setLoadingProgress(0);
-        setArePointCloudsLoading(true);
+        setGlobalIsLoading(true);
     };
 
     const handleFileChange = (folder, file) => {

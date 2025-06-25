@@ -13,17 +13,20 @@ import {
     CuboidsProvider,
     BatchProvider,
     OdometryProvider,
+    LoadingProvider,
 } from "contexts";
 
 const DataProviders = ({ children }) => (
     <EventProvider>
-        <FramesProvider>
-            <FileManagerProvider>
-                <ConfigProvider>
-                    <ModerationProvider>{children}</ModerationProvider>
-                </ConfigProvider>
-            </FileManagerProvider>
-        </FramesProvider>
+        <LoadingProvider>
+            <FramesProvider>
+                <FileManagerProvider>
+                    <ConfigProvider>
+                        <ModerationProvider>{children}</ModerationProvider>
+                    </ConfigProvider>
+                </FileManagerProvider>
+            </FramesProvider>
+        </LoadingProvider>
     </EventProvider>
 );
 

@@ -3,7 +3,7 @@ import { Texture } from "three";
 import { useEffect, useMemo } from "react";
 import {
     useFileManager,
-    useFrames,
+    useLoading,
     useImages,
     useCalibrations,
     useEditor,
@@ -13,7 +13,7 @@ import {
 
 import { buildImageGeometry } from "utils/calibrations";
 
-export const useImageLoader = (loadingBarRef) => {
+export const useImageLoader = () => {
     const { config } = useConfig();
     const { settings } = useSettings();
     const { images } = useFileManager();
@@ -24,10 +24,9 @@ export const useImageLoader = (loadingBarRef) => {
         selectedImagePath,
         imagesByCamera,
         setSelectedCamera,
-        setAreImagesLoading,
     } = useImages();
-    const { arePointCloudsLoading, setLoadingProgress } = useFrames();
-    const { calibrations, areCalibrationsProcessed, projectedPointsRef } = useCalibrations();
+    const { topLoaderBarRef, globalIsLoading, setTopLoaderLoadingProgress } = useLoading();
+    const { calibrations, projectedPointsRef } = useCalibrations();
 
     const defaultCamera = useMemo(() => {
         if (!config?.job?.default_camera) return "";
@@ -40,9 +39,9 @@ export const useImageLoader = (loadingBarRef) => {
     }, []);
 
     useEffect(() => {
-        if (arePointCloudsLoading || !areCalibrationsProcessed) return;
+        if (globalIsLoading) return;
 
-        setAreImagesLoading(true);
+        setTopLoaderLoadingProgress({ message: "loadingImages", progress: 0, isLoading: true });
 
         const loaded = {};
         const allUrls = Object.values(images).flat();
@@ -50,8 +49,12 @@ export const useImageLoader = (loadingBarRef) => {
         let loadedCount = 0;
 
         if (total === 0) {
-            setAreImagesLoading(false);
-            loadingBarRef?.current?.complete();
+            setTopLoaderLoadingProgress({
+                message: "loadingImages",
+                progress: 0,
+                isLoading: false,
+            });
+            topLoaderBarRef?.current?.complete();
             return;
         }
 
@@ -63,8 +66,12 @@ export const useImageLoader = (loadingBarRef) => {
                 img.onload = () => {
                     loadedCount++;
                     const progress = loadedCount / total;
-                    setLoadingProgress(progress);
-                    loadingBarRef?.current?.staticStart(progress * 100);
+                    setTopLoaderLoadingProgress({
+                        message: "loadingImages",
+                        progress: progress,
+                        isLoading: true,
+                    });
+                    topLoaderBarRef?.current?.staticStart(progress * 100);
 
                     buildImageGeometry(
                         url,
@@ -84,8 +91,12 @@ export const useImageLoader = (loadingBarRef) => {
                     if (loadedCount === total) {
                         setLoadedImages(loaded);
                         setSelectedCamera(defaultCamera);
-                        setAreImagesLoading(false);
-                        loadingBarRef?.current?.complete();
+                        setTopLoaderLoadingProgress({
+                            message: "loadingImages",
+                            progress: 0,
+                            isLoading: false,
+                        });
+                        topLoaderBarRef?.current?.complete();
                     }
 
                     const texture = new Texture(img);
@@ -104,5 +115,5 @@ export const useImageLoader = (loadingBarRef) => {
         return () => {
             projectedPointsRef.current = {};
         };
-    }, [images, arePointCloudsLoading, areCalibrationsProcessed]);
+    }, [images, globalIsLoading]);
 };

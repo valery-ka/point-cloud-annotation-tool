@@ -9,6 +9,7 @@ import {
     useSettings,
     useImages,
     useCalibrations,
+    useLoading,
 } from "contexts";
 import { useSubscribeFunction, useRaycastClickSelect } from "hooks";
 
@@ -29,7 +30,8 @@ export const useEditorHelpers = () => {
 
     const { pcdFiles } = useFileManager();
     const { sceneRef, pointCloudRefs } = useEditor();
-    const { activeFrameIndex, arePointCloudsLoading } = useFrames();
+    const { activeFrameIndex } = useFrames();
+    const { globalIsLoading } = useLoading();
 
     const { loadedImages, selectedCamera, setSelectedCamera } = useImages();
     const { calibrations } = useCalibrations();
@@ -59,7 +61,7 @@ export const useEditorHelpers = () => {
             boundingBoxRef,
             isBoxActive.current,
         );
-    }, [pcdFiles, activeFrameIndex, arePointCloudsLoading]);
+    }, [pcdFiles, activeFrameIndex, globalIsLoading]);
 
     const toggleGlobalBox = useCallback(() => {
         const activeFrameFilePath = pcdFiles[activeFrameIndex];
@@ -72,7 +74,7 @@ export const useEditorHelpers = () => {
             boundingBoxRef,
             isBoxActive.current,
         );
-    }, [pcdFiles, activeFrameIndex, arePointCloudsLoading]);
+    }, [pcdFiles, activeFrameIndex, globalIsLoading]);
 
     useSubscribeFunction("toggleGlobalBox", toggleGlobalBox, []);
 

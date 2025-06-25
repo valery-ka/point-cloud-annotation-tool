@@ -13,3 +13,4 @@ export { CalibrationsProvider, useCalibrations } from "./CalibrationsProvider";
 export { CuboidsProvider, useCuboids } from "./CuboidsProvider";
 export { BatchProvider, useBatch } from "./BatchProvider";
 export { OdometryProvider, useOdometry } from "./OdometryProvider";
+export { LoadingProvider, useLoading } from "./LoadingProvider";

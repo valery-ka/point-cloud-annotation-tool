@@ -1,6 +1,6 @@
 import { useEffect, useCallback } from "react";
 
-import { useFileManager, useEditor, useFrames, useEvent, useCuboids } from "contexts";
+import { useFileManager, useEditor, useFrames, useEvent, useCuboids, useLoading } from "contexts";
 import { useSubscribeFunction, useCuboidInterpolation } from "hooks";
 
 export const useUndoRedo = (requestSaveLabels, onUndoRedo) => {
@@ -8,7 +8,8 @@ export const useUndoRedo = (requestSaveLabels, onUndoRedo) => {
 
     const { pcdFiles } = useFileManager();
     const { pointLabelsRef, undoStackRef, redoStackRef } = useEditor();
-    const { isPlaying, activeFrameIndex, arePointCloudsLoading } = useFrames();
+    const { isPlaying, activeFrameIndex } = useFrames();
+    const { globalIsLoading } = useLoading();
 
     const { cuboidsSolutionRef, updateSingleCuboidRef } = useCuboids();
 
@@ -22,12 +23,12 @@ export const useUndoRedo = (requestSaveLabels, onUndoRedo) => {
 
         publish(undoStack.length ? "enableUndo" : "disableUndo");
         publish(redoStack.length ? "enableRedo" : "disableRedo");
-    }, [onUndoRedo, arePointCloudsLoading, publish]);
+    }, [onUndoRedo, globalIsLoading, publish]);
 
     useSubscribeFunction("updateUndoRedoState", updateUndoRedoState, []);
 
     const undoAction = useCallback(() => {
-        if (!pcdFiles.length || arePointCloudsLoading || isPlaying) return;
+        if (!pcdFiles.length || globalIsLoading || isPlaying) return;
 
         const activeFrameFilePath = pcdFiles[activeFrameIndex];
         const undoStack = undoStackRef.current[activeFrameFilePath];
@@ -67,12 +68,12 @@ export const useUndoRedo = (requestSaveLabels, onUndoRedo) => {
         undoStack.pop();
         onUndoRedo?.();
         updateUndoRedoState();
-    }, [arePointCloudsLoading, isPlaying, onUndoRedo, updateCuboidPSR, interpolatePSR]);
+    }, [globalIsLoading, isPlaying, onUndoRedo, updateCuboidPSR, interpolatePSR]);
 
     useSubscribeFunction("undoAction", undoAction, []);
 
     const redoAction = useCallback(() => {
-        if (!pcdFiles.length || arePointCloudsLoading || isPlaying) return;
+        if (!pcdFiles.length || globalIsLoading || isPlaying) return;
 
         const activeFrameFilePath = pcdFiles[activeFrameIndex];
         const redoStack = redoStackRef.current[activeFrameFilePath];
@@ -112,14 +113,14 @@ export const useUndoRedo = (requestSaveLabels, onUndoRedo) => {
         redoStack.pop();
         onUndoRedo?.();
         updateUndoRedoState();
-    }, [arePointCloudsLoading, isPlaying, onUndoRedo, updateCuboidPSR, interpolatePSR]);
+    }, [globalIsLoading, isPlaying, onUndoRedo, updateCuboidPSR, interpolatePSR]);
 
     useSubscribeFunction("redoAction", redoAction, []);
 
     useEffect(() => {
-        if (arePointCloudsLoading || isPlaying) return;
+        if (globalIsLoading || isPlaying) return;
         updateUndoRedoState();
-    }, [arePointCloudsLoading, isPlaying, onUndoRedo]);
+    }, [globalIsLoading, isPlaying, onUndoRedo]);
 
     return { updateUndoRedoState };
 };

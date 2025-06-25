@@ -9,7 +9,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { useTranslation } from "react-i18next";
 
-import { useFileManager, useFrames } from "contexts";
+import { useFileManager, useLoading } from "contexts";
 import { useSubscribeFunction } from "hooks";
 
 import { RenderSidebarTabsButton } from "./RenderSidebarTabsButton";
@@ -24,7 +24,7 @@ const COMPONENT_NAME = "";
 
 export const Sidebar = memo(() => {
     const { pcdFiles } = useFileManager();
-    const { arePointCloudsLoading } = useFrames();
+    const { globalIsLoading } = useLoading();
 
     const [activeTab, setActiveTab] = useState(0);
     const [sidebarVisible, setSidebarVisible] = useState(true);
@@ -47,7 +47,7 @@ export const Sidebar = memo(() => {
 
     useSubscribeFunction("setActiveTab", (data) => setTab(data), []);
 
-    if (!pcdFiles.length || arePointCloudsLoading) return null;
+    if (!pcdFiles.length || globalIsLoading) return null;
 
     const createTab = (icon, title, Component, hasTabButton = true) => ({
         icon,

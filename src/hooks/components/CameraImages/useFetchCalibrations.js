@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-import { useFileManager, useImages, useCalibrations } from "contexts";
+import { useFileManager, useImages, useCalibrations, useLoading } from "contexts";
 
 import { API_PATHS } from "config/apiPaths";
 
@@ -9,14 +9,16 @@ const { NAVIGATOR } = API_PATHS;
 export const useFetchCalibrations = () => {
     const { folderName } = useFileManager();
     const { imagesByCamera } = useImages();
-    const { setCalibrations, setAreCalibrationsProcessed } = useCalibrations();
+    const { setCalibrations } = useCalibrations();
+    const { setLoadingProgress } = useLoading();
 
     useEffect(() => {
         if (!imagesByCamera.length || !folderName) return;
-
-        setAreCalibrationsProcessed(false);
+        const message = "loadingCalibrations";
+        let loadedCalibrations = 0;
 
         const fetchCalibrations = async () => {
+            setLoadingProgress({ message: message, progress: 0, isLoading: true });
             const allCalibrations = {};
 
             await Promise.all(
@@ -33,14 +35,23 @@ export const useFetchCalibrations = () => {
                         allCalibrations[camera] = calibrationData;
                     } catch (error) {
                         console.warn(`Failed to load calibrations for ${camera}:`, error);
+                    } finally {
+                        loadedCalibrations++;
+                        const progress = loadedCalibrations / imagesByCamera.length;
+
+                        setLoadingProgress({
+                            message: message,
+                            progress: progress,
+                            isLoading: true,
+                        });
                     }
                 }),
             );
 
             setCalibrations(allCalibrations);
-            setAreCalibrationsProcessed(true);
+            setLoadingProgress({ message: message, progress: 0, isLoading: false });
         };
 
         fetchCalibrations();
-    }, [imagesByCamera, folderName]);
+    }, [folderName]);
 };

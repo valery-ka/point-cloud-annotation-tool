@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, useMemo } from "react";
 
-import { useFileManager } from "./FileManagerProvider";
+import { useFileManager, useLoading } from "contexts";
 
 import { API_PATHS } from "config/apiPaths";
 
@@ -11,7 +11,9 @@ const ConfigContext = createContext();
 export const ConfigProvider = ({ children }) => {
     const [config, setConfig] = useState({});
     const [nonHiddenClasses, setNonHiddenClasses] = useState([]);
+
     const { folderName } = useFileManager();
+    const { setLoadingProgress } = useLoading();
 
     const isModerationJob = useMemo(() => {
         return config?.job?.type === "moderation";
@@ -19,28 +21,47 @@ export const ConfigProvider = ({ children }) => {
 
     useEffect(() => {
         if (!folderName.length) return;
+        const message = "loadingConfig";
 
-        const fetchConfig = async (endpoint) => {
+        const fetchConfig = async (endpoint, configName) => {
             try {
                 const response = await fetch(endpoint);
                 if (!response.ok) throw new Error(`Error: ${response.statusText}`);
-                return await response.json();
+                const data = await response.json();
+                return data;
             } catch (error) {
-                console.error(`Loading error ${endpoint}:`, error);
+                console.error(`Loading error for ${configName}:`, error);
                 return [];
             }
         };
 
         const loadAllConfigs = async () => {
-            const configEntries = await Promise.all(
-                Object.entries(NAVIGATOR.CONFIG).map(async ([key, pathFn]) => {
-                    const data = await fetchConfig(pathFn(folderName));
-                    return [key.toLowerCase(), data];
-                }),
-            );
+            setLoadingProgress({ message: message, progress: 0, isLoading: true });
+
+            const configKeys = Object.keys(NAVIGATOR.CONFIG);
+            const totalConfigs = configKeys.length;
+
+            const configEntries = [];
+            let loadedCount = 0;
+
+            for (const [key, pathFn] of Object.entries(NAVIGATOR.CONFIG)) {
+                const data = await fetchConfig(pathFn(folderName), key);
+                configEntries.push([key.toLowerCase(), data]);
+
+                loadedCount++;
+                const progress = loadedCount / totalConfigs;
+
+                setLoadingProgress({
+                    message: message,
+                    progress: progress,
+                    isLoading: true,
+                });
+            }
 
             const config = Object.fromEntries(configEntries);
+
             setConfig(config);
+            setLoadingProgress({ message: message, progress: 0, isLoading: true });
         };
 
         loadAllConfigs();

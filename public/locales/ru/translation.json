@@ -99,6 +99,8 @@
     "loadingConfig": "Загрузка конфигурации",
     "loadingFrames": "Загрузка кадров",
     "loadingImages": "Загрузка изображений",
+    "loadingCalibrations": "Загрузка калибровок",
+    "loadingOdometry": "Загрузка одометрии",
     "BSOD": "Что-то пошло не так :С",
     "setCamera": "Выбрать камеру",
     "cameraProjections": "Проекции точек на изображение",

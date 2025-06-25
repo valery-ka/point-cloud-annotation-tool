@@ -2,7 +2,7 @@ import { useCallback, useRef, useEffect } from "react";
 import { useThree } from "@react-three/fiber";
 import { debounce, isEmpty } from "lodash";
 
-import { useFileManager, useEditor, useFrames } from "contexts";
+import { useFileManager, useEditor, useFrames, useLoading } from "contexts";
 
 import { updatePixelProjections } from "utils/editor";
 import * as APP_CONSTANTS from "constants";
@@ -13,7 +13,8 @@ export const useUpdatePixelProjections = (glSize) => {
     const { camera } = useThree();
 
     const { pcdFiles } = useFileManager();
-    const { activeFrameIndex, arePointCloudsLoading } = useFrames();
+    const { activeFrameIndex } = useFrames();
+    const { globalIsLoading } = useLoading();
     const { setPixelProjections, pointCloudRefs } = useEditor();
 
     const glSizeRef = useRef(glSize);
@@ -45,7 +46,7 @@ export const useUpdatePixelProjections = (glSize) => {
     useEffect(() => {
         setPixelProjections(new Float32Array());
         requestPixelProjectionsUpdate();
-    }, [activeFrameIndex, arePointCloudsLoading]);
+    }, [activeFrameIndex, globalIsLoading]);
 
     return requestPixelProjectionsUpdate;
 };

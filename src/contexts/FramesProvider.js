@@ -5,8 +5,6 @@ const FramesContext = createContext();
 export const FramesProvider = ({ children }) => {
     const [isPlaying, setIsPlaying] = useState(false);
     const [activeFrameIndex, setActiveFrameIndex] = useState(0);
-    const [arePointCloudsLoading, setArePointCloudsLoading] = useState(false);
-    const [loadingProgress, setLoadingProgress] = useState(0);
 
     return (
         <FramesContext.Provider
@@ -15,10 +13,6 @@ export const FramesProvider = ({ children }) => {
                 setIsPlaying,
                 activeFrameIndex,
                 setActiveFrameIndex,
-                arePointCloudsLoading,
-                setArePointCloudsLoading,
-                loadingProgress,
-                setLoadingProgress,
             }}
         >
             {children}

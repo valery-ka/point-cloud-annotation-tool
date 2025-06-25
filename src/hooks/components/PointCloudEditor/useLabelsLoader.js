@@ -32,5 +32,5 @@ export const useLabelsLoader = () => {
         }
     }, [availableLabels, folderName]);
 
-    return { labelsCacheRef, areLabelsLoaded };
+    return { labelsCacheRef, areLabelsLoaded, availableLabels };
 };

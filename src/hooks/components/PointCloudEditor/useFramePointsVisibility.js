@@ -1,6 +1,14 @@
 import { useEffect, useCallback } from "react";
 
-import { useFileManager, useEditor, useFrames, useConfig, useImages, useCuboids } from "contexts";
+import {
+    useFileManager,
+    useEditor,
+    useFrames,
+    useConfig,
+    useImages,
+    useCuboids,
+    useLoading,
+} from "contexts";
 import { useSubscribeFunction, useCuboidInterpolation } from "hooks";
 
 import {
@@ -16,7 +24,8 @@ const { SELECTION } = APP_CONSTANTS.HIDDEN_POSITION;
 export const useFramePointsVisibility = (updateGlobalBox) => {
     const { pcdFiles } = useFileManager();
     const { nonHiddenClasses } = useConfig();
-    const { activeFrameIndex, arePointCloudsLoading } = useFrames();
+    const { activeFrameIndex } = useFrames();
+    const { globalIsLoading } = useLoading();
     const {
         pointCloudRefs,
         classesVisibilityRef,
@@ -133,7 +142,7 @@ export const useFramePointsVisibility = (updateGlobalBox) => {
     useSubscribeFunction("showFilteredPoints", showFilterSelectedPoints, []);
 
     useEffect(() => {
-        if (arePointCloudsLoading || !pcdFiles.length || !nonHiddenClasses.length) return;
+        if (globalIsLoading || !pcdFiles.length || !nonHiddenClasses.length) return;
 
         nonHiddenClasses.forEach(({ originalIndex }) => {
             if (!(originalIndex in classesVisibilityRef.current)) {
@@ -152,7 +161,7 @@ export const useFramePointsVisibility = (updateGlobalBox) => {
                 visible: true,
             };
         }
-    }, [arePointCloudsLoading, pcdFiles, nonHiddenClasses]);
+    }, [globalIsLoading, pcdFiles, nonHiddenClasses]);
 
     const updateMinMaxZ = useCallback(
         (data) => {

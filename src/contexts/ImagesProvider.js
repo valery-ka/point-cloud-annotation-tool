@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useMemo, useRef } from "react";
 import { isEmpty } from "lodash";
 
-import { useFrames, useFileManager } from "contexts";
+import { useFrames, useFileManager, useLoading } from "contexts";
 
 import { MIN_IMAGE_HEIGHT } from "constants";
 
@@ -9,7 +9,8 @@ const ImagesContext = createContext();
 
 export const ImagesProvider = ({ children }) => {
     const { images, pcdFiles } = useFileManager();
-    const { activeFrameIndex, arePointCloudsLoading } = useFrames();
+    const { activeFrameIndex } = useFrames();
+    const { globalIsLoading } = useLoading();
 
     const imagePointsAlphaNeedsUpdateRef = useRef(true);
     const imagePointsColorNeedsUpdateRef = useRef(true);
@@ -18,16 +19,15 @@ export const ImagesProvider = ({ children }) => {
     const [imageMaximized, setImageMaximized] = useState(false);
     const [loadedImages, setLoadedImages] = useState({});
     const [selectedCamera, setSelectedCamera] = useState(null);
-    const [areImagesLoading, setAreImagesLoading] = useState(true);
 
     const imagesByCamera = useMemo(() => {
         return Object.keys(images ?? {});
     }, [images]);
 
     const frameFileName = useMemo(() => {
-        if (arePointCloudsLoading || isEmpty(pcdFiles)) return null;
+        if (globalIsLoading || isEmpty(pcdFiles)) return null;
         return pcdFiles[activeFrameIndex].split("/").pop().replace(".pcd", ".");
-    }, [activeFrameIndex, arePointCloudsLoading]);
+    }, [activeFrameIndex, globalIsLoading]);
 
     const activeFrameImagesPath = useMemo(() => {
         if (!frameFileName || !loadedImages) return [];
@@ -71,8 +71,6 @@ export const ImagesProvider = ({ children }) => {
                 imagePointsAlphaNeedsUpdateRef,
                 imagePointsColorNeedsUpdateRef,
                 imagePointsSizeNeedsUpdateRef,
-                areImagesLoading,
-                setAreImagesLoading,
             }}
         >
             {children}
