@@ -158,5 +158,14 @@
     "closeObjectCard": "Закрыть карточку объекта",
     "removedObjectsList": "Список удаленных объектов",
     "cloneObject": "Клонировать объект",
-    "back": "Назад"
+    "back": "Назад",
+    "transformNull": "Отвязать объект",
+    "transformTranslate": "Перемещение",
+    "transformRotate": "Вращение",
+    "transformScale": "Масштабирование",
+    "openBatchMode": "Открыть пакетный режим",
+    "rotateObjectPlus": "Повернуть кубоид на 90° по часовой стрелке",
+    "rotateObjectMinus": "Повернуть кубоид на 90° против часовой стрелке",
+    "flipObjectZ": "Развернуть кубоид",
+    "switchViewToCuboid": "Перейти к кубоиду"
 }

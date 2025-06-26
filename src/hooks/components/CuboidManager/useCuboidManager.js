@@ -13,7 +13,7 @@ import {
     useWorldShifting,
 } from "hooks";
 
-import { TABS } from "constants";
+import { TABS, DEFAULT_TRANSFORM_MODE } from "constants";
 
 export const useCuboidManager = (handlers) => {
     const { publish } = useEvent();
@@ -29,6 +29,7 @@ export const useCuboidManager = (handlers) => {
         sideViewsCamerasNeedUpdateRef,
         setSelectedCuboid,
         setFrameMarkers,
+        setTransformMode,
     } = useCuboids();
 
     const { updateCuboidPSR, findFrameMarkers } = useCuboidInterpolation();
@@ -42,6 +43,7 @@ export const useCuboidManager = (handlers) => {
             const geometry = cuboidsGeometriesRef.current[id].cube.mesh;
             selectedCuboidGeometryRef.current = geometry;
             transformControlsRef.current.detach();
+            setTransformMode(DEFAULT_TRANSFORM_MODE);
             cameraControlsRef.current.enabled = true;
             sideViewsCamerasNeedUpdateRef.current = true;
             setSelectedCuboid(cuboids.find((cube) => cube.id === id));

@@ -158,5 +158,14 @@
     "closeObjectCard": "Close object card",
     "removedObjectsList": "Removed Objects List",
     "cloneObject": "Clone object",
-    "back": "Back"
+    "back": "Back",
+    "transformNull": "Detach object",
+    "transformTranslate": "Translate",
+    "transformRotate": "Rotate",
+    "transformScale": "Scale",
+    "openBatchMode": "Open batch mode",
+    "rotateObjectPlus": "Rotate cuboid 90° clockwise",
+    "rotateObjectMinus": "Rotate cuboid 90° anticlockwise",
+    "flipObjectZ": "Flip cuboid",
+    "switchViewToCuboid": "Go to cuboid"
 }

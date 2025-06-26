@@ -10,6 +10,7 @@ import {
     useBatchCloudsUpdater,
     useBatchEditorGeometrySelector,
     useMousetrapPause,
+    useSubscribeFunction,
 } from "hooks";
 
 import { SIDE_VIEWS_GAP } from "constants";
@@ -169,12 +170,17 @@ export const useBatchEditor = ({ handlers, views }) => {
         );
     });
 
-    // temp hook
+    //
+    // Batch Mode activate / deactivate start
+    const openBatchEditor = () => {
+        setBatchMode(true);
+    };
+
+    useSubscribeFunction("openBatchMode", openBatchEditor, []);
+
     useEffect(() => {
         const handleKeyDown = (e) => {
-            if (e.code === "Tab") {
-                setBatchMode((prev) => !prev);
-            } else if (e.code === "Escape") {
+            if (e.code === "Escape") {
                 setBatchMode(false);
             }
         };
@@ -182,4 +188,6 @@ export const useBatchEditor = ({ handlers, views }) => {
         document.addEventListener("keydown", handleKeyDown);
         return () => document.removeEventListener("keydown", handleKeyDown);
     }, []);
+    // Batch Mode activate / deactivate end
+    //
 };

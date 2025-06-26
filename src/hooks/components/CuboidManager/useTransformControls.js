@@ -15,8 +15,13 @@ export const useTransformControls = () => {
     const { activeFrameIndex } = useFrames();
     const { cameraControlsRef, transformControlsRef } = useEditor();
 
-    const { sideViewsCamerasNeedUpdateRef, isCuboidTransformingRef, updateSingleCuboidRef } =
-        useCuboids();
+    const {
+        transformMode,
+        sideViewsCamerasNeedUpdateRef,
+        isCuboidTransformingRef,
+        updateSingleCuboidRef,
+        selectedCuboidGeometryRef,
+    } = useCuboids();
     const { batchMode, batchViewsCamerasNeedUpdateRef, updateBatchCuboidRef } = useBatch();
 
     const { saveCurrentPSR, interpolatePSR, findFrameMarkers } = useCuboidInterpolation();
@@ -79,4 +84,26 @@ export const useTransformControls = () => {
             transform?.detach();
         };
     }, [onTransformChange, onDraggingChanged]);
+
+    useEffect(() => {
+        const transform = transformControlsRef.current;
+        const object = selectedCuboidGeometryRef.current;
+
+        transform.attach(object);
+
+        switch (transformMode) {
+            case "transformTranslate":
+                transform.setMode("translate");
+                break;
+            case "transformRotate":
+                transform.setMode("rotate");
+                break;
+            case "transformScale":
+                transform.setMode("scale");
+                break;
+            default:
+                transform.detach();
+                break;
+        }
+    }, [transformMode]);
 };

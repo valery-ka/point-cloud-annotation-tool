@@ -47,6 +47,7 @@ export const ObjectCardTab = memo(() => {
     const updateCuboidState = useCallback(() => {
         isCuboidTransformingRef.current = true;
         transformControlsRef.current.dispatchEvent({ type: "change" });
+        transformControlsRef.current.dispatchEvent({ type: "dragging-changed" });
     }, []);
 
     const handleAction = useCallback(

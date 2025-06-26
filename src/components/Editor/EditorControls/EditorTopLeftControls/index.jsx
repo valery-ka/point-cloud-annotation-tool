@@ -6,11 +6,12 @@ import {
     faCube,
     faCircleDot,
     faArrowsUpDown,
+    faCubesStacked,
 } from "@fortawesome/free-solid-svg-icons";
 import Slider from "rc-slider";
 import { useTranslation } from "react-i18next";
 
-import { useEvent } from "contexts";
+import { useEvent, useCuboids } from "contexts";
 import { useButtonState } from "hooks";
 import * as APP_CONSTANTS from "constants";
 
@@ -25,6 +26,7 @@ const POSITIVE_INFINITY = Number.POSITIVE_INFINITY;
 
 export const EditorTopLeftControls = memo(() => {
     const { publish } = useEvent();
+    const { selectedCuboid } = useCuboids();
 
     const { t } = useTranslation();
 
@@ -115,6 +117,7 @@ export const EditorTopLeftControls = memo(() => {
                     </div>
                 )}
             </div>
+            {selectedCuboid && renderButton("openBatchMode", faCubesStacked, "single", "cuboids")}
         </div>
     );
 });

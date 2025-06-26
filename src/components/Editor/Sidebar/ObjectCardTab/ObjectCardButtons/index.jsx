@@ -6,7 +6,7 @@ import {
     faAngleDoubleRight,
     faTruck,
     faTrailer,
-    faMagic,
+    faMagicWandSparkles,
     faCheck,
 } from "@fortawesome/free-solid-svg-icons";
 
@@ -138,7 +138,7 @@ export const ObjectCardButtons = memo(() => {
                 className={`icon-style ${isOdometryEnabled ? "" : "disabled"}`}
                 size="20px"
                 title={t("fixOdometryFrame")}
-                icon={fixOdometryFrame ? faCheck : faMagic}
+                icon={fixOdometryFrame ? faCheck : faMagicWandSparkles}
                 action={"fixOdometryFrame"}
                 hotkey={isOdometryEnabled ? hotkeys["cuboids"]["fixOdometryFrame"] : null}
             />

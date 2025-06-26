@@ -1,5 +1,5 @@
 import { createContext, useContext, useRef, useState } from "react";
-import { INITIAL_SIDE_VIEWS_ZOOM } from "constants";
+import { INITIAL_SIDE_VIEWS_ZOOM, DEFAULT_TRANSFORM_MODE } from "constants";
 
 const CuboidsContext = createContext();
 
@@ -39,6 +39,7 @@ export const CuboidsProvider = ({ children }) => {
     const [sideViews, setSideViews] = useState([]);
     const [handlePositions, setHandlePositions] = useState({});
 
+    const [transformMode, setTransformMode] = useState(DEFAULT_TRANSFORM_MODE);
     const isCuboidTransformingRef = useRef(false);
     const sideViewCameraZoomsRef = useRef(DEFAULT_ZOOM);
     const sideViewsCamerasNeedUpdateRef = useRef(true);
@@ -85,6 +86,8 @@ export const CuboidsProvider = ({ children }) => {
                 setDeletedObjects,
                 cuboidsVisibilityRef,
                 copiedPSRRef,
+                transformMode,
+                setTransformMode,
             }}
         >
             {children}
