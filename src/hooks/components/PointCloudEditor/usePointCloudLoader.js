@@ -27,7 +27,7 @@ export const usePointCloudLoader = (THEME_COLORS) => {
     const { settings } = useSettings();
     const { theme } = settings.general;
     const { pcdFiles, folderName } = useFileManager();
-    const { setGlobalIsLoading, setLoadingProgress } = useLoading();
+    const { setGlobalIsLoading, setLoadingProgress, loadedData, setLoadedData } = useLoading();
     const { pointCloudRefs, pointLabelsRef, prevLabelsRef } = useEditor();
 
     const POINT_MATERIAL = useMemo(() => {
@@ -38,11 +38,15 @@ export const usePointCloudLoader = (THEME_COLORS) => {
         });
     }, [theme]);
 
-    const { labelsCacheRef, areLabelsLoaded, availableLabels } = useLabelsLoader();
-    const { areObjectsLoaded, findPointsInsideCuboids } = useObjectsLoader();
+    const { labelsCacheRef, availableLabels } = useLabelsLoader();
+    const { findPointsInsideCuboids } = useObjectsLoader();
 
     useEffect(() => {
-        if (!availableLabels.size || !areLabelsLoaded || !areObjectsLoaded) return;
+        if (
+            !availableLabels.size ||
+            Object.values(loadedData.solution).some((sol) => sol === false)
+        )
+            return;
 
         const message = "loadingFrames";
         const loaderWorker = PCDLoaderWorker();
@@ -104,7 +108,13 @@ export const usePointCloudLoader = (THEME_COLORS) => {
             const totalFiles = pcdFiles.length;
             if (loadedFrames === totalFiles) {
                 findPointsInsideCuboids();
-                setLoadingProgress({ message: message, progress: 0, isLoading: false });
+
+                setLoadingProgress({ message: "", progress: 0, isLoading: false });
+                setLoadedData((prev) => ({
+                    ...prev,
+                    pointclouds: true,
+                }));
+
                 setGlobalIsLoading(false);
                 loaderWorker.terminate();
             } else {
@@ -124,7 +134,7 @@ export const usePointCloudLoader = (THEME_COLORS) => {
         return () => {
             cleanupPointClouds(scene, pointCloudRefs, pointLabelsRef, prevLabelsRef, loaderWorker);
         };
-    }, [pcdFiles, scene, availableLabels, areLabelsLoaded, areObjectsLoaded]);
+    }, [pcdFiles, loadedData.solution]);
 
     useEffect(() => {
         return () => console.log("ДУ НОТ ФОРГЕТ ТУ ОЧИСТИТЬ СЦЕНУ ХРИСТА РАДИ!!!!!!!!!");

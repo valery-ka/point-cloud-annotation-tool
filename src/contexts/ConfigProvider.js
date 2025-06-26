@@ -13,7 +13,7 @@ export const ConfigProvider = ({ children }) => {
     const [nonHiddenClasses, setNonHiddenClasses] = useState([]);
 
     const { folderName } = useFileManager();
-    const { setLoadingProgress } = useLoading();
+    const { setLoadedData, setLoadingProgress } = useLoading();
 
     const isModerationJob = useMemo(() => {
         return config?.job?.type === "moderation";
@@ -33,6 +33,14 @@ export const ConfigProvider = ({ children }) => {
                 console.error(`Loading error for ${configName}:`, error);
                 return [];
             }
+        };
+
+        const onFinish = () => {
+            setLoadingProgress({ message: "", progress: 0, isLoading: false });
+            setLoadedData((prev) => ({
+                ...prev,
+                config: true,
+            }));
         };
 
         const loadAllConfigs = async () => {
@@ -61,7 +69,7 @@ export const ConfigProvider = ({ children }) => {
             const config = Object.fromEntries(configEntries);
 
             setConfig(config);
-            setLoadingProgress({ message: message, progress: 0, isLoading: true });
+            onFinish();
         };
 
         loadAllConfigs();

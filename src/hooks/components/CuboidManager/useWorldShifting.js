@@ -21,7 +21,7 @@ export const useWorldShifting = () => {
     const { activeFrameIndex } = useFrames();
 
     const { odometry, setOdometry } = useOdometry();
-    const { setLoadingProgress } = useLoading();
+    const { loadedData, setLoadedData, setLoadingProgress } = useLoading();
     const { selectedCuboid, copiedPSRRef, cuboidsSolutionRef, updateSingleCuboidRef } =
         useCuboids();
 
@@ -31,9 +31,17 @@ export const useWorldShifting = () => {
     //
     // Fetch odometry start
     useEffect(() => {
-        if (!pcdFiles.length) return;
+        if (!pcdFiles.length || !loadedData.calibrations) return;
         const message = "loadingOdometry";
         let loadedOdometriesCount = 0;
+
+        const onFinish = () => {
+            setLoadingProgress({ message: "", progress: 0, isLoading: false });
+            setLoadedData((prev) => ({
+                ...prev,
+                odometry: true,
+            }));
+        };
 
         const loadAllOdometries = async () => {
             setLoadingProgress({ message: message, progress: 0, isLoading: true });
@@ -74,11 +82,11 @@ export const useWorldShifting = () => {
             );
 
             setOdometry(allOdometries);
-            setLoadingProgress({ message: message, progress: 0, isLoading: false });
+            onFinish();
         };
 
         loadAllOdometries();
-    }, [folderName]);
+    }, [folderName, loadedData.calibrations]);
     // Fetch odometry end
     //
 

@@ -19,6 +19,20 @@ export const LoadingProvider = ({ children }) => {
         isLoading: false,
     });
 
+    // Порядок ключей по фактической последовательности загрузки
+    const [loadedData, setLoadedData] = useState({
+        config: false, // ConfigProvider.js
+        calibrations: false, // useFetchCalibrations.js
+        odometry: false, // useWorldShifting.js
+        solution: {
+            labels: false, // useLabelsLoader.js
+            objects: false, // useObjectsLoader.js
+            moderation: false, // ModerationProvider.js
+        },
+        pointclouds: false, // usePointCloudLoader.js
+        images: false, // useImageLoader.js
+    });
+
     return (
         <LoadingContext.Provider
             value={{
@@ -29,6 +43,8 @@ export const LoadingProvider = ({ children }) => {
                 setLoadingProgress,
                 topLoaderLoadingProgress,
                 setTopLoaderLoadingProgress,
+                loadedData,
+                setLoadedData,
             }}
         >
             {children}

@@ -1,12 +1,13 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef } from "react";
 
-import { useFileManager, useConfig } from "contexts";
+import { useFileManager, useConfig, useLoading } from "contexts";
 
 import { loadLabels } from "utils/editor";
 
 export const useLabelsLoader = () => {
     const { folderName } = useFileManager();
     const { nonHiddenClasses } = useConfig();
+    const { loadedData, setLoadedData, setLoadingProgress } = useLoading();
 
     const availableLabels = useMemo(() => {
         return new Set(nonHiddenClasses.map((cls) => cls.originalIndex));
@@ -15,22 +16,34 @@ export const useLabelsLoader = () => {
     // labels loader
     const labelsCacheRef = useRef({});
 
-    const [areLabelsLoaded, setAreLabelsLoaded] = useState(false);
-
     useEffect(() => {
+        if (!loadedData.odometry) return;
+        const message = "loadingLabels";
+
+        const onFinish = () => {
+            setLoadingProgress({ message: "", progress: 0, isLoading: false });
+            setLoadedData((prev) => ({
+                ...prev,
+                solution: {
+                    ...prev.solution,
+                    labels: true,
+                },
+            }));
+        };
+
         const loadAllLabels = async () => {
+            setLoadingProgress({ message: message, progress: 0, isLoading: true });
             if (!labelsCacheRef.current[folderName]) {
                 const labels = await loadLabels(folderName);
                 labelsCacheRef.current[folderName] = labels;
-                console.log("labels", labels);
             }
-            setAreLabelsLoaded(true);
+            onFinish();
         };
 
         if (availableLabels.size) {
             loadAllLabels();
         }
-    }, [availableLabels, folderName]);
+    }, [availableLabels, folderName, loadedData.odometry]);
 
-    return { labelsCacheRef, areLabelsLoaded, availableLabels };
+    return { labelsCacheRef, availableLabels };
 };

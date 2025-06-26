@@ -25,7 +25,8 @@ export const useImageLoader = () => {
         imagesByCamera,
         setSelectedCamera,
     } = useImages();
-    const { topLoaderBarRef, globalIsLoading, setTopLoaderLoadingProgress } = useLoading();
+    const { topLoaderBarRef, loadedData, setLoadedData, setTopLoaderLoadingProgress } =
+        useLoading();
     const { calibrations, projectedPointsRef } = useCalibrations();
 
     const defaultCamera = useMemo(() => {
@@ -39,9 +40,23 @@ export const useImageLoader = () => {
     }, []);
 
     useEffect(() => {
-        if (globalIsLoading) return;
+        if (!loadedData.pointclouds) return;
+        const message = "loadingImages";
 
-        setTopLoaderLoadingProgress({ message: "loadingImages", progress: 0, isLoading: true });
+        setTopLoaderLoadingProgress({ message: message, progress: 0, isLoading: true });
+
+        const onFinish = () => {
+            setTopLoaderLoadingProgress({
+                message: "",
+                progress: 0,
+                isLoading: false,
+            });
+            setLoadedData((prev) => ({
+                ...prev,
+                images: true,
+            }));
+            topLoaderBarRef?.current?.complete();
+        };
 
         const loaded = {};
         const allUrls = Object.values(images).flat();
@@ -49,12 +64,7 @@ export const useImageLoader = () => {
         let loadedCount = 0;
 
         if (total === 0) {
-            setTopLoaderLoadingProgress({
-                message: "loadingImages",
-                progress: 0,
-                isLoading: false,
-            });
-            topLoaderBarRef?.current?.complete();
+            onFinish();
             return;
         }
 
@@ -91,12 +101,7 @@ export const useImageLoader = () => {
                     if (loadedCount === total) {
                         setLoadedImages(loaded);
                         setSelectedCamera(defaultCamera);
-                        setTopLoaderLoadingProgress({
-                            message: "loadingImages",
-                            progress: 0,
-                            isLoading: false,
-                        });
-                        topLoaderBarRef?.current?.complete();
+                        onFinish();
                     }
 
                     const texture = new Texture(img);
@@ -115,5 +120,5 @@ export const useImageLoader = () => {
         return () => {
             projectedPointsRef.current = {};
         };
-    }, [images, globalIsLoading]);
+    }, [images, loadedData.pointclouds]);
 };

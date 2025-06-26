@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useThree } from "@react-three/fiber";
 
-import { useFileManager, useEditor, useConfig, useCuboids } from "contexts";
+import { useFileManager, useEditor, useConfig, useCuboids, useLoading } from "contexts";
 
 import { loadObjects } from "utils/editor";
 import { addCuboid, getPointsInsideCuboid } from "utils/cuboids";
@@ -12,6 +12,8 @@ export const useObjectsLoader = () => {
     const { config } = useConfig();
     const { pointCloudRefs } = useEditor();
     const { pcdFiles, folderName } = useFileManager();
+    const { loadedData, setLoadedData, setLoadingProgress } = useLoading();
+
     const {
         cuboidIdToLabelRef,
         pointsInsideCuboidsRef,
@@ -22,7 +24,6 @@ export const useObjectsLoader = () => {
     } = useCuboids();
 
     const objectsCacheRef = useRef({});
-    const [areObjectsLoaded, setAreObjectsLoaded] = useState(false);
 
     const findPointsInsideCuboids = () => {
         const colors = pointsInsideCuboidsRef.current;
@@ -64,15 +65,27 @@ export const useObjectsLoader = () => {
     };
 
     useEffect(() => {
-        if (!config.objects) return;
+        if (!config.objects || !loadedData.odometry) return;
+        const message = "loadingObjects";
+
+        const onFinish = () => {
+            setLoadingProgress({ message: "", progress: 0, isLoading: false });
+            setLoadedData((prev) => ({
+                ...prev,
+                solution: {
+                    ...prev.solution,
+                    objects: true,
+                },
+            }));
+        };
 
         const loadAllObjects = async () => {
+            setLoadingProgress({ message: message, progress: 0, isLoading: true });
             if (!objectsCacheRef.current[folderName]) {
                 try {
                     const objects = await loadObjects(folderName);
                     cuboidsSolutionRef.current = structuredClone(objects);
                     prevCuboidsRef.current = structuredClone(objects);
-                    console.log("objects", objects);
                 } catch (error) {
                     console.error(`Error loading objects for ${folderName}`, error);
                 }
@@ -80,7 +93,7 @@ export const useObjectsLoader = () => {
                 const solution = cuboidsSolutionRef.current[0];
 
                 if (!solution) {
-                    setAreObjectsLoaded(true);
+                    onFinish();
                     return;
                 }
 
@@ -114,13 +127,13 @@ export const useObjectsLoader = () => {
                     return [...prev, ...newCuboids];
                 });
             }
-            setAreObjectsLoaded(true);
+            onFinish();
         };
 
         if (folderName.length) {
             loadAllObjects();
         }
-    }, [folderName, config]);
+    }, [folderName, config, loadedData.odometry]);
 
-    return { areObjectsLoaded, findPointsInsideCuboids };
+    return { findPointsInsideCuboids };
 };

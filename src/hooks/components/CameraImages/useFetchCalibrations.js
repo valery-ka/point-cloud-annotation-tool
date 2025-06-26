@@ -10,12 +10,20 @@ export const useFetchCalibrations = () => {
     const { folderName } = useFileManager();
     const { imagesByCamera } = useImages();
     const { setCalibrations } = useCalibrations();
-    const { setLoadingProgress } = useLoading();
+    const { loadedData, setLoadedData, setLoadingProgress } = useLoading();
 
     useEffect(() => {
-        if (!imagesByCamera.length || !folderName) return;
+        if (!imagesByCamera.length || !folderName || !loadedData.config) return;
         const message = "loadingCalibrations";
         let loadedCalibrations = 0;
+
+        const onFinish = () => {
+            setLoadingProgress({ message: "", progress: 0, isLoading: false });
+            setLoadedData((prev) => ({
+                ...prev,
+                calibrations: true,
+            }));
+        };
 
         const fetchCalibrations = async () => {
             setLoadingProgress({ message: message, progress: 0, isLoading: true });
@@ -49,9 +57,9 @@ export const useFetchCalibrations = () => {
             );
 
             setCalibrations(allCalibrations);
-            setLoadingProgress({ message: message, progress: 0, isLoading: false });
+            onFinish();
         };
 
         fetchCalibrations();
-    }, [folderName]);
+    }, [folderName, loadedData.config]);
 };
