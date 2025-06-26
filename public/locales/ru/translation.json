@@ -156,5 +156,7 @@
     "nextObject": "Следующий объект",
     "removeObjectFromAllFrames": "Удалить объект со всех кадров",
     "closeObjectCard": "Закрыть карточку объекта",
-    "removedObjectsList": "Список удаленных объектов"
+    "removedObjectsList": "Список удаленных объектов",
+    "cloneObject": "Клонировать объект",
+    "back": "Назад"
 }

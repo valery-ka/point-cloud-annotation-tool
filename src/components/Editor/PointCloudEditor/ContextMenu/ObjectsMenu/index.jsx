@@ -1,9 +1,10 @@
 import { useEffect, useCallback, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { Tooltip } from "react-tooltip";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faQuestionCircle, faCaretRight } from "@fortawesome/free-solid-svg-icons";
 
-import { useConfig } from "contexts";
+import { useConfig, useCuboids } from "contexts";
 import { useMousetrapPause, useAddRemoveRestoreCuboid } from "hooks";
 
 import { getChildObjects, getChildTypes, formatObjectData } from "utils/shared";
@@ -17,10 +18,14 @@ export const ObjectsMenu = ({
     isSubMenuOpened,
     setIsSubMenuOpened,
 }) => {
+    const { t } = useTranslation();
+
     const { config } = useConfig();
     const { objects } = config;
 
-    const { addNewObject, updateExistingObject } = useAddRemoveRestoreCuboid();
+    const { selectedCuboid } = useCuboids();
+
+    const { addNewObject, cloneObject, updateExistingObject } = useAddRemoveRestoreCuboid();
 
     const objectList = useMemo(() => {
         if (!objects) return [];
@@ -95,11 +100,18 @@ export const ObjectsMenu = ({
                     handleOpenSubMenu(object);
                 }
             }
+
+            if (event.code === "KeyC" && selectedCuboid) {
+                cloneObject(clickedInfoRef, resetContextMenu);
+            }
         },
         [
             isOpened,
-            objectList,
             isSubMenuOpened,
+            resetContextMenu,
+            objectList,
+            selectedCuboid,
+            cloneObject,
             handleObjectAction,
             handleOpenSubMenu,
             handleBackToParent,
@@ -158,15 +170,28 @@ export const ObjectsMenu = ({
                         </div>
                     ),
                 )}
+                {selectedCuboid && (
+                    <div className="editor-context-menu-item-container">
+                        <div className="editor-context-menu-item" onClick={cloneObject}>
+                            <div className="editor-context-menu-item-key back">{"C"}</div>
+                            <div className="editor-context-menu-item-title">{t("cloneObject")}</div>
+                            <div
+                                className="editor-context-menu-item-info"
+                                data-tooltip-id={"tooltip-clone-object"}
+                                data-tooltip-html={"clone-object"}
+                            ></div>
+                        </div>
+                    </div>
+                )}
                 {isSubMenuOpened.isOpen && (
                     <div className="editor-context-menu-item-container">
                         <div className="editor-context-menu-item" onClick={handleBackToParent}>
                             <div className="editor-context-menu-item-key back">{`Esc`}</div>
-                            <div className="editor-context-menu-item-title">{`Назад`}</div>
+                            <div className="editor-context-menu-item-title">{t("back")}</div>
                             <div
                                 className="editor-context-menu-item-info"
-                                data-tooltip-id={`tooltip-${123}`}
-                                data-tooltip-html={123}
+                                data-tooltip-id={"tooltip-back-to-parent"}
+                                data-tooltip-html={"back-to-parent"}
                             ></div>
                         </div>
                     </div>

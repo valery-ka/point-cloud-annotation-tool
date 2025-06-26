@@ -156,5 +156,7 @@
     "nextObject": "Next object",
     "removeObjectFromAllFrames": "Remove object from all frames",
     "closeObjectCard": "Close object card",
-    "removedObjectsList": "Removed Objects List"
+    "removedObjectsList": "Removed Objects List",
+    "cloneObject": "Clone object",
+    "back": "Back"
 }

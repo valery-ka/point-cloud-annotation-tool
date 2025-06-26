@@ -34,6 +34,7 @@ export const useAddRemoveRestoreCuboid = () => {
         updateSingleCuboidRef,
         cuboidIdToLabelRef,
         prevCuboidsRef,
+        selectedCuboidGeometryRef,
     } = useCuboids();
 
     const { imagePointsAlphaNeedsUpdateRef } = useImages();
@@ -89,13 +90,15 @@ export const useAddRemoveRestoreCuboid = () => {
 
     const addNewObject = useCallback(
         (object, position) => {
+            console.log(object);
             const { color, type: label, dimensions } = object;
             const { selected, scale, position: selPos, rotation } = selectedCuboidInfoRef.current;
 
-            const defaultScale = [dimensions.length, dimensions.width, dimensions.height];
+            const objectScale = [dimensions.length, dimensions.width, dimensions.height];
+
             const newPosition = selected
-                ? [position[0], position[1], selPos[2] - (scale[2] - defaultScale[2]) / 2]
-                : [position[0], position[1], position[2] + defaultScale[2] / 2];
+                ? [position[0], position[1], selPos[2] - (scale[2] - objectScale[2]) / 2]
+                : [position[0], position[1], position[2] + objectScale[2] / 2];
 
             setCuboids((prev = []) => {
                 const newId = String(getNextId(prev, deletedCuboidsRef.current));
@@ -104,7 +107,7 @@ export const useAddRemoveRestoreCuboid = () => {
                     label,
                     color,
                     position: newPosition,
-                    scale: defaultScale,
+                    scale: objectScale,
                     rotation: selected ? rotation : [0, 0, 0],
                 };
                 addCuboidOnScene(cuboid);
@@ -112,6 +115,29 @@ export const useAddRemoveRestoreCuboid = () => {
             });
         },
         [addCuboidOnScene],
+    );
+
+    const cloneObject = useCallback(
+        (clickedInfoRef, resetContextMenu) => {
+            publish("copyObjectTransform");
+
+            const toClone = selectedCuboidGeometryRef.current;
+
+            const color = toClone.userData.color;
+            const type = toClone.userData.label;
+            const dimensions = {
+                length: toClone.scale.x,
+                width: toClone.scale.y,
+                height: toClone.scale.z,
+            };
+
+            const object = { color, type, dimensions };
+            const position = clickedInfoRef.current.position;
+
+            addNewObject(object, position);
+            resetContextMenu();
+        },
+        [publish, addNewObject],
     );
 
     const updateExistingObject = useCallback(
@@ -281,5 +307,12 @@ export const useAddRemoveRestoreCuboid = () => {
         [saveObjectsSolution, resetUndoRedoStacks],
     );
 
-    return { addNewObject, updateExistingObject, addRemovedObject, restoreObject, removeObject };
+    return {
+        addNewObject,
+        cloneObject,
+        updateExistingObject,
+        addRemovedObject,
+        restoreObject,
+        removeObject,
+    };
 };
