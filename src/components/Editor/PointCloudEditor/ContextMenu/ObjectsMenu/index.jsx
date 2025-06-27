@@ -27,6 +27,8 @@ export const ObjectsMenu = ({
 
     const { addNewObject, cloneObject, updateExistingObject } = useAddRemoveRestoreCuboid();
 
+    const isCloningAvailable = clickedInfoRef.current?.position && selectedCuboid;
+
     const objectList = useMemo(() => {
         if (!objects) return [];
         const result = [];
@@ -101,7 +103,7 @@ export const ObjectsMenu = ({
                 }
             }
 
-            if (event.code === "KeyC" && selectedCuboid) {
+            if (event.code === "KeyC" && isCloningAvailable) {
                 cloneObject(clickedInfoRef, resetContextMenu);
             }
         },
@@ -110,7 +112,6 @@ export const ObjectsMenu = ({
             isSubMenuOpened,
             resetContextMenu,
             objectList,
-            selectedCuboid,
             cloneObject,
             handleObjectAction,
             handleOpenSubMenu,
@@ -170,7 +171,7 @@ export const ObjectsMenu = ({
                         </div>
                     ),
                 )}
-                {selectedCuboid && (
+                {isCloningAvailable && (
                     <div className="editor-context-menu-item-container">
                         <div className="editor-context-menu-item" onClick={cloneObject}>
                             <div className="editor-context-menu-item-key back">{"C"}</div>

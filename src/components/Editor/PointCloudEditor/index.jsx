@@ -1,9 +1,11 @@
+import { memo } from "react";
+
 import * as HOOKS from "hooks";
 
 import { ModerationComments } from "./ModerationComments";
 import { CuboidsLabels } from "./CuboidsLabels";
 
-export const PointCloudEditor = () => {
+export const PointCloudEditor = memo(() => {
     const { THEME_COLORS } = HOOKS.useEditorTheme();
 
     const updateGlobalBox = HOOKS.useEditorHelpers();
@@ -58,9 +60,10 @@ export const PointCloudEditor = () => {
     });
 
     return (
+        // в этих компонентах каша, срочно надо рефакторить
         <>
             <ModerationComments />
             <CuboidsLabels />
         </>
     );
-};
+});

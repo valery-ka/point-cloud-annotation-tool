@@ -2,9 +2,11 @@ import React, { memo, useCallback, useMemo } from "react";
 import { faCheck, faTimes, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { useTranslation } from "react-i18next";
 
-import { useEvent, useModeration, useConfig } from "contexts";
+import { useEvent, useModeration, useConfig, useCuboids } from "contexts";
 
 import { SidebarIcon } from "../../SidebarIcon";
+
+import { getCuboidMeshPositionById } from "utils/cuboids";
 
 // const COMPONENT_NAME = "IssueItem.";
 const COMPONENT_NAME = "";
@@ -15,6 +17,7 @@ export const IssueItem = memo(({ issue, index, orderNumber }) => {
     const { publish } = useEvent();
     const { isModerationJob } = useConfig();
     const { isIssuesHidden } = useModeration();
+    const { cuboidsGeometriesRef } = useCuboids();
 
     const isIssueActive = useMemo(() => {
         return issue.resolved || isIssuesHidden || issue.checked;
@@ -22,7 +25,11 @@ export const IssueItem = memo(({ issue, index, orderNumber }) => {
 
     const switchCameraToPoint = useCallback(() => {
         if (issue.resolved || isIssuesHidden || issue.checked) return;
-        publish("switchCameraToPoint", issue.position);
+
+        const position =
+            issue.position || getCuboidMeshPositionById(cuboidsGeometriesRef, issue.id);
+
+        publish("switchCameraToPoint", position);
     }, [publish, isIssueActive]);
 
     return (

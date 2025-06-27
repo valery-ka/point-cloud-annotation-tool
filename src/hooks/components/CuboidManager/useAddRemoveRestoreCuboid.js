@@ -90,7 +90,6 @@ export const useAddRemoveRestoreCuboid = () => {
 
     const addNewObject = useCallback(
         (object, position) => {
-            console.log(object);
             const { color, type: label, dimensions } = object;
             const { selected, scale, position: selPos, rotation } = selectedCuboidInfoRef.current;
 

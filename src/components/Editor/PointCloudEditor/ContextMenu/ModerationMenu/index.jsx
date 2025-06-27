@@ -27,13 +27,23 @@ export const ModerationMenu = ({
     const { issues, setIssues } = useModeration();
     const { folderName } = useFileManager();
 
+    const issueSource = clickedInfoRef.current?.source;
+
     const pointIssuesList = useMemo(() => {
-        return moderation?.filter(({ applicableTo }) => applicableTo === "point");
+        return moderation?.filter(
+            ({ applicableTo }) => applicableTo === "point" || applicableTo === "all",
+        );
     }, [config]);
 
     const objectIssuesList = useMemo(() => {
-        return moderation?.filter(({ applicableTo }) => applicableTo === "object");
+        return moderation?.filter(
+            ({ applicableTo }) => applicableTo === "object" || applicableTo === "all",
+        );
     }, [config]);
+
+    const issuesList = useMemo(() => {
+        return (issueSource === "point" ? pointIssuesList : objectIssuesList) ?? [];
+    }, [issueSource]);
 
     const saveIssuesList = useCallback(() => {
         const issuesJSON = JSON.stringify(issues);
@@ -60,14 +70,14 @@ export const ModerationMenu = ({
                 return;
             }
 
-            const point = clickedInfoRef.current.index;
+            const id = clickedInfoRef.current.id;
             const position = clickedInfoRef.current.position;
 
             setIssues((prevIssues) => {
                 const newIssue = {
-                    type: "point",
+                    source: issueSource,
                     frame: activeFrameIndex,
-                    clickedInfoRef: point,
+                    id: parseInt(id),
                     position: position,
                     issue: issue.value,
                     workerHint: issue.workerHint,
@@ -77,7 +87,7 @@ export const ModerationMenu = ({
             });
             resetContextMenu();
         },
-        [activeFrameIndex, contextMenuPosition],
+        [issueSource, activeFrameIndex, contextMenuPosition],
     );
 
     const handleContextMenuClick = useCallback(
@@ -90,7 +100,7 @@ export const ModerationMenu = ({
     const handleKeyDown = useCallback(
         (event) => {
             if (event.key >= "1" && event.key <= "9" && isOpened && !isTextInputOpened) {
-                const issue = pointIssuesList[+event.key - 1];
+                const issue = issuesList[+event.key - 1];
                 if (issue) {
                     addIssue(issue);
                 }
@@ -127,7 +137,7 @@ export const ModerationMenu = ({
                         addIssue={addIssue}
                     />
                 ) : (
-                    pointIssuesList?.map((issue, index) => (
+                    issuesList?.map((issue, index) => (
                         <div key={issue.value} className="editor-context-menu-item-container">
                             <div
                                 className="editor-context-menu-item"

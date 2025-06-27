@@ -187,7 +187,7 @@ export const getPointsInsideCuboid = (positions, position, quaternionObj, scale)
 
 export const getCuboidMeshPositionById = (cuboidsGeometriesRef, id) => {
     for (const geometry of Object.values(cuboidsGeometriesRef.current)) {
-        if (geometry?.cube?.mesh?.name === id) {
+        if (geometry?.cube?.mesh?.name === id.toString()) {
             const position = geometry.cube.mesh.position;
             const scale = geometry.cube.mesh.scale;
             return [position.x, position.y, position.z - scale.z / 2];

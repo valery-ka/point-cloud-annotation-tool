@@ -88,8 +88,9 @@ export const EditorContextMenu = () => {
                     });
 
                     clickedInfoRef.current = {
-                        index: highlightedPoint?.index,
+                        id: highlightedPoint?.index,
                         position: [highlightedPoint?.x, highlightedPoint?.y, highlightedPoint?.z],
+                        source: "point",
                     };
 
                     setIsModerationMenuOpened(true);
@@ -119,7 +120,7 @@ export const EditorContextMenu = () => {
 
                 if (highlightedPoint) {
                     clickedInfoRef.current = {
-                        index: highlightedPoint.index,
+                        id: highlightedPoint.index,
                         position: [highlightedPoint.x, highlightedPoint.y, highlightedPoint.z],
                     };
                 } else {
@@ -134,7 +135,7 @@ export const EditorContextMenu = () => {
                     raycasterRef.current.ray.intersectPlane(planeZ, intersection);
 
                     clickedInfoRef.current = {
-                        index: null,
+                        id: null,
                         position: [intersection.x, intersection.y, intersection.z],
                     };
                 }
@@ -170,6 +171,34 @@ export const EditorContextMenu = () => {
     );
 
     useSubscribeFunction("editCuboidLabel", editCuboidLabel, []);
+
+    const openCuboidIssuesList = useCallback((data) => {
+        if (data) {
+            const { event, cuboid } = data;
+            setIsObjectsMenuOpened(false);
+
+            const container = document.querySelector(CONTEXT_MENU_CONTAINER);
+
+            if (container && container.contains(event.target)) {
+                const { left, top } = container.getBoundingClientRect();
+                const clientX = event.clientX - left;
+                const clientY = event.clientY - top;
+
+                requestAnimationFrame(() => {
+                    updateMenuPosition(clientX, clientY, "moderation");
+                });
+
+                clickedInfoRef.current = {
+                    id: cuboid.id,
+                    source: "object",
+                };
+
+                setIsModerationMenuOpened(true);
+            }
+        }
+    }, []);
+
+    useSubscribeFunction("openCuboidIssuesList", openCuboidIssuesList, []);
 
     const handleMouseDown = useCallback(
         (event) => {

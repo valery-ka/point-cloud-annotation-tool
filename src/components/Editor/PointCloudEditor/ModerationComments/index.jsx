@@ -1,11 +1,11 @@
-import { useCallback } from "react";
+import { memo, useCallback } from "react";
 import { useEvent, useFrames, useModeration } from "contexts";
 
 import { SceneButton } from "../SceneButton";
 
 import { TABS } from "constants";
 
-export const ModerationComments = () => {
+export const ModerationComments = memo(() => {
     const { issues, isIssuesHidden } = useModeration();
     const { activeFrameIndex } = useFrames();
     const { publish } = useEvent();
@@ -14,7 +14,14 @@ export const ModerationComments = () => {
         publish("setActiveTab", TABS.MODERATION);
     }, [publish]);
 
-    if (!issues.length || isIssuesHidden) return;
+    const getIsHidden = useCallback(
+        (issue) => {
+            return issue.resolved || issue.checked || issue.source === "object" || isIssuesHidden;
+        },
+        [isIssuesHidden],
+    );
+
+    if (!issues.length) return;
 
     return (
         <>
@@ -26,7 +33,7 @@ export const ModerationComments = () => {
                             index={index}
                             text={acc.length + 1}
                             position={issue.position}
-                            hidden={issue.resolved || issue.checked}
+                            hidden={getIsHidden(issue)}
                             hint={issue.workerHint}
                             hover={true}
                             onClick={setActiveTab}
@@ -37,4 +44,4 @@ export const ModerationComments = () => {
             }, [])}
         </>
     );
-};
+});
