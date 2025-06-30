@@ -2,8 +2,8 @@ import { memo } from "react";
 
 import * as HOOKS from "hooks";
 
-import { ModerationComments } from "./ModerationComments";
-import { CuboidsLabels } from "./CuboidsLabels";
+import { PointsHtml } from "./DreiHtml/PointsHtml";
+import { CuboidsHtml } from "./DreiHtml/CuboidsHtml";
 
 export const PointCloudEditor = memo(() => {
     const { THEME_COLORS } = HOOKS.useEditorTheme();
@@ -60,10 +60,9 @@ export const PointCloudEditor = memo(() => {
     });
 
     return (
-        // в этих компонентах каша, срочно надо рефакторить
         <>
-            <ModerationComments />
-            <CuboidsLabels />
+            <PointsHtml />
+            <CuboidsHtml />
         </>
     );
 });

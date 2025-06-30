@@ -1,18 +1,16 @@
 import { memo, useCallback } from "react";
-import { useEvent, useFrames, useModeration } from "contexts";
+import { useEvent, useFrames, useModeration, useConfig } from "contexts";
 
-import { SceneButton } from "../SceneButton";
+import { PointIssueButton } from "./PointIssueButton";
 
 import { TABS } from "constants";
 
-export const ModerationComments = memo(() => {
-    const { issues, isIssuesHidden } = useModeration();
-    const { activeFrameIndex } = useFrames();
+export const PointsHtml = memo(() => {
     const { publish } = useEvent();
+    const { isModerationJob } = useConfig();
+    const { issues, isIssuesHidden } = useModeration();
 
-    const setActiveTab = useCallback(() => {
-        publish("setActiveTab", TABS.MODERATION);
-    }, [publish]);
+    const { activeFrameIndex } = useFrames();
 
     const getIsHidden = useCallback(
         (issue) => {
@@ -21,6 +19,10 @@ export const ModerationComments = memo(() => {
         [isIssuesHidden],
     );
 
+    const setActiveTab = useCallback(() => {
+        publish("setActiveTab", TABS.MODERATION);
+    }, [publish]);
+
     if (!issues.length) return;
 
     return (
@@ -28,15 +30,16 @@ export const ModerationComments = memo(() => {
             {issues.reduce((acc, issue, index) => {
                 if (issue.frame === activeFrameIndex) {
                     acc.push(
-                        <SceneButton
+                        <PointIssueButton
                             key={index}
                             index={index}
                             text={acc.length + 1}
                             position={issue.position}
-                            hidden={getIsHidden(issue)}
+                            hiddenIssue={getIsHidden(issue)}
                             hint={issue.workerHint}
-                            hover={true}
                             onClick={setActiveTab}
+                            publish={publish}
+                            isModerationJob={isModerationJob}
                         />,
                     );
                 }

@@ -1,13 +1,14 @@
+.html-scene-button-wrapper {
+    pointer-events: none;
+}
+
 .scene-button-wrapper {
-    position: relative;
     display: flex;
     flex-direction: column;
+    gap: 5px;
+    transform: translate(-50%, -100%);
     align-items: center;
-    justify-content: center;
-    width: 100%;
-    font-family: Arial, sans-serif;
-    font-size: 15px;
-    margin-bottom: -45px;
+    pointer-events: auto;
 }
 
 .scene-button {
@@ -19,85 +20,11 @@
     border-radius: 5px;
     font-size: 16px;
     cursor: pointer;
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
     opacity: 0.75;
     padding: 0 10px;
+    user-select: none;
 
     &:hover {
         opacity: 1;
-    }
-}
-
-.issue-hover {
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%) translateY(-27px);
-
-    padding: 10px;
-    background-color: var(--primary-theme-color);
-    border: 1px solid var(--border-color);
-    border-radius: 5px;
-
-    width: 250px;
-
-    &::before,
-    &::after {
-        content: "";
-        position: absolute;
-        top: 100%;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 0;
-        height: 0;
-        border-left: 8px solid transparent;
-        border-right: 8px solid transparent;
-        border-top: 8px solid var(--border-color);
-    }
-
-    &::after {
-        transform: translateX(-50%) translateY(-2px);
-        border-top-color: var(--primary-theme-color);
-    }
-
-    &-text {
-        text-align: center;
-        color: var(--text-color);
-        opacity: 0.75;
-        margin-bottom: 10px;
-    }
-
-    &-buttons {
-        display: flex;
-        flex-direction: row;
-        justify-content: center;
-
-        gap: 5px;
-        padding: 0px 5px;
-    }
-
-    &-button {
-        min-width: 100px;
-        padding: 4px 16px;
-        border-radius: 6px;
-        border: 1px solid var(--border-color);
-        font-family: "Montserrat", ui-sans-serif, system-ui, sans-serif;
-        font-weight: 500;
-        font-size: 14px;
-        background-color: var(--primary-theme-color);
-        color: var(--text-color);
-        cursor: pointer;
-
-        &:hover {
-            background-color: var(--secondary-theme-color);
-        }
-
-        &:active {
-            transform: scale(0.98);
-            background-color: var(--button-active-bg-color);
-        }
     }
 }

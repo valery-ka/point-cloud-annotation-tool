@@ -26,9 +26,9 @@ export const ModerationTab = memo(({ title }) => {
     }, [issues]);
 
     const { isPrevButtonActive, isNextButtonActive } = useMemo(() => {
-        const firstIssueFrame = framesWithIssues.length > 0 ? framesWithIssues[0] : null;
+        const firstIssueFrame = framesWithIssues.length > 0 ? framesWithIssues[0] : undefined;
         const lastIssueFrame =
-            framesWithIssues.length > 0 ? framesWithIssues[framesWithIssues.length - 1] : null;
+            framesWithIssues.length > 0 ? framesWithIssues[framesWithIssues.length - 1] : undefined;
 
         return {
             isPrevButtonActive: activeFrameIndex > firstIssueFrame,
