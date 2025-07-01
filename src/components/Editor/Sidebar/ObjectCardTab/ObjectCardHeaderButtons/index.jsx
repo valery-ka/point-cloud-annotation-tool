@@ -19,11 +19,11 @@ import { SidebarIcon } from "../../SidebarIcon";
 import { getCuboidMeshPositionById } from "utils/cuboids";
 import { isEmpty } from "lodash";
 
-// const COMPONENT_NAME = "ObjectCardButtons.";
+// const COMPONENT_NAME = "ObjectCardHeaderButtons.";
 const COMPONENT_NAME = "";
 const OBJECTS_TAB_INDEX = 0;
 
-export const ObjectCardButtons = memo(() => {
+export const ObjectCardHeaderButtons = memo(() => {
     const { t } = useTranslation();
 
     const { publish } = useEvent();

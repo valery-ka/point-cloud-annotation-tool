@@ -154,6 +154,7 @@
     "copyObjectTransform": "Copy object transform",
     "prevObject": "Previous object",
     "nextObject": "Next object",
+    "cuboidAttributes": "Cuboid Attributes",
     "removeObjectFromAllFrames": "Remove object from all frames",
     "closeObjectCard": "Close object card",
     "removedObjectsList": "Removed Objects List",

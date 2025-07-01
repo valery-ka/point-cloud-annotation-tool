@@ -205,6 +205,7 @@ export const writePSRToSolution = ({
                 scale: { x: scale.x, y: scale.y, z: scale.z },
                 quaternion: { x: quaternion.x, y: quaternion.y, z: quaternion.z, w: quaternion.w },
             },
+            attributes: existing?.attributes || [],
         };
 
         if (existing) {

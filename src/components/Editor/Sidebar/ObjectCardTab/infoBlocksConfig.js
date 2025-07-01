@@ -1,4 +1,4 @@
-export const infoBlocksConfig = (t) => [
+export const infoBlocksConfigActions = (t) => [
     {
         title: [t("points")],
         type: "points",
@@ -34,5 +34,13 @@ export const infoBlocksConfig = (t) => [
             global: ["reset"],
             local: ["plus", "minus", "reset"],
         },
+    },
+];
+
+export const infoBlocksConfigButtons = (t) => [
+    {
+        title: [t("cuboidAttributes")],
+        type: "attributes",
+        action: "attributes",
     },
 ];

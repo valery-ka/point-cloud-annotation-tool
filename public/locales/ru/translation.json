@@ -154,6 +154,7 @@
     "copyObjectTransform": "Скопировать смещение объекта",
     "prevObject": "Предыдущий объект",
     "nextObject": "Следующий объект",
+    "cuboidAttributes": "Аттрибуты кубоида",
     "removeObjectFromAllFrames": "Удалить объект со всех кадров",
     "closeObjectCard": "Закрыть карточку объекта",
     "removedObjectsList": "Список удаленных объектов",

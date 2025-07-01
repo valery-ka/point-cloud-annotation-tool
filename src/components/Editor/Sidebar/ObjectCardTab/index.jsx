@@ -6,7 +6,8 @@ import { useEvent, useCuboids, useConfig, useEditor } from "contexts";
 import { useContinuousAction } from "hooks";
 
 import { ObjectCardInfoBlock } from "./ObjectCardInfoBlock";
-import { ObjectCardButtons } from "./ObjectCardButtons";
+import { ObjectCardHeaderButtons } from "./ObjectCardHeaderButtons";
+import { ObjectCardInfoAttributes } from "./ObjectCardInfoAttributes";
 
 import { TABS } from "constants";
 
@@ -16,7 +17,7 @@ import {
     ROTATION_HANDLERS,
     RESET_HANDLERS,
 } from "./handlersConfig";
-import { infoBlocksConfig } from "./infoBlocksConfig";
+import { infoBlocksConfigActions, infoBlocksConfigButtons } from "./infoBlocksConfig";
 
 // const COMPONENT_NAME = "ObjectCardTab.";
 const COMPONENT_NAME = "";
@@ -162,11 +163,16 @@ export const ObjectCardTab = memo(() => {
         return valueMap[type] || {};
     }, []);
 
+    const getCuboidAttributes = useCallback(() => {
+        const attributes = objects[0][selectedCuboid?.label]?.attributes;
+        return attributes;
+    }, [objects, selectedCuboid?.label]);
+
     return (
         <div className="sidebar-tab-panel">
             <div className="tab-header-container">
                 <h2 className="tab-header">ID: {selectedCuboid?.id}</h2>
-                <ObjectCardButtons />
+                <ObjectCardHeaderButtons />
             </div>
             <div className="sidebar-content">
                 <div className="object-info-container">
@@ -180,7 +186,7 @@ export const ObjectCardTab = memo(() => {
                         </div>
                     </div>
                     <div className="object-card-info-block-container">
-                        {infoBlocksConfig(t).map(
+                        {infoBlocksConfigActions(t).map(
                             ({ title, type, action, unit, decimals, buttons }) => (
                                 <ObjectCardInfoBlock
                                     key={type}
@@ -194,6 +200,13 @@ export const ObjectCardTab = memo(() => {
                                 />
                             ),
                         )}
+                        {infoBlocksConfigButtons(t).map(({ title, type }) => (
+                            <ObjectCardInfoAttributes
+                                key={type}
+                                title={title}
+                                attributes={getCuboidAttributes()}
+                            />
+                        ))}
                     </div>
                 </div>
             </div>

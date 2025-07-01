@@ -81,7 +81,6 @@ export const useTransformControls = () => {
         return () => {
             transform?.removeEventListener("change", onTransformChange);
             transform?.removeEventListener("dragging-changed", onDraggingChanged);
-            transform?.detach();
         };
     }, [onTransformChange, onDraggingChanged]);
 
