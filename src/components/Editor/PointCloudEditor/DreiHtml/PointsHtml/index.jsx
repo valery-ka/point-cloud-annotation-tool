@@ -8,15 +8,15 @@ import { TABS } from "constants";
 export const PointsHtml = memo(() => {
     const { publish } = useEvent();
     const { isModerationJob } = useConfig();
-    const { issues, isIssuesHidden } = useModeration();
+    const { issues, isIssueHidden } = useModeration();
 
     const { activeFrameIndex } = useFrames();
 
     const getIsHidden = useCallback(
         (issue) => {
-            return issue.resolved || issue.checked || issue.source === "object" || isIssuesHidden;
+            return issue.source === "object" || isIssueHidden(issue);
         },
-        [isIssuesHidden],
+        [isIssueHidden, isModerationJob],
     );
 
     const setActiveTab = useCallback(() => {

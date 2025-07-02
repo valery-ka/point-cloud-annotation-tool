@@ -9,7 +9,7 @@ import { TABS } from "constants";
 export const CuboidsHtml = memo(() => {
     const { publish } = useEvent();
     const { isModerationJob } = useConfig();
-    const { issues, isIssuesHidden } = useModeration();
+    const { issues, isIssueHidden } = useModeration();
 
     const { activeFrameIndex } = useFrames();
     const { cuboidsGeometriesRef, hoveredCuboid } = useCuboids();
@@ -18,11 +18,16 @@ export const CuboidsHtml = memo(() => {
         (mesh) => {
             const id = parseInt(mesh.name);
 
-            const issueIndex = issues.findIndex((issue) => issue.id === id);
+            const issueIndex = issues.findIndex(
+                (issue) =>
+                    issue.source === "object" &&
+                    issue.id === id &&
+                    issue.frame === activeFrameIndex,
+            );
 
             return issueIndex;
         },
-        [issues],
+        [issues, activeFrameIndex],
     );
 
     const getIssueIndexOnFrame = useCallback(
@@ -109,9 +114,9 @@ export const CuboidsHtml = memo(() => {
                     issue.frame === activeFrameIndex,
             );
 
-            return issue?.checked || issue?.resolved || isIssuesHidden;
+            return isIssueHidden(issue);
         },
-        [issues, activeFrameIndex, isIssuesHidden],
+        [issues, isIssueHidden, activeFrameIndex],
     );
 
     const getIssueWorkerHint = useCallback(

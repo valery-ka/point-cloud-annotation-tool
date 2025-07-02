@@ -1,20 +1,27 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect, useCallback } from "react";
 
-import { useFileManager } from "./FileManagerProvider";
+import { useLoading, useConfig, useFileManager } from "contexts";
 
 import { API_PATHS } from "config/apiPaths";
-import { useLoading } from "./LoadingProvider";
 
 const { NAVIGATOR } = API_PATHS;
 
 const ModerationContext = createContext();
 
 export const ModerationProvider = ({ children }) => {
+    const { isModerationJob } = useConfig();
     const { folderName } = useFileManager();
     const { loadedData, setLoadedData, setLoadingProgress } = useLoading();
 
     const [issues, setIssues] = useState([]);
     const [isIssuesHidden, setIsIssuesHidden] = useState(false);
+
+    const isIssueHidden = useCallback(
+        (issue) => {
+            return isIssuesHidden || (isModerationJob ? issue?.resolved : issue?.checked);
+        },
+        [isIssuesHidden, isModerationJob],
+    );
 
     useEffect(() => {
         if (!folderName.length || !loadedData.odometry) return;
@@ -60,6 +67,7 @@ export const ModerationProvider = ({ children }) => {
             value={{
                 issues,
                 setIssues,
+                isIssueHidden,
                 isIssuesHidden,
                 setIsIssuesHidden,
             }}

@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useMemo } from "react";
+import React, { memo, useCallback } from "react";
 import { faCheck, faTimes, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { useTranslation } from "react-i18next";
 
@@ -16,25 +16,21 @@ export const IssueItem = memo(({ issue, index, orderNumber }) => {
 
     const { publish } = useEvent();
     const { isModerationJob } = useConfig();
-    const { isIssuesHidden } = useModeration();
+    const { isIssueHidden } = useModeration();
     const { cuboidsGeometriesRef } = useCuboids();
 
-    const isIssueActive = useMemo(() => {
-        return issue.resolved || isIssuesHidden || issue.checked;
-    }, [issue, isIssuesHidden]);
-
     const switchCameraToPoint = useCallback(() => {
-        if (issue.resolved || isIssuesHidden || issue.checked) return;
+        if (isIssueHidden(issue)) return;
 
         const position =
             issue.position || getCuboidMeshPositionById(cuboidsGeometriesRef, issue.id);
 
         publish("switchCameraToPoint", position);
-    }, [publish, isIssueActive]);
+    }, [publish, issue, isIssueHidden]);
 
     return (
         <div
-            className={`issue-item ${isIssueActive ? "resolved" : ""}`}
+            className={`issue-item ${isIssueHidden(issue) ? "resolved" : ""}`}
             key={index}
             onClick={() => switchCameraToPoint(issue)}
         >
