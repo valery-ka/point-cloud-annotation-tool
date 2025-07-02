@@ -3,6 +3,8 @@ import { memo, useState, useEffect, useCallback } from "react";
 import { useFrames, useCuboids } from "contexts";
 import { useSaveSolution } from "hooks";
 
+import { isEmpty } from "lodash";
+
 export const ObjectCardInfoAttributes = memo(({ title, attributes }) => {
     const { activeFrameIndex } = useFrames();
     const { selectedCuboid, cuboidsSolutionRef } = useCuboids();
@@ -83,6 +85,8 @@ export const ObjectCardInfoAttributes = memo(({ title, attributes }) => {
     useEffect(() => {
         setCuboidAttributes(getCurrentAttributes());
     }, [selectedCuboid, activeFrameIndex, getCurrentAttributes]);
+
+    if (isEmpty(attributes)) return;
 
     return (
         <div className="object-card-info-block">

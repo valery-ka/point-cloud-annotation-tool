@@ -180,7 +180,8 @@ export const writePSRToSolution = ({
     preserveManual = false,
 }) => {
     const id = mesh.name;
-    const type = mesh.userData.label;
+    const type = mesh.userData.type;
+    const label = mesh.userData.label;
     const position = mesh.position.clone();
     const scale = mesh.scale.clone();
     const rotation = mesh.rotation.clone();
@@ -197,6 +198,7 @@ export const writePSRToSolution = ({
         const data = {
             id,
             type,
+            label,
             manual,
             visible: isVisible,
             psr: {

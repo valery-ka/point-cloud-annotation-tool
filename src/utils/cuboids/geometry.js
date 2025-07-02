@@ -101,7 +101,7 @@ export const extractPsrFromObject = (object3D) => {
 };
 
 export const addCuboid = (scene, cuboid) => {
-    const { label, color, position, scale, rotation } = cuboid;
+    const { label, type, color, position, scale, rotation } = cuboid;
 
     const cube = createCubeGeometry(color, position, scale, rotation);
     const edges = createEdgesGeometry(cube.mesh.geometry, color);
@@ -117,26 +117,29 @@ export const addCuboid = (scene, cuboid) => {
     cube.mesh.name = cuboid.id;
     cube.mesh.userData.color = color;
     cube.mesh.userData.label = label;
+    cube.mesh.userData.type = type;
 
     scene.add(cube.mesh);
 
     return { cube, edges, arrow };
 };
 
-export const updateCuboid = (id, label, color, cuboidsGeometriesRef, cuboidsSolutionRef) => {
+export const updateCuboid = (id, type, label, color, cuboidsGeometriesRef, cuboidsSolutionRef) => {
     for (const geometry of Object.values(cuboidsGeometriesRef.current)) {
         if (geometry?.cube?.mesh?.name === id) {
             cuboidsGeometriesRef.current[id].cube.mesh.material.color = new Color(color);
             cuboidsGeometriesRef.current[id].edges.mesh.material.color = new Color(color);
             cuboidsGeometriesRef.current[id].arrow.mesh.material.color = new Color(color);
-            cuboidsGeometriesRef.current[id].cube.mesh.userData.color = color;
+            cuboidsGeometriesRef.current[id].cube.mesh.userData.type = type;
             cuboidsGeometriesRef.current[id].cube.mesh.userData.label = label;
+            cuboidsGeometriesRef.current[id].cube.mesh.userData.color = color;
         }
     }
     for (const solutionFrame of Object.values(cuboidsSolutionRef.current)) {
         for (const cuboid of Object.values(solutionFrame)) {
             if (cuboid.id === id) {
-                cuboid.type = label;
+                cuboid.type = type;
+                cuboid.label = label;
             }
         }
     }

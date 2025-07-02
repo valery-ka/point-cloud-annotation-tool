@@ -52,8 +52,8 @@ export const useAddRemoveRestoreCuboid = () => {
         return deletedCuboidsRef.current
             .map((item) => {
                 const firstSolution = item.solutions[0];
-                if (firstSolution && firstSolution.id && firstSolution.type) {
-                    return `ID: ${firstSolution.id} Label: ${firstSolution.type}`;
+                if (firstSolution && firstSolution.id && firstSolution.label) {
+                    return `ID: ${firstSolution.id} Label: ${firstSolution.label}`;
                 }
                 return null;
             })
@@ -74,7 +74,12 @@ export const useAddRemoveRestoreCuboid = () => {
 
     const addCuboidOnScene = useCallback(
         (cuboid) => {
-            const toSelect = { id: cuboid.id, label: cuboid.label, color: cuboid.color };
+            const toSelect = {
+                id: cuboid.id,
+                type: cuboid.type,
+                label: cuboid.label,
+                color: cuboid.color,
+            };
             const cuboidGeometry = addCuboid(sceneRef.current, cuboid);
             cuboidsGeometriesRef.current[cuboid.id] = cuboidGeometry;
 
@@ -90,7 +95,7 @@ export const useAddRemoveRestoreCuboid = () => {
 
     const addNewObject = useCallback(
         (object, position) => {
-            const { color, type: label, dimensions } = object;
+            const { color, type, label, dimensions } = object;
             const { selected, scale, position: selPos, rotation } = selectedCuboidInfoRef.current;
 
             const objectScale = [dimensions.length, dimensions.width, dimensions.height];
@@ -103,6 +108,7 @@ export const useAddRemoveRestoreCuboid = () => {
                 const newId = String(getNextId(prev, deletedCuboidsRef.current));
                 const cuboid = {
                     id: newId,
+                    type,
                     label,
                     color,
                     position: newPosition,
@@ -110,7 +116,7 @@ export const useAddRemoveRestoreCuboid = () => {
                     rotation: selected ? rotation : [0, 0, 0],
                 };
                 addCuboidOnScene(cuboid);
-                return [...prev, { id: newId, label, color }];
+                return [...prev, { id: newId, type, label, color }];
             });
         },
         [addCuboidOnScene],
@@ -123,14 +129,15 @@ export const useAddRemoveRestoreCuboid = () => {
             const toClone = selectedCuboidGeometryRef.current;
 
             const color = toClone.userData.color;
-            const type = toClone.userData.label;
+            const type = toClone.userData.type;
+            const label = toClone.userData.label;
             const dimensions = {
                 length: toClone.scale.x,
                 width: toClone.scale.y,
                 height: toClone.scale.z,
             };
 
-            const object = { color, type, dimensions };
+            const object = { color, type, label, dimensions };
             const position = clickedInfoRef.current.position;
 
             addNewObject(object, position);
@@ -141,13 +148,15 @@ export const useAddRemoveRestoreCuboid = () => {
 
     const updateExistingObject = useCallback(
         (id, object) => {
-            const { type: label, color } = object;
+            const { type, label, color } = object;
 
-            updateCuboid(id, label, color, cuboidsGeometriesRef, cuboidsSolutionRef);
+            updateCuboid(id, type, label, color, cuboidsGeometriesRef, cuboidsSolutionRef);
             setCuboids((prev) =>
-                prev.map((cuboid) => (cuboid.id === id ? { ...cuboid, label, color } : cuboid)),
+                prev.map((cuboid) =>
+                    cuboid.id === id ? { ...cuboid, type, label, color } : cuboid,
+                ),
             );
-            setSelectedCuboid({ id, label, color });
+            setSelectedCuboid({ id, type, label, color });
 
             updateSingleCuboidRef.current = { needsUpdate: true, id: id };
             saveObjectsSolution({ updateStack: false, isAutoSave: false });
@@ -158,7 +167,12 @@ export const useAddRemoveRestoreCuboid = () => {
     const addRemovedObject = useCallback(
         (cuboid, toRestore) => {
             const { points, solutions } = toRestore;
-            const toSelect = { id: cuboid.id, label: cuboid.label, color: cuboid.color };
+            const toSelect = {
+                id: cuboid.id,
+                type: cuboid.type,
+                label: cuboid.label,
+                color: cuboid.color,
+            };
 
             const restoreToScene = () => {
                 const cuboidGeometry = addCuboid(sceneRef.current, cuboid);
@@ -208,7 +222,8 @@ export const useAddRemoveRestoreCuboid = () => {
             const deletedCuboids = deletedCuboidsRef.current;
             const toRestore = deletedCuboids[index];
 
-            const label = toRestore.solutions[activeFrameIndex].type;
+            const type = toRestore.solutions[activeFrameIndex].type;
+            const label = toRestore.solutions[activeFrameIndex].label;
             const color = objects[label].color;
 
             const { position, scale, rotation } = toRestore.solutions[activeFrameIndex].psr;
@@ -217,6 +232,7 @@ export const useAddRemoveRestoreCuboid = () => {
                 const newId = String(getNextId(prev, deletedCuboids));
                 const cuboid = {
                     id: newId,
+                    type,
                     label,
                     color,
                     position: [position.x, position.y, position.z],
@@ -228,7 +244,7 @@ export const useAddRemoveRestoreCuboid = () => {
                 deletedCuboids.splice(index, 1);
                 setDeletedObjects(getDeletedItemsList());
 
-                return [...prev, { id: newId, label, color }];
+                return [...prev, { id: newId, type, label, color }];
             });
         },
         [activeFrameIndex, config?.objects],

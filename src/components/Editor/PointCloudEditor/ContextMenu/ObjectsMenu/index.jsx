@@ -35,9 +35,9 @@ export const ObjectsMenu = ({
         const childTypes = getChildTypes(objects);
 
         for (const obj of objects) {
-            for (const [type, data] of Object.entries(obj)) {
-                if (childTypes.has(type)) continue;
-                result.push(formatObjectData(type, data, objects));
+            for (const [label, data] of Object.entries(obj)) {
+                if (childTypes.has(label)) continue;
+                result.push(formatObjectData(label, data, objects));
             }
         }
 
@@ -55,7 +55,7 @@ export const ObjectsMenu = ({
 
     const handleOpenSubMenu = useCallback(
         (parentObject) => {
-            const children = getChildObjects(parentObject.type, objects);
+            const children = getChildObjects(parentObject.label, objects);
             setIsSubMenuOpened({
                 isOpen: true,
                 parentObject,
@@ -153,15 +153,20 @@ export const ObjectsMenu = ({
                                     className="editor-context-menu-item-info"
                                     data-tooltip-id={`tooltip-${object.title}`}
                                     data-tooltip-html={object?.description}
+                                    style={{
+                                        visibility: object?.description ? "visible" : "hidden",
+                                    }}
                                 >
                                     <FontAwesomeIcon icon={faQuestionCircle} className="icon" />
                                 </div>
-                                <Tooltip
-                                    id={`tooltip-${object.title}`}
-                                    place="bottom"
-                                    effect="solid"
-                                    delayShow={300}
-                                />
+                                {object?.description && (
+                                    <Tooltip
+                                        id={`tooltip-${object.title}`}
+                                        place="bottom"
+                                        effect="solid"
+                                        delayShow={300}
+                                    />
+                                )}
                                 {object.children && !isSubMenuOpened.isOpen && (
                                     <div className="editor-context-menu-item-tree">
                                         <FontAwesomeIcon icon={faCaretRight} className="icon" />

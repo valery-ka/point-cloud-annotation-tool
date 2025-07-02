@@ -12,14 +12,14 @@ export const getChildTypes = (objects) => {
     return childTypes;
 };
 
-export const formatObjectData = (type, data, objects) => {
+export const formatObjectData = (label, data, objects) => {
     let children = null;
 
     if (data.abstract) {
         const childrenList = [];
         for (const obj of objects) {
             for (const [childType, childData] of Object.entries(obj)) {
-                if (childData.parent === type) {
+                if (childData.parent === label) {
                     childrenList.push(childType);
                 }
             }
@@ -28,7 +28,8 @@ export const formatObjectData = (type, data, objects) => {
     }
 
     return {
-        type,
+        label,
+        type: data.type,
         title: data.title,
         description: data.description,
         dimensions: data.dimensions || null,

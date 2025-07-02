@@ -47,7 +47,7 @@ export const useObjectsLoader = () => {
             colors[filePath] = colors[filePath] || {};
 
             Object.values(frameSolution).forEach((cuboid) => {
-                const { id, type: label, psr, visible } = cuboid;
+                const { id, label, psr, visible } = cuboid;
                 const { position, scale, quaternion } = psr;
 
                 const points = getPointsInsideCuboid(
@@ -102,12 +102,13 @@ export const useObjectsLoader = () => {
                 setCuboids((prev = []) => {
                     const newCuboids = [];
 
-                    Object.values(solution).forEach(({ id, type: label, psr }) => {
+                    Object.values(solution).forEach(({ id, type, label, psr }) => {
                         const { position, scale, rotation } = psr;
                         const cuboidToAdd = {
                             id,
+                            type,
                             label,
-                            color: objectsConfig[label].color,
+                            color: objectsConfig[label]?.color,
                             position: [position.x, position.y, position.z],
                             scale: [scale.x, scale.y, scale.z],
                             rotation: [rotation.x, rotation.y, rotation.z],
@@ -119,6 +120,7 @@ export const useObjectsLoader = () => {
 
                         newCuboids.push({
                             id,
+                            type,
                             label,
                             color: cuboidToAdd.color,
                         });

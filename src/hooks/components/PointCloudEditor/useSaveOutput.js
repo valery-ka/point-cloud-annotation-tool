@@ -257,9 +257,14 @@ export const useSaveOutput = (updateUndoRedoState) => {
     useSubscribeFunction("saveObjectsSolution", requestSaveObjects, []);
 
     useEffect(() => {
+        const sound = new Audio("/sounds/kojima.mp3");
+        sound.volume = 0.2;
+        sound.load();
+
         const handleBeforeUnload = (event) => {
             if (hasUnsavedSolution) {
                 event.returnValue = true;
+                sound.play().catch((e) => console.error("Playback error:", e));
             }
         };
 
