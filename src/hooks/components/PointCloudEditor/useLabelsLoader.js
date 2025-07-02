@@ -21,7 +21,7 @@ export const useLabelsLoader = () => {
         const message = "loadingLabels";
 
         const onFinish = () => {
-            setLoadingProgress({ message: "", progress: 0, isLoading: false });
+            setLoadingProgress({ message: message, progress: 0, isLoading: false });
             setLoadedData((prev) => ({
                 ...prev,
                 solution: {

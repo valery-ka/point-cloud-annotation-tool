@@ -69,7 +69,7 @@ export const useObjectsLoader = () => {
         const message = "loadingObjects";
 
         const onFinish = () => {
-            setLoadingProgress({ message: "", progress: 0, isLoading: false });
+            setLoadingProgress({ message: message, progress: 0, isLoading: false });
             setLoadedData((prev) => ({
                 ...prev,
                 solution: {
