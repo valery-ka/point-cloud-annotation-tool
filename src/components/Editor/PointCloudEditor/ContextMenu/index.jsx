@@ -31,6 +31,10 @@ export const EditorContextMenu = () => {
 
     const raycasterRef = useRef(new Raycaster());
 
+    const getDefaultContextMenuContainer = useCallback(() => {
+        return document.querySelector(CONTEXT_MENU_CONTAINER);
+    }, []);
+
     const resetContextMenu = useCallback(() => {
         clickedInfoRef.current = null;
         setIsSubMenuOpened(false);
@@ -40,9 +44,8 @@ export const EditorContextMenu = () => {
         setContextMenuPosition(CONTEXT_MENU_RESET_POSITION);
     }, []);
 
-    const updateMenuPosition = useCallback((x, y, menuKey) => {
-        const container = document.querySelector(CONTEXT_MENU_CONTAINER);
-        const padding = 10;
+    const updateMenuPosition = useCallback(({ position, container, menuKey }) => {
+        const padding = 2;
 
         const menuEl = menuRefs.current[menuKey];
         if (!container || !menuEl) return;
@@ -54,8 +57,8 @@ export const EditorContextMenu = () => {
         const maxY = containerRect.height - offsetHeight - padding;
 
         const adjustedPosition = {
-            x: Math.max(padding, Math.min(x, maxX)),
-            y: Math.max(padding, Math.min(y, maxY)),
+            x: Math.max(padding, Math.min(position.x, maxX)) + 1,
+            y: Math.max(padding, Math.min(position.y, maxY)) + 1,
         };
 
         setContextMenuPosition(adjustedPosition);
@@ -63,9 +66,15 @@ export const EditorContextMenu = () => {
 
     useEffect(() => {
         const { x, y } = contextMenuPosition;
+        const container = getDefaultContextMenuContainer();
+
         if (isTextInputOpened) {
             requestAnimationFrame(() => {
-                updateMenuPosition(x, y, "moderation");
+                updateMenuPosition({
+                    position: { x, y },
+                    container: container,
+                    menuKey: "moderation",
+                });
             });
         }
     }, [isTextInputOpened]);
@@ -75,16 +84,20 @@ export const EditorContextMenu = () => {
             if (selectedTool !== "handPointer" || !isModerationJob) return;
             setIsObjectsMenuOpened(false);
 
-            const container = document.querySelector(CONTEXT_MENU_CONTAINER);
+            const container = getDefaultContextMenuContainer();
 
             if (container && container.contains(event.target)) {
                 if (highlightedPoint) {
                     const { left, top } = container.getBoundingClientRect();
-                    const clientX = event.clientX - left;
-                    const clientY = event.clientY - top;
+                    const x = event.clientX - left;
+                    const y = event.clientY - top;
 
                     requestAnimationFrame(() => {
-                        updateMenuPosition(clientX, clientY, "moderation");
+                        updateMenuPosition({
+                            position: { x, y },
+                            container: container,
+                            menuKey: "moderation",
+                        });
                     });
 
                     clickedInfoRef.current = {
@@ -105,15 +118,19 @@ export const EditorContextMenu = () => {
             if (selectedTool !== "handPointer") return;
             setIsModerationMenuOpened(false);
 
-            const container = document.querySelector(CONTEXT_MENU_CONTAINER);
+            const container = getDefaultContextMenuContainer();
 
             if (container && container.contains(event.target)) {
                 const { left, top, width, height } = container.getBoundingClientRect();
-                const clientX = event.clientX - left;
-                const clientY = event.clientY - top;
+                const x = event.clientX - left;
+                const y = event.clientY - top;
 
                 requestAnimationFrame(() => {
-                    updateMenuPosition(clientX, clientY, "objects");
+                    updateMenuPosition({
+                        position: { x, y },
+                        container: container,
+                        menuKey: "objects",
+                    });
                 });
 
                 setIsObjectsMenuOpened(true);
@@ -125,8 +142,8 @@ export const EditorContextMenu = () => {
                     };
                 } else {
                     const mouse = new Vector2();
-                    mouse.x = ((event.clientX - left) / width) * 2 - 1;
-                    mouse.y = -((event.clientY - top) / height) * 2 + 1;
+                    mouse.x = (x / width) * 2 - 1;
+                    mouse.y = -(y / height) * 2 + 1;
 
                     raycasterRef.current.setFromCamera(mouse, cameraRef.current);
 
@@ -146,19 +163,23 @@ export const EditorContextMenu = () => {
 
     const editCuboidLabel = useCallback(
         (data) => {
-            if (data) {
-                const { event, cuboid } = data;
+            if (data && !isTextInputOpened) {
+                const { event, cuboid, menuContainer } = data;
                 setIsModerationMenuOpened(false);
 
-                const container = document.querySelector(CONTEXT_MENU_CONTAINER);
+                const container = menuContainer || getDefaultContextMenuContainer();
 
                 if (container && container.contains(event.target)) {
                     const { left, top } = container.getBoundingClientRect();
-                    const clientX = event.clientX - left;
-                    const clientY = event.clientY - top;
+                    const x = event.clientX - left;
+                    const y = event.clientY - top;
 
                     requestAnimationFrame(() => {
-                        updateMenuPosition(clientX, clientY, "objects");
+                        updateMenuPosition({
+                            position: { x, y },
+                            container: container,
+                            menuKey: "objects",
+                        });
                     });
 
                     setIsObjectsMenuOpened(true);
@@ -167,36 +188,45 @@ export const EditorContextMenu = () => {
                 }
             }
         },
-        [selectedTool],
+        [isTextInputOpened],
     );
 
     useSubscribeFunction("editCuboidLabel", editCuboidLabel, []);
 
-    const openCuboidIssuesList = useCallback((data) => {
-        if (data) {
-            const { event, cuboid } = data;
-            setIsObjectsMenuOpened(false);
+    const openCuboidIssuesList = useCallback(
+        (data) => {
+            if (data) {
+                if (data && !isTextInputOpened) {
+                    const { event, cuboid } = data;
+                    setIsObjectsMenuOpened(false);
 
-            const container = document.querySelector(CONTEXT_MENU_CONTAINER);
+                    const container = getDefaultContextMenuContainer();
 
-            if (container && container.contains(event.target)) {
-                const { left, top } = container.getBoundingClientRect();
-                const clientX = event.clientX - left;
-                const clientY = event.clientY - top;
+                    if (container && container.contains(event.target)) {
+                        const { left, top } = container.getBoundingClientRect();
+                        const x = event.clientX - left;
+                        const y = event.clientY - top;
 
-                requestAnimationFrame(() => {
-                    updateMenuPosition(clientX, clientY, "moderation");
-                });
+                        requestAnimationFrame(() => {
+                            updateMenuPosition({
+                                position: { x, y },
+                                container: container,
+                                menuKey: "moderation",
+                            });
+                        });
 
-                clickedInfoRef.current = {
-                    id: cuboid.id,
-                    source: "object",
-                };
+                        clickedInfoRef.current = {
+                            id: cuboid.id,
+                            source: "object",
+                        };
 
-                setIsModerationMenuOpened(true);
+                        setIsModerationMenuOpened(true);
+                    }
+                }
             }
-        }
-    }, []);
+        },
+        [isTextInputOpened],
+    );
 
     useSubscribeFunction("openCuboidIssuesList", openCuboidIssuesList, []);
 
@@ -204,25 +234,29 @@ export const EditorContextMenu = () => {
         (event) => {
             if (isTextInputOpened) return;
 
-            const container = document.querySelector(CONTEXT_MENU_CONTAINER);
+            const clickedInsideMenu = Object.values(menuRefs.current).some(
+                (menuEl) => menuEl && menuEl.contains(event.target),
+            );
 
-            if (container && container.contains(event.target)) {
+            if (clickedInsideMenu) return;
+
+            const container = getDefaultContextMenuContainer();
+            const clickedInsideContainer = container && container.contains(event.target);
+
+            if (clickedInsideContainer) {
                 if (OPEN_MODERATION_MENU(event)) {
                     handleModerationMenuOpen(event);
-                } else if (OPEN_OBJECTS_MENU(event)) {
+                    return;
+                }
+                if (OPEN_OBJECTS_MENU(event)) {
                     handleObjectsMenuOpen(event);
-                } else {
-                    const clickedInsideMenu = Object.values(menuRefs.current).some(
-                        (menuEl) => menuEl && menuEl.contains(event.target),
-                    );
-
-                    if (!clickedInsideMenu) {
-                        resetContextMenu();
-                    }
+                    return;
                 }
             }
+
+            resetContextMenu();
         },
-        [handleModerationMenuOpen, handleObjectsMenuOpen, isTextInputOpened],
+        [handleModerationMenuOpen, handleObjectsMenuOpen, resetContextMenu, isTextInputOpened],
     );
 
     const handleKeyDown = useCallback(

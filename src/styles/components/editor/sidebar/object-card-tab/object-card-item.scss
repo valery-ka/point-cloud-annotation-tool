@@ -23,6 +23,10 @@
     background-color: var(--content-theme-color);
     border-radius: 5px;
     cursor: pointer;
+
+    &:hover {
+        box-shadow: 0 0 5px currentColor inset;
+    }
 }
 
 .object-card-info-block-container {

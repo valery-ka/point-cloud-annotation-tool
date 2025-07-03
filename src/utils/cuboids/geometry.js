@@ -124,22 +124,26 @@ export const addCuboid = (scene, cuboid) => {
     return { cube, edges, arrow };
 };
 
-export const updateCuboid = (id, type, label, color, cuboidsGeometriesRef, cuboidsSolutionRef) => {
-    for (const geometry of Object.values(cuboidsGeometriesRef.current)) {
+export const updateCuboid = ({ cuboid, refs }) => {
+    const { id, type, label, color, attributes } = cuboid;
+    const { geometries, solution } = refs;
+
+    for (const geometry of Object.values(geometries.current)) {
         if (geometry?.cube?.mesh?.name === id) {
-            cuboidsGeometriesRef.current[id].cube.mesh.material.color = new Color(color);
-            cuboidsGeometriesRef.current[id].edges.mesh.material.color = new Color(color);
-            cuboidsGeometriesRef.current[id].arrow.mesh.material.color = new Color(color);
-            cuboidsGeometriesRef.current[id].cube.mesh.userData.type = type;
-            cuboidsGeometriesRef.current[id].cube.mesh.userData.label = label;
-            cuboidsGeometriesRef.current[id].cube.mesh.userData.color = color;
+            geometries.current[id].cube.mesh.material.color = new Color(color);
+            geometries.current[id].edges.mesh.material.color = new Color(color);
+            geometries.current[id].arrow.mesh.material.color = new Color(color);
+            geometries.current[id].cube.mesh.userData.type = type;
+            geometries.current[id].cube.mesh.userData.label = label;
+            geometries.current[id].cube.mesh.userData.color = color;
         }
     }
-    for (const solutionFrame of Object.values(cuboidsSolutionRef.current)) {
+    for (const solutionFrame of Object.values(solution.current)) {
         for (const cuboid of Object.values(solutionFrame)) {
             if (cuboid.id === id) {
                 cuboid.type = type;
                 cuboid.label = label;
+                cuboid.attributes = cuboid.attributes.filter((attr) => attributes.includes(attr));
             }
         }
     }

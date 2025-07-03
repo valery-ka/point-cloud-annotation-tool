@@ -150,7 +150,22 @@ export const useAddRemoveRestoreCuboid = () => {
         (id, object) => {
             const { type, label, color } = object;
 
-            updateCuboid(id, type, label, color, cuboidsGeometriesRef, cuboidsSolutionRef);
+            const newAttributesList = config.objects[0][label].attributes;
+
+            updateCuboid({
+                cuboid: {
+                    id: id,
+                    type: type,
+                    label: label,
+                    color: color,
+                    attributes: newAttributesList,
+                },
+                refs: {
+                    geometries: cuboidsGeometriesRef,
+                    solution: cuboidsSolutionRef,
+                },
+            });
+
             setCuboids((prev) =>
                 prev.map((cuboid) =>
                     cuboid.id === id ? { ...cuboid, type, label, color } : cuboid,
@@ -161,7 +176,7 @@ export const useAddRemoveRestoreCuboid = () => {
             updateSingleCuboidRef.current = { needsUpdate: true, id: id };
             saveObjectsSolution({ updateStack: false, isAutoSave: false });
         },
-        [saveObjectsSolution],
+        [config, saveObjectsSolution],
     );
 
     const addRemovedObject = useCallback(

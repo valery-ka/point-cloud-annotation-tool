@@ -24,8 +24,8 @@ export const App = () => {
             <BatchView />
             <FileNavigator />
             <div className="tool-3d-scene">
+                <EditorContextMenu />
                 <div className="tool-3d-container">
-                    <EditorContextMenu />
                     <canvas id="canvasSelection" className="tool-3d-canvas-selection"></canvas>
                     <Canvas>
                         <PointCloudEditor />

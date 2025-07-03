@@ -1,7 +1,7 @@
 import { Vector3, OrthographicCamera, Quaternion } from "three";
 
 const TRANSLATE_STEP = 0.01;
-const ROTATE_STEP = 1;
+const ROTATE_STEP = 0.33;
 
 export const setupCamera = (name) => {
     const camera = new OrthographicCamera();
@@ -288,6 +288,12 @@ export const scalingConfigs = (dx, dy) => {
     });
 };
 
+export const applyLocalOffset = (cuboid, offset) => {
+    const direction = new Vector3(offset.x, offset.y, offset.z);
+    direction.applyQuaternion(cuboid.quaternion);
+    return direction;
+};
+
 export const applyKeyTransformToMesh = ({ code, mesh, configTranslate, configRotate }) => {
     if (!mesh || !configTranslate || !configRotate) return;
 
@@ -296,30 +302,26 @@ export const applyKeyTransformToMesh = ({ code, mesh, configTranslate, configRot
     switch (code) {
         case "KeyW": {
             const move = configTranslate(0, -TRANSLATE_STEP);
-            const worldTarget = mesh.localToWorld(move.clone());
-            const worldMove = worldTarget.sub(mesh.position);
-            mesh.position.add(worldMove);
+            const globalOffset = applyLocalOffset(mesh, move);
+            mesh.position.add(globalOffset);
             return true;
         }
         case "KeyS": {
             const move = configTranslate(0, TRANSLATE_STEP);
-            const worldTarget = mesh.localToWorld(move.clone());
-            const worldMove = worldTarget.sub(mesh.position);
-            mesh.position.add(worldMove);
+            const globalOffset = applyLocalOffset(mesh, move);
+            mesh.position.add(globalOffset);
             return true;
         }
         case "KeyA": {
             const move = configTranslate(-TRANSLATE_STEP, 0);
-            const worldTarget = mesh.localToWorld(move.clone());
-            const worldMove = worldTarget.sub(mesh.position);
-            mesh.position.add(worldMove);
+            const globalOffset = applyLocalOffset(mesh, move);
+            mesh.position.add(globalOffset);
             return true;
         }
         case "KeyD": {
             const move = configTranslate(TRANSLATE_STEP, 0);
-            const worldTarget = mesh.localToWorld(move.clone());
-            const worldMove = worldTarget.sub(mesh.position);
-            mesh.position.add(worldMove);
+            const globalOffset = applyLocalOffset(mesh, move);
+            mesh.position.add(globalOffset);
             return true;
         }
         case "KeyQ": {

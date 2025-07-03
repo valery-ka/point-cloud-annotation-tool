@@ -1,19 +1,13 @@
-import { Vector3 } from "three";
+import { applyLocalOffset } from "utils/cuboids";
 
 const POSITION_STEP = 0.05;
 const SCALE_STEP = 0.05;
-const ROTATION_STEP = 1;
+const ROTATION_STEP = 0.33;
 
 const ACTION_MAP = {
     0: "x",
     1: "y",
     2: "z",
-};
-
-const applyLocalOffset = (cuboid, offset) => {
-    const direction = new Vector3(offset.x, offset.y, offset.z);
-    direction.applyQuaternion(cuboid.quaternion);
-    return direction;
 };
 
 export const RESET_HANDLERS = {

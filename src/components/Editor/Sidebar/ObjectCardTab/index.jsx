@@ -168,6 +168,22 @@ export const ObjectCardTab = memo(() => {
         return attributes;
     }, [objects, selectedCuboid?.label]);
 
+    const openObjectsContextMenu = useCallback(
+        (e) => {
+            const container = document.getElementsByClassName("tool-3d-scene");
+
+            publish("editCuboidLabel", {
+                event: e,
+                cuboid: {
+                    id: selectedCuboid?.id,
+                    label: selectedCuboid?.label,
+                },
+                menuContainer: container[0],
+            });
+        },
+        [publish, selectedCuboid],
+    );
+
     return (
         <div className="sidebar-tab-panel">
             <div className="tab-header-container">
@@ -181,7 +197,10 @@ export const ObjectCardTab = memo(() => {
                             className="color-box"
                             style={{ backgroundColor: selectedCuboid?.color }}
                         ></div>
-                        <div className="object-label-button">
+                        <div
+                            className="object-label-button"
+                            onClick={(e) => openObjectsContextMenu(e)}
+                        >
                             <h3 className="classes-label">{selectedCuboid?.label}</h3>
                         </div>
                     </div>

@@ -32,6 +32,7 @@ export {
     getOrientationQuaternion,
     updateCamera,
     getBatchLayout,
+    applyLocalOffset,
 } from "./sideViews";
 
 export {
