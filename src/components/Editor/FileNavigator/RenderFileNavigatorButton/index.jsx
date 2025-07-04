@@ -1,7 +1,7 @@
 import { Tooltip } from "react-tooltip";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-export const RenderFileNavigatorButton = ({ icon, title, className, onClick }) => {
+export const RenderFileNavigatorButton = ({ icon, title, className = "", onClick }) => {
     return (
         <>
             <FontAwesomeIcon

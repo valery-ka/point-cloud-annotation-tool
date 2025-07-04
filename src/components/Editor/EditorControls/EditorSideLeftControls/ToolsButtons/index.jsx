@@ -1,16 +1,12 @@
 import { memo } from "react";
-import {
-    faPaintBrush,
-    faDrawPolygon,
-    faBezierCurve,
-    faVectorSquare,
-} from "@fortawesome/free-solid-svg-icons";
+import { faPaintBrush, faDrawPolygon, faVectorSquare } from "@fortawesome/free-solid-svg-icons";
 import { useTranslation } from "react-i18next";
 
 import { MODES } from "tools";
 import { useTools } from "contexts";
 import * as APP_CONSTANTS from "constants";
 
+import { SVGIcon } from "assets/SVGIcon";
 import { RenderEditorButton } from "../../RenderEditorButton";
 
 // const COMPONENT_NAME = "ToolsButtons.";
@@ -25,7 +21,7 @@ export const ToolsButtons = memo(() => {
     const paintModes = Object.keys(MODES).filter((mode) => MODES[mode].type === "paint");
     const filterModes = Object.keys(MODES).filter((mode) => MODES[mode].type === "filter");
 
-    const renderToolButton = (tool, icon, iconPosition = "") => {
+    const renderToolButton = ({ tool, icon, iconType, iconPosition = "" }) => {
         return (
             <RenderEditorButton
                 className={`tool-3d-control-button ${iconPosition} ${
@@ -35,6 +31,7 @@ export const ToolsButtons = memo(() => {
                 actionType={"tools"}
                 action={tool}
                 icon={icon}
+                iconType={iconType}
                 onClick={() => setSelectedTool(tool)}
             />
         );
@@ -66,10 +63,18 @@ export const ToolsButtons = memo(() => {
     return (
         <div className="tool-3d-controls-group--horizontal">
             <div className="tool-3d-controls-group--vertical">
-                {renderToolButton("brushTool", faPaintBrush, "top")}
-                {renderToolButton("polygonTool", faDrawPolygon)}
-                {renderToolButton("lassoTool", faBezierCurve)}
-                {renderToolButton("rectangleTool", faVectorSquare, "bottom")}
+                {renderToolButton({ tool: "brushTool", icon: faPaintBrush, iconPosition: "top" })}
+                {renderToolButton({ tool: "polygonTool", icon: faDrawPolygon })}
+                {renderToolButton({
+                    tool: "lassoTool",
+                    icon: <SVGIcon icon={"Lasso"} />,
+                    iconType: "custom",
+                })}
+                {renderToolButton({
+                    tool: "rectangleTool",
+                    icon: faVectorSquare,
+                    iconPosition: "bottom",
+                })}
             </div>
             {selectedTool !== DEFAULT_TOOL && (
                 <div className="tool-3d-controls-group">

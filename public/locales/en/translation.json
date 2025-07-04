@@ -168,5 +168,18 @@
     "rotateObjectPlus": "Rotate cuboid 90° clockwise",
     "rotateObjectMinus": "Rotate cuboid 90° anticlockwise",
     "flipObjectZ": "Flip cuboid",
-    "switchViewToCuboid": "Go to cuboid"
+    "switchViewToCuboid": "Go to cuboid",
+    "batchCount": "Batch count",
+    "batchInfoDialog": "Batch editor info",
+    "openBatchInfoDialog": "Open batch editor info",
+    "batchInfoDialogGeneral": "General",
+    "batchInfoDialogTransform": "Cuboid transform",
+    "batchInfoDialogActions": "Actions",
+    "closeBatchEditor": "Close batch editor",
+    "batchInfoDialogTranslate": "Cuboid translation",
+    "batchInfoDialogRotate": "Cuboid rotation",
+    "batchInfoDialogHide": "Hide cuboid",
+    "batchInfoDialogShow": "Show cuboid",
+    "batchInfoDialogRemoveKeyframe": "Remove hovered keyframe",
+    "batchInfoDialogGoToFrame": "Go to hovered frame"
 }

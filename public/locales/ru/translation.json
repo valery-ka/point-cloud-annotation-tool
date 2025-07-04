@@ -168,5 +168,18 @@
     "rotateObjectPlus": "Повернуть кубоид на 90° по часовой стрелке",
     "rotateObjectMinus": "Повернуть кубоид на 90° против часовой стрелке",
     "flipObjectZ": "Развернуть кубоид",
-    "switchViewToCuboid": "Перейти к кубоиду"
+    "switchViewToCuboid": "Перейти к кубоиду",
+    "batchCount": "Количество батчей",
+    "batchInfoDialog": "Справка",
+    "openBatchInfoDialog": "Открыть справку",
+    "batchInfoDialogGeneral": "Общее",
+    "batchInfoDialogTransform": "Трансформация кубоида",
+    "batchInfoDialogActions": "Действия",
+    "closeBatchEditor": "Закрыть пакетный режим",
+    "batchInfoDialogTranslate": "Перемещение кубоида",
+    "batchInfoDialogRotate": "Вращение кубоида",
+    "batchInfoDialogHide": "Скрыть кубоид",
+    "batchInfoDialogShow": "Показать кубоид",
+    "batchInfoDialogRemoveKeyframe": "Удалить подсвеченный ключевой кадр",
+    "batchInfoDialogGoToFrame": "Перейти к подсвеченному кадру"
 }

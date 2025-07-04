@@ -8,7 +8,7 @@ export const Dialog = ({
     isOpen,
     onClose,
     children,
-    size = "small",
+    size = "medium",
     title,
     initiator,
     buttons,

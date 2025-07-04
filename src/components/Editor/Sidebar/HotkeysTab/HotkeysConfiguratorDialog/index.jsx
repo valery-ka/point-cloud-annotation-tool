@@ -13,8 +13,8 @@ import {
     getTranslatedCommand,
 } from "utils/settings";
 
-// const COMPONENT_NAME = "HotkeyConfiguratorDialog.";
-const COMPONENT_NAME = "";
+const COMPONENT_NAME = "HotkeyConfiguratorDialog.";
+// const COMPONENT_NAME = "";
 const EMPTY_KEY = "---";
 
 export const HotkeyConfiguratorDialog = () => {
@@ -39,14 +39,16 @@ export const HotkeyConfiguratorDialog = () => {
         setIsDialogOpen(true);
     }, [hotkeys]);
 
-    useSubscribeFunction("openHotkeyConfigurator", openConfigurator, [hotkeys]);
+    useSubscribeFunction("openHotkeyConfigurator", openConfigurator, []);
 
     const handleDialogAction = useCallback(
-        (data) => DIALOG_BUTTONS[data]?.action(),
+        (data) => {
+            DIALOG_BUTTONS[data]?.action();
+        },
         [newHotkeys, cancelNewHotkeys],
     );
 
-    useSubscribeFunction(COMPONENT_NAME, handleDialogAction, [newHotkeys, cancelNewHotkeys]);
+    useSubscribeFunction(COMPONENT_NAME, handleDialogAction, []);
 
     const handleInputFieldKeyDown = useCallback(
         (e, category, command) => {
@@ -161,26 +163,26 @@ export const HotkeyConfiguratorDialog = () => {
 
     const DIALOG_BUTTONS = {
         OK: {
-            label: t(`${COMPONENT_NAME}OK`),
+            label: t(`OK`),
             action: () => {
                 updateHotkeys(newHotkeys);
                 resetState();
             },
         },
         Reset: {
-            label: t(`${COMPONENT_NAME}reset`),
+            label: t(`reset`),
             action: () => {
                 setNewHotkeys(generateClassHotkeys(defaultHotkeys, nonHiddenClasses));
             },
         },
         Clear: {
-            label: t(`${COMPONENT_NAME}clear`),
+            label: t(`clear`),
             action: () => {
                 setNewHotkeys((prevHotkeys) => clearHotkeys(prevHotkeys));
             },
         },
         Cancel: {
-            label: t(`${COMPONENT_NAME}cancel`),
+            label: t(`cancel`),
             action: () => {
                 updateHotkeys(cancelNewHotkeys);
                 resetState();
@@ -212,8 +214,7 @@ export const HotkeyConfiguratorDialog = () => {
     return (
         <Dialog
             isOpen={isDialogOpen}
-            title={t(`${COMPONENT_NAME}configureHotkeys`)}
-            size="medium"
+            title={t(`configureHotkeys`)}
             initiator={COMPONENT_NAME}
             buttons={DIALOG_BUTTONS}
         >
@@ -226,9 +227,7 @@ export const HotkeyConfiguratorDialog = () => {
                             className="hotkey-configurator-group"
                             style={{ gridColumn: index % 2 === 0 ? "1" : "2" }}
                         >
-                            <div className="hotkey-configurator-title">
-                                {t(`${COMPONENT_NAME}${category}`)}
-                            </div>
+                            <div className="hotkey-configurator-title">{t(`${category}`)}</div>
                             {Object.entries(commands).map(([command, hotkey]) => (
                                 <div
                                     key={command}
