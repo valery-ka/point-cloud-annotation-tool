@@ -1,6 +1,14 @@
 import { useEffect, useCallback } from "react";
 
-import { useCuboids, useFrames, useFileManager, useBatch, useEditor, useLoading } from "contexts";
+import {
+    useCuboids,
+    useFrames,
+    useFileManager,
+    useBatch,
+    useEditor,
+    useLoading,
+    useImages,
+} from "contexts";
 import { useCuboidInterpolation, useSaveSolution, useSubscribeFunction } from "hooks";
 
 import { computeVisibilityFrameRange } from "utils/cuboids";
@@ -11,9 +19,15 @@ export const useCuboidsVisibility = () => {
     const { globalIsLoading } = useLoading();
     const { cloudPointsColorNeedsUpdateRef } = useEditor();
 
-    const { cuboids, cuboidsSolutionRef, cuboidsVisibilityRef, selectedCuboidGeometryRef } =
-        useCuboids();
+    const {
+        cuboids,
+        cuboidsSolutionRef,
+        cuboidsVisibilityRef,
+        selectedCuboidGeometryRef,
+        updateProjectedCuboidsRef,
+    } = useCuboids();
     const { batchMode } = useBatch();
+    const { imagePointsAlphaNeedsUpdateRef } = useImages();
 
     const { findFrameMarkers } = useCuboidInterpolation();
     const { saveObjectsSolution } = useSaveSolution();
@@ -23,6 +37,10 @@ export const useCuboidsVisibility = () => {
         if (!geometry || batchMode) return;
 
         const id = geometry.name;
+
+        const globalVisibility = cuboidsVisibilityRef.current[id].visible;
+        if (!globalVisibility) return;
+
         const newVisibility = !geometry.visible;
         geometry.visible = newVisibility;
 
@@ -47,6 +65,8 @@ export const useCuboidsVisibility = () => {
         saveObjectsSolution({ updateStack: true, isAutoSave: false, id: id });
 
         cloudPointsColorNeedsUpdateRef.current = true;
+        imagePointsAlphaNeedsUpdateRef.current = true;
+        updateProjectedCuboidsRef.current = true;
     }, [pcdFiles, activeFrameIndex, batchMode, saveObjectsSolution]);
 
     useSubscribeFunction("toggleCuboidVisibility", toggleVisibility, []);

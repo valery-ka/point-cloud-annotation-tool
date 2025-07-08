@@ -8,6 +8,7 @@ export {
     createCubeGeometry,
     createEdgesGeometry,
     createArrowGeometry,
+    getProjectedCuboidGeometry,
     addCuboid,
     updateCuboid,
     removeCuboid,

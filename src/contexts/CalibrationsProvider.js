@@ -4,6 +4,7 @@ const CalibrationsContext = createContext();
 
 export const CalibrationsProvider = ({ children }) => {
     const projectedPointsRef = useRef({});
+    const projectedCuboidsRef = useRef({});
 
     const [calibrations, setCalibrations] = useState({});
 
@@ -13,6 +14,7 @@ export const CalibrationsProvider = ({ children }) => {
                 calibrations,
                 setCalibrations,
                 projectedPointsRef,
+                projectedCuboidsRef,
             }}
         >
             {children}

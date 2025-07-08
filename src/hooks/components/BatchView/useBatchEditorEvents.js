@@ -7,7 +7,7 @@ export const useBatchEditorEvents = () => {
     const { setActiveFrameIndex } = useFrames();
     const { cloudPointsColorNeedsUpdateRef } = useEditor();
 
-    const { selectedCuboidGeometryRef, cuboidsSolutionRef } = useCuboids();
+    const { selectedCuboidGeometryRef, cuboidsSolutionRef, cuboidsVisibilityRef } = useCuboids();
     const {
         updateBatchCuboidRef,
         selectedCuboidBatchGeometriesRef,
@@ -48,11 +48,15 @@ export const useBatchEditorEvents = () => {
 
     const setBatchCuboidVisibility = useCallback(
         (frame, visible) => {
+            const id = selectedCuboidGeometryRef.current.name;
+
+            const globalVisibility = cuboidsVisibilityRef.current[id].visible;
+            if (!globalVisibility) return;
+
             const cuboid = selectedCuboidBatchGeometriesRef.current[frame];
             if (cuboid) cuboid.visible = visible;
 
             const solution = cuboidsSolutionRef.current;
-            const id = selectedCuboidGeometryRef.current.name;
             const frameSol = solution[frame];
             const existingEntry = frameSol?.find((e) => e.id === id);
             if (existingEntry) existingEntry.visible = visible;

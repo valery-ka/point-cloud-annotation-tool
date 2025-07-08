@@ -100,6 +100,56 @@ export const extractPsrFromObject = (object3D) => {
     };
 };
 
+export const getProjectedCuboidGeometry = (mesh) => {
+    const { width, height, depth } = mesh.geometry.parameters;
+
+    // Точки кубоида
+    const cuboidLocalPoints = [
+        // Нижняя грань
+        new Vector3(-0.5, -0.5, -0.5),
+        new Vector3(-0.5, -0.5, 0.5),
+        new Vector3(-0.5, 0.5, 0.5),
+        new Vector3(-0.5, 0.5, -0.5),
+        // Верхняя грань
+        new Vector3(0.5, -0.5, -0.5),
+        new Vector3(0.5, -0.5, 0.5),
+        new Vector3(0.5, 0.5, 0.5),
+        new Vector3(0.5, 0.5, -0.5),
+    ].map((corner) => {
+        return new Vector3(corner.x * width, corner.y * height, corner.z * depth);
+    });
+
+    // Точки стрелки
+    const ARROW_SIZE = 0.85;
+    const Z_OFFSET = -0.5;
+    const arrowLocalPoints = [
+        [-0.5, 0],
+        [-1, 1],
+        [1, 0],
+        [-1, -1],
+        [-0.5, 0],
+    ].map(([x, y]) => {
+        return new Vector3((x / 2) * ARROW_SIZE, (y / 2) * ARROW_SIZE, Z_OFFSET);
+    });
+
+    const allWorldPoints = [...cuboidLocalPoints, ...arrowLocalPoints].map((point) =>
+        point.applyMatrix4(mesh.matrixWorld),
+    );
+
+    const result = new Float32Array(allWorldPoints.length * 3);
+    allWorldPoints.forEach((point, i) => {
+        result[i * 3] = point.x;
+        result[i * 3 + 1] = point.y;
+        result[i * 3 + 2] = point.z;
+    });
+
+    return {
+        points: result,
+        cuboidPointCount: cuboidLocalPoints.length,
+        arrowPointCount: arrowLocalPoints.length,
+    };
+};
+
 export const addCuboid = (scene, cuboid) => {
     const { label, type, color, position, scale, rotation } = cuboid;
 

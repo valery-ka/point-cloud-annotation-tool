@@ -1,6 +1,7 @@
 export { parseExtrinsic, getCalibrationByUrl, get3DPointsForImage } from "./general";
 export {
-    buildImageGeometry,
+    buildImagePointsGeometry,
+    buildImageCuboidsGeometry,
     chooseBestCamera,
     getCameraWorldPosition,
     getIntrinsicParameters,

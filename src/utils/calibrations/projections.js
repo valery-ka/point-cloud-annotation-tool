@@ -6,6 +6,7 @@ import {
     Matrix4,
     BufferGeometry,
     BufferAttribute,
+    Float32BufferAttribute,
 } from "three";
 
 import { getCalibrationByUrl, get3DPointsForImage } from "utils/calibrations";
@@ -69,6 +70,7 @@ export const project3DPointsTo2D = (
     imageWidth,
     imageHeight,
     distortionThreshold,
+    bypass = false,
 ) => {
     const { extrinsic, intrinsic, distortion } = calibration;
     if (!intrinsic || !extrinsic) return new Int32Array(0);
@@ -87,8 +89,9 @@ export const project3DPointsTo2D = (
         const dist_u = Math.round(fx * x_dist + cx);
         const dist_v = imageHeight - Math.round(fy * y_dist + cy);
         if (
-            pointInPolyRaycast([u, v], polygon) &&
-            isPointInImageBounds({ u: dist_u, v: dist_v, imageWidth, imageHeight })
+            bypass ||
+            (pointInPolyRaycast([u, v], polygon) &&
+                isPointInImageBounds({ u: dist_u, v: dist_v, imageWidth, imageHeight }))
         ) {
             points2D.push(dist_u, dist_v, index);
         }
@@ -97,13 +100,13 @@ export const project3DPointsTo2D = (
     const processKannalaBrandtPoint = (x_dist, y_dist, index) => {
         const u = Math.round(fx * x_dist + cx);
         const v = imageHeight - Math.round(fy * y_dist + cy);
-        if (isPointInImageBounds({ u, v, imageWidth, imageHeight })) {
+        if (bypass || isPointInImageBounds({ u, v, imageWidth, imageHeight })) {
             points2D.push(u, v, index);
         }
     };
 
     const processUndistortedPoint = (u, v, index) => {
-        if (isPointInImageBounds({ u, v, imageWidth, imageHeight })) {
+        if (bypass || isPointInImageBounds({ u, v, imageWidth, imageHeight })) {
             points2D.push(u, v, index);
         }
     };
@@ -261,7 +264,7 @@ export const getCameraWorldPosition = (extrinsic) => {
     };
 };
 
-export const buildImageGeometry = (
+export const buildImagePointsGeometry = (
     url,
     img,
     imagesByCamera,
@@ -351,4 +354,59 @@ export const buildImageGeometry = (
             },
         };
     }
+};
+
+export const buildImageCuboidsGeometry = (img, calibration, distortionThreshold, cuboidEdges) => {
+    const { width, height } = img;
+    const { points, cuboidPointCount } = cuboidEdges;
+
+    const projectedPoints = project3DPointsTo2D(
+        points,
+        calibration,
+        width,
+        height,
+        distortionThreshold,
+        true,
+    );
+
+    const geometry = new BufferGeometry();
+
+    const hasPointsBehindCamera = projectedPoints.length !== points.length;
+
+    if (hasPointsBehindCamera) {
+        return geometry;
+    }
+
+    const vertices = Array.from({ length: projectedPoints.length / 3 }, (_, i) => {
+        return new Vector3(
+            projectedPoints[i * 3] - width / 2,
+            projectedPoints[i * 3 + 1] - height / 2,
+            0,
+        );
+    });
+
+    // prettier-ignore
+    const cuboidIndices = [
+        // Нижняя грань кубоида
+        0, 1, 1, 2, 2, 3, 3, 0,
+        // Верхняя грань кубоида
+        4, 5, 5, 6, 6, 7, 7, 4,
+        // Вертикальные рёбра
+        0, 4, 1, 5, 2, 6, 3, 7
+    ];
+    const arrowIndices = [0, 1, 1, 2, 2, 3, 3, 4].map((i) => i + cuboidPointCount);
+    const edgesIndices = [...cuboidIndices, ...arrowIndices];
+
+    geometry.setAttribute(
+        "position",
+        new Float32BufferAttribute(
+            edgesIndices.flatMap((idx) => {
+                const v = vertices[idx];
+                return v ? [v.x, v.y, 0] : [0, 0, 0];
+            }),
+            3,
+        ),
+    );
+
+    return geometry;
 };

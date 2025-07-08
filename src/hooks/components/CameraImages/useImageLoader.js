@@ -11,7 +11,7 @@ import {
     useSettings,
 } from "contexts";
 
-import { buildImageGeometry } from "utils/calibrations";
+import { buildImagePointsGeometry } from "utils/calibrations";
 
 export const useImageLoader = () => {
     const { config } = useConfig();
@@ -37,7 +37,7 @@ export const useImageLoader = () => {
 
     const distortionThreshold = useMemo(() => {
         return settings.editorSettings.images.distortionThreshold;
-    }, []);
+    }, []); // <-- да, без зависимостей
 
     useEffect(() => {
         if (!loadedData.pointclouds) return;
@@ -83,7 +83,7 @@ export const useImageLoader = () => {
                     });
                     topLoaderBarRef?.current?.staticStart(progress * 100);
 
-                    buildImageGeometry(
+                    buildImagePointsGeometry(
                         url,
                         img,
                         imagesByCamera,

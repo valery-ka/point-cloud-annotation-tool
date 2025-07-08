@@ -22,8 +22,13 @@ export const useBatchEditor = ({ handlers, views }) => {
 
     const { batchMode, setBatchMode, batchEditorCameras, selectedCuboidBatchGeometriesRef } =
         useBatch();
-    const { selectedCuboid, selectedCuboidGeometryRef, cuboidsSolutionRef, cuboidsGeometriesRef } =
-        useCuboids();
+    const {
+        selectedCuboid,
+        selectedCuboidGeometryRef,
+        cuboidsSolutionRef,
+        cuboidsGeometriesRef,
+        cuboidsVisibilityRef,
+    } = useCuboids();
 
     const BATCH_CAMERAS = Object.values(batchEditorCameras);
 
@@ -110,6 +115,11 @@ export const useBatchEditor = ({ handlers, views }) => {
     const addBatchCuboidsToScene = (frame, tempObjects) => {
         const selectedBatchCuboid = selectedCuboidBatchGeometriesRef.current;
         if (!selectedBatchCuboid) return;
+
+        const id = selectedBatchCuboid[frame].name;
+
+        const globalVisibility = cuboidsVisibilityRef.current[id].visible;
+        if (!globalVisibility) return;
 
         const batchClone = selectedBatchCuboid[frame];
 

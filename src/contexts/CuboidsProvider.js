@@ -53,6 +53,7 @@ export const CuboidsProvider = ({ children }) => {
     const pointsInsideCuboidsRef = useRef({});
 
     const updateSingleCuboidRef = useRef({ needsUpdate: false, id: null });
+    const updateProjectedCuboidsRef = useRef(false);
 
     return (
         <CuboidsContext.Provider
@@ -88,6 +89,7 @@ export const CuboidsProvider = ({ children }) => {
                 copiedPSRRef,
                 transformMode,
                 setTransformMode,
+                updateProjectedCuboidsRef,
             }}
         >
             {children}

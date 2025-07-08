@@ -35,7 +35,7 @@ export const ImageGeometryUpdater = memo(({ image }) => {
     } = useImages();
     const { projectedPointsRef } = useCalibrations();
 
-    const { cuboidsVisibilityRef, pointsInsideCuboidsRef } = useCuboids();
+    const { cuboidsGeometriesRef, pointsInsideCuboidsRef } = useCuboids();
 
     const { settings } = useSettings();
 
@@ -86,7 +86,7 @@ export const ImageGeometryUpdater = memo(({ image }) => {
         const activeFrameCloudGeometry = pointCloudRefs.current[activeFrameFilePath]?.geometry;
         const activeFrameLabels = pointLabelsRef.current[activeFrameFilePath];
         const activeFrameCuboidsPoints = pointsInsideCuboidsRef.current[activeFrameFilePath];
-        const cuboidsVisibility = cuboidsVisibilityRef.current;
+        const cuboids = cuboidsGeometriesRef.current;
         const projectedPoints = projectedPointsRef.current;
         const imageGeometry = projectedPointsRef.current[image?.src]?.geometry;
 
@@ -96,8 +96,8 @@ export const ImageGeometryUpdater = memo(({ image }) => {
                 cloudData: {
                     geometry: activeFrameCloudGeometry,
                     labels: activeFrameLabels,
-                    cuboids: activeFrameCuboidsPoints,
-                    cuboidsVisibility: cuboidsVisibility,
+                    cuboidsPoints: activeFrameCuboidsPoints,
+                    cuboids: cuboids,
                 },
                 imageData: {
                     image,

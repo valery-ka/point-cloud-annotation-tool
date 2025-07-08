@@ -3,7 +3,7 @@ import * as APP_CONSTANTS from "constants";
 const { HIDDEN_POINT } = APP_CONSTANTS;
 
 export const invalidateImagePointsVisibility = ({ cloudData, imageData }) => {
-    const { geometry, labels, cuboids, cuboidsVisibility } = cloudData;
+    const { geometry, labels, cuboids, cuboidsPoints } = cloudData;
     const { image, projectedPoints, visibleVOID } = imageData;
 
     if (!image) return;
@@ -17,9 +17,9 @@ export const invalidateImagePointsVisibility = ({ cloudData, imageData }) => {
     const matchedPositionArray = geometry.attributes.position.array;
 
     const pointsInsideCuboids = new Set();
-    if (cuboids) {
-        for (const [id, pointIndices] of Object.entries(cuboids)) {
-            const isVisible = cuboidsVisibility?.[id]?.visible ?? true;
+    if (cuboidsPoints) {
+        for (const [id, pointIndices] of Object.entries(cuboidsPoints)) {
+            const isVisible = cuboids?.[id]?.cube?.mesh?.visible ?? true;
             if (!isVisible) continue;
 
             for (const index of pointIndices) {

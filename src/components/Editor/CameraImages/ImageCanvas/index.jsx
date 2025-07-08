@@ -10,7 +10,8 @@ import { ImagePointShader } from "shaders";
 
 import { ImageCameraControls } from "../ImageCameraControls";
 import { ImageGeometryUpdater } from "../ImageGeometryUpdater";
-import { ImageScene } from "../ImageScene";
+import { ImageScenePoints } from "../ImageScenePoints";
+import { ImageSceneCuboids } from "../ImageSceneCuboids";
 
 export const ImageCanvas = memo(({ image, size }) => {
     const { settings } = useSettings();
@@ -87,7 +88,8 @@ export const ImageCanvas = memo(({ image, size }) => {
                         texture={texture}
                         scale={[image.width * scale, image.height * scale, 1]}
                     />
-                    <ImageScene
+                    <ImageSceneCuboids image={image} scale={scale} />
+                    <ImageScenePoints
                         image={image}
                         geometry={geometry}
                         material={shaderMaterial}

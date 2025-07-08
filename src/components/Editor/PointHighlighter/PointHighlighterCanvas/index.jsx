@@ -8,7 +8,7 @@ import { useImagePointHighlighter, useSubscribeFunction } from "hooks";
 
 import { ImageCameraControls } from "components/Editor/CameraImages/ImageCameraControls";
 import { HighlightedPointGeometryUpdater } from "../HighlightedPointGeometryUpdater";
-import { ImageScene } from "../../CameraImages/ImageScene";
+import { ImageScenePoints } from "../../CameraImages/ImageScenePoints";
 
 import { PointHighlighterShader } from "shaders";
 
@@ -71,7 +71,7 @@ export const PointHighlighterCanvas = memo(({ image, positions }) => {
                         fixedZoomLevel={settings.editorSettings.highlighter.highlighterZoom}
                     />
                     <Image texture={imageRef.current?.texture} scale={scale} />
-                    <ImageScene
+                    <ImageScenePoints
                         image={image}
                         geometry={geometryRef.current}
                         material={shaderMaterial}

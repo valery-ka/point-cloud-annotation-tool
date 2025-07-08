@@ -34,7 +34,8 @@ export const useFramePointsVisibility = (updateGlobalBox) => {
         setHasFilterSelectionPoint,
         cloudPointsColorNeedsUpdateRef,
     } = useEditor();
-    const { cuboidsVisibilityRef } = useCuboids();
+
+    const { updateProjectedCuboidsRef, cuboidsVisibilityRef } = useCuboids();
 
     const { imagePointsAlphaNeedsUpdateRef } = useImages();
 
@@ -191,6 +192,7 @@ export const useFramePointsVisibility = (updateGlobalBox) => {
             filterFramePoints();
 
             cloudPointsColorNeedsUpdateRef.current = true;
+            updateProjectedCuboidsRef.current = true;
         },
         [filterFramePoints, updateCuboidPSR],
     );

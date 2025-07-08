@@ -1,9 +1,11 @@
-import { useEffect, useRef } from "react";
-import { useThree } from "@react-three/fiber";
-import * as THREE from "three";
+import { Points } from "three";
 
-export const ImageScene = ({ image, geometry, material, visible = true, scale = 1 }) => {
-    const { gl, scene } = useThree();
+import { useRef, useEffect } from "react";
+import { useThree } from "@react-three/fiber";
+
+export const ImageScenePoints = ({ image, geometry, material, visible = true, scale = 1 }) => {
+    const { scene } = useThree();
+
     const pointsRef = useRef(null);
     const prevGeometryRef = useRef(null);
     const prevMaterialRef = useRef(null);
@@ -15,7 +17,7 @@ export const ImageScene = ({ image, geometry, material, visible = true, scale = 
                 prevGeometryRef.current?.dispose();
             }
 
-            pointsRef.current = new THREE.Points(geometry, material);
+            pointsRef.current = new Points(geometry, material);
             scene.add(pointsRef.current);
 
             prevGeometryRef.current = geometry;
@@ -41,8 +43,9 @@ export const ImageScene = ({ image, geometry, material, visible = true, scale = 
     }, [material]);
 
     useEffect(() => {
-        if (pointsRef.current) {
-            pointsRef.current.scale.set(scale, scale, 1);
+        const points = pointsRef.current;
+        if (points) {
+            points.scale.set(scale, scale, 1);
         }
     }, [image, scale]);
 
