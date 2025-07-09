@@ -311,6 +311,15 @@ export const SettingsTab = memo(({ title }) => {
                         options={[true, false]}
                         alias={[t(`${COMPONENT_NAME}enabled`), t(`${COMPONENT_NAME}disabled`)]}
                     />
+                    <RadioButtonGroup
+                        title={t(`${COMPONENT_NAME}fastBoxEditing`)}
+                        action={"fastBoxEditing"}
+                        setting={"editorSettings"}
+                        settingType={"performance"}
+                        settingKey={"fastBoxEditing"}
+                        options={[true, false]}
+                        alias={[t(`${COMPONENT_NAME}enabled`), t(`${COMPONENT_NAME}disabled`)]}
+                    />
                     <SettingsSlider
                         title={t(`${COMPONENT_NAME}autoSaveTimer`)}
                         action={"autoSaveTimer"}

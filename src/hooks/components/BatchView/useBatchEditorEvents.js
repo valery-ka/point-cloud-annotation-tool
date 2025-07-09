@@ -40,7 +40,7 @@ export const useBatchEditorEvents = () => {
                 findFrameMarkers();
                 interpolatePSRBatch();
                 updateCuboidPSRBatch();
-                updateBatchCuboidRef.current = true;
+                updateBatchCuboidRef.current.needsUpdate = true;
             }
         },
         [batchMode, interpolatePSRBatch],

@@ -23,7 +23,12 @@ export const useTransformControls = () => {
         selectedCuboidGeometryRef,
         updateProjectedCuboidsRef,
     } = useCuboids();
-    const { batchMode, batchViewsCamerasNeedUpdateRef, updateBatchCuboidRef } = useBatch();
+    const {
+        batchMode,
+        batchViewsCamerasNeedUpdateRef,
+        updateBatchCuboidRef,
+        batchEditingFrameRef,
+    } = useBatch();
 
     const { saveCurrentPSR, interpolatePSR, findFrameMarkers } = useCuboidInterpolation();
     const { saveCurrentPSRBatch, interpolatePSRBatch, updateCuboidPSRBatch } =
@@ -42,14 +47,19 @@ export const useTransformControls = () => {
         findFrameMarkers();
         interpolatePSRBatch();
         updateCuboidPSRBatch();
-        updateBatchCuboidRef.current = true;
+        updateBatchCuboidRef.current.needsUpdate = true;
         updateProjectedCuboidsRef.current = true;
     }, REQUEST_INTERPOLATE_PSR_TIME);
 
     const onTransformChange = useCallback(() => {
+        updateSingleCuboidRef.current.frame = activeFrameIndex;
+        updateSingleCuboidRef.current.needsUpdate = true;
         sideViewsCamerasNeedUpdateRef.current = true;
+
+        updateBatchCuboidRef.current.frame = batchEditingFrameRef.current;
+        updateBatchCuboidRef.current.needsUpdate = true;
         batchViewsCamerasNeedUpdateRef.current = true;
-    }, []);
+    }, [activeFrameIndex]);
 
     const onTransformFinished = useCallback(() => {
         batchMode ? debouncedInterpolatePSRBatch() : debouncedInterpolatePSRSingle();

@@ -35,6 +35,7 @@ export const defaultEditorSettings = {
     performance: {
         statsPanelEnabled: false,
         autoSaveTimerEnabled: false,
+        fastBoxEditing: true,
         autoSaveTimer: 30,
         imageFPS: 165,
         highlighterFPS: 165,

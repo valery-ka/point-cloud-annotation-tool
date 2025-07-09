@@ -52,7 +52,7 @@ export const CuboidsProvider = ({ children }) => {
     const cuboidIdToLabelRef = useRef({});
     const pointsInsideCuboidsRef = useRef({});
 
-    const updateSingleCuboidRef = useRef({ needsUpdate: false, id: null });
+    const updateSingleCuboidRef = useRef({ needsUpdate: false, frame: null, id: null });
     const updateProjectedCuboidsRef = useRef(false);
 
     return (
