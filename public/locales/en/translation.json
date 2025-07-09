@@ -182,5 +182,9 @@
     "batchInfoDialogHide": "Hide cuboid",
     "batchInfoDialogShow": "Show cuboid",
     "batchInfoDialogRemoveKeyframe": "Remove hovered keyframe",
-    "batchInfoDialogGoToFrame": "Go to hovered frame"
+    "batchInfoDialogGoToFrame": "Go to hovered frame",
+    "projectedCuboids": "Projected cuboids",
+    "allCuboids": "All cuboids",
+    "selectedCuboids": "Selected cuboid only",
+    "noneCuboids": "No cuboids"
 }

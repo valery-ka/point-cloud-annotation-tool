@@ -18,7 +18,11 @@ export const ImageSceneCuboids = ({ image, scale = 1 }) => {
 
     const distortionThreshold = useMemo(() => {
         return settings.editorSettings.images.distortionThreshold;
-    }, []); // <-- да, без зависимостей
+    }, [settings.editorSettings.images.distortionThreshold]);
+
+    const projectedCuboids = useMemo(() => {
+        return settings.editorSettings.images.projectedCuboids;
+    }, [settings.editorSettings.images.projectedCuboids]);
 
     const createCuboidLines = (cube) => {
         if (cube.visible) {
@@ -103,11 +107,24 @@ export const ImageSceneCuboids = ({ image, scale = 1 }) => {
 
     useEffect(() => {
         updateProjectedCuboidsRef.current = true;
-    }, [image, scale]);
+    }, [image, scale, projectedCuboids]);
 
     useFrame(() => {
-        updateSelectedCuboid({ id: selectedCuboid?.id });
-        updateAllCuboids();
+        switch (projectedCuboids) {
+            case "all":
+                updateSelectedCuboid({ id: selectedCuboid?.id });
+                updateAllCuboids();
+                break;
+            case "selected":
+                cleanupProjectedCuboids();
+                updateSelectedCuboid({ id: selectedCuboid?.id });
+                break;
+            case "none":
+                cleanupProjectedCuboids();
+                break;
+            default:
+                break;
+        }
     });
 
     return null;

@@ -182,5 +182,9 @@
     "batchInfoDialogHide": "Скрыть кубоид",
     "batchInfoDialogShow": "Показать кубоид",
     "batchInfoDialogRemoveKeyframe": "Удалить подсвеченный ключевой кадр",
-    "batchInfoDialogGoToFrame": "Перейти к подсвеченному кадру"
+    "batchInfoDialogGoToFrame": "Перейти к подсвеченному кадру",
+    "projectedCuboids": "Проецируемые кубоиды",
+    "allCuboids": "Все кубоиды",
+    "selectedCuboids": "Только выбранный кубоид",
+    "noneCuboids": "Никакие кубоиды"
 }

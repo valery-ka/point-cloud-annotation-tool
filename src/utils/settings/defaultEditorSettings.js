@@ -19,6 +19,7 @@ export const defaultEditorSettings = {
     images: {
         cameraPositions: true,
         visibleVOID: false,
+        projectedCuboids: "all",
         generalPointSize: 1.0,
         selectedClassSize: 1.0,
         highlightedPointSize: 2.0,

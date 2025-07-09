@@ -35,7 +35,7 @@ export const ImageGeometryUpdater = memo(({ image }) => {
     } = useImages();
     const { projectedPointsRef } = useCalibrations();
 
-    const { cuboidsGeometriesRef, pointsInsideCuboidsRef } = useCuboids();
+    const { selectedCuboid, cuboidsGeometriesRef, pointsInsideCuboidsRef } = useCuboids();
 
     const { settings } = useSettings();
 
@@ -58,6 +58,11 @@ export const ImageGeometryUpdater = memo(({ image }) => {
     const selectedClass = useMemo(() => {
         return nonHiddenClasses[selectedClassIndex]?.originalIndex;
     }, [nonHiddenClasses, selectedClassIndex]);
+
+    const projectedCuboids = useMemo(() => {
+        imagePointsAlphaNeedsUpdateRef.current = true;
+        return settings.editorSettings.images.projectedCuboids;
+    }, [settings.editorSettings.images.projectedCuboids]);
 
     useEffect(() => {
         imagePointsSizeNeedsUpdateRef.current = true;
@@ -90,13 +95,39 @@ export const ImageGeometryUpdater = memo(({ image }) => {
         const projectedPoints = projectedPointsRef.current;
         const imageGeometry = projectedPointsRef.current[image?.src]?.geometry;
 
+        const filterCuboidPoints = (cuboidsPoints) => {
+            let filteredCuboidsPoints = {};
+
+            switch (projectedCuboids) {
+                case "all":
+                    filteredCuboidsPoints = cuboidsPoints;
+                    break;
+                case "selected":
+                    if (selectedCuboid?.id && cuboidsPoints[selectedCuboid.id]) {
+                        filteredCuboidsPoints = {
+                            [selectedCuboid.id]: cuboidsPoints[selectedCuboid.id],
+                        };
+                    }
+                    break;
+                case "none":
+                    filteredCuboidsPoints = {};
+                    break;
+                default:
+                    break;
+            }
+
+            return filteredCuboidsPoints;
+        };
+
         // Alpha (visibility) update
         if (imagePointsAlphaNeedsUpdateRef.current) {
+            const filteredCuboidsPoints = filterCuboidPoints(activeFrameCuboidsPoints);
+
             invalidateImagePointsVisibility({
                 cloudData: {
                     geometry: activeFrameCloudGeometry,
                     labels: activeFrameLabels,
-                    cuboidsPoints: activeFrameCuboidsPoints,
+                    cuboidsPoints: filteredCuboidsPoints,
                     cuboids: cuboids,
                 },
                 imageData: {

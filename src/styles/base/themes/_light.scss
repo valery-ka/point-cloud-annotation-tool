@@ -37,4 +37,8 @@
     --radio-button-input-checked-bg-color: #fff;
     --radio-button-input-checked-text-color: #000;
     --radio-button-span-text-color: #5c5c5c;
+
+    // context-settings
+    --context-settings-bg-color: var(--radio-options-bg-color);
+    --context-settings-border-color: var(--radio-options-bg-color);
 }

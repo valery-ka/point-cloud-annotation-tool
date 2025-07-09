@@ -1,0 +1,17 @@
+.settings-context-menu-container {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+
+    select {
+        width: 100%;
+        padding: 6px;
+        font-size: 14px;
+        border-radius: 5px;
+
+        border: 1px dotted var(--context-settings-border-color);
+        background-color: var(--context-settings-bg-color);
+
+        cursor: pointer;
+    }
+}

@@ -4,8 +4,9 @@ import { useTranslation } from "react-i18next";
 import { useConfig } from "contexts";
 
 import { Spoiler } from "./Spoiler";
-import { SettingsSlider } from "./Slider";
+import { SettingsSlider } from "./SettingsSlider";
 import { RadioButtonGroup } from "./RadioButtonGroup";
+import { SettingsContextMenu } from "./SettingsContextMenu";
 
 // const COMPONENT_NAME = "SettingsTab.";
 const COMPONENT_NAME = "";
@@ -180,6 +181,18 @@ export const SettingsTab = memo(({ title }) => {
                         settingKey={"visibleVOID"}
                         options={[true, false]}
                         alias={[t(`${COMPONENT_NAME}show`), t(`${COMPONENT_NAME}hide`)]}
+                    />
+                    <SettingsContextMenu
+                        title={t(`${COMPONENT_NAME}projectedCuboids`)}
+                        select={[
+                            t(`${COMPONENT_NAME}allCuboids`),
+                            t(`${COMPONENT_NAME}selectedCuboids`),
+                            t(`${COMPONENT_NAME}noneCuboids`),
+                        ]}
+                        options={["all", "selected", "none"]}
+                        setting={"editorSettings"}
+                        settingType={"images"}
+                        settingKey={"projectedCuboids"}
                     />
                     <SettingsSlider
                         title={t(`${COMPONENT_NAME}generalPointSize`)}

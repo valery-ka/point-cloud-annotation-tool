@@ -1,6 +1,6 @@
 import { useEffect, useCallback } from "react";
 
-import { useCuboids, useEditor, useEvent, useLoading } from "contexts";
+import { useCuboids, useEditor, useEvent, useLoading, useImages } from "contexts";
 import {
     useTransformControls,
     useRaycastClickSelect,
@@ -32,6 +32,8 @@ export const useCuboidManager = (handlers) => {
         setTransformMode,
     } = useCuboids();
 
+    const { imagePointsAlphaNeedsUpdateRef } = useImages();
+
     const { updateCuboidPSR, findFrameMarkers } = useCuboidInterpolation();
 
     useOrthographicView(handlers);
@@ -49,6 +51,8 @@ export const useCuboidManager = (handlers) => {
             setSelectedCuboid(cuboids.find((cube) => cube.id === id));
             findFrameMarkers();
             publish("setActiveTab", TABS.OBJECT_CARD);
+
+            imagePointsAlphaNeedsUpdateRef.current = true;
         },
         [cuboids],
     );
@@ -58,6 +62,8 @@ export const useCuboidManager = (handlers) => {
         selectedCuboidGeometryRef.current = null;
         cameraControlsRef.current.enabled = true;
         setFrameMarkers([]);
+
+        imagePointsAlphaNeedsUpdateRef.current = true;
     }, []);
 
     useHoveredCuboid({
