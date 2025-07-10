@@ -6,6 +6,7 @@
     "switchToRightView": "Switch to Right view",
     "switchToBackView": "Switch to Back view",
     "handPointer": "Stop editing",
+    "propagateLastPolygon": "Propagate last polygon",
     "brushTool": "Brush tool",
     "polygonTool": "Polygon tool",
     "lassoTool": "Lasso tool",

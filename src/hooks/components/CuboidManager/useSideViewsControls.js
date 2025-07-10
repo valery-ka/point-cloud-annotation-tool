@@ -37,6 +37,7 @@ const handleFrameShortcuts = (e, actions, batchMode) => {
     if (batchMode) return;
 
     const frameShortcuts = {
+        Tab: actions.publishOpenBatchMode,
         Digit1: actions.publishGoToPreviousFrame,
         Digit2: actions.publishGoToNextFrame,
         KeyZ: e.ctrlKey ? actions.publishUndoAction : actions.publishToggleCuboidVisibility,
@@ -63,6 +64,7 @@ export const useSideViewsControls = ({ camera, mesh, hoveredView, hoveredHandler
 
     const { removeKeyFrame } = useCuboidInterpolation();
     const actions = usePublishActions([
+        "openBatchMode",
         "fixOdometryFrame",
         "copyObjectTransform",
         "applyTransform",

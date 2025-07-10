@@ -10,6 +10,8 @@ export const ToolsProvider = ({ children }) => {
     const [selectedTool, setSelectedTool] = useState(DEFAULT_TOOL);
     const [isDrawing, setIsDrawing] = useState(false);
 
+    const [savedPolygonState, setSavedPolygonState] = useState(null);
+
     return (
         <ToolsContext.Provider
             value={{
@@ -19,6 +21,8 @@ export const ToolsProvider = ({ children }) => {
                 setSelectedTool,
                 isDrawing,
                 setIsDrawing,
+                savedPolygonState,
+                setSavedPolygonState,
             }}
         >
             {children}

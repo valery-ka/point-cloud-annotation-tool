@@ -6,6 +6,7 @@
     "switchToRightView": "Вид справа",
     "switchToBackView": "Вид сзади",
     "handPointer": "Завершить редактирование",
+    "propagateLastPolygon": "Применить последний полигон",
     "brushTool": "Инструмент кисть",
     "polygonTool": "Инструмент полигон",
     "lassoTool": "Инструмент лассо",

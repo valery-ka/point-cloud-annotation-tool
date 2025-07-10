@@ -13,7 +13,7 @@ export const useFetchCalibrations = () => {
     const { loadedData, setLoadedData, setLoadingProgress } = useLoading();
 
     useEffect(() => {
-        if (!imagesByCamera.length || !folderName || !loadedData.config) return;
+        if (!folderName || !loadedData.config) return;
         const message = "loadingCalibrations";
         let loadedCalibrations = 0;
 

@@ -1,4 +1,5 @@
 import { useRef, useMemo, useCallback, useState, useEffect } from "react";
+import { useThree } from "@react-three/fiber";
 
 import {
     useEditor,
@@ -10,9 +11,12 @@ import {
     useSettings,
     useHoveredPoint,
 } from "contexts";
+import { useSubscribeFunction } from "hooks";
 
 import { BrushTool, PolygonTool, LassoTool, RectangleTool, MODES } from "tools";
+
 import * as APP_CONSTANTS from "constants";
+import { updatePixelProjections } from "utils/editor";
 
 const { DEFAULT_TOOL } = APP_CONSTANTS;
 
@@ -48,41 +52,113 @@ export const useSelectorTools = (
         rectangleTool: RectangleTool,
     };
 
-    const toolProps = useMemo(
+    const { gl, camera } = useThree();
+    const { savedPolygonState, setSavedPolygonState } = useTools();
+
+    const savePolygonState = useCallback(
+        (polygon) => {
+            setSavedPolygonState({
+                glSize: {
+                    width: gl.domElement.width,
+                    height: gl.domElement.height,
+                },
+                camera: camera.clone(),
+                polygon: polygon,
+            });
+        },
+        [gl.domElement, camera],
+    );
+
+    const createCallbacks = useCallback(
         () => ({
-            callbacks: {
-                setIsDrawing,
-                paintSelectedPoints,
-                filterSelectedPoints,
-                handleSelectedPointsSize,
-                requestSaveLabels,
-            },
-            selectionData: {
-                theme,
-                selectionMode,
-                highlightedPoint,
-                paintDepth: paintDepth,
-                originalClassIndex: nonHiddenClasses[selectedClassIndex]?.originalIndex,
-            },
-            cloudData: {
-                pixelProjections,
-                positions:
-                    pointCloudRefs.current[pcdFiles[activeFrameIndex]]?.geometry.attributes.position
-                        .array,
-                labels: pointLabelsRef.current[pcdFiles[activeFrameIndex]],
-            },
+            setIsDrawing,
+            paintSelectedPoints,
+            filterSelectedPoints,
+            handleSelectedPointsSize,
+            requestSaveLabels,
+            savePolygonState,
         }),
         [
             setIsDrawing,
-            pixelProjections,
-            highlightedPoint,
-            selectedClassIndex,
-            selectionMode,
-            nonHiddenClasses,
-            theme,
-            paintDepth,
+            paintSelectedPoints,
+            filterSelectedPoints,
+            handleSelectedPointsSize,
+            requestSaveLabels,
+            savePolygonState,
         ],
     );
+
+    const getCloudData = useCallback(
+        (frameIndex, pixelProjectionsOverride) => {
+            const filePath = pcdFiles[frameIndex];
+            const cloud = pointCloudRefs.current[filePath];
+            const positions =
+                cloud?.geometry?.attributes?.original?.array ??
+                cloud?.geometry?.attributes?.position?.array;
+
+            return {
+                positions,
+                labels: pointLabelsRef.current[filePath],
+                pixelProjections: pixelProjectionsOverride || null,
+            };
+        },
+        [pcdFiles],
+    );
+
+    const getSelectionData = useCallback(
+        (themeOverride = theme) => ({
+            theme: themeOverride,
+            selectionMode,
+            highlightedPoint,
+            paintDepth,
+            originalClassIndex: nonHiddenClasses[selectedClassIndex]?.originalIndex,
+        }),
+        [theme, selectionMode, highlightedPoint, paintDepth, nonHiddenClasses, selectedClassIndex],
+    );
+
+    const toolProps = useMemo(
+        () => ({
+            callbacks: createCallbacks(),
+            selectionData: getSelectionData(),
+            cloudData: getCloudData(activeFrameIndex, pixelProjections),
+        }),
+        [createCallbacks, getSelectionData, getCloudData, activeFrameIndex, pixelProjections],
+    );
+
+    const propagateLastPolygon = useCallback(() => {
+        if (!savedPolygonState || typeof selectedClassIndex !== "number") return;
+        const polygonTool = selectorToolsRefs.current["polygonTool"];
+
+        const { glSize, camera, polygon } = savedPolygonState;
+        const filePath = pcdFiles[activeFrameIndex];
+        const cloud = pointCloudRefs.current[filePath];
+        const positions = cloud?.geometry?.attributes?.original?.array;
+
+        const pixelProjections = updatePixelProjections(positions, camera, glSize);
+        const cloudData = getCloudData(activeFrameIndex, pixelProjections);
+        const selectionData = getSelectionData("dark");
+        const callbacks = createCallbacks();
+
+        const polygonParams = {
+            brushCenter: [0, 0],
+            brushRadius: 0,
+            isBrushTool: false,
+            polygon,
+        };
+
+        polygonTool.updateProps({ cloudData, selectionData, callbacks });
+        polygonTool.selectBySavedPolygon({ cloudData, selectionData, polygonParams });
+    }, [
+        savedPolygonState,
+        selectedClassIndex,
+        pcdFiles,
+        activeFrameIndex,
+        getCloudData,
+        getSelectionData,
+        createCallbacks,
+    ]);
+
+    useSubscribeFunction("propagateLastPolygon", propagateLastPolygon, []);
 
     const selectorToolsRefs = useRef(
         Object.keys(toolClasses).reduce((acc, toolName) => {
@@ -90,8 +166,6 @@ export const useSelectorTools = (
             return acc;
         }, {}),
     );
-
-    const [prevTool, setPrevTool] = useState(null);
 
     // creating each tool
     // if tool is created, update it's props when deps are changed
@@ -126,6 +200,8 @@ export const useSelectorTools = (
 
     // activation of selected tool
     // deactivation of previous selected tool
+    const [prevTool, setPrevTool] = useState(null);
+
     useEffect(() => {
         if (prevTool && selectorToolsRefs.current[prevTool]) {
             selectorToolsRefs.current[prevTool].deactivate();

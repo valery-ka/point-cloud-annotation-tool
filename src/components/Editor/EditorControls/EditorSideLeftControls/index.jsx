@@ -1,5 +1,5 @@
 import { memo } from "react";
-import { faHandPointer, faSignOutAlt } from "@fortawesome/free-solid-svg-icons";
+import { faHandPointer, faSignOutAlt, faSatellite } from "@fortawesome/free-solid-svg-icons";
 
 import { useTranslation } from "react-i18next";
 import { useEditor, useCuboids, useTools } from "contexts";
@@ -18,21 +18,34 @@ export const EditorSideLeftControls = memo(() => {
     const { t } = useTranslation();
 
     const { selectedClassIndex, hasFilterSelectionPoint } = useEditor();
-    const { selectedTool, setSelectedTool } = useTools();
+    const { selectedTool, setSelectedTool, savedPolygonState } = useTools();
     const { selectedCuboid } = useCuboids();
 
     return (
         <div className="controls-side-left">
-            <RenderEditorButton
-                className={`tool-3d-control-button single ${
-                    selectedTool === DEFAULT_TOOL ? "selected" : ""
-                }`}
-                title={t(`${COMPONENT_NAME}${DEFAULT_TOOL}`)}
-                actionType={"tools"}
-                action={DEFAULT_TOOL}
-                icon={faHandPointer}
-                onClick={() => setSelectedTool(DEFAULT_TOOL)}
-            />
+            <div className="tool-3d-controls-group--horizontal">
+                <RenderEditorButton
+                    className={`tool-3d-control-button single ${
+                        selectedTool === DEFAULT_TOOL ? "selected" : ""
+                    }`}
+                    title={t(`${COMPONENT_NAME}${DEFAULT_TOOL}`)}
+                    actionType={"tools"}
+                    action={DEFAULT_TOOL}
+                    icon={faHandPointer}
+                    onClick={() => setSelectedTool(DEFAULT_TOOL)}
+                />
+                <RenderEditorButton
+                    className={`tool-3d-control-button single ${
+                        savedPolygonState && typeof selectedClassIndex === "number"
+                            ? ""
+                            : "disabled"
+                    }`}
+                    title={t(`${COMPONENT_NAME}propagateLastPolygon`)}
+                    actionType={"tools"}
+                    action="propagateLastPolygon"
+                    icon={faSatellite}
+                />
+            </div>
 
             {selectedClassIndex !== null && <ToolsButtons />}
             {selectedCuboid && <TransformControlsButtons />}

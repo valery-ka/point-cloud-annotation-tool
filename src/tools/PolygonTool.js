@@ -1,4 +1,5 @@
 import SelectorTools from "./SelectorTools";
+import { selectByPolygon } from "utils/tools";
 
 export default class PolygonTool extends SelectorTools {
     constructor(props) {
@@ -58,26 +59,31 @@ export default class PolygonTool extends SelectorTools {
         }
     }
 
-    /** TODO: в будущем можно добавить кнопку, которая будет запомнить положение камеры и нарисованный полигон
-     *  и затем просто одним нажатием красить на нужном кадре нужную область.
-     */
     confirmSelection(ev) {
         if (!this.isDrawing) return;
         if (ev.key === "Enter" || ev.key === " ") {
-            let lastPoint = null;
             if (this.polygon.length > 3) {
-                lastPoint = this.polygon.pop();
+                this.polygon.pop();
             }
 
+            this.callbacks.savePolygonState([...this.polygon]);
             this.selectByPolygon(this.polygon);
-
-            if (lastPoint) {
-                this.polygon.push(lastPoint);
-            }
-
+            this.reset();
+            this.updateDrawingStatus(false);
+            this.canvasSelectionIsDirty = true;
             this.saveFrame();
         }
         this.clearHoveredPoint();
+    }
+
+    selectBySavedPolygon({ cloudData, selectionData, polygonParams }) {
+        const { paintSelectedPoints, handleSelectedPointsSize } = this.callbacks;
+        const selectedPoints = selectByPolygon({ cloudData, selectionData, polygonParams });
+
+        paintSelectedPoints?.("paintFill", selectedPoints);
+        handleSelectedPointsSize?.(selectedPoints);
+
+        this.saveFrame();
     }
 
     handleMouseMove(ev) {

@@ -26,12 +26,14 @@ export const FileManagerProvider = ({ children }) => {
         }
 
         const imagesByCamera = folderFiles.images;
-        const imagesPaths = Object.fromEntries(
-            Object.entries(imagesByCamera).map(([cameraName, files]) => [
-                cameraName,
-                files.map((file) => NAVIGATOR.IMG(folder, cameraName, file)),
-            ]),
-        );
+        const imagesPaths = imagesByCamera
+            ? Object.fromEntries(
+                  Object.entries(imagesByCamera).map(([cameraName, files]) => [
+                      cameraName,
+                      files.map((file) => NAVIGATOR.IMG(folder, cameraName, file)),
+                  ]),
+              )
+            : {};
 
         setFolderName(folder);
         setPcdFiles(pcdPaths);
