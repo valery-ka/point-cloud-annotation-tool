@@ -7,7 +7,8 @@ import { useSubscribeFunction } from "hooks";
 import { ModerationMenu } from "./ModerationMenu";
 import { ObjectsMenu } from "./ObjectsMenu";
 
-const OPEN_OBJECTS_MENU = (event) => event.button === 0 && event.ctrlKey;
+const OPEN_OBJECTS_MENU = (event, isDetectionTask) =>
+    event.button === 0 && event.ctrlKey && isDetectionTask;
 const OPEN_MODERATION_MENU = (event) => event.button === 2 && event.ctrlKey;
 const CONTEXT_MENU_CONTAINER = ".tool-3d-container";
 const CONTEXT_MENU_RESET_POSITION = { x: -1000, y: -1000 };
@@ -16,7 +17,7 @@ export const EditorContextMenu = () => {
     const { cameraRef } = useEditor();
     const { highlightedPoint } = useHoveredPoint();
     const { selectedTool } = useTools();
-    const { isModerationJob } = useConfig();
+    const { isModerationJob, isDetectionTask } = useConfig();
 
     const menuRefs = useRef({});
 
@@ -248,7 +249,7 @@ export const EditorContextMenu = () => {
                     handleModerationMenuOpen(event);
                     return;
                 }
-                if (OPEN_OBJECTS_MENU(event)) {
+                if (OPEN_OBJECTS_MENU(event, isDetectionTask)) {
                     handleObjectsMenuOpen(event);
                     return;
                 }
@@ -256,7 +257,13 @@ export const EditorContextMenu = () => {
 
             resetContextMenu();
         },
-        [handleModerationMenuOpen, handleObjectsMenuOpen, resetContextMenu, isTextInputOpened],
+        [
+            handleModerationMenuOpen,
+            handleObjectsMenuOpen,
+            resetContextMenu,
+            isTextInputOpened,
+            isDetectionTask,
+        ],
     );
 
     const handleKeyDown = useCallback(

@@ -107,7 +107,11 @@ export const showFilterPointsBySelection = ({ cloudData, filterData, index }) =>
 export const updateObjectsFilter = (unit, action, index, classesData, cuboidsData) => {
     ACTIONS[action]?.classFilter(classesData);
     ACTIONS[action]?.cuboidFilter(cuboidsData);
-    classesData[Object.keys(classesData)[0]].show = false;
+
+    const VOIDClassKey = Object.keys(classesData)[0];
+    if (VOIDClassKey && classesData[VOIDClassKey]) {
+        classesData[VOIDClassKey].show = false;
+    }
 
     switch (unit) {
         case "class":
@@ -137,8 +141,8 @@ export const updateObjectsFilter = (unit, action, index, classesData, cuboidsDat
     cuboidList.forEach((cuboidObj) => {
         if (inShowMode) {
             cuboidObj.visible = showCuboids.includes(cuboidObj);
-            if (!showClasses.length) {
-                classesData[Object.keys(classesData)[0]].visible = true;
+            if (!showClasses.length && VOIDClassKey && classesData[VOIDClassKey]) {
+                classesData[VOIDClassKey].visible = true;
             }
         } else {
             cuboidObj.visible = !cuboidObj.hide;

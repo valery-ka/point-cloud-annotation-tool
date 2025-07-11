@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from "react";
 import { useThree } from "@react-three/fiber";
 
-import { useFileManager, useEditor, useSettings, useLoading } from "contexts";
+import { useFileManager, useEditor, useSettings, useLoading, useConfig } from "contexts";
 import { useLabelsLoader, useObjectsLoader } from "hooks";
 
 import { CloudPointShader } from "shaders";
@@ -30,6 +30,8 @@ export const usePointCloudLoader = (THEME_COLORS) => {
     const { setGlobalIsLoading, setLoadingProgress, loadedData, setLoadedData } = useLoading();
     const { pointCloudRefs, pointLabelsRef, prevLabelsRef } = useEditor();
 
+    const { isSemanticSegmentationTask } = useConfig();
+
     const POINT_MATERIAL = useMemo(() => {
         return CloudPointShader({
             sizeMultiplier: POINT_SIZE_MULTIPLIER,
@@ -42,11 +44,7 @@ export const usePointCloudLoader = (THEME_COLORS) => {
     const { findPointsInsideCuboids } = useObjectsLoader();
 
     useEffect(() => {
-        if (
-            !availableLabels.size ||
-            Object.values(loadedData.solution).some((sol) => sol === false)
-        )
-            return;
+        if (Object.values(loadedData.solution).some((sol) => sol === false)) return;
 
         const message = "loadingFrames";
         const loaderWorker = PCDLoaderWorker();
@@ -92,6 +90,7 @@ export const usePointCloudLoader = (THEME_COLORS) => {
                     prevLabelsRef,
                     availableLabels,
                     loadLabels,
+                    isSemanticSegmentationTask,
                 });
 
                 loadedFrames++;
@@ -134,7 +133,7 @@ export const usePointCloudLoader = (THEME_COLORS) => {
         return () => {
             cleanupPointClouds(scene, pointCloudRefs, pointLabelsRef, prevLabelsRef, loaderWorker);
         };
-    }, [pcdFiles, loadedData.solution]);
+    }, [pcdFiles, loadedData.solution, isSemanticSegmentationTask]);
 
     useEffect(() => {
         return () => console.log("ДУ НОТ ФОРГЕТ ТУ ОЧИСТИТЬ СЦЕНУ ХРИСТА РАДИ!!!!!!!!!");

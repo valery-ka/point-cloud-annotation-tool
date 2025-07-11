@@ -1,4 +1,7 @@
 {
     "type": "annotation",
+    "detection_task": true,
+    "semantic_segmentation_task": true,
+    "instance_segmentation_task": false,
     "default_camera": "camera_front"
 }

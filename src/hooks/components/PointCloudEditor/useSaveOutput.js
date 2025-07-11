@@ -8,6 +8,7 @@ import {
     useCuboids,
     useBatch,
     useLoading,
+    useConfig,
 } from "contexts";
 import { useSubscribeFunction, useDebouncedCallback } from "hooks";
 
@@ -28,6 +29,8 @@ export const useSaveOutput = (updateUndoRedoState) => {
 
     const { prevCuboidsRef, cuboidsSolutionRef, cuboidEditingFrameRef } = useCuboids();
     const { batchEditingFrameRef } = useBatch();
+
+    const { isDetectionTask, isSemanticSegmentationTask } = useConfig();
 
     const [hasUnsavedSolution, setHasUnsavedSolution] = useState(false);
 
@@ -144,7 +147,7 @@ export const useSaveOutput = (updateUndoRedoState) => {
 
     const requestSaveLabels = useCallback(
         ({ updateStack = true, isAutoSave = false }) => {
-            if (!pcdFiles.length) return;
+            if (!pcdFiles.length || !isSemanticSegmentationTask) return;
 
             const activeFrameFilePath = pcdFiles[activeFrameIndex];
             const activeFrameLabels = pointLabelsRef.current[activeFrameFilePath];
@@ -181,12 +184,12 @@ export const useSaveOutput = (updateUndoRedoState) => {
 
             debouncedSaveLabels(newController);
         },
-        [saveLabelsSolution, pcdFiles, activeFrameIndex],
+        [saveLabelsSolution, pcdFiles, activeFrameIndex, isSemanticSegmentationTask],
     );
 
     const requestSaveObjects = useCallback(
         ({ updateStack = true, isAutoSave = false, id = null }) => {
-            if (!pcdFiles.length) return;
+            if (!pcdFiles.length || !isDetectionTask) return;
 
             const frame =
                 batchEditingFrameRef.current ?? cuboidEditingFrameRef.current ?? activeFrameIndex;
@@ -233,7 +236,7 @@ export const useSaveOutput = (updateUndoRedoState) => {
 
             debouncedSaveObjects(newController);
         },
-        [saveObjectsSolution, pcdFiles, activeFrameIndex],
+        [saveObjectsSolution, pcdFiles, activeFrameIndex, isDetectionTask],
     );
 
     useEffect(() => {

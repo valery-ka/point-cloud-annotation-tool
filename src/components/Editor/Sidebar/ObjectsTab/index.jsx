@@ -203,31 +203,38 @@ export const ObjectsTab = memo(({ title }) => {
                 </div>
             </div>
             <div className="sidebar-content">
-                <div className="classes-list">
-                    {nonHiddenClasses.map((cls, idx) => (
-                        <ClassItem
-                            key={idx}
-                            cls={cls}
-                            index={cls.originalIndex}
-                            action={`selectClass${cls.originalIndex}`}
-                            hotkey={hotkeys["selectClass"]?.[`selectClass${cls.originalIndex}`]}
-                            isSelected={selectedClassIndex === idx}
-                            isVisible={handleIsClassVisible(cls.originalIndex)}
-                        />
-                    ))}
-                </div>
-                <div className="cuboids-list">
-                    {cuboids.length > 0 &&
-                        cuboids.map((obj, idx) => (
-                            <CuboidItem
-                                key={idx}
-                                obj={obj}
-                                index={obj.id}
-                                action={`selectObject${obj.id}`}
-                                isSelected={selectedCuboid?.id === obj?.id}
-                                isVisible={handleIsObjectVisible(obj?.id)}
-                            />
-                        ))}
+                <div className="objects-list">
+                    {nonHiddenClasses.length > 0 && (
+                        <div className="classes-list">
+                            {nonHiddenClasses.map((cls, idx) => (
+                                <ClassItem
+                                    key={idx}
+                                    cls={cls}
+                                    index={cls.originalIndex}
+                                    action={`selectClass${cls.originalIndex}`}
+                                    hotkey={
+                                        hotkeys["selectClass"]?.[`selectClass${cls.originalIndex}`]
+                                    }
+                                    isSelected={selectedClassIndex === idx}
+                                    isVisible={handleIsClassVisible(cls.originalIndex)}
+                                />
+                            ))}
+                        </div>
+                    )}
+                    {cuboids.length > 0 && (
+                        <div className="cuboids-list">
+                            {cuboids.map((obj, idx) => (
+                                <CuboidItem
+                                    key={idx}
+                                    obj={obj}
+                                    index={obj.id}
+                                    action={`selectObject${obj.id}`}
+                                    isSelected={selectedCuboid?.id === obj?.id}
+                                    isVisible={handleIsObjectVisible(obj?.id)}
+                                />
+                            ))}
+                        </div>
+                    )}
                 </div>
             </div>
             <ContextMenu

@@ -9,7 +9,7 @@ import { addCuboid, getPointsInsideCuboid } from "utils/cuboids";
 export const useObjectsLoader = () => {
     const { scene } = useThree();
 
-    const { config } = useConfig();
+    const { config, isDetectionTask } = useConfig();
     const { pointCloudRefs } = useEditor();
     const { pcdFiles, folderName } = useFileManager();
     const { loadedData, setLoadedData, setLoadingProgress } = useLoading();
@@ -79,6 +79,11 @@ export const useObjectsLoader = () => {
             }));
         };
 
+        if (!isDetectionTask) {
+            onFinish();
+            return;
+        }
+
         const loadAllObjects = async () => {
             setLoadingProgress({ message: message, progress: 0, isLoading: true });
             if (!objectsCacheRef.current[folderName]) {
@@ -135,7 +140,7 @@ export const useObjectsLoader = () => {
         if (folderName.length) {
             loadAllObjects();
         }
-    }, [folderName, config, loadedData.odometry]);
+    }, [folderName, config, loadedData.odometry, isDetectionTask]);
 
     return { findPointsInsideCuboids };
 };

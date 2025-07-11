@@ -40,6 +40,7 @@ export const getLabelsForFile = async ({
     prevLabelsRef,
     availableLabels,
     loadLabels,
+    isSemanticSegmentationTask,
 }) => {
     const path = filePath.split("/");
     const fileName = path.pop();
@@ -63,8 +64,13 @@ export const getLabelsForFile = async ({
         availableLabels.has(label) ? label : 0,
     );
 
-    pointLabelsRef.current[filePath] = new Uint8Array(updatedLabels);
-    prevLabelsRef.current[filePath] = new Uint8Array(updatedLabels);
+    pointLabelsRef.current[filePath] = isSemanticSegmentationTask
+        ? new Uint8Array(updatedLabels)
+        : new Uint8Array(numPoints).fill(0);
+
+    prevLabelsRef.current[filePath] = isSemanticSegmentationTask
+        ? new Uint8Array(updatedLabels)
+        : new Uint8Array(numPoints).fill(0);
 };
 
 export const setupPointCloudGeometry = (geometry) => {

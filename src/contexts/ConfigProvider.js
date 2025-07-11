@@ -16,7 +16,19 @@ export const ConfigProvider = ({ children }) => {
     const { setLoadedData, setLoadingProgress } = useLoading();
 
     const isModerationJob = useMemo(() => {
-        return config?.job?.type === "moderation";
+        return config?.job?.type === "moderation" ?? false;
+    }, [config]);
+
+    const isDetectionTask = useMemo(() => {
+        return config?.job?.detection_task ?? true;
+    }, [config]);
+
+    const isSemanticSegmentationTask = useMemo(() => {
+        return config?.job?.semantic_segmentation_task ?? true;
+    }, [config]);
+
+    const isInstanceSegmentationTask = useMemo(() => {
+        return config?.job?.instance_segmentation_task ?? false;
     }, [config]);
 
     useEffect(() => {
@@ -83,13 +95,21 @@ export const ConfigProvider = ({ children }) => {
                     originalIndex: index,
                 }))
                 .filter((cls) => !cls.hidden);
-
-            setNonHiddenClasses(filteredClasses);
+            setNonHiddenClasses(isSemanticSegmentationTask ? filteredClasses : []);
         }
-    }, [config]);
+    }, [config, isSemanticSegmentationTask]);
 
     return (
-        <ConfigContext.Provider value={{ config, nonHiddenClasses, isModerationJob }}>
+        <ConfigContext.Provider
+            value={{
+                config,
+                nonHiddenClasses,
+                isModerationJob,
+                isDetectionTask,
+                isSemanticSegmentationTask,
+                isInstanceSegmentationTask,
+            }}
+        >
             {children}
         </ConfigContext.Provider>
     );

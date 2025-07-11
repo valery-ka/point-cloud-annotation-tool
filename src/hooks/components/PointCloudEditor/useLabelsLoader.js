@@ -6,7 +6,7 @@ import { loadLabels } from "utils/editor";
 
 export const useLabelsLoader = () => {
     const { folderName } = useFileManager();
-    const { nonHiddenClasses } = useConfig();
+    const { nonHiddenClasses, isSemanticSegmentationTask } = useConfig();
     const { loadedData, setLoadedData, setLoadingProgress } = useLoading();
 
     const availableLabels = useMemo(() => {
@@ -31,6 +31,11 @@ export const useLabelsLoader = () => {
             }));
         };
 
+        if (!isSemanticSegmentationTask) {
+            onFinish();
+            return;
+        }
+
         const loadAllLabels = async () => {
             setLoadingProgress({ message: message, progress: 0, isLoading: true });
             if (!labelsCacheRef.current[folderName]) {
@@ -43,7 +48,7 @@ export const useLabelsLoader = () => {
         if (availableLabels.size) {
             loadAllLabels();
         }
-    }, [availableLabels, folderName, loadedData.odometry]);
+    }, [availableLabels, folderName, loadedData.odometry, isSemanticSegmentationTask]);
 
     return { labelsCacheRef, availableLabels };
 };
