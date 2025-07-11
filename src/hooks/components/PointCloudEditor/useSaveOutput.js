@@ -34,6 +34,8 @@ export const useSaveOutput = (updateUndoRedoState) => {
 
     const [hasUnsavedSolution, setHasUnsavedSolution] = useState(false);
 
+    const kojimaRef = useRef(null);
+
     const labelsWorker = useRef(null);
     const objectsWorker = useRef(null);
 
@@ -49,6 +51,10 @@ export const useSaveOutput = (updateUndoRedoState) => {
     }, [settings.editorSettings.performance.autoSaveTimer]);
 
     useEffect(() => {
+        kojimaRef.current = new Audio("/sounds/kojima.mp3");
+        kojimaRef.current.volume = 0.2;
+        kojimaRef.current.load();
+
         labelsWorker.current = SaveOutputWorker();
         objectsWorker.current = SaveObjectsWorker();
         return () => {
@@ -260,14 +266,10 @@ export const useSaveOutput = (updateUndoRedoState) => {
     useSubscribeFunction("saveObjectsSolution", requestSaveObjects, []);
 
     useEffect(() => {
-        const sound = new Audio("/sounds/kojima.mp3");
-        sound.volume = 0.2;
-        sound.load();
-
         const handleBeforeUnload = (event) => {
             if (hasUnsavedSolution) {
                 event.returnValue = true;
-                sound.play().catch((e) => console.error("Playback error:", e));
+                kojimaRef.current.play().catch((e) => console.error("Playback error:", e));
             }
         };
 
