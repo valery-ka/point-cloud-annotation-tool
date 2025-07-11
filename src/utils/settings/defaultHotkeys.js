@@ -11,7 +11,7 @@ export const defaultHotkeys = {
     playback: {
         goToFirstFrame: "---",
         goToPreviousFrame: ",",
-        play: "space",
+        play: "p",
         goToNextFrame: ".",
         goToLastFrame: "---",
         playCycle: "---",
