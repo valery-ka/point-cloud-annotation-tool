@@ -273,5 +273,5 @@ export const useSelectorTools = (
         };
     }, [subscribe, unsubscribe]);
 
-    return selectorToolsRefs.current;
+    return { selectorTools: selectorToolsRefs.current };
 };

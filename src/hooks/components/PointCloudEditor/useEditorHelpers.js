@@ -28,7 +28,7 @@ export const useEditorHelpers = () => {
     const { scene } = useThree();
     const { settings } = useSettings();
 
-    const { pcdFiles } = useFileManager();
+    const { pcdFiles, folderName } = useFileManager();
     const { sceneRef, pointCloudRefs } = useEditor();
     const { activeFrameIndex } = useFrames();
     const { globalIsLoading } = useLoading();
@@ -124,7 +124,7 @@ export const useEditorHelpers = () => {
     }, [selectedCamera]);
 
     useEffect(() => {
-        if (!calibrations || !scene || isEmpty(loadedImages)) return;
+        if (!calibrations || isEmpty(loadedImages)) return;
 
         const cameraDimensions = {};
 
@@ -195,5 +195,11 @@ export const useEditorHelpers = () => {
         setCameraColor(selectedCamera);
     }, [showCameraPositions, calibrations, loadedImages, scene]);
 
-    return updateGlobalBox;
+    useEffect(() => {
+        return () => {
+            cameraMeshes.current = {};
+        };
+    }, [folderName]);
+
+    return { updateGlobalBox };
 };

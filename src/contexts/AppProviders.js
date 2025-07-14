@@ -19,13 +19,13 @@ import {
 const DataProviders = ({ children }) => (
     <EventProvider>
         <LoadingProvider>
-            <FramesProvider>
-                <FileManagerProvider>
-                    <ConfigProvider>
+            <FileManagerProvider>
+                <ConfigProvider>
+                    <FramesProvider>
                         <ModerationProvider>{children}</ModerationProvider>
-                    </ConfigProvider>
-                </FileManagerProvider>
-            </FramesProvider>
+                    </FramesProvider>
+                </ConfigProvider>
+            </FileManagerProvider>
         </LoadingProvider>
     </EventProvider>
 );
@@ -34,11 +34,11 @@ const PointCloudProvider = ({ children }) => (
     <EditorProvider>
         <ToolsProvider>
             <HoveredPointProvider>
-                <CuboidsProvider>
-                    <OdometryProvider>
+                <OdometryProvider>
+                    <CuboidsProvider>
                         <BatchProvider>{children}</BatchProvider>
-                    </OdometryProvider>
-                </CuboidsProvider>
+                    </CuboidsProvider>
+                </OdometryProvider>
             </HoveredPointProvider>
         </ToolsProvider>
     </EditorProvider>

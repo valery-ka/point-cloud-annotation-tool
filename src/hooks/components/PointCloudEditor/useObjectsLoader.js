@@ -65,7 +65,7 @@ export const useObjectsLoader = () => {
     };
 
     useEffect(() => {
-        if (!config.objects || !loadedData.odometry) return;
+        if (!config.objects || !loadedData.odometry || !loadedData.isLoadingRunning) return;
         const message = "loadingObjects";
 
         const onFinish = () => {
@@ -140,7 +140,7 @@ export const useObjectsLoader = () => {
         if (folderName.length) {
             loadAllObjects();
         }
-    }, [folderName, config, loadedData.odometry, isDetectionTask]);
+    }, [folderName, config, loadedData.odometry, loadedData.isLoadingRunning, isDetectionTask]);
 
     return { findPointsInsideCuboids };
 };

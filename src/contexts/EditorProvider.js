@@ -1,9 +1,13 @@
-import { createContext, useContext, useState, useRef } from "react";
+import { createContext, useContext, useState, useRef, useEffect } from "react";
+
+import { useLoading } from "contexts";
 
 const EditorContext = createContext();
 
 // РАБОТАЕТ - НЕ ТРОГАЙ
 export const EditorProvider = ({ children }) => {
+    const { isCleaningUp, setIsCleaningUp } = useLoading();
+
     const pointCloudRefs = useRef({});
 
     const [pendingSaveState, setPendingSaveState] = useState(false);
@@ -30,6 +34,34 @@ export const EditorProvider = ({ children }) => {
     const isIntersectingMap = useRef(new Map());
 
     const cloudPointsColorNeedsUpdateRef = useRef(false);
+
+    useEffect(() => {
+        if (!isCleaningUp.moderation) return;
+
+        pointCloudRefs.current = {};
+
+        setPendingSaveState(false);
+        setSelectedClassIndex(null);
+        setPixelProjections(new Float32Array());
+
+        classesVisibilityRef.current = {};
+        setHasFilterSelectionPoint(false);
+
+        pointLabelsRef.current = {};
+        prevLabelsRef.current = {};
+
+        undoStackRef.current = {};
+        redoStackRef.current = {};
+
+        isIntersectingMap.current = new Map();
+
+        cloudPointsColorNeedsUpdateRef.current = false;
+
+        setIsCleaningUp((prev) => ({
+            ...prev,
+            editor: true,
+        }));
+    }, [isCleaningUp.moderation]);
 
     return (
         <EditorContext.Provider

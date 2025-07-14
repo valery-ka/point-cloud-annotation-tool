@@ -89,21 +89,3 @@ export const setupPointCloudGeometry = (geometry) => {
 export const createPointCloud = (geometry, material) => {
     return new Points(geometry, material);
 };
-
-export const cleanupPointClouds = (
-    scene,
-    pointCloudRefs,
-    pointLabelsRef,
-    prevLabelsRef,
-    loaderWorker,
-) => {
-    Object.values(pointCloudRefs.current).forEach((pointCloud) => {
-        scene.remove(pointCloud);
-    });
-
-    pointCloudRefs.current = {};
-    pointLabelsRef.current = {};
-    prevLabelsRef.current = {};
-
-    loaderWorker.terminate();
-};

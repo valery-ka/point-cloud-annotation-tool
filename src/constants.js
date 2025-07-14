@@ -58,7 +58,7 @@ export const SIDE_VIEWS_GAP = 2;
 export const INITIAL_SIDE_VIEWS_ZOOM = 0.8;
 
 // save
-export const SAVE_LABELS_REQUEST_TIME = 500;
+export const SAVE_LABELS_REQUEST_TIME = 1000;
 export const SAVE_OBJECTS_REQUEST_TIME = 1000;
 export const UNDO_REDO_STACK_DEPTH = 10;
 

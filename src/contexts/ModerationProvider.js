@@ -9,8 +9,11 @@ const { NAVIGATOR } = API_PATHS;
 const ModerationContext = createContext();
 
 export const ModerationProvider = ({ children }) => {
-    const { isModerationJob } = useConfig();
     const { folderName } = useFileManager();
+
+    const { isModerationJob } = useConfig();
+
+    const { isCleaningUp, setIsCleaningUp } = useLoading();
     const { loadedData, setLoadedData, setLoadingProgress } = useLoading();
 
     const [issues, setIssues] = useState([]);
@@ -24,7 +27,7 @@ export const ModerationProvider = ({ children }) => {
     );
 
     useEffect(() => {
-        if (!folderName.length || !loadedData.odometry) return;
+        if (!folderName.length || !loadedData.odometry || !loadedData.isLoadingRunning) return;
 
         const message = "loadingModeration";
 
@@ -60,7 +63,19 @@ export const ModerationProvider = ({ children }) => {
         };
 
         fetchModerationData();
-    }, [folderName, loadedData.odometry]);
+    }, [folderName, loadedData.odometry, loadedData.isLoadingRunning]);
+
+    useEffect(() => {
+        if (!isCleaningUp.frames) return;
+
+        setIssues([]);
+        setIsIssuesHidden(false);
+
+        setIsCleaningUp((prev) => ({
+            ...prev,
+            moderation: true,
+        }));
+    }, [isCleaningUp.frames]);
 
     return (
         <ModerationContext.Provider

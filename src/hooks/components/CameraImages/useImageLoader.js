@@ -16,7 +16,7 @@ import { buildImagePointsGeometry } from "utils/calibrations";
 export const useImageLoader = () => {
     const { config } = useConfig();
     const { settings } = useSettings();
-    const { images } = useFileManager();
+    const { images, folderName } = useFileManager();
     const { pointCloudRefs } = useEditor();
     const {
         setAspectRatio,
@@ -40,7 +40,7 @@ export const useImageLoader = () => {
     }, []); // <-- да, без зависимостей
 
     useEffect(() => {
-        if (!loadedData.pointclouds) return;
+        if (!loadedData.pointclouds || !loadedData.isLoadingRunning) return;
         const message = "loadingImages";
 
         setTopLoaderLoadingProgress({ message: message, progress: 0, isLoading: true });
@@ -54,6 +54,7 @@ export const useImageLoader = () => {
             setLoadedData((prev) => ({
                 ...prev,
                 images: true,
+                isLoadingRunning: false,
             }));
             topLoaderBarRef?.current?.complete();
         };
@@ -116,9 +117,5 @@ export const useImageLoader = () => {
                 };
             }
         });
-
-        return () => {
-            projectedPointsRef.current = {};
-        };
-    }, [images, loadedData.pointclouds]);
+    }, [folderName, loadedData.pointclouds, loadedData.isLoadingRunning]);
 };

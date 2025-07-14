@@ -14,7 +14,6 @@ import {
     setupPointCloudGeometry,
     getLabelsForFile,
     createPointCloud,
-    cleanupPointClouds,
 } from "utils/editor";
 
 import * as APP_CONSTANTS from "constants";
@@ -44,7 +43,11 @@ export const usePointCloudLoader = (THEME_COLORS) => {
     const { findPointsInsideCuboids } = useObjectsLoader();
 
     useEffect(() => {
-        if (Object.values(loadedData.solution).some((sol) => sol === false)) return;
+        if (
+            Object.values(loadedData.solution).some((sol) => sol === false) ||
+            !loadedData.isLoadingRunning
+        )
+            return;
 
         const message = "loadingFrames";
         const loaderWorker = PCDLoaderWorker();
@@ -129,13 +132,5 @@ export const usePointCloudLoader = (THEME_COLORS) => {
         for (let i = 0; i < MAX_WORKERS; i++) {
             processNextFile();
         }
-
-        return () => {
-            cleanupPointClouds(scene, pointCloudRefs, pointLabelsRef, prevLabelsRef, loaderWorker);
-        };
-    }, [pcdFiles, loadedData.solution, isSemanticSegmentationTask]);
-
-    useEffect(() => {
-        return () => console.log("ДУ НОТ ФОРГЕТ ТУ ОЧИСТИТЬ СЦЕНУ ХРИСТА РАДИ!!!!!!!!!");
-    }, [folderName]);
+    }, [pcdFiles, loadedData.solution, loadedData.isLoadingRunning, isSemanticSegmentationTask]);
 };

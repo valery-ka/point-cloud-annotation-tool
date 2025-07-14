@@ -31,7 +31,7 @@ export const useWorldShifting = () => {
     //
     // Fetch odometry start
     useEffect(() => {
-        if (!pcdFiles.length || !loadedData.calibrations) return;
+        if (!pcdFiles.length || !loadedData.calibrations || !loadedData.isLoadingRunning) return;
         const message = "loadingOdometry";
         let loadedOdometriesCount = 0;
 
@@ -86,7 +86,7 @@ export const useWorldShifting = () => {
         };
 
         loadAllOdometries();
-    }, [folderName, loadedData.calibrations]);
+    }, [folderName, loadedData.calibrations, loadedData.isLoadingRunning]);
     // Fetch odometry end
     //
 

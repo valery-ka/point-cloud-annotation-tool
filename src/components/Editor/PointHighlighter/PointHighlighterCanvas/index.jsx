@@ -63,7 +63,7 @@ export const PointHighlighterCanvas = memo(({ image, positions }) => {
         <Canvas orthographic className="chessboard">
             {imageRef.current?.texture && (
                 <>
-                    <HighlightedPointGeometryUpdater image={image} />
+                    <HighlightedPointGeometryUpdater image={image} positions={positions} />
                     <ImageCameraControls
                         image={image}
                         enabled={true}

@@ -4,7 +4,7 @@ import { useThree } from "@react-three/fiber";
 export const useCanvasResize = (requestPixelProjectionsUpdate) => {
     const { gl } = useThree();
 
-    const [size, setSize] = useState({
+    const [glSize, setGlSize] = useState({
         width: gl.domElement.width,
         height: gl.domElement.height,
     });
@@ -12,7 +12,7 @@ export const useCanvasResize = (requestPixelProjectionsUpdate) => {
     useEffect(() => {
         const observer = new ResizeObserver(([entry]) => {
             const { width, height } = entry.contentRect;
-            setSize({ width, height });
+            setGlSize({ width, height });
             requestPixelProjectionsUpdate?.();
         });
 
@@ -20,5 +20,5 @@ export const useCanvasResize = (requestPixelProjectionsUpdate) => {
         return () => observer.disconnect();
     }, [gl]);
 
-    return size;
+    return { glSize };
 };

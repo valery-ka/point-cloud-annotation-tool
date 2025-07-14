@@ -1,4 +1,7 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
+
+import { useLoading } from "contexts";
+
 import * as APP_CONSTANTS from "constants";
 
 const { DEFAULT_TOOL, DEFAULT_MODE } = APP_CONSTANTS;
@@ -11,6 +14,23 @@ export const ToolsProvider = ({ children }) => {
     const [isDrawing, setIsDrawing] = useState(false);
 
     const [savedPolygonState, setSavedPolygonState] = useState(null);
+
+    const { isCleaningUp, setIsCleaningUp } = useLoading();
+
+    useEffect(() => {
+        if (!isCleaningUp.editor) return;
+
+        setSelectionMode(DEFAULT_MODE);
+        setSelectedTool(DEFAULT_TOOL);
+        setIsDrawing(false);
+
+        setSavedPolygonState(null);
+
+        setIsCleaningUp((prev) => ({
+            ...prev,
+            tools: true,
+        }));
+    }, [isCleaningUp.editor]);
 
     return (
         <ToolsContext.Provider

@@ -13,7 +13,7 @@ export const useFetchCalibrations = () => {
     const { loadedData, setLoadedData, setLoadingProgress } = useLoading();
 
     useEffect(() => {
-        if (!folderName || !loadedData.config) return;
+        if (!folderName || !loadedData.config || !loadedData.isLoadingRunning) return;
         const message = "loadingCalibrations";
         let loadedCalibrations = 0;
 
@@ -61,5 +61,5 @@ export const useFetchCalibrations = () => {
         };
 
         fetchCalibrations();
-    }, [folderName, loadedData.config]);
+    }, [folderName, loadedData.config, loadedData.isLoadingRunning]);
 };

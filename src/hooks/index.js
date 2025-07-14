@@ -43,6 +43,7 @@ export { useRaycastClickSelect } from "./components/PointCloudEditor/useRaycastC
 export { useEditorFrameSwitcher } from "./components/PointCloudEditor/useEditorFrameSwitcher";
 export { useFramePointsVisibility } from "./components/PointCloudEditor/useFramePointsVisibility";
 export { useUpdatePixelProjections } from "./components/PointCloudEditor/useUpdatePixelProjections";
+export { usePointCloudEditorWillUnmount } from "./components/PointCloudEditor/usePointCloudEditorWillUnmount";
 
 export { usePlayback } from "./components/FrameSwitcher/usePlayback";
 export { useFrameSwitcher } from "./components/FrameSwitcher/useFrameSwitcher";

@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useMemo, useRef } from "react";
+import { createContext, useContext, useState, useMemo, useRef, useEffect } from "react";
 import { isEmpty } from "lodash";
 
 import { useFrames, useFileManager, useLoading } from "contexts";
@@ -10,7 +10,8 @@ const ImagesContext = createContext();
 export const ImagesProvider = ({ children }) => {
     const { images, pcdFiles } = useFileManager();
     const { activeFrameIndex } = useFrames();
-    const { globalIsLoading } = useLoading();
+
+    const { globalIsLoading, isCleaningUp, setIsCleaningUp } = useLoading();
 
     const imagePointsAlphaNeedsUpdateRef = useRef(true);
     const imagePointsColorNeedsUpdateRef = useRef(true);
@@ -49,6 +50,22 @@ export const ImagesProvider = ({ children }) => {
             images[selectedCamera]?.find((imagePath) => imagePath.includes(frameFileName)) ?? null
         );
     }, [images, selectedCamera, frameFileName]);
+
+    useEffect(() => {
+        if (!isCleaningUp.calibrations) return;
+
+        setImageMaximized(false);
+        setLoadedImages({});
+        setSelectedCamera(null);
+
+        setAspectRatio(1);
+        setImageHeight(MIN_IMAGE_HEIGHT);
+
+        setIsCleaningUp((prev) => ({
+            ...prev,
+            images: true,
+        }));
+    }, [isCleaningUp.calibrations]);
 
     return (
         <ImagesContext.Provider

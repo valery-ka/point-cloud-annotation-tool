@@ -8,13 +8,13 @@ import { CuboidsHtml } from "./DreiHtml/CuboidsHtml";
 export const PointCloudEditor = memo(() => {
     const { THEME_COLORS } = HOOKS.useEditorTheme();
 
-    const updateGlobalBox = HOOKS.useEditorHelpers();
+    const { updateGlobalBox } = HOOKS.useEditorHelpers();
 
     HOOKS.usePointCloudLoader(THEME_COLORS);
 
-    const glSize = HOOKS.useCanvasResize(() => requestPixelProjectionsUpdate());
+    const { glSize } = HOOKS.useCanvasResize(() => requestPixelProjectionsUpdate());
 
-    const requestPixelProjectionsUpdate = HOOKS.useUpdatePixelProjections(glSize);
+    const { requestPixelProjectionsUpdate } = HOOKS.useUpdatePixelProjections(glSize);
 
     HOOKS.useCameraControls(requestPixelProjectionsUpdate);
 
@@ -30,7 +30,7 @@ export const PointCloudEditor = memo(() => {
     const { handlePointCloudColors, paintSelectedPoints } =
         HOOKS.usePaintFramePoints(updateGlobalBox);
 
-    const selectorTools = HOOKS.useSelectorTools(
+    const { selectorTools } = HOOKS.useSelectorTools(
         paintSelectedPoints,
         filterSelectedPoints,
         handleSelectedPointsSize,
@@ -58,6 +58,8 @@ export const PointCloudEditor = memo(() => {
         handlePointsSize,
         filterFramePoints,
     });
+
+    HOOKS.usePointCloudEditorWillUnmount();
 
     return (
         <>

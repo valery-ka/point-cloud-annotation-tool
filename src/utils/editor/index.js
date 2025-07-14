@@ -65,5 +65,4 @@ export {
     setupPointCloudGeometry,
     getLabelsForFile,
     createPointCloud,
-    cleanupPointClouds,
 } from "./geometry/loader";

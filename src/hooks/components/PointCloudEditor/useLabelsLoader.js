@@ -17,7 +17,7 @@ export const useLabelsLoader = () => {
     const labelsCacheRef = useRef({});
 
     useEffect(() => {
-        if (!loadedData.odometry) return;
+        if (!loadedData.odometry || !loadedData.isLoadingRunning) return;
         const message = "loadingLabels";
 
         const onFinish = () => {
@@ -48,7 +48,13 @@ export const useLabelsLoader = () => {
         if (availableLabels.size) {
             loadAllLabels();
         }
-    }, [availableLabels, folderName, loadedData.odometry, isSemanticSegmentationTask]);
+    }, [
+        availableLabels,
+        folderName,
+        loadedData.odometry,
+        loadedData.isLoadingRunning,
+        isSemanticSegmentationTask,
+    ]);
 
     return { labelsCacheRef, availableLabels };
 };

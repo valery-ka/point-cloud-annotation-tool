@@ -2,7 +2,7 @@ import { useEffect, useRef, useCallback } from "react";
 import { useThree, useFrame } from "@react-three/fiber";
 import { Euler } from "three";
 
-import { useCuboids, useFileManager } from "contexts";
+import { useCuboids } from "contexts";
 import { useSideViewsRenderer, useBatchEditor } from "hooks";
 
 import {
@@ -15,7 +15,6 @@ import {
 export const useOrthographicView = (handlers) => {
     const { size } = useThree();
 
-    const { pcdFiles } = useFileManager();
     const {
         sideViews,
         setSideViews,
@@ -77,7 +76,7 @@ export const useOrthographicView = (handlers) => {
             camera: setupCamera(config.name),
         }));
         setSideViews(sideViewsList);
-    }, [pcdFiles]);
+    }, []);
 
     useFrame(() => {
         if (sideViewsCamerasNeedUpdateRef.current) {

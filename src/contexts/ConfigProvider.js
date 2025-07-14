@@ -9,11 +9,13 @@ const { NAVIGATOR } = API_PATHS;
 const ConfigContext = createContext();
 
 export const ConfigProvider = ({ children }) => {
+    const { folderName } = useFileManager();
+
     const [config, setConfig] = useState({});
     const [nonHiddenClasses, setNonHiddenClasses] = useState([]);
 
-    const { folderName } = useFileManager();
-    const { setLoadedData, setLoadingProgress } = useLoading();
+    const { setLoadedData, setLoadingProgress, isCleaningUp, setIsCleaningUp, loadedData } =
+        useLoading();
 
     const isModerationJob = useMemo(() => {
         return config?.job?.type === "moderation" ?? false;
@@ -32,7 +34,8 @@ export const ConfigProvider = ({ children }) => {
     }, [config]);
 
     useEffect(() => {
-        if (!folderName.length) return;
+        if (!folderName.length || !loadedData.isLoadingRunning) return;
+
         const message = "loadingConfig";
 
         const fetchConfig = async (endpoint, configName) => {
@@ -85,7 +88,7 @@ export const ConfigProvider = ({ children }) => {
         };
 
         loadAllConfigs();
-    }, [folderName]);
+    }, [folderName, isCleaningUp.isCleaningRunning]);
 
     useEffect(() => {
         if (config?.classes) {
@@ -98,6 +101,18 @@ export const ConfigProvider = ({ children }) => {
             setNonHiddenClasses(isSemanticSegmentationTask ? filteredClasses : []);
         }
     }, [config, isSemanticSegmentationTask]);
+
+    useEffect(() => {
+        if (!isCleaningUp.isCleaningRunning) return;
+
+        setConfig({});
+        setNonHiddenClasses([]);
+
+        setIsCleaningUp((prev) => ({
+            ...prev,
+            config: true,
+        }));
+    }, [isCleaningUp.isCleaningRunning]);
 
     return (
         <ConfigContext.Provider

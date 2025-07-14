@@ -48,5 +48,5 @@ export const useUpdatePixelProjections = (glSize) => {
         requestPixelProjectionsUpdate();
     }, [activeFrameIndex, globalIsLoading]);
 
-    return requestPixelProjectionsUpdate;
+    return { requestPixelProjectionsUpdate };
 };

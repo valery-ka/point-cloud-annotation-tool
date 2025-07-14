@@ -1,4 +1,7 @@
-import { createContext, useContext, useRef, useState } from "react";
+import { createContext, useContext, useRef, useState, useEffect } from "react";
+
+import { useLoading } from "contexts";
+
 import { INITIAL_SIDE_VIEWS_ZOOM, DEFAULT_TRANSFORM_MODE } from "constants";
 
 const CuboidsContext = createContext();
@@ -21,6 +24,8 @@ const DEFAULT_ZOOM = {
 };
 
 export const CuboidsProvider = ({ children }) => {
+    const { isCleaningUp, setIsCleaningUp } = useLoading();
+
     const cuboidsGeometriesRef = useRef({});
 
     const deletedCuboidsRef = useRef([]);
@@ -54,6 +59,49 @@ export const CuboidsProvider = ({ children }) => {
 
     const updateSingleCuboidRef = useRef({ needsUpdate: false, frame: null, id: null });
     const updateProjectedCuboidsRef = useRef(false);
+
+    useEffect(() => {
+        if (!isCleaningUp.odometry) return;
+
+        cuboidsGeometriesRef.current = {};
+
+        deletedCuboidsRef.current = [];
+        setDeletedObjects([]);
+
+        selectedCuboidGeometryRef.current = null;
+        selectedCuboidInfoRef.current = DEFAULT_INFO_CARD;
+
+        copiedPSRRef.current = null;
+
+        setCuboids([]);
+        setSelectedCuboid(null);
+        setFrameMarkers([[], []]);
+        setHoveredCuboid(null);
+
+        // setSideViews([]);
+        setHandlePositions({});
+
+        setTransformMode(DEFAULT_TRANSFORM_MODE);
+        isCuboidTransformingRef.current = false;
+        sideViewCameraZoomsRef.current = DEFAULT_ZOOM;
+        sideViewsCamerasNeedUpdateRef.current = true;
+
+        cuboidsSolutionRef.current = [];
+        prevCuboidsRef.current = [];
+        cuboidEditingFrameRef.current = null;
+
+        cuboidsVisibilityRef.current = {};
+        cuboidIdToLabelRef.current = {};
+        pointsInsideCuboidsRef.current = {};
+
+        updateSingleCuboidRef.current = { needsUpdate: false, frame: null, id: null };
+        updateProjectedCuboidsRef.current = false;
+
+        setIsCleaningUp((prev) => ({
+            ...prev,
+            cuboids: true,
+        }));
+    }, [isCleaningUp.odometry]);
 
     return (
         <CuboidsContext.Provider

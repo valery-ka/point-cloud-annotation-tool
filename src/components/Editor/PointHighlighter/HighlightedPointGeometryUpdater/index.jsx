@@ -18,7 +18,7 @@ import {
 
 const MS_TO_SEC = 1000;
 
-export const HighlightedPointGeometryUpdater = memo(({ image }) => {
+export const HighlightedPointGeometryUpdater = memo(({ image, positions }) => {
     const { pcdFiles } = useFileManager();
     const { projectedPointsRef } = useCalibrations();
     const { pointCloudRefs } = useEditor();
@@ -43,12 +43,14 @@ export const HighlightedPointGeometryUpdater = memo(({ image }) => {
 
         lastFrameTimeRef.current = now;
 
-        if (!highlightedPoint) return;
+        if (!highlightedPoint || !positions) return;
 
         const activeFrameFilePath = pcdFiles[activeFrameIndex];
         const activeFrameCloudGeometry = pointCloudRefs.current[activeFrameFilePath].geometry;
         const projectedPoints = projectedPointsRef.current;
         const imageGeometry = projectedPoints[image?.src]?.geometry;
+
+        if (!imageGeometry) return;
 
         invalidateHighlighterPointsVisibility({
             cloudData: { geometry: activeFrameCloudGeometry, point: highlightedPoint },
