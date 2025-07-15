@@ -36,7 +36,13 @@ const rotate = "rotate";
 const handleFrameShortcuts = (e, actions, batchMode) => {
     if (batchMode) return;
 
-    const frameShortcuts = {
+    const mouse = {
+        1: actions.publishToggleCuboidVisibility,
+        3: actions.publishFixOdometryFrame,
+        4: actions.publishApplyTransform,
+    };
+
+    const keyboard = {
         Tab: actions.publishOpenBatchMode,
         Digit1: actions.publishGoToPreviousFrame,
         Digit2: actions.publishGoToNextFrame,
@@ -44,9 +50,14 @@ const handleFrameShortcuts = (e, actions, batchMode) => {
         KeyX: e.ctrlKey ? actions.publishRedoAction : actions.publishCopyObjectTransform,
         KeyC: actions.publishFixOdometryFrame,
         KeyV: actions.publishApplyTransform,
+        KeyF: actions.publishFlipObjectZ,
     };
 
-    frameShortcuts[e.code]?.();
+    if (e instanceof KeyboardEvent) {
+        keyboard[e.code]?.();
+    } else if (e instanceof MouseEvent) {
+        mouse[e.button]?.();
+    }
 };
 // fixed shortcuts for hovered view end
 //
@@ -63,6 +74,7 @@ export const useSideViewsControls = ({ camera, mesh, hoveredView, hoveredHandler
         useBatchEditorEvents();
 
     const { removeKeyFrame } = useCuboidInterpolation();
+
     const actions = usePublishActions([
         "openBatchMode",
         "fixOdometryFrame",
@@ -74,6 +86,10 @@ export const useSideViewsControls = ({ camera, mesh, hoveredView, hoveredHandler
         "toggleCuboidVisibility",
         "undoAction",
         "redoAction",
+        "flipObjectZ",
+        "toggleCuboidVisibility",
+        "fixOdometryFrame",
+        "applyTransform",
     ]);
 
     const scaleHandlerRef = useRef(null);
@@ -169,9 +185,11 @@ export const useSideViewsControls = ({ camera, mesh, hoveredView, hoveredHandler
 
     const handleMouseDown = useCallback(
         (e) => {
-            if (e.button !== 0 || !mesh || !mesh.visible) return;
-
             if (!hoveredView) return;
+
+            handleFrameShortcuts(e, actions, false);
+
+            if (e.button !== 0 || !mesh || !mesh.visible) return;
 
             cameraControlsRef.current.enabled = false;
 
@@ -189,7 +207,7 @@ export const useSideViewsControls = ({ camera, mesh, hoveredView, hoveredHandler
             isCuboidTransformingRef.current = true;
             batchEditingFrameRef.current = mesh?.userData?.frame;
         },
-        [hoveredView, hoveredHandler],
+        [actions, hoveredView, hoveredHandler],
     );
 
     const handleMouseMove = useCallback(

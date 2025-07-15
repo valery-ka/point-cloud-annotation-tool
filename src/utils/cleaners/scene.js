@@ -1,4 +1,7 @@
-const isDisposableObject = (obj) => obj.isMesh || obj.isGroup || obj.isPoints || obj.isLineSegments;
+const isDisposableObject = (obj) => {
+    const isHelper = obj.isAxesHelper || obj.type === "AxesHelper";
+    return (obj.isMesh || obj.isGroup || obj.isPoints || obj.isLineSegments) && !isHelper;
+};
 
 export const clearThreeScene = (scene) => {
     const objectsToRemove = [];
