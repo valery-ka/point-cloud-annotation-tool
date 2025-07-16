@@ -3,7 +3,7 @@
         "value": "OTHER",
         "title": "Другое",
         "moderatorHint": "Любая ошибка, не подпадающая под предыдущие варианты",
-        "applicableTo": "point",
+        "applicableTo": "all",
         "icon": ""
     }
 ]

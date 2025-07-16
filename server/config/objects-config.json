@@ -1,52 +1,78 @@
 [
     {
         "vehicle": {
+            "title": "Автомобили",
+            "description": "Группа объектов с типом `vehicle`",
+            "abstract": true
+        },
+        "car": {
             "title": "Легковое авто",
-            "description": "Легковые автомобили",
+            "description": "",
+            "parent": "vehicle",
+            "type": "vehicle",
             "dimensions": {
                 "height": 1.7,
                 "length": 4.5,
                 "width": 2.0
             },
-            "color": "#fcc203"
+            "color": "#1bd6ff",
+            "attributes": ["parked", "door_open", "etalon_size"]
         },
-        "parent_truck": {
-            "title": "Грузовик",
-            "description": "Тягачи, обычные грузовики и малые грузовики.",
-            "abstract": true
-        },
-        "semitruck": {
-            "title": "Тягач фуры",
-            "description": "Тягачи, даже без прицепов.",
-            "parent": "parent_truck",
-            "dimensions": {
-                "height": 3.8,
-                "length": 6.0,
-                "width": 2.6
-            },
-            "color": "#e703fc"
-        },
-        "truck": {
-            "title": "Обычный грузовик",
-            "description": "Грузовик с несъемным кузовом.",
-            "parent": "parent_truck",
-            "dimensions": {
-                "height": 2.85,
-                "length": 8.0,
-                "width": 2.75
-            },
-            "color": "#03fc6f"
-        },
-        "pickup": {
-            "title": "«Газель» / микроавтобус / пикап",
-            "description": "Легкие коммерческие автомобили",
-            "parent": "parent_truck",
+        "van": {
+            "title": "Газель",
+            "description": "",
+            "parent": "vehicle",
+            "type": "vehicle",
             "dimensions": {
                 "height": 2.85,
                 "length": 6.0,
                 "width": 2.55
             },
-            "color": "#00ffea"
+            "color": "#1bd6ff",
+            "attributes": ["parked", "door_open", "etalon_size"]
+        },
+        "train": {
+            "title": "Поезда / локомотивы / вагоны",
+            "description": "",
+            "abstract": true
+        },
+        "train_locomotive": {
+            "title": "Локомотив поезда",
+            "description": "",
+            "parent": "train",
+            "type": "train_locomotive",
+            "dimensions": {
+                "height": 4.6,
+                "length": 10.0,
+                "width": 3.25
+            },
+            "color": "#ffcc33",
+            "attributes": []
+        },
+        "train_wagon": {
+            "title": "Вагон поезда",
+            "description": "",
+            "parent": "train",
+            "type": "train_wagon",
+            "dimensions": {
+                "height": 4.6,
+                "length": 10.0,
+                "width": 3.25
+            },
+            "color": "#ff66ff",
+            "attributes": []
+        },
+        "person": {
+            "title": "Человек",
+            "description": "",
+            "type": "person",
+            "dimensions": {
+                "height": 1.75,
+                "length": 0.7,
+                "width": 0.7
+            },
+            "color": "#ff7a52",
+            "attributes": []
         }
     }
 ]
